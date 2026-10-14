@@ -67,7 +67,8 @@ Two places only: **Library** and **Add a book**.
   segmented control in the centre, search and the account button right.
 - Phone: a two-tab bar at the bottom.
 - **No Settings tab.** The account button opens a menu with: change password,
-  Sign in with Ward (linked or not), download a full backup (.zip), sign out.
+  Sign in with Ward (linked or not), download a backup (the database file),
+  sign out.
 - **No loans** at all (owner, 2026-10-14).
 - The **wishlist** is not a place: Library has two collections, Owned and
   Wishlist, as text tabs under the page title ("Owned 14 · Wishlist 3").

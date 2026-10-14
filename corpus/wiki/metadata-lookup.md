@@ -68,8 +68,9 @@ per ~400 ms for Open Library, so 300 books take about two minutes.
 
 ## Covers
 
-Download the chosen cover once and store it at `data/covers/<book id>.jpg`,
-resized to a sensible maximum. Serve it from our API. Rejected: hotlinking
+Download the chosen cover once, on the server, from an allowlist of cover hosts
+(the SSRF guard), and store it in the `covers` table; serve it from our API.
+Photos taken in the app are resized in the browser before upload. Rejected: hotlinking
 Open Library or Google, which breaks offline, leaks every page view to them
 and runs into the cover rate limit. When there is no cover, the user can take
 a photo of the book in the book page.

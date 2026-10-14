@@ -1,11 +1,12 @@
 ---
-summary: How Shelfmark will be put together, proposed on 2026-10-14 before any code. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
+summary: How Shelfmark will be put together, specified in briefs 01-14 on 2026-10-14 before any code. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
 updated: 2026-10-14
 ---
 
 # Architecture (proposed)
 
-Nothing is built. This is the intended shape; the first brief creates it.
+Nothing is built. This is the intended shape; briefs 01 to 14 build it
+([status.md](status.md) has the order).
 
 ## Pieces
 
@@ -32,8 +33,8 @@ No CLI workspace: nothing outside the browser needs the data yet.
 | `GET /api/books` | every book, for the table |
 | `POST /api/books`, `PATCH /api/books/:id`, `DELETE /api/books/:id` | save, edit, delete |
 | `POST /api/lookup` `{ isbn }` | draft from cache, Open Library, Google Books |
-| `GET /api/books/:id/cover`, `PUT` same | serve or replace the cover |
-| `GET /api/backup` | zip of the database and covers |
+| `GET`, `PUT`, `DELETE /api/books/:id/cover`; `POST …/cover/fetch` | serve, upload, remove, or fetch a candidate from an allowed cover host |
+| `GET /api/backup` | the database file (covers included) |
 | `/auth/*` | the vendored `ward-auth` plugin: local login and Sign in with Ward |
 
 ## Request paths
@@ -53,8 +54,14 @@ The camera needs HTTPS on a phone ([scanning.md](scanning.md)): a
 
 ## Data
 
-`data/` at the repo root in dev, a mounted volume in the container:
-`shelfmark.db` and `covers/`. See [data-model.md](data-model.md).
+`data/` at the repo root in dev, a bind-mounted volume in the container:
+`shelfmark.db`, which holds the covers too. See [data-model.md](data-model.md).
+
+## Ports
+
+Dev: API `8808`, Vite `5176` (`npm run dev:https` serves Vite on the LAN over
+HTTPS for the phone camera). Production: the API container on
+`127.0.0.1:8796`. All free in the estate on 2026-10-14.
 
 ## Secrets
 

@@ -1,7 +1,7 @@
 ---
 title: Scaffold the npm workspaces
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, infra]
 ---
 
@@ -19,3 +19,5 @@ See [architecture.md](../wiki/architecture.md). Copy conventions from
 `../satchel` (root `package.json`, `tsconfig.base.json`, `.npmrc`), not its
 code. Pick current versions at build time; vite-plugin-pwa 2.0.0 was only eleven
 days old on 2026-10-14.
+
+Promoted to [brief 01](../briefs/todo/01-workspace-scaffold.md) on 2026-10-14.

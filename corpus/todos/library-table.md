@@ -1,7 +1,7 @@
 ---
 title: Library table
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, web]
 ---
 
@@ -22,3 +22,5 @@ column". Design in [library-table.md](../wiki/library-table.md).
 ## Acceptance
 
 Every column can be sorted and filtered.
+
+Promoted to [brief 08](../briefs/todo/08-library-page.md) on 2026-10-14.

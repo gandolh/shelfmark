@@ -1,7 +1,7 @@
 ---
 title: Export to CSV and Excel, and backup
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, web, server]
 ---
 
@@ -20,3 +20,5 @@ The owner asked for export to Excel/CSV. Details and the rejected libraries in
 ## Acceptance
 
 Exported files open in Excel with Romanian diacritics intact.
+
+Promoted to [brief 11](../briefs/todo/11-export-and-backup.md) on 2026-10-14.

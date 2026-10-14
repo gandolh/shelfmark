@@ -1,7 +1,7 @@
 ---
 title: Book store and CRUD API
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, server]
 ---
 
@@ -16,3 +16,5 @@ own tables. Migrations that run on boot.
 Schema proposal in [data-model.md](../wiki/data-model.md). One row per
 physical copy is decided; wishlist rows share the table; no loans
 ([decisions.md](../wiki/decisions.md)).
+
+Promoted to [brief 02](../briefs/todo/02-book-store-and-api.md) on 2026-10-14.

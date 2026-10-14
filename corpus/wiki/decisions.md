@@ -1,5 +1,5 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key. Research recommendations live on the concept pages until the owner confirms them.
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite. Research recommendations live on the concept pages until the owner confirms them.
 updated: 2026-10-14
 ---
 
@@ -91,3 +91,11 @@ K10plus 1/40, BnF 1/40, DNB and the Library of Congress 0; Jisc refuses
 scripts; the national library's own CIP catalog sits behind a CAPTCHA, which
 the app must not work around. The key lives in `.env` as
 `GOOGLE_BOOKS_API_KEY`. Details in [metadata-lookup.md](metadata-lookup.md).
+
+## Covers live in SQLite
+_2026-10-14, while writing the briefs_. Cover images are BLOBs in a `covers`
+table with `ON DELETE CASCADE`, not files in `data/covers/`. Deleting a book
+deletes its cover in the same transaction, and the backup is the database file
+alone. Rejected: a covers folder (the first design), which needs its own
+clean-up on delete and a zip to back up. At a few thousand covers of
+30-100 KB the database stays well under a gigabyte.

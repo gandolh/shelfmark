@@ -1,5 +1,5 @@
 ---
-summary: The SQLite schema, proposed on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and lookup provenance, wishlist rows in the same table; tags and the lookup cache as their own tables; how ISBNs, authors, money and dates are stored; and why there is no full-text index.
+summary: The SQLite schema as specified for brief 02 on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and lookup provenance, wishlist rows in the same table; tags, covers (as BLOBs) and the lookup cache as their own tables; no isbn10 column; how ISBNs, authors, money and dates are stored; and why there is no full-text index.
 updated: 2026-10-14
 ---
 
@@ -13,12 +13,12 @@ which the owner decided ([decisions.md](decisions.md)). Column names follow
 
 | Group | Columns |
 |---|---|
-| Identity | `id` INTEGER PK; `isbn13` TEXT nullable, indexed, **not unique**; `isbn10` TEXT nullable (derived; null for `979`); `barcode` TEXT nullable (raw non-ISBN code) |
+| Identity | `id` INTEGER PK; `isbn13` TEXT nullable, indexed, **not unique**; `barcode` TEXT nullable (raw non-ISBN code). No `isbn10` column: it is derived from `isbn13` when shown (null for `979`). |
 | Bibliographic | `title` NOT NULL; `subtitle`; `authors` (JSON array of display names); `author_sort` ("Cărtărescu, Mircea", derived, editable); `publisher`; `published_year` INTEGER; `pages` INTEGER; `language` (ISO 639-1, e.g. `ro`); `series`; `series_number` TEXT; `description`; `subjects` (JSON array) |
 | Copy | `collection` (`owned`, `wishlist`); `format` (`hardcover`, `paperback`, `other`); `condition` (`new`, `good`, `worn`, `damaged`); `shelf` TEXT ("Living room · A2"); `signed` BOOLEAN |
 | Reading | `status` (`unread`, `reading`, `read`, `abandoned`); `rating` 1-5 nullable; `notes` |
 | Acquired | `acquired_on` DATE; `acquired_from` TEXT (shop, person); `price_minor` INTEGER + `currency` (default `RON`) |
-| Provenance | `metadata_source` (`openlibrary`, `googlebooks`, `manual`, `import`); `cover_file` nullable |
+| Provenance | `metadata_source` (`openlibrary`, `googlebooks`, `manual`, `import`) |
 | Times | `created_at`, `updated_at` (UTC ISO strings) |
 
 Why one row per copy: the question the app answers is "what is on my shelves",
@@ -32,6 +32,9 @@ but doubles the join and the edit UI for a case that hardly happens.
 - **`tags`** (`id`, `name` UNIQUE) and **`book_tags`** (`book_id`, `tag_id`).
   A table, not a JSON column, so renaming a tag is one update.
 - No `loans` table: the owner dropped loans ([decisions.md](decisions.md)).
+- **`covers`**: `book_id` (PK, FK to `books` with `ON DELETE CASCADE`), `mime`,
+  `bytes` BLOB, `source`, `updated_at`. Covers live in the database, not in a
+  folder ([decisions.md](decisions.md)); `Book.hasCover` is derived from it.
 - **`lookup_cache`**: `isbn13`, `source`, `response` (raw JSON), `fetched_at`.
   Re-looking an ISBN up never hits the network twice.
 - Auth tables come from the vendored `ward-auth` library, as in Satchel.
@@ -53,5 +56,5 @@ but doubles the join and the edit UI for a case that hardly happens.
 
 ## Files
 
-`data/shelfmark.db` (WAL mode) and `data/covers/<book id>.jpg`. Both
-gitignored; both in the backup ([export.md](export.md)).
+`data/shelfmark.db` (WAL mode), gitignored. It holds everything, covers
+included, so the backup is this one file ([export.md](export.md)).

@@ -58,3 +58,15 @@ cip-bibliography-index.
 
 The owner has no spreadsheet, Goodreads or Libib list, so CSV import stays in
 v1.x and every book enters by scan, ISBN or hand. No open questions remain.
+
+## [2026-10-14] todo | Briefs 01-14 filed for v1, in six waves
+
+Fourteen briefs in `briefs/todo/`: scaffold; store and API; ISBN utilities;
+app shell and tokens; lookup and covers; camera scanner; accounts; Library
+page; Add a book page; book page; export and backup; PWA; impeccable's design
+finish and DESIGN.md; deploy. Eleven v1 todos are marked promoted; the ISBN
+utilities, app shell and design finish briefs had no todo. Writing them settled
+two things, recorded in [wiki/decisions.md](wiki/decisions.md) and the data
+model: covers live in SQLite (the backup is one `.db` file, no zip) and there
+is no `isbn10` column. Ports fixed: dev 8808/5176, production 8796. Waves and
+states in [wiki/status.md](wiki/status.md).

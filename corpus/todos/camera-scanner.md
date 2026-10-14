@@ -1,7 +1,7 @@
 ---
 title: Camera barcode scanner
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, web]
 ---
 
@@ -22,3 +22,5 @@ in [scanning.md](../wiki/scanning.md).
 ## Acceptance
 
 Scanning a book's barcode on a phone ends with the book saved in SQLite.
+
+Promoted to [brief 07](../briefs/todo/07-camera-scanner.md) on 2026-10-14.

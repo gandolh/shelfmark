@@ -1,7 +1,7 @@
 ---
 title: Deploy to the shared VPS
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1, infra]
 ---
 
@@ -15,3 +15,5 @@ owner's deploy commands written down. Deploying is an owner step.
 
 Decided on 2026-10-14 ([decisions.md](../wiki/decisions.md)). Shape in
 [architecture.md](../wiki/architecture.md).
+
+Promoted to [brief 14](../briefs/todo/14-deploy.md) on 2026-10-14.

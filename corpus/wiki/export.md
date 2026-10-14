@@ -1,5 +1,5 @@
 ---
-summary: How CSV and Excel export work and the traps they avoid. What gets exported (the current view or everything), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup.
+summary: How CSV and Excel export work and the traps they avoid. What gets exported (the current view or everything), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup (one `.db` file).
 updated: 2026-10-14
 ---
 
@@ -43,8 +43,9 @@ write-only job and has not had a release since 2024.
 
 ## Backup
 
-`GET /api/backup` returns a zip with a consistent copy of the SQLite file
-(better-sqlite3's `backup()`, safe while the server runs) and the covers
-folder. It is offered from the account menu, not the export menu
-([design.md](design.md)). It is the only export that round-trips everything,
-including the wishlist and the lookup cache. Restore is an owner step: stop the app, unpack, start it.
+`GET /api/backup` returns a consistent copy of the SQLite database
+(better-sqlite3's `backup()`, safe while the server runs) as
+`shelfmark-<YYYY-MM-DD>.db`. Covers live in the database, so this one file is
+everything: books, covers, the wishlist and the lookup cache. It is offered
+from the account menu, not the export menu ([design.md](design.md)). Restore is
+an owner step: stop the container, replace the file, start it.

@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-14. Feature research filed, product questions answered (one user, on the VPS, English UI), UI chosen (the familiar table app, Covers variant), one row per copy, no loans, wishlist wanted, Google Books key accepted; no code and no briefs yet. Lists the captured todos by tier and the next steps (create the Google key, then write the v1 briefs).
+summary: Snapshot as of 2026-10-14. Feature research filed, product questions answered (one user, on the VPS, English UI), UI chosen (the familiar table app, Covers variant), one row per copy, no loans, wishlist wanted, Google Books key accepted; 14 v1 briefs written in 6 waves; no code yet. One line per brief, the waves, and the todos left by tier.
 updated: 2026-10-14
 ---
 
@@ -20,32 +20,39 @@ commits and no remote; the owner creates the remote later.
 
 ## Next
 
-1. Owner step: create the Google Books API key (steps in the
-   [metadata-lookup-and-covers](../todos/metadata-lookup-and-covers.md) todo).
-2. Answer the last open question, an existing list to import
-   ([open-questions.md](open-questions.md)).
-3. Promote the v1 todos to briefs, in the order below. UI briefs follow
-   [design.md](design.md); every brief uses [glossary.md](glossary.md).
+1. Owner step before brief 05: create the Google Books API key (steps in
+   [brief 05](../briefs/todo/05-lookup-and-covers.md)).
+2. Build the briefs wave by wave (`plan-split-dispatch`), with a typecheck,
+   lint and test gate between waves.
 
 ## Briefs
 
-None yet.
+| # | Brief | Wave | State |
+|---|---|---|---|
+| 01 | [Workspace scaffold](../briefs/todo/01-workspace-scaffold.md) | 1 | todo |
+| 02 | [Book store and API](../briefs/todo/02-book-store-and-api.md) | 2 | todo |
+| 03 | [ISBN utilities](../briefs/todo/03-isbn-utilities.md) | 2 | todo |
+| 04 | [App shell, tokens, books client](../briefs/todo/04-app-shell-and-tokens.md) | 3 | todo |
+| 05 | [Lookup and covers](../briefs/todo/05-lookup-and-covers.md) | 3 | todo (needs the Google key) |
+| 07 | [Camera scanner](../briefs/todo/07-camera-scanner.md) | 3 | todo |
+| 06 | [Accounts and sign-in](../briefs/todo/06-accounts-and-sign-in.md) | 4 | todo |
+| 08 | [Library page](../briefs/todo/08-library-page.md) | 4 | todo |
+| 09 | [Add a book page](../briefs/todo/09-add-a-book-page.md) | 4 | todo |
+| 10 | [Book page](../briefs/todo/10-book-page.md) | 5 | todo |
+| 11 | [Export and backup](../briefs/todo/11-export-and-backup.md) | 5 | todo |
+| 12 | [PWA](../briefs/todo/12-pwa.md) | 5 | todo |
+| 13 | [Design finish and DESIGN.md](../briefs/todo/13-design-finish.md) | 6 | todo |
+| 14 | [Deploy](../briefs/todo/14-deploy.md) | 6 | todo (the deploy itself is the owner's) |
 
-## Todos, by tier
+Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
+the web foundation from the server lookup and the scanner; accounts wait for
+the shell (wave 4) so the login page is in the design's world, and every route
+test then moves to a signed-in session in one place.
+
+## Todos left, by tier
 
 | Tier | Todo |
 |---|---|
-| v1 | [scaffold-workspaces](../todos/scaffold-workspaces.md) |
-| v1 | [book-store-and-api](../todos/book-store-and-api.md) |
-| v1 | [metadata-lookup-and-covers](../todos/metadata-lookup-and-covers.md) |
-| v1 | [camera-scanner](../todos/camera-scanner.md) |
-| v1 | [add-by-isbn-or-by-hand](../todos/add-by-isbn-or-by-hand.md) |
-| v1 | [library-table](../todos/library-table.md) |
-| v1 | [book-page](../todos/book-page.md) |
-| v1 | [export-csv-xlsx-and-backup](../todos/export-csv-xlsx-and-backup.md) |
-| v1 | [pwa-shell](../todos/pwa-shell.md) |
-| v1 | [accounts-and-sign-in](../todos/accounts-and-sign-in.md) |
-| v1 | [deploy](../todos/deploy.md) |
 | v1.x | [bulk-edit](../todos/bulk-edit.md) |
 | v1.x | [offline-owned-check](../todos/offline-owned-check.md) |
 | v1.x | [offline-scan-queue](../todos/offline-scan-queue.md) |
@@ -57,6 +64,5 @@ None yet.
 | later | [cip-bibliography-index](../todos/cip-bibliography-index.md) |
 | later | [atrium-link](../todos/atrium-link.md) |
 
-The v1 rows are in a sensible build order: scaffold, store, lookup, then the
-two ways to add a book, then the table and book page, then export, PWA,
-accounts and deploy.
+Every v1 todo is promoted (see the briefs above). The v1.x todos are promoted
+after v1 ships, so their briefs can point at real code.
