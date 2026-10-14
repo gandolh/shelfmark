@@ -32,7 +32,7 @@ started 2026-10-14.
 |---|---|---|---|
 | 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | 1 | done |
 | 02 | [Book store and API](../briefs/todo/02-book-store-and-api.md) | 2 | todo |
-| 03 | [ISBN utilities](../briefs/todo/03-isbn-utilities.md) | 2 | todo |
+| 03 | [ISBN utilities](../briefs/done/03-isbn-utilities.md) | 2 | done |
 | 04 | [App shell, tokens, books client](../briefs/todo/04-app-shell-and-tokens.md) | 3 | todo |
 | 05 | [Lookup and covers](../briefs/todo/05-lookup-and-covers.md) | 3 | todo (needs the Google key) |
 | 07 | [Camera scanner](../briefs/todo/07-camera-scanner.md) | 3 | todo |
