@@ -82,3 +82,22 @@ lookup, cover bytes, auth or UI.
 - `GET /api/books` with 3,000 seeded books answers in under 100 ms (a test
   seeds them in a transaction and measures).
 - [data-model.md](../../wiki/data-model.md) matches what shipped.
+
+## Outcome
+
+_2026-10-15_. Done. `buildApp` opens and migrates `<DATA_DIR>/shelfmark.db`
+once and hands every feature a `FeatureContext` (`config`, `db`, `books`);
+a feature is one `(app, ctx) => …` entry in `FEATURES` in
+`server/src/app.ts`. The store is `createBookStore(db)`; `findByIsbn` returns
+whole books from both collections. `GET /api/books` answers
+`{ books: Book[] }`; 3,000 books list in 33-40 ms. Departures from the
+brief, all recorded in [data-model.md](../../wiki/data-model.md): tags match
+on a `name_key` column (trimmed, NFC, lower-cased in JS) because SQLite's
+`NOCASE` folds ASCII only; there is no "derived" flag, a stored `author_sort`
+counts as derived when it equals the derivation of the stored authors; `null`
+or a blank string clears a field, defaulted columns return to their
+default. Create and patch bodies are strict (an unknown key is 400), so
+clients send only the fields they change. A malformed `:id` is 404. The books
+routes check the ISBN's shape, not its check digit. Checked: typecheck, lint,
+93 tests, build, and create, list, patch, delete with `curl` through the dev
+proxy.

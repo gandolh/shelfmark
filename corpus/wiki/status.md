@@ -31,7 +31,7 @@ started 2026-10-14.
 | # | Brief | Wave | State |
 |---|---|---|---|
 | 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | 1 | done |
-| 02 | [Book store and API](../briefs/todo/02-book-store-and-api.md) | 2 | todo |
+| 02 | [Book store and API](../briefs/done/02-book-store-and-api.md) | 2 | done |
 | 03 | [ISBN utilities](../briefs/done/03-isbn-utilities.md) | 2 | done |
 | 04 | [App shell, tokens, books client](../briefs/todo/04-app-shell-and-tokens.md) | 3 | todo |
 | 05 | [Lookup and covers](../briefs/todo/05-lookup-and-covers.md) | 3 | todo (needs the Google key) |

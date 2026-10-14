@@ -22,7 +22,7 @@ try {
 }
 
 // `npm run dev` runs the server from `server/`, so a relative DATA_DIR means the repo root's.
-// Nothing opens it yet; the store (brief 03) will.
+// `buildApp` opens `<dataDir>/shelfmark.db` there, creating the directory if needed.
 const dataDir = isAbsolute(config.dataDir) ? config.dataDir : resolve(REPO_ROOT, config.dataDir);
 
 const app = await buildApp({ ...config, dataDir }, { logger: true });

@@ -17,4 +17,4 @@ Schema proposal in [data-model.md](../wiki/data-model.md). One row per
 physical copy is decided; wishlist rows share the table; no loans
 ([decisions.md](../wiki/decisions.md)).
 
-Promoted to [brief 02](../briefs/todo/02-book-store-and-api.md) on 2026-10-14.
+Promoted to [brief 02](../briefs/done/02-book-store-and-api.md) on 2026-10-14.
