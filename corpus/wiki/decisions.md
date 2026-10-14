@@ -1,0 +1,93 @@
+---
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key. Research recommendations live on the concept pages until the owner confirms them.
+updated: 2026-10-14
+---
+
+# Decisions
+
+Each entry passed three tests: hard to reverse, surprising without context, and
+a real trade-off. Changing one needs an explicit revisit and a `log.md` entry.
+Recommendations on other pages (scanner library, export library, client-side
+filtering) are **not** decisions until the owner confirms
+them; [open-questions.md](open-questions.md) tracks what still needs an answer.
+
+## Physical books only; ebooks stay in Atrium
+_2026-10-14_. Shelfmark catalogs printed books on the owner's shelves. It never
+stores or reads a book file. The owner asked for "what physical books do I
+own". Rejected: adding a physical-books section to Atrium (`../atrium`), which
+is built around uploaded files, readers and per-profile reading progress; a
+catalog of objects shares almost none of that, and would bend Atrium's single
+media grid around items with no file. A later link from a book to its Atrium
+copy is allowed ([features.md](features.md)).
+
+## A web app with a PWA, on React + Fastify + SQLite
+_2026-10-14_. The owner chose the stack: a React PWA for the phone and laptop,
+a Fastify API, SQLite for storage. It matches the estate's house stack (Satchel,
+`../satchel`), so the layout, auth library and deploy pattern are reused.
+Rejected: a native app, which would scan more easily (no browser camera
+quirks, see [scanning.md](scanning.md)) but means a second codebase and an
+app-store or sideload step for one user. Rejected: an existing service
+(Libib, CLZ Books), because the owner asked for their own application.
+
+## One user, deployed on the VPS with its own login
+_2026-10-14_. The owner answered: Shelfmark is for the owner alone, and it runs
+on the shared VPS like Satchel (HTTPS through Caddy, deployed by
+`../vps-deploy`), with Shelfmark's own login and "Sign in with Ward" as the
+second way in (the estate rule in `../wzd_auth`, decisions-oidc). Rejected:
+home network only, which still needs a local certificate for the phone camera
+and loses the "do I own this?" check in a bookshop. Rejected: household
+accounts and view-only guests, which would put an owner or role on every row
+and screen for people who are not asking for it. Because there is one user,
+the schema has no per-user data beyond the auth tables. Adding people later is
+a revisit of this entry.
+
+## English interface
+_2026-10-14_. All interface copy is English; book data stays in the book's own
+language. Rejected: Romanian, and both with a switch, which would route every
+string in every brief through translations. Diacritics-insensitive search and
+Romanian collation still apply to the data ([library-table.md](library-table.md)).
+
+## The UI is the familiar table app, in the Covers variant
+_2026-10-14_. The owner chose the category standard, a familiar table app
+played straight, over three themed directions from impeccable's direction
+round (seed `ac946dc9`): Dictionary (a DEX page), Ledger (an inventory
+register) and Departures (a split-flap board). Then, from three light variants
+of the standard calibrated on real products (Calm after Notion, Grid after
+Airtable, Covers after Apple's own apps), the owner chose **Covers**: the cover
+leads, the chrome recedes, one teal accent, light. Rejected: the themed
+directions, which make the owner learn a metaphor before finding a book (the
+same call the owner made for showcase); Calm, whose coloured tags get busy at
+library scale; Grid, which hides covers. Mock-ups and tokens:
+[design.md](design.md).
+
+## Two places only: Library and Add a book
+_2026-10-14_. The owner asked for no Loans tab and no Settings tab unless it
+has content. The account items (password, Sign in with Ward, backup download,
+sign out) live in a menu on the account button instead. The wishlist is a
+second collection inside Library, not a third place. Rejected: a Settings page
+holding four links, and a Loans tab. A new top-level place needs an
+explicit revisit of this entry.
+
+## One row per physical copy
+_2026-10-14_. The owner confirmed the recommendation: a row in `books` is one
+physical copy on a shelf, and its shelf, condition and acquisition belong to
+it. Owning two copies of a book means two rows; ISBN is indexed but not unique.
+Rejected: an `editions` table plus a `copies` table, which doubles the join and
+the edit screens for a case that hardly happens. See
+[data-model.md](data-model.md).
+
+## No loans
+_2026-10-14_. The owner dropped loans entirely: no Loans tab, no "Lend"
+action, no `loans` table, no "on loan" column. Rejected: loans as a small
+book-page action, recommended for "who has my book?", which the owner does not
+need. Adding loans later is a revisit of this entry and of the two-places
+entry above.
+
+## Google Books needs the owner's free API key
+_2026-10-14_. The owner accepts a Google Cloud API key only because no free
+keyless service covers Romanian books. Measured on 2026-10-14 against 40
+ISBNs from each of two national-library CIP lists: Open Library 4/40 and 1/40,
+K10plus 1/40, BnF 1/40, DNB and the Library of Congress 0; Jisc refuses
+scripts; the national library's own CIP catalog sits behind a CAPTCHA, which
+the app must not work around. The key lives in `.env` as
+`GOOGLE_BOOKS_API_KEY`. Details in [metadata-lookup.md](metadata-lookup.md).

@@ -1,0 +1,20 @@
+node_modules/
+dist/
+dev-dist/
+coverage/
+*.tsbuildinfo
+*.log
+.vite/
+vite.config.ts.timestamp-*
+
+# Secrets: the Google Books key and seed values live in .env, never in git
+.env
+.env.*
+!.env.example
+
+# The SQLite database and the downloaded covers
+data/
+
+# Local dev certificates for testing the camera on a phone
+*.pem
+*.local

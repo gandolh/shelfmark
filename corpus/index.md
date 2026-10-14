@@ -1,0 +1,33 @@
+# Shelfmark corpus index
+
+Start here. Triage on the summary lines and open at most 2-3 pages.
+
+- [CLAUDE.md](CLAUDE.md) - the rules for this corpus
+- [routing.md](routing.md) - which skill runs the work, which layer answers which question
+- [log.md](log.md) - chronological record of meaningful changes
+
+## Wiki
+
+<!-- BEGIN CATALOG -->
+
+- [wiki/architecture.md](wiki/architecture.md) - How Shelfmark will be put together, proposed on 2026-10-14 before any code. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
+- [wiki/data-model.md](wiki/data-model.md) - The SQLite schema, proposed on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and lookup provenance, wishlist rows in the same table; tags and the lookup cache as their own tables; how ISBNs, authors, money and dates are stored; and why there is no full-text index.
+- [wiki/decisions.md](wiki/decisions.md) - Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key. Research recommendations live on the concept pages until the owner confirms them.
+- [wiki/design.md](wiki/design.md) - How Shelfmark looks and behaves, chosen by the owner on 2026-10-14. The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). Tokens in Shelfmark's own values, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, and links to the mock-ups. Read before any UI brief.
+- [wiki/export.md](wiki/export.md) - How CSV and Excel export work and the traps they avoid. What gets exported (the current view or everything), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup.
+- [wiki/features.md](wiki/features.md) - The researched feature set, in tiers (v1, v1.x, later, out; loans are out, the wishlist is v1.x), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
+- [wiki/glossary.md](wiki/glossary.md) - Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status, lookup and draft, CIP. Use these words in code, UI copy and briefs.
+- [wiki/library-table.md](wiki/library-table.md) - How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), remembered column layout, virtual scrolling, row selection, and why filtering does not need the server.
+- [wiki/metadata-lookup.md](wiki/metadata-lookup.md) - Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, why lookups run on the server with a cache, how covers are stored, and the fallbacks for Romanian books.
+- [wiki/open-questions.md](wiki/open-questions.md) - Genuinely unresolved questions. As of 2026-10-14 there are none; the last one (an existing list to import) was answered no. Add a question here the moment one opens, delete it the moment it is answered.
+- [wiki/overview.md](wiki/overview.md) - What Shelfmark is in a paragraph. A catalog of the owner's physical books, filled by scanning barcodes with a phone, shown as a sortable, filterable table that exports to CSV and Excel. Who uses it, what it deliberately leaves out, and how it relates to Atrium and Satchel.
+- [wiki/scanning.md](wiki/scanning.md) - How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+- [wiki/status.md](wiki/status.md) - Snapshot as of 2026-10-14. Feature research filed, product questions answered (one user, on the VPS, English UI), UI chosen (the familiar table app, Covers variant), one row per copy, no loans, wishlist wanted, Google Books key accepted; no code and no briefs yet. Lists the captured todos by tier and the next steps (create the Google key, then write the v1 briefs).
+
+<!-- END CATALOG -->
+
+## Work
+
+- Brief states, the todo catalog by tier and the build order live in
+  [wiki/status.md](wiki/status.md). Specs are in [briefs/](briefs/), captured
+  ideas in [todos/](todos/).
