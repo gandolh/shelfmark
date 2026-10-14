@@ -20,4 +20,4 @@ See [architecture.md](../wiki/architecture.md). Copy conventions from
 code. Pick current versions at build time; vite-plugin-pwa 2.0.0 was only eleven
 days old on 2026-10-14.
 
-Promoted to [brief 01](../briefs/todo/01-workspace-scaffold.md) on 2026-10-14.
+Promoted to [brief 01](../briefs/done/01-workspace-scaffold.md) on 2026-10-14.

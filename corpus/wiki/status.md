@@ -15,8 +15,9 @@ variant, light, with two places (Library, Add a book); see
 [features.md](features.md), [metadata-lookup.md](metadata-lookup.md),
 [scanning.md](scanning.md), [library-table.md](library-table.md),
 [export.md](export.md), [data-model.md](data-model.md) and
-[architecture.md](architecture.md). Git is initialised on `main` with no
-commits and no remote; the owner creates the remote later.
+[architecture.md](architecture.md). The remote is the
+GitHub repo gandolh/shelfmark (set 2026-10-14); the owner pushes. Building
+started 2026-10-14.
 
 ## Next
 
@@ -29,7 +30,7 @@ commits and no remote; the owner creates the remote later.
 
 | # | Brief | Wave | State |
 |---|---|---|---|
-| 01 | [Workspace scaffold](../briefs/todo/01-workspace-scaffold.md) | 1 | todo |
+| 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | 1 | done |
 | 02 | [Book store and API](../briefs/todo/02-book-store-and-api.md) | 2 | todo |
 | 03 | [ISBN utilities](../briefs/todo/03-isbn-utilities.md) | 2 | todo |
 | 04 | [App shell, tokens, books client](../briefs/todo/04-app-shell-and-tokens.md) | 3 | todo |

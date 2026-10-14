@@ -104,3 +104,16 @@ UI beyond the placeholder: briefs 02 to 12 own those.
   server.
 - `npm run dev:https` serves over HTTPS on the LAN address.
 - `bash corpus/lint.sh` is clean.
+
+## Outcome
+
+_2026-10-14_. Done. Three workspaces on Satchel's tooling shape, with every pin
+as listed; `@vitejs/plugin-basic-ssl` 2.3.0 (published 2026-03-24, peer
+`vite ^6 || ^7 || ^8`). `npm audit` found nothing, so no pin moved. Feature
+routes go in the `FEATURES` list in `server/src/app.ts`; `startTestApp()` in
+`server/src/testing/testApp.ts` returns `{ app, config, dataDir, close }`.
+`server/src/app.test.ts` was added beyond the file list to test the health
+route through `startTestApp`. `.env.example` carries the non-secret defaults
+(`HOST`, `PORT`, `DATA_DIR`) as values; every other key is empty. Checked:
+typecheck, lint, 6 tests, build, `npm start` + health, `npm run dev` through
+the proxy, `npm run dev:https` on the LAN addresses.
