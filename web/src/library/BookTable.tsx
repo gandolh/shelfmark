@@ -28,6 +28,7 @@ import { Link } from "../components/Link";
 import { bookRoute, navigate } from "../router";
 import { BOOK_COLUMN_ID, COLUMNS, columnById, type ColumnId, type LibraryColumn } from "./columns";
 import { SortIcon } from "./icons";
+import { TAB_BAR_HEIGHT } from "../layout/viewport";
 import { normalizeOrder, normalizeSizing, normalizeVisibility, type Layout, type LibraryPrefs } from "./prefs";
 import { rememberScroll } from "./scroll";
 import { directionLabel, toggleSort, type Sorting } from "./sort";
@@ -216,7 +217,7 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
     overscan: 8,
     scrollMargin: geometry.margin,
     scrollPaddingStart: geometry.covered,
-    scrollPaddingEnd: desktop ? 0 : 76,
+    scrollPaddingEnd: desktop ? 0 : TAB_BAR_HEIGHT,
     getItemKey: (index) => tableRows[index]?.id ?? index,
     initialOffset: () => window.scrollY,
   });

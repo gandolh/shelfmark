@@ -5,6 +5,7 @@ import { authorLine } from "../components/cover";
 import { CoverImage } from "../components/CoverImage";
 import { Link } from "../components/Link";
 import { bookRoute } from "../router";
+import { TAB_BAR_HEIGHT } from "../layout/viewport";
 import type { Layout } from "./prefs";
 import { rememberScroll } from "./scroll";
 
@@ -54,7 +55,7 @@ export function CoversGrid({ rows, layout }: { rows: readonly Book[]; layout: La
     estimateSize: () => rowHeight,
     overscan: 3,
     scrollMargin: box.margin,
-    scrollPaddingEnd: desktop ? 0 : 76,
+    scrollPaddingEnd: desktop ? 0 : TAB_BAR_HEIGHT,
     initialOffset: () => window.scrollY,
   });
 

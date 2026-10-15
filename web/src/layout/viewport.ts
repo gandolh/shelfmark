@@ -3,6 +3,9 @@ import { useCallback, useSyncExternalStore } from "react";
 /** From here up the shell is the desktop one: the top bar instead of the tab bar (design.md). */
 export const DESKTOP_QUERY = "(min-width: 768px)";
 
+/** The phone tab bar's height; must equal `--tabbar-height` in tokens.css. */
+export const TAB_BAR_HEIGHT = 76;
+
 /** Whether a media query matches now; re-renders when that changes. */
 export function useMediaQuery(query: string): boolean {
   const subscribe = useCallback(

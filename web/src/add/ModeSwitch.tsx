@@ -15,6 +15,8 @@ export interface ModeSwitchProps {
   panelId: string;
   /** Over the camera: the track on a translucent ground instead of the flat fill. */
   overCamera?: boolean;
+  /** A save is in flight: it belongs to the current mode's form, so the mode stays put. */
+  disabled?: boolean;
 }
 
 /** The id of a mode's tab, for the panel's `aria-labelledby`. */
@@ -28,10 +30,11 @@ export function modeTabId(panelId: string, mode: Mode): string {
  * switching is React state, never a route, so the camera's page never
  * navigates.
  */
-export function ModeSwitch({ value, onChange, panelId, overCamera }: ModeSwitchProps) {
+export function ModeSwitch({ value, onChange, panelId, overCamera, disabled }: ModeSwitchProps) {
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
     const index = MODES.findIndex((mode) => mode.value === value);
     const last = MODES.length - 1;
     const next =
@@ -69,6 +72,7 @@ export function ModeSwitch({ value, onChange, panelId, overCamera }: ModeSwitchP
             }}
             type="button"
             role="tab"
+            disabled={disabled}
             id={modeTabId(panelId, mode.value)}
             className="segmented__item"
             aria-selected={selected}

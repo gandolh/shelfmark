@@ -11,8 +11,14 @@ live in [corpus/](corpus/index.md).
 
 ```sh
 npm install
+cp .env.example .env   # optional, the defaults work
+npm run seed -w @shelfmark/server
 npm run dev
 ```
+
+The seed step creates the account you sign in with: it asks for a username and
+password on the terminal, or reads `SEED_USERNAME` and `SEED_PASSWORD` from the
+environment. They are stored nowhere but the database.
 
 Open `http://localhost:5176/shelfmark/`. To try the scanner on a phone, run
 `npm run dev:https` and open the same path on the computer's LAN address over

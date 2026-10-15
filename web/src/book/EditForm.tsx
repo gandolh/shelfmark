@@ -36,17 +36,14 @@ function OptionalChoice<T extends string>({
   value,
   options,
   onChange,
-  required,
 }: {
   label: string;
   value: T | null;
   options: Record<T, string>;
   onChange: (next: T | null) => void;
-  /** No "Not set" chip: the collection is always one or the other. */
-  required?: boolean;
 }) {
   const name = useId();
-  const entries = [...(required ? [] : [[null, "Not set"]]), ...Object.entries<string>(options)] as [T | null, string][];
+  const entries = [[null, "Not set"], ...Object.entries<string>(options)] as [T | null, string][];
   return (
     <fieldset className="add-choice">
       <legend className="add-label">{label}</legend>
@@ -216,13 +213,6 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
 
       <fieldset className="book-card book-card--form" disabled={saving}>
         <legend className="book-card__title">About this copy</legend>
-        <OptionalChoice
-          label="Collection"
-          value={values.collection}
-          options={{ owned: "Owned", wishlist: "Wishlist" }}
-          required
-          onChange={(next) => next && set("collection", next)}
-        />
         <ShelfPicker value={values.shelf} onChange={(shelf) => set("shelf", shelf)} shelves={shelves} />
         <StatusPicker value={values.status} onChange={(status) => set("status", status)} options={STATUSES} />
         <RatingField value={values.rating} onChange={(rating) => set("rating", rating)} />

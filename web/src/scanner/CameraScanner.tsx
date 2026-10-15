@@ -154,6 +154,11 @@ export function CameraScanner({
   });
 
   const reading = engine !== null && state === "scanning" && visible && !paused;
+  // A book still in frame when the sheet closes (Save, Skip) must not fire
+  // again: the 3 s window starts over from the moment the scanner resumes.
+  useEffect(() => {
+    if (reading) guard.touch();
+  }, [reading, guard]);
   useEffect(() => {
     const video = videoRef.current;
     if (!reading || engine === null || video === null) return;

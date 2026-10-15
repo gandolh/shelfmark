@@ -2,6 +2,7 @@ import { useSession, useWardResult, type SessionState } from "../../vendor/ward/
 import { apiUrl } from "../api";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
+import { COVER_CACHE } from "../pwa/routes";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
 
@@ -103,6 +104,13 @@ export async function downloadBackup(): Promise<void> {
 export async function signOut(): Promise<void> {
   const result = await authClient().logout();
   if (!result.ok) throw new Error(accountMessage(result.error));
+  // The worker serves cached covers with no session; drop them, but never let
+  // a storage failure keep the owner signed in.
+  try {
+    if (typeof caches !== "undefined") await caches.delete(COVER_CACHE.name);
+  } catch {
+    // Nothing to do: the reload below still ends the session's page.
+  }
   window.location.replace(pathFor(LOGIN));
 }
 

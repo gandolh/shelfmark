@@ -13,6 +13,7 @@ import {
   copyProposal,
   flowReducer,
   initialFlow,
+  isSaving,
   scannerPaused,
   type CoverPlan,
   type FlowState,
@@ -157,7 +158,7 @@ export function AddBookPage() {
     dispatch({ type: "mode", mode: next });
   };
 
-  const switcher = <ModeSwitch value={mode} onChange={changeMode} panelId={panelId} overCamera={!desktop && mode === "scan"} />;
+  const switcher = <ModeSwitch value={mode} onChange={changeMode} panelId={panelId} overCamera={!desktop && mode === "scan"} disabled={isSaving(step)} />;
   const status = added > 0 || notice !== null ? <SessionStatus added={added} notice={notice} /> : null;
   const sheet = (floating: boolean, takeFocus: boolean) =>
     step.kind === "ready" ? null : (

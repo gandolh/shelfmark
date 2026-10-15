@@ -1,4 +1,4 @@
-import type { Book, BookPatch, Collection, Condition, Format, Status } from "@shelfmark/shared";
+import type { Book, BookPatch, Condition, Format, Status } from "@shelfmark/shared";
 import { parseIsbn } from "@shelfmark/shared";
 import { splitAuthors, joinAuthors } from "../add/form";
 import { isbnProblem } from "../add/words";
@@ -24,7 +24,6 @@ export interface EditValues {
   isbn13: string;
   subjects: string[];
   description: string;
-  collection: Collection;
   shelf: string | null;
   status: Status;
   rating: number | null;
@@ -57,7 +56,6 @@ export function valuesOf(book: Book): EditValues {
     isbn13: book.isbn13 ?? "",
     subjects: [...book.subjects],
     description: book.description ?? "",
-    collection: book.collection,
     shelf: book.shelf,
     status: book.status,
     rating: book.rating,
@@ -148,7 +146,7 @@ export function buildPatch(book: Book, baseline: EditValues, values: EditValues)
   const list = (key: "subjects" | "tags") => {
     if (touched(key) && !sameList(values[key], book[key])) patch[key] = values[key];
   };
-  const choice = <K extends "shelf" | "status" | "rating" | "format" | "condition" | "signed" | "collection">(key: K) => {
+  const choice = <K extends "shelf" | "status" | "rating" | "format" | "condition" | "signed">(key: K) => {
     // Choices share their names and types with the book's fields.
     if (touched(key) && (values[key] as unknown) !== (book[key] as unknown)) (patch as Record<string, unknown>)[key] = values[key];
   };
@@ -186,7 +184,6 @@ export function buildPatch(book: Book, baseline: EditValues, values: EditValues)
   }
   list("subjects");
   long("description");
-  choice("collection");
   if (touched("shelf") && values.shelf !== book.shelf) patch.shelf = values.shelf;
   choice("status");
   choice("rating");

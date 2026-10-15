@@ -19,6 +19,18 @@ describe("createRepeatGuard", () => {
     expect(guard.accept("9786063205583")).toBe(true);
   });
 
+  it("touch restarts every remembered window, so a code still in frame stays quiet", () => {
+    const guard = createRepeatGuard();
+    expect(guard.accept("9786063205583")).toBe(true);
+    vi.advanceTimersByTime(10_000);
+    guard.touch();
+    expect(guard.accept("9786063205583")).toBe(false);
+    // A different code still fires at once.
+    expect(guard.accept("9789731000015")).toBe(true);
+    vi.advanceTimersByTime(REPEAT_WINDOW_MS);
+    expect(guard.accept("9786063205583")).toBe(true);
+  });
+
   it("fires a different code at once", () => {
     const guard = createRepeatGuard();
     expect(guard.accept("9786063205583")).toBe(true);

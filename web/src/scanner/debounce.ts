@@ -7,6 +7,8 @@
 export interface RepeatGuard {
   /** True when `key` should fire now; firing starts its quiet window. */
   accept(key: string, now?: number): boolean;
+  /** Restart every remembered code's window at `now`: a code still in frame stays quiet. */
+  touch(now?: number): void;
   /** Forget every code, so the next sighting of any code fires. */
   reset(): void;
 }
@@ -27,6 +29,9 @@ export function createRepeatGuard(windowMs: number = REPEAT_WINDOW_MS): RepeatGu
       // whole shelf of scans does not grow the map for the session.
       for (const [k, t] of firedAt) if (now - t >= windowMs) firedAt.delete(k);
       return true;
+    },
+    touch(now = Date.now()) {
+      for (const k of firedAt.keys()) firedAt.set(k, now);
     },
     reset() {
       firedAt.clear();

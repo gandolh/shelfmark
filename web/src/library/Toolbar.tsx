@@ -28,7 +28,7 @@ export interface ToolbarProps {
  * "Columns" (in the table) and "Filter and sort"; Add a book is the tab bar's.
  */
 export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
-  // EXPORT SLOT (brief 11): replace `null` with `<ExportMenu view={view} />`.
+  // The Export menu, shown on both layouts.
   const exportMenu: ReactNode = <ExportMenu view={view} />;
 
   const count = activeFilters(view.filters).length;
