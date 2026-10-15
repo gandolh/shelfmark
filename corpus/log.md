@@ -70,3 +70,28 @@ two things, recorded in [wiki/decisions.md](wiki/decisions.md) and the data
 model: covers live in SQLite (the backup is one `.db` file, no zip) and there
 is no `isbn10` column. Ports fixed: dev 8808/5176, production 8796. Waves and
 states in [wiki/status.md](wiki/status.md).
+
+## [2026-10-15] build | Waves 1-3 built: briefs 01, 02, 03, 04, 05, 07
+
+Built with `plan-split-dispatch`, one commit per brief on `main`, not pushed.
+The remote is the GitHub repo gandolh/shelfmark (set 2026-10-14). Gate
+between waves: typecheck, lint, tests (280 after wave 3), build. Rulings worth
+keeping:
+
+- Dependencies are installed by the controller before a wave, never by
+  parallel agents, so two `npm install`s never race on the lockfile.
+- Brief 05's SSRF allowlist also accepts `archive.org` and
+  `iaNNNNNN.us.archive.org`, as redirect targets only: every Open Library
+  cover redirects there, so the brief's three hosts alone would refuse them all.
+- Brief 07's `.wasm` is a `?url` import, not a copy step in `vite.config.ts`;
+  it reaches the build once a production page imports the scanner (brief 09).
+  `zxing-wasm` 3.1.3 is now a direct dependency so it can't drift from the
+  ponyfill.
+- Wave 4 runs as 08 and 09 first, then 06 alone: 06 puts every route behind a
+  session, and the page agents' live checks would start failing midway.
+- The design canvas (claude.ai artifact) could not be read after the session
+  restarted under another account; its Covers artboards were transcribed for
+  the page agents from an earlier read.
+- Owner checks waiting: the scanner on an Android phone and an iPhone (steps in
+  [brief 07's outcome](briefs/done/07-camera-scanner.md)); the Google
+  measurement once `GOOGLE_BOOKS_API_KEY` is in `.env`.

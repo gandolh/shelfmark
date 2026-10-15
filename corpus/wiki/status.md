@@ -37,7 +37,7 @@ started 2026-10-14.
 | 05 | [Lookup and covers](../briefs/done/05-lookup-and-covers.md) | 3 | done |
 | 07 | [Camera scanner](../briefs/done/07-camera-scanner.md) | 3 | done |
 | 06 | [Accounts and sign-in](../briefs/todo/06-accounts-and-sign-in.md) | 4 | todo |
-| 08 | [Library page](../briefs/todo/08-library-page.md) | 4 | todo |
+| 08 | [Library page](../briefs/done/08-library-page.md) | 4 | done |
 | 09 | [Add a book page](../briefs/todo/09-add-a-book-page.md) | 4 | todo |
 | 10 | [Book page](../briefs/todo/10-book-page.md) | 5 | todo |
 | 11 | [Export and backup](../briefs/todo/11-export-and-backup.md) | 5 | todo |

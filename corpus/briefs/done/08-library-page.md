@@ -83,3 +83,28 @@ The shell, router, books client (use them), the server.
   without a mouse.
 - impeccable's detector run on `web/src/library`; `npm run typecheck && npm
   run lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Done. `@tanstack/react-table` 9.2.4 (2026-08-28) and
+`@tanstack/react-virtual` 3.14.13 (2026-09-14). TanStack handles the columns
+(order, visibility, sizing, resizing) and renders the cells; filtering,
+search and sorting are our own pure functions in `filters.ts`, `search.ts` and
+`sort.ts`, so the export reads exactly the rows on screen through `view.ts`.
+With 3,000 books in the production build, a search keystroke paints in
+27-37 ms and a filter toggle in 15-33 ms; the pure path is under 1 ms after
+the first search folds every book's text once, done ahead of time when the
+browser is idle. Checked in a browser at 1440 and 390 px: both views, every
+filter kind, chips, the column picker and filters by keyboard alone, the
+sticky header, the error state with retry, corrupt prefs. Departures: the page
+scrolls rather than the table; desktop Table sorts by header click and its
+button reads "Filter", while Covers and the phone say "Filter and sort" with
+a sort section; a "Columns" button, which the mock-up doesn't draw, shows in
+Table view; Status is 112 px wide so "Abandoned" fits; prefs are kept per
+layout (`shelfmark.library.desktop`, `shelfmark.library.phone`); filters last
+the session so Back from a book keeps them, and Back restores the scroll.
+Extra files: `Panel.tsx` (a `<dialog>` that hangs under its button on desktop
+and is a bottom sheet on the phone), `state.ts`, `scroll.ts`,
+`LibraryStates.tsx`, `icons.tsx`, `test-books.ts`. Brief 11 fills the slot
+marked `EXPORT SLOT` in `Toolbar.tsx`. Detector clean; 58 tests. Left for the
+design finish: the Year header still shows "Ye…" at 1440 px.

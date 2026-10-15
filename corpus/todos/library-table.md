@@ -23,4 +23,4 @@ column". Design in [library-table.md](../wiki/library-table.md).
 
 Every column can be sorted and filtered.
 
-Promoted to [brief 08](../briefs/todo/08-library-page.md) on 2026-10-14.
+Promoted to [brief 08](../briefs/done/08-library-page.md) on 2026-10-14.
