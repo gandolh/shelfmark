@@ -145,6 +145,19 @@ docker compose -f infrastructure/docker-compose.yml exec -it shelfmark-api node 
 If you would rather pass them, add `-e SEED_USERNAME=<name> -e SEED_PASSWORD=<password>`
 after `exec`, and keep the command out of any file. An existing user is left as it is.
 
+After your first sign-in, check that the login lockout sees each visitor's own
+address. Under rootless Docker, Caddy may reach the container from an address
+outside `172.16.0.0/12`, the range vps-deploy trusts:
+
+```
+docker compose -f infrastructure/docker-compose.yml logs shelfmark-api | grep -i "X-Forwarded-For ignored"
+```
+
+No output is right. If the line shows up, every visitor shares one lockout
+counter, so five wrong passwords from anyone lock everyone out for a while.
+The line names the address Caddy came from; trust that range in vps-deploy's
+`AUTH_TRUSTED_PROXIES` for this stack and deploy again.
+
 ## 7. Let your Ward account in
 
 In Ward's console, open the `shelfmark` app and grant your own Ward account a
