@@ -1,6 +1,6 @@
 ---
-summary: Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, why lookups run on the server with a cache, how covers are stored, and the fallbacks for Romanian books.
-updated: 2026-10-14
+summary: Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, the lookup flow and cache as shipped by brief 05 (two Open Library calls per found ISBN), how covers are downloaded (the host allowlist, Open Library's archive.org redirects) and stored, the measurement script, and the fallbacks for Romanian books.
+updated: 2026-10-15
 ---
 
 # Metadata lookup
@@ -9,8 +9,8 @@ updated: 2026-10-14
 
 | Source | Key | Limits | Notes |
 |---|---|---|---|
-| Open Library | none | 1 req/s anonymous, 3 req/s with a `User-Agent` naming the app and a contact address | Crowd-sourced. Use `/api/books?bibkeys=ISBN:<isbn>&jscmd=data&format=json`: one call returns resolved authors, publishers and cover URLs. Cover URLs by cover ID are not rate limited; by ISBN they were limited (100 per 5 min per IP, as of 2011). |
-| Google Books | **required in practice** | ~1,000 req/day per project by default | `GET /books/v1/volumes?q=isbn:<isbn>&key=...`. Without a key every call returned 429 "Queries per day" on 2026-10-14: keyless calls share one public quota that is always spent. |
+| Open Library | none | 1 req/s anonymous, 3 req/s with a `User-Agent` naming the app and a contact address | Crowd-sourced. `/api/books?bibkeys=ISBN:<isbn>&jscmd=data&format=json` returns resolved authors, publishers, subjects and cover URLs, but no language and no description; `jscmd=details` (the edition record) has those, as MARC codes (`/languages/rum`), and no resolved authors. So a found ISBN costs two calls. Cover URLs by cover ID are not rate limited; by ISBN they were limited (100 per 5 min per IP, as of 2011). |
+| Google Books | **required in practice** | ~1,000 req/day per project by default | `GET /books/v1/volumes?q=isbn:<isbn>&key=...`. Without a key every call returned 429 "Queries per day" on 2026-10-14 and again on 2026-10-15 (`quota_limit_value` 0): keyless calls share one public quota that is always spent. |
 | ISBNdb | paid | per plan | Not evaluated further; only if the free sources prove too thin. |
 | Romanian National Library (BNR) | n/a | n/a | The CIP catalog (`aleph.bibnat.ro`, base `CIP`) covers nearly every book from a Romanian publisher since 1996, but every request redirects to a CAPTCHA. Not usable, and not to be worked around. |
 | K10plus, BnF, DNB, Library of Congress | none (SRU) | polite | Free library catalogs with a search URL. Hold a few Romanian books (K10plus and BnF both have *Inocenții*), but see the second measurement below. Jisc refuses scripted requests. |
@@ -47,29 +47,63 @@ The CIP lists include small and academic presses, so a home library of
 mainstream publishers should do better, but no free keyless service is good
 enough to be the Romanian fallback. Hence the owner's call
 ([decisions.md](decisions.md)): Google Books with a free key. Its Romanian
-coverage is **untested** until the key exists; the first lookup brief measures
-it on the same samples.
+coverage is **still untested**: brief 05 shipped on 2026-10-15 without the key,
+so the measurement waits for it.
 
-## Recommended flow
+To measure, put ISBNs one per line in a file per sample (a fresh 40 from a CIP
+bibliography PDF, never from the CAPTCHA'd catalog) and run
+`npx tsx server/scripts/measure-lookup.ts <file> ...`
+([measure-lookup.ts](../../server/scripts/measure-lookup.ts)). It asks every
+source about every ISBN through the app's own clients and queues, with no
+cache, and prints a table per file: found, with cover, with page count,
+errors, and "any of them". Without `GOOGLE_BOOKS_API_KEY` in `.env` the
+Google row says skipped.
 
-1. The browser sends the ISBN to `POST /api/lookup`; the server does the work.
-   This keeps the Google key out of the browser and lets one queue respect the
-   rate limits.
-2. The server checks a lookup cache (ISBN → raw response per source, with a
-   fetch date). A hit costs nothing.
+## The flow (shipped 2026-10-15, brief 05)
+
+1. The browser sends the ISBN to `POST /api/lookup`; the server does the work
+   ([routes/lookup.ts](../../server/src/routes/lookup.ts)). This keeps the
+   Google key out of the browser and lets one queue per source respect the
+   rate limits ([queue.ts](../../server/src/lookup/queue.ts)): one request at
+   a time, starts at least 400 ms apart for Open Library and 200 ms for Google.
+2. The server checks the lookup cache, `lookup_cache`: the raw answer per ISBN
+   and source, with its outcome and fetch date
+   ([cache.ts](../../server/src/lookup/cache.ts)). A found answer is reused
+   forever, a not-found one for 7 days; an error is never stored. A hit costs
+   no request, even for Google after its key is gone.
 3. Open Library first. If missing or thin (no title, or no cover), ask Google
-   Books. Merge field by field: the first non-empty value wins, in that order.
-4. Return a draft the user confirms or edits before saving. Nothing is saved
-   silently.
+   Books; without a key it is reported `skipped_no_key`. Merge field by field:
+   the first non-empty value wins, in that order; cover candidates are Open
+   Library's then Google's ([merge.ts](../../server/src/lookup/merge.ts)). An
+   Open Library lookup counts as an error unless both its calls succeed, so a
+   half answer is never cached.
+4. Return a draft the user confirms or edits before saving, with `tried` (each
+   source asked and how it did) and the copies already saved with that ISBN.
+   Nothing is saved silently.
 5. Not found anywhere: open the manual form with the ISBN filled in.
 
-A batch (CSV import, offline queue) goes through the same queue, one request
-per ~400 ms for Open Library, so 300 books take about two minutes.
+What the clients keep: text trimmed and cut to the book schema's limits, the
+year from any date string ("Apr 07, 2016"), MARC language codes mapped to
+ISO 639-1 (`rum` → `ro`), the first 10 subjects only (Open Library lists 93
+for The Hobbit, "thrushes" among them), Open Library's large cover by cover
+ID, Google's largest image link forced to https without its page curl.
+
+A batch (CSV import, offline queue) goes through the same queues. A found
+ISBN costs two Open Library calls, so 300 found books take about four minutes,
+300 unknown ones about two.
 
 ## Covers
 
 Download the chosen cover once, on the server, from an allowlist of cover hosts
-(the SSRF guard), and store it in the `covers` table; serve it from our API.
+(the SSRF guard), and store it in the `covers` table; serve it from our API
+([routes/covers.ts](../../server/src/routes/covers.ts)). The allowlist is
+`covers.openlibrary.org`, `books.google.com` and
+`books.googleusercontent.com`, https on the default port only, checked again
+at every redirect, 2 MB and 10 s at most. Open Library's covers live at the
+Internet Archive: on 2026-10-15 every cover URL answered 302 to `archive.org`,
+which answered 302 to an `iaNNNNNN.us.archive.org` node. Those two are allowed
+as redirect targets only, never as the URL asked for. Google's cover host
+answered directly.
 Photos taken in the app are resized in the browser before upload. Rejected: hotlinking
 Open Library or Google, which breaks offline, leaks every page view to them
 and runs into the cover rate limit. When there is no cover, the user can take

@@ -1,6 +1,6 @@
 ---
 summary: The SQLite schema as shipped by brief 02 on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs) and the planned lookup cache as their own tables; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
-updated: 2026-10-14
+updated: 2026-10-15
 ---
 
 # Data model
@@ -52,9 +52,12 @@ but doubles the join and the edit UI for a case that hardly happens.
   `mime`, `bytes` BLOB, `source`, `updated_at`, all NOT NULL. Covers live in
   the database, not in a folder ([decisions.md](decisions.md)); `Book.hasCover`
   is derived from it. Brief 02 created the table; brief 05 fills and serves it.
-- **`lookup_cache`** (brief 05, not yet shipped): `isbn13`, `source`,
-  `response` (raw JSON), `fetched_at`. Re-looking an ISBN up never hits the
-  network twice.
+- **`lookup_cache`** (migration 2, brief 05): `isbn13`, `source`, `outcome`
+  (`found` or `not_found`, CHECK), `response` (the source's answer as JSON),
+  `fetched_at`; primary key `(isbn13, source)`, `WITHOUT ROWID`. The
+  `outcome` column lets expiry work without parsing each source's format, and
+  its CHECK keeps an error from ever being stored. A found answer is reused
+  forever, a not-found one for 7 days ([metadata-lookup.md](metadata-lookup.md)).
 - Auth tables come from the vendored `ward-auth` library, as in Satchel.
 
 ## Storage rules

@@ -12,6 +12,8 @@ export const ERROR_STATUS = {
   validation: 400,
   not_found: 404,
   internal: 500,
+  /** A host the server called (a cover download) failed or timed out. */
+  upstream: 502,
 } as const satisfies Record<string, number>;
 
 export type ErrorCode = keyof typeof ERROR_STATUS;

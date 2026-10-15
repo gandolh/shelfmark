@@ -51,7 +51,7 @@ describe("openDb", () => {
     expect(db.pragma("journal_mode", { simple: true })).toBe("wal");
     expect(db.pragma("foreign_keys", { simple: true })).toBe(1);
     expect(version(db)).toBe(migrations.length);
-    expect(tables(db)).toEqual(["book_tags", "books", "covers", "tags"]);
+    expect(tables(db)).toEqual(["book_tags", "books", "covers", "lookup_cache", "tags"]);
   });
 
   it("leaves a migrated database as it is on the next open", () => {

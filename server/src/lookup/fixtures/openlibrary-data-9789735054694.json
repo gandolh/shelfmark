@@ -1,0 +1,45 @@
+{
+  "ISBN:9789735054694": {
+    "url": "http://openlibrary.org/books/OL32189769M/Inocentii",
+    "key": "/books/OL32189769M",
+    "title": "Inocentii",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL9148589A/Ioana_Parvulescu",
+        "name": "Ioana Parvulescu"
+      }
+    ],
+    "number_of_pages": 348,
+    "identifiers": {
+      "isbn_10": [
+        "9735054698"
+      ],
+      "isbn_13": [
+        "9789735054694"
+      ],
+      "oclc": [
+        "1019493425"
+      ],
+      "openlibrary": [
+        "OL32189769M"
+      ]
+    },
+    "classifications": {
+      "lc_classifications": [
+        "PC840.426.A78 I56 2015"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Humanitas"
+      }
+    ],
+    "publish_date": "Apr 07, 2016",
+    "notes": "Source title: Inocentii (Romanian Edition)",
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/10842140-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/10842140-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/10842140-L.jpg"
+    }
+  }
+}

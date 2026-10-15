@@ -1,0 +1,138 @@
+{
+  "ISBN:9789735066109": {
+    "bib_key": "ISBN:9789735066109",
+    "info_url": "http://openlibrary.org/books/OL44031341M/Omul_care_mută_norii",
+    "preview": "noview",
+    "preview_url": "http://openlibrary.org/books/OL44031341M/Omul_care_mută_norii",
+    "details": {
+      "type": {
+        "key": "/type/edition"
+      },
+      "publish_date": "2019",
+      "copyright_date": "2019",
+      "publish_country": "rm",
+      "languages": [
+        {
+          "key": "/languages/rum"
+        }
+      ],
+      "authors": [
+        {
+          "key": "/authors/OL1620501A",
+          "name": "Radu Paraschivescu"
+        }
+      ],
+      "oclc_numbers": [
+        "1273732097"
+      ],
+      "lc_classifications": [
+        "PC840.26.A64 O48 2019"
+      ],
+      "notes": {
+        "type": "/type/text",
+        "value": "Short stories"
+      },
+      "table_of_contents": [
+        {
+          "level": 0,
+          "label": "",
+          "title": "Șapticemie",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Omul care mută norii",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Cățui, plase, Doamne-ajută",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Un nas şi o gură",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Speranța cântă trash",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Armadillo",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        },
+        {
+          "level": 0,
+          "label": "",
+          "title": "Marmură de Pavonazzo",
+          "pagenum": "",
+          "type": {
+            "key": "/type/toc_item"
+          }
+        }
+      ],
+      "title": "Omul care mută norii",
+      "subtitle": "şapte întâmplări",
+      "by_statement": "Radu Paraschivescu",
+      "publishers": [
+        "Humanitas"
+      ],
+      "publish_places": [
+        "Bucureşti"
+      ],
+      "isbn_13": [
+        "9789735066109"
+      ],
+      "isbn_10": [
+        "9735066106"
+      ],
+      "pagination": "258 pages",
+      "number_of_pages": 258,
+      "source_records": [
+        "marc:marc_columbia/Columbia-extract-20221130-031.mrc:377161602:1032"
+      ],
+      "works": [
+        {
+          "key": "/works/OL32283532W"
+        }
+      ],
+      "key": "/books/OL44031341M",
+      "latest_revision": 1,
+      "revision": 1,
+      "created": {
+        "type": "/type/datetime",
+        "value": "2022-12-15T20:14:44.416167"
+      },
+      "last_modified": {
+        "type": "/type/datetime",
+        "value": "2022-12-15T20:14:44.416167"
+      }
+    }
+  }
+}

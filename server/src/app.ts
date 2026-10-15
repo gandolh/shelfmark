@@ -3,6 +3,8 @@ import type { Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
 import { bookRoutes } from "./routes/books.js";
+import { coverRoutes } from "./routes/covers.js";
+import { lookupRoutes } from "./routes/lookup.js";
 import { createBookStore, type BookStore } from "./store/books.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
@@ -12,6 +14,8 @@ export interface FeatureContext {
   db: Db;
   /** Books go through this store, never through another module's SQL. */
   books: BookStore;
+  /** Every outbound request: the lookup's sources and cover downloads. Tests pass a fake (`startTestApp`). */
+  fetch: typeof globalThis.fetch;
 }
 
 /**
@@ -24,11 +28,17 @@ export interface FeatureContext {
 export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike<unknown>;
 
 /** Every feature, set up in this order. A later brief adds its entry here and nowhere else in this file. */
-const FEATURES: Feature[] = [(app, ctx) => app.register(bookRoutes, ctx)];
+const FEATURES: Feature[] = [
+  (app, ctx) => app.register(bookRoutes, ctx),
+  (app, ctx) => app.register(lookupRoutes, ctx),
+  (app, ctx) => app.register(coverRoutes, ctx),
+];
 
 export interface BuildAppOptions {
   /** Fastify's logger option. Default off; `index.ts` turns it on. */
   logger?: FastifyServerOptions["logger"];
+  /** What `FeatureContext.fetch` is. Default the global `fetch`. */
+  fetch?: typeof globalThis.fetch;
 }
 
 /** The app, not listening, with `<dataDir>/shelfmark.db` open and migrated. Closing the app closes the database. */
@@ -58,7 +68,7 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
 
   app.get("/api/health", async () => ({ ok: true }));
 
-  const ctx: FeatureContext = { config, db, books: createBookStore(db) };
+  const ctx: FeatureContext = { config, db, books: createBookStore(db), fetch: options.fetch ?? globalThis.fetch };
   for (const feature of FEATURES) await feature(app, ctx);
 
   return app;

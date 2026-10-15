@@ -71,6 +71,21 @@ export const migrations: readonly string[] = [
     updated_at  TEXT NOT NULL
   );
   `,
+
+  // 2 (brief 05): the lookup cache, one raw answer per ISBN and source.
+  // `outcome` is what expiry needs (lookup/cache.ts: found kept forever,
+  // not_found 7 days) without parsing each source's format; errors are never
+  // stored. `source` has no CHECK, as the list of sources may grow.
+  `
+  CREATE TABLE lookup_cache (
+    isbn13      TEXT NOT NULL,
+    source      TEXT NOT NULL,
+    outcome     TEXT NOT NULL CHECK (outcome IN ('found', 'not_found')),
+    response    TEXT NOT NULL CHECK (json_valid(response)),
+    fetched_at  TEXT NOT NULL,
+    PRIMARY KEY (isbn13, source)
+  ) WITHOUT ROWID;
+  `,
 ];
 
 /** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */

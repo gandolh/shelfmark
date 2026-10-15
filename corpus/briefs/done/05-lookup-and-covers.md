@@ -92,3 +92,24 @@ server/scripts/measure-lookup.ts
   cover candidate; `9786063205583` returns `draft: null` with every source in
   `tried`.
 - `npm run typecheck && npm run lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Done, except the Google measurement, which waits for the key:
+there is no `.env` yet, so Google is skipped and reported `skipped_no_key`,
+and its client is tested against fixtures in the Books API `volumes` shape
+(the only real Google recording is a keyless 429). Against the dev server,
+`9780547928227` returns The Hobbit with an Open Library cover candidate and
+`9786063205583` returns `draft: null` with both sources in `tried`. Three
+departures, forced by real behaviour and recorded in
+[metadata-lookup.md](../../wiki/metadata-lookup.md): every Open Library cover
+redirects through `archive.org` to `iaNNNNNN.us.archive.org`, so those two
+hosts are allowed as redirect targets only, never as the URL asked for;
+`jscmd=data` has no language or description, so a found ISBN costs a second
+`jscmd=details` call (300 found books take about 4 minutes); `lookup_cache`
+has an `outcome` column so expiry needs no parsing and an error row can't be
+stored. Also: subjects capped at 10, a new `upstream` (502) error code for a
+failed cover download, and one outbound `fetch` on `FeatureContext` that
+`startTestApp(overrides, { fetch })` replaces, refusing every request by
+default so no test reaches the network. A replaced cover keeps its URL, so
+the web client adds `?v=` to get past the day's cache. 103 new tests.
