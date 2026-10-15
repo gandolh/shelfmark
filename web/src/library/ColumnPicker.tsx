@@ -12,7 +12,14 @@ import { updatePrefs, useLibraryPrefs } from "./state";
  * follow A to Z. Showing a column puts it at the table's end. The book
  * column always leads. Everything applies at once.
  */
-export function ColumnPicker({ layout, onClose }: { layout: Layout; onClose: () => void }) {
+export interface ColumnPickerProps {
+  layout: Layout;
+  /** A step back to the sheet it was opened from: the phone's "Filter and sort". */
+  back?: { label: string; onClick: () => void };
+  onClose: () => void;
+}
+
+export function ColumnPicker({ layout, back, onClose }: ColumnPickerProps) {
   const { columnOrder, columnVisibility } = useLibraryPrefs(layout);
   const shown = columnOrder.filter((id) => id === BOOK_COLUMN_ID || columnVisibility[id]);
   const hidden = columnOrder
@@ -24,6 +31,11 @@ export function ColumnPicker({ layout, onClose }: { layout: Layout; onClose: () 
   // to the next row of the list it left, so a run of changes stays put.
   const list = useRef<HTMLDivElement>(null);
   const pendingFocus = useRef<string | null>(null);
+  // Opened from inside an open sheet, nothing else moves focus here.
+  const stepped = back !== undefined;
+  useLayoutEffect(() => {
+    if (stepped) list.current?.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+  }, [stepped]);
   useLayoutEffect(() => {
     const key = pendingFocus.current;
     if (key === null) return;
@@ -77,7 +89,7 @@ export function ColumnPicker({ layout, onClose }: { layout: Layout; onClose: () 
 
   return (
     <div className="library-panel__content">
-      <PanelHeader title="Columns" onDone={onClose} />
+      <PanelHeader title="Columns" back={back} onDone={onClose} />
       <div ref={list} className="library-panel__scroll">
         <section className="library-panel__section" aria-label="Shown">
           <h3 className="library-panel__label" aria-hidden="true">

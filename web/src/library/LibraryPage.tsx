@@ -22,8 +22,12 @@ import { Toolbar } from "./Toolbar";
 import { useLibraryView } from "./view";
 import "./library.css";
 
-/** The open panel, the control it hangs from, and which of that control's edges it lines up with. */
-type PanelState = { kind: "filter" | "columns"; anchor: HTMLElement; align: "start" | "end"; column?: ColumnId };
+/**
+ * The open panel, the control it hangs from, and which of that control's
+ * edges it lines up with. `stepped`: the phone's sheet went from "Filter and
+ * sort" to Columns (or back), so each step knows where focus belongs.
+ */
+type PanelState = { kind: "filter" | "columns"; anchor: HTMLElement; align: "start" | "end"; column?: ColumnId; stepped?: boolean };
 
 function books(count: number): string {
   return count === 1 ? "1 book" : `${count.toLocaleString("en-GB")} books`;
@@ -58,8 +62,12 @@ export function LibraryPage() {
   const setSorting = (sorting: Sorting) => updatePrefs(layout, (p) => ({ ...p, sorting }));
   const toggle = (kind: "filter" | "columns", anchor: HTMLElement | null) => {
     if (!anchor) return;
-    setPanel((open) => (open?.kind === kind ? null : { kind, anchor, align: "end" }));
+    // On the phone one button opens the sheet, whichever step it is on.
+    setPanel((open) => (open?.kind === kind || (!desktop && open !== null) ? null : { kind, anchor, align: "end" }));
   };
+  // The phone's table has no Columns button: the sheet steps between its two panels.
+  const phoneColumns = !desktop && mode === "table";
+  const step = (kind: "filter" | "columns") => setPanel((open) => open && { ...open, kind, column: undefined, stepped: true });
 
   const count = view.narrowed ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}` : books(view.total);
   const caption = hasBooks ? `${count}, ${describeSort(view.sorting)}` : undefined;
@@ -144,10 +152,16 @@ export function LibraryPage() {
               sorting={view.sorting}
               onSortingChange={setSorting}
               startColumn={panel.column}
+              onColumns={phoneColumns ? () => step("columns") : undefined}
+              focusColumns={phoneColumns && panel.stepped === true}
               onClose={() => setPanel(null)}
             />
           ) : (
-            <ColumnPicker layout={layout} onClose={() => setPanel(null)} />
+            <ColumnPicker
+              layout={layout}
+              back={phoneColumns ? { label: "Filter and sort", onClick: () => step("filter") } : undefined}
+              onClose={() => setPanel(null)}
+            />
           )}
         </Panel>
       )}

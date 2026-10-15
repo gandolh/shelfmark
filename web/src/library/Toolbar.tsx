@@ -1,4 +1,4 @@
-import type { ReactNode, RefObject } from "react";
+import type { RefObject } from "react";
 import { ButtonLink } from "../components/Button";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { ExportMenu } from "../export/ExportMenu";
@@ -25,12 +25,9 @@ export interface ToolbarProps {
  * The Library's controls (design.md). Desktop, right of the title: Table /
  * Covers, Filter, Columns (in the table), Export, and the accent "Add a
  * book" pill. Phone, under the search box: Covers / Table, then the quiet
- * "Columns" (in the table) and "Filter and sort"; Add a book is the tab bar's.
+ * "Filter and sort" and "Export" as accent text; Add a book is the tab bar's.
  */
 export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
-  // The Export menu, shown on both layouts.
-  const exportMenu: ReactNode = <ExportMenu view={view} />;
-
   const count = activeFilters(view.filters).length;
   const badge =
     count > 0 ? (
@@ -78,7 +75,7 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
             Columns
           </button>
         )}
-        {exportMenu}
+        <ExportMenu view={view} />
         <ButtonLink to={ADD_BOOK} variant="primary">
           Add a book
         </ButtonLink>
@@ -86,6 +83,8 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
     );
   }
 
+  // The phone keeps one quiet row: Columns is a row inside "Filter and sort"
+  // (LibraryPage), so its sheet is open for either panel.
   return (
     <>
       <SegmentedControl
@@ -99,30 +98,18 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
         onChange={onModeChange}
       />
       <div className="library-toolbar__end">
-        {mode === "table" && (
-          <button
-            ref={columnsButton}
-            type="button"
-            className="button button--quiet button--regular"
-            aria-haspopup="dialog"
-            aria-expanded={open === "columns"}
-            onClick={onColumns}
-          >
-            Columns
-          </button>
-        )}
         <button
           ref={filterButton}
           type="button"
           className="button button--quiet button--regular"
           aria-haspopup="dialog"
-          aria-expanded={open === "filter"}
+          aria-expanded={open !== null}
           onClick={onFilter}
         >
           Filter and sort
           {badge}
         </button>
-        {exportMenu}
+        <ExportMenu view={view} quiet />
       </div>
     </>
   );

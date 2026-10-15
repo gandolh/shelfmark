@@ -5,6 +5,13 @@
  * (`.shell--desktop` from 768 px), so these rules follow its classes.
  */
 
+/* The desktop columns, on the page so its header can line up with them. */
+.page:has(> .page__body > .book) {
+  --book-cover-width: 260px;
+  --book-main-width: 720px;
+  --book-gap: 40px;
+}
+
 .book {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -13,9 +20,14 @@
 }
 
 .shell--desktop .book {
-  grid-template-columns: 260px minmax(0, 720px);
-  gap: 40px;
+  grid-template-columns: var(--book-cover-width) minmax(0, var(--book-main-width));
+  gap: var(--book-gap);
   padding-top: 6px;
+}
+
+/* The header's actions (Edit, Re-run lookup) end where the cards do, not at the page's edge. */
+.shell--desktop .page:has(> .page__body > .book) .page__headrow {
+  max-width: calc(var(--book-cover-width) + var(--book-gap) + var(--book-main-width));
 }
 
 /* --- The cover column --------------------------------------------------------- */
@@ -133,6 +145,7 @@ legend.book-card__title + * {
   display: grid;
   grid-template-columns: 140px minmax(0, 1fr);
   gap: 12px;
+  align-items: baseline; /* the 14 px term sits on its 15 px value's line */
   padding: 11px 0;
   border-top: 1px solid var(--divider);
   font-size: var(--text-body);
@@ -143,13 +156,13 @@ legend.book-card__title + * {
 }
 
 .book-fact dt {
-  padding-top: 1px;
   color: var(--muted);
   font-size: var(--text-meta);
 }
 
 .book-fact dd {
   min-width: 0;
+  margin: 0; /* the browser's 40 px indent */
   color: var(--ink);
   font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;

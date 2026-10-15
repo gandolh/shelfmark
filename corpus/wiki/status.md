@@ -42,7 +42,7 @@ started 2026-10-14.
 | 10 | [Book page](../briefs/done/10-book-page.md) | 5 | done |
 | 11 | [Export and backup](../briefs/done/11-export-and-backup.md) | 5 | done |
 | 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
-| 13 | [Design finish and DESIGN.md](../briefs/todo/13-design-finish.md) | 6 | todo |
+| 13 | [Design finish and DESIGN.md](../briefs/done/13-design-finish.md) | 6 | done |
 | 14 | [Deploy](../briefs/done/14-deploy.md) | 6 | done |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits

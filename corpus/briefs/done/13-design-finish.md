@@ -52,3 +52,27 @@ Server code, tests' intent, anything not named by a finding.
   `web/src/styles/tokens.css`.
 - `npm run typecheck && npm run lint && npm test` pass; `bash corpus/lint.sh`
   is clean.
+
+## Outcome
+
+_2026-10-15_. Done. impeccable's detector found nothing before or after. With
+40 seeded books (20 real Open Library covers, 20 placeholders) captured at
+1440 and 390 px, the finish reviewer's first verdict was `fix` with seven
+material items: the phone Library toolbar's Export as a filled control past
+the gutter (now quiet, with Columns moved into the filter sheet as a step);
+the book page's values indented by the browser's default `dd` margin and its
+header actions overrunning the cards; the desktop Add page's mode switch
+floating far right (now heading the form column); the Year header
+truncating when sorted (80 px); the offline notice over the login heading;
+and the icon reading as a bar chart (redrawn as books on a shelf, one
+leaning; PNGs regenerated). The verdict pass scored all seven resolved:
+`ship`, for those fixes. Judged fine: the 260 px book-page cover and the
+three chip styles (one family). Left for the owner: whether the 46×69
+placeholder in the table should drop to a simpler mark (the reviewer says no:
+real covers are as unreadable there, and the book would look different
+between Table and Covers); the desktop Add result still uses the phone's
+60×90 cover; the Ward states of the login page and account menu weren't
+captured (no Ward here). `DESIGN.md` ("The Lit Shelf") and its sidecar
+`.impeccable/design.json` describe the built UI; their 29 colours equal
+`web/src/styles/tokens.css`. The review packet and the transcribed mock-ups
+are in `.impeccable/review/` (screenshots gitignored).

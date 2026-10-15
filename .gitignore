@@ -21,3 +21,6 @@ data/
 
 # Deploy secrets
 infrastructure/.env
+
+# Impeccable's review screenshots (the packet's text is kept)
+.impeccable/review/*.png

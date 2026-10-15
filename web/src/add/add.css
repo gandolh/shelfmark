@@ -183,9 +183,15 @@
   max-height: calc(100% - var(--add-top-room) - 12px);
 }
 
-/* Desktop: the camera as a rounded stage under the title; the switch is in the header. */
+/* Desktop: the switch at the head of the content column, then the camera as a rounded stage. */
 .shell--desktop .add {
   --add-top-room: 0px;
+
+  gap: 20px;
+}
+
+.add-modes-row {
+  display: flex;
 }
 
 .shell--desktop .add-stage {

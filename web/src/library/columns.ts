@@ -277,7 +277,7 @@ export const COLUMNS: readonly LibraryColumn[] = [
     id: "year",
     label: "Year",
     header: "Year",
-    size: 64,
+    size: 80, // "Year" and its sort arrow whole
     minSize: 56,
     defaultVisible: true,
     directions: DATE_DIRECTIONS,

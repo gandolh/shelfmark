@@ -7,11 +7,16 @@
 
 /* --- The page ----------------------------------------------------------------- */
 
-/* Pinned to the top, not centred: an error appearing must not move the form under the pointer. */
+/*
+ * Pinned to the top, not centred: an error appearing must not move the form
+ * under the pointer. The top always leaves room for the offline notice
+ * (pwa.css), which floats there on this page: one line on the desktop, two
+ * on a phone.
+ */
 .gate {
   display: grid;
   min-height: 100dvh;
-  padding: max(14vh, 48px) var(--gutter-phone) 48px;
+  padding: max(14vh, 64px) var(--gutter-phone) 48px;
   place-items: start center;
   background: var(--ground);
 }
@@ -216,7 +221,7 @@
 
 @media (max-width: 767.98px) {
   .gate {
-    padding-top: calc(env(safe-area-inset-top) + 7vh);
+    padding-top: calc(env(safe-area-inset-top) + max(7vh, 80px));
     line-height: var(--leading-phone);
   }
 

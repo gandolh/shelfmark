@@ -1,9 +1,16 @@
 ---
-summary: How Shelfmark looks and behaves, chosen by the owner on 2026-10-14. The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). Tokens in Shelfmark's own values, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, and links to the mock-ups. Read before any UI brief.
-updated: 2026-10-14
+summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The system as built is DESIGN.md at the repo root. Read before any UI brief.
+updated: 2026-10-15
 ---
 
 # Design
+
+**The design system as built is [DESIGN.md](../../DESIGN.md)** at the repo
+root (with its sidecar `.impeccable/design.json`), written on 2026-10-15 by
+brief 13 from the shipped UI; its tokens equal
+[tokens.css](../../web/src/styles/tokens.css). Build against DESIGN.md. This
+page keeps how the look was chosen, what the owner decided, and the finish
+review. Where the two disagree, DESIGN.md and the code win.
 
 Chosen on 2026-10-14 through two rounds on the design canvas (private artifact,
 <https://claude.ai/artifact/CqxmMKHrx4wgk4wZkF6C7D>):
@@ -110,13 +117,38 @@ Two places only: **Library** and **Add a book**.
     book".
 - "Not this book" or "Discard this scan" sits apart from the primary action.
 
-## Open design work for the build
+## Open design work for the build (done)
+
+What the mock-ups left open, as the v1 briefs drew it (DESIGN.md has the detail):
 
 - A **no-cover placeholder** in this world. Free databases miss most Romanian
-  covers ([metadata-lookup.md](metadata-lookup.md)), so it will be common: a
-  typographic cover (title and author on a tint derived from the title) rather
-  than a grey box.
-- The book page, the filter chip row, the Owned / Wishlist tabs, empty and
-  loading states, and the account menu, none of which the mock-ups draw.
-- `DESIGN.md` at the repo root is written by impeccable's documenter from the
-  built UI, not before; until then this page is the design record.
+  covers ([metadata-lookup.md](metadata-lookup.md)), so it is common: a
+  typographic cover (title and author on one of eight tints picked from the
+  title), not a grey box.
+- The book page, the filter chip row, empty and loading states, and the
+  account menu. The Owned / Wishlist tabs wait for the v1.x wishlist brief.
+- `DESIGN.md`, written from the built UI by brief 13 (below).
+
+## Finish review (2026-10-15, brief 13)
+
+Impeccable's finish reviewer, run fresh over desktop (1440) and phone (390)
+captures with 40 seeded books, against this page and the mock-ups'
+measurements (code-led build, no approved comp). Detector: no findings.
+
+- Round 1, `fix`, seven material fixes: the phone Library toolbar became one
+  quiet row (Export as accent text, Columns moved inside "Filter and sort");
+  the book page's fact values lost the browser's 40 px `dd` indent and its
+  header actions now end at the cards' edge; the desktop Add a book mode
+  switch moved from the far right into the content column; the Year column
+  widened to 80 px so its sorted header fits; the offline notice no longer
+  collides with the login heading; the app icon was redrawn (books on a
+  shelf, one leaning) because the old three spines read as a bar chart.
+- Verdict pass: all seven resolved, `ship`.
+- Judged fine as built: the 260 px book-page cover ("the cover leads"), and
+  the three chip styles (toggle, tag, filter chip), which read as one family.
+- Left for the owner: whether the 46×69 table placeholder should drop its
+  title and author for a simpler mark (real covers are just as unreadable at
+  that size, and a miniature keeps a book the same in Table and Covers);
+  whether the desktop Add result should show a larger cover than the phone
+  sheet's 60×90; and a look at the Sign in with Ward states, which the review
+  could not capture without Ward configured.

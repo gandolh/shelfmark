@@ -1,0 +1,764 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-15T10:02:02.501Z",
+  "title": "Design System: Shelfmark",
+  "extensions": {
+    "colorMeta": {
+      "ground": {
+        "role": "neutral",
+        "displayName": "Ground",
+        "canonical": "#F5F5F3",
+        "oklch": "oklch(97.0% 0.0026 106.4)",
+        "tonalRamp": [
+          "#0B0B0A",
+          "#242423",
+          "#40403E",
+          "#5E5E5C",
+          "#80807E",
+          "#A5A5A3",
+          "#CACAC9",
+          "#EEEEEC"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "#FFFFFF",
+        "oklch": "oklch(100.0% 0.0000 89.9)",
+        "tonalRamp": [
+          "#0B0B0B",
+          "#242424",
+          "#404040",
+          "#5D5D5D",
+          "#808080",
+          "#A4A4A4",
+          "#CACACA",
+          "#EEEEEE"
+        ]
+      },
+      "control": {
+        "role": "neutral",
+        "displayName": "Control Grey",
+        "canonical": "#E6E6E2",
+        "oklch": "oklch(92.4% 0.0054 106.5)",
+        "tonalRamp": [
+          "#0B0B09",
+          "#242421",
+          "#40403D",
+          "#5E5E5A",
+          "#80807D",
+          "#A5A5A1",
+          "#CBCBC7",
+          "#EFEFEB"
+        ]
+      },
+      "field": {
+        "role": "neutral",
+        "displayName": "Field Grey",
+        "canonical": "#E9E9E6",
+        "oklch": "oklch(93.3% 0.0040 106.5)",
+        "tonalRamp": [
+          "#0B0B09",
+          "#242422",
+          "#40403D",
+          "#5E5E5B",
+          "#80807E",
+          "#A5A5A2",
+          "#CBCBC8",
+          "#EFEFEC"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#E2E2DF",
+        "oklch": "oklch(91.2% 0.0040 106.5)",
+        "tonalRamp": [
+          "#0B0B09",
+          "#242422",
+          "#40403D",
+          "#5E5E5B",
+          "#80807E",
+          "#A5A5A2",
+          "#CBCBC8",
+          "#EFEFEC"
+        ]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider",
+        "canonical": "#ECECE9",
+        "oklch": "oklch(94.2% 0.0040 106.5)",
+        "tonalRamp": [
+          "#0B0B09",
+          "#242422",
+          "#40403D",
+          "#5E5E5B",
+          "#80807E",
+          "#A5A5A2",
+          "#CBCBC8",
+          "#EFEFEC"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1B1B1D",
+        "oklch": "oklch(22.3% 0.0038 286.1)",
+        "tonalRamp": [
+          "#0B0B0D",
+          "#242426",
+          "#3F3F42",
+          "#5D5D60",
+          "#808082",
+          "#A4A4A7",
+          "#CACACD",
+          "#EEEEF1"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Ink Two",
+        "canonical": "#45454A",
+        "oklch": "oklch(39.2% 0.0083 286.0)",
+        "tonalRamp": [
+          "#0B0B0F",
+          "#232328",
+          "#3F3F44",
+          "#5D5D62",
+          "#7F8085",
+          "#A4A4AA",
+          "#CACAD0",
+          "#EEEEF4"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#5F5F65",
+        "oklch": "oklch(48.8% 0.0095 286.0)",
+        "tonalRamp": [
+          "#0B0B0F",
+          "#232329",
+          "#3F3F45",
+          "#5D5D63",
+          "#7F7F86",
+          "#A4A4AA",
+          "#CACAD1",
+          "#EEEEF5"
+        ]
+      },
+      "accent": {
+        "role": "primary",
+        "displayName": "Shelf Teal",
+        "canonical": "#0E6E8C",
+        "oklch": "oklch(50.2% 0.0924 226.1)",
+        "tonalRamp": [
+          "#000D14",
+          "#012836",
+          "#01475C",
+          "#056784",
+          "#378BAA",
+          "#5FB1D1",
+          "#86D7F9",
+          "#DAF3FE"
+        ]
+      },
+      "accent-press": {
+        "role": "primary",
+        "displayName": "Pressed Teal",
+        "canonical": "#0A4F65",
+        "oklch": "oklch(39.9% 0.0722 225.9)",
+        "tonalRamp": [
+          "#000D14",
+          "#022836",
+          "#01475C",
+          "#28667D",
+          "#4D89A1",
+          "#72AEC7",
+          "#97D5EF",
+          "#DAF3FE"
+        ]
+      },
+      "accent-tint": {
+        "role": "primary",
+        "displayName": "Teal Wash",
+        "canonical": "#DCEDF2",
+        "oklch": "oklch(93.5% 0.0193 217.2)",
+        "tonalRamp": [
+          "#030D10",
+          "#19262A",
+          "#354246",
+          "#526165",
+          "#748388",
+          "#98A8AD",
+          "#BDCED3",
+          "#E1F2F7"
+        ]
+      },
+      "accent-tint-soft": {
+        "role": "primary",
+        "displayName": "Faint Teal Wash",
+        "canonical": "#EDF5F8",
+        "oklch": "oklch(96.5% 0.0094 222.1)",
+        "tonalRamp": [
+          "#070C0E",
+          "#1F2527",
+          "#3B4143",
+          "#585F61",
+          "#7A8284",
+          "#9FA6A9",
+          "#C4CCCF",
+          "#E8F0F3"
+        ]
+      },
+      "cover-1-bg": {
+        "role": "tertiary",
+        "displayName": "Oxblood cover tint",
+        "canonical": "#7B2D35",
+        "oklch": "oklch(41.2% 0.1086 17.1)",
+        "tonalRamp": [
+          "#1E0003",
+          "#4A0111",
+          "#6E212A",
+          "#914047",
+          "#B86368",
+          "#E0888C",
+          "#FEB4B6",
+          "#FFE8E8"
+        ]
+      },
+      "cover-1-ink": {
+        "role": "tertiary",
+        "displayName": "Oxblood cover ink",
+        "canonical": "#F7EEE6",
+        "oklch": "oklch(95.4% 0.0145 64.3)",
+        "tonalRamp": [
+          "#0F0A05",
+          "#29231D",
+          "#453E38",
+          "#645C55",
+          "#877F77",
+          "#ABA39B",
+          "#D1C9C1",
+          "#F6EDE5"
+        ]
+      },
+      "cover-2-bg": {
+        "role": "tertiary",
+        "displayName": "Ochre cover tint",
+        "canonical": "#D4A23A",
+        "oklch": "oklch(74.1% 0.1312 82.1)",
+        "tonalRamp": [
+          "#120A00",
+          "#312100",
+          "#533B02",
+          "#795704",
+          "#A47702",
+          "#CD9B32",
+          "#F5C25D",
+          "#FFECCB"
+        ]
+      },
+      "cover-2-ink": {
+        "role": "tertiary",
+        "displayName": "Ochre cover ink",
+        "canonical": "#2A1F10",
+        "oklch": "oklch(24.8% 0.0307 74.2)",
+        "tonalRamp": [
+          "#130900",
+          "#2D2213",
+          "#4A3E2E",
+          "#685B4B",
+          "#8B7E6C",
+          "#B0A290",
+          "#D7C8B5",
+          "#FBECD8"
+        ]
+      },
+      "cover-3-bg": {
+        "role": "tertiary",
+        "displayName": "Forest cover tint",
+        "canonical": "#33503E",
+        "oklch": "oklch(40.2% 0.0463 156.4)",
+        "tonalRamp": [
+          "#000F05",
+          "#0E2B1B",
+          "#2A4736",
+          "#486653",
+          "#6A8975",
+          "#8EAE99",
+          "#B3D4BE",
+          "#D6F8E2"
+        ]
+      },
+      "cover-3-ink": {
+        "role": "tertiary",
+        "displayName": "Forest cover ink",
+        "canonical": "#EEF0E2",
+        "oklch": "oklch(95.0% 0.0186 113.3)",
+        "tonalRamp": [
+          "#0B0C04",
+          "#24251B",
+          "#3F4136",
+          "#5D5F53",
+          "#808275",
+          "#A4A699",
+          "#CACCBE",
+          "#EEF0E2"
+        ]
+      },
+      "cover-4-bg": {
+        "role": "tertiary",
+        "displayName": "Slate cover tint",
+        "canonical": "#2C3E57",
+        "oklch": "oklch(36.0% 0.0495 256.7)",
+        "tonalRamp": [
+          "#000A1F",
+          "#14243C",
+          "#2F415A",
+          "#4C5F7A",
+          "#6D829E",
+          "#91A6C4",
+          "#B6CCEB",
+          "#E5EFFF"
+        ]
+      },
+      "cover-4-ink": {
+        "role": "tertiary",
+        "displayName": "Slate cover ink",
+        "canonical": "#EAEFF5",
+        "oklch": "oklch(95.0% 0.0097 252.8)",
+        "tonalRamp": [
+          "#080B0F",
+          "#212429",
+          "#3C4045",
+          "#5A5E63",
+          "#7C8186",
+          "#A0A5AB",
+          "#C6CBD1",
+          "#EAEFF5"
+        ]
+      },
+      "cover-5-bg": {
+        "role": "tertiary",
+        "displayName": "Plum cover tint",
+        "canonical": "#5C3F78",
+        "oklch": "oklch(42.6% 0.0966 306.2)",
+        "tonalRamp": [
+          "#140024",
+          "#301248",
+          "#4D3067",
+          "#6B4E88",
+          "#8F71AE",
+          "#B495D5",
+          "#DABBFD",
+          "#F3EAFE"
+        ]
+      },
+      "cover-5-ink": {
+        "role": "tertiary",
+        "displayName": "Plum cover ink",
+        "canonical": "#F2ECF7",
+        "oklch": "oklch(95.1% 0.0159 310.1)",
+        "tonalRamp": [
+          "#0D0910",
+          "#26222A",
+          "#423D46",
+          "#605B64",
+          "#837E87",
+          "#A8A2AC",
+          "#CEC8D2",
+          "#F2ECF7"
+        ]
+      },
+      "cover-6-bg": {
+        "role": "tertiary",
+        "displayName": "Sand cover tint",
+        "canonical": "#DCCDB0",
+        "oklch": "oklch(85.3% 0.0423 83.9)",
+        "tonalRamp": [
+          "#110A00",
+          "#2E2209",
+          "#4A3E25",
+          "#695C42",
+          "#8C7E64",
+          "#B1A387",
+          "#D8C9AC",
+          "#FCEDCF"
+        ]
+      },
+      "cover-6-ink": {
+        "role": "tertiary",
+        "displayName": "Sand cover ink",
+        "canonical": "#3A2E22",
+        "oklch": "oklch(31.1% 0.0269 66.6)",
+        "tonalRamp": [
+          "#130902",
+          "#2D2216",
+          "#4A3D31",
+          "#685B4E",
+          "#8C7D70",
+          "#B1A293",
+          "#D7C8B9",
+          "#FBEBDC"
+        ]
+      },
+      "cover-7-bg": {
+        "role": "tertiary",
+        "displayName": "Sage cover tint",
+        "canonical": "#B9C3A5",
+        "oklch": "oklch(80.1% 0.0426 122.4)",
+        "tonalRamp": [
+          "#090D00",
+          "#20270F",
+          "#3C432A",
+          "#596247",
+          "#7B8569",
+          "#A0A98C",
+          "#C5CFB1",
+          "#E9F4D4"
+        ]
+      },
+      "cover-7-ink": {
+        "role": "tertiary",
+        "displayName": "Sage cover ink",
+        "canonical": "#26301F",
+        "oklch": "oklch(29.4% 0.0327 132.9)",
+        "tonalRamp": [
+          "#060E02",
+          "#1E2717",
+          "#394432",
+          "#56624F",
+          "#798571",
+          "#9DA995",
+          "#C2CFBA",
+          "#E6F4DD"
+        ]
+      },
+      "cover-8-bg": {
+        "role": "tertiary",
+        "displayName": "Charcoal cover tint",
+        "canonical": "#2E2E30",
+        "oklch": "oklch(30.2% 0.0036 286.2)",
+        "tonalRamp": [
+          "#0B0B0D",
+          "#242426",
+          "#3F3F42",
+          "#5D5D5F",
+          "#808082",
+          "#A4A4A7",
+          "#CACACD",
+          "#EEEEF1"
+        ]
+      },
+      "cover-8-ink": {
+        "role": "tertiary",
+        "displayName": "Charcoal cover ink",
+        "canonical": "#E8C66C",
+        "oklch": "oklch(83.7% 0.1161 89.1)",
+        "tonalRamp": [
+          "#100A00",
+          "#2E2201",
+          "#4F3D02",
+          "#745A00",
+          "#9C7C16",
+          "#C2A145",
+          "#E9C76D",
+          "#FFEDC1"
+        ]
+      },
+      "on-accent": {
+        "role": "derived",
+        "displayName": "on-accent",
+        "canonical": "var(--surface)",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "bar": {
+        "role": "derived",
+        "displayName": "bar",
+        "canonical": "color-mix(in srgb, var(--surface) 40%, var(--ground))",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "control-hover": {
+        "role": "derived",
+        "displayName": "control-hover",
+        "canonical": "color-mix(in srgb, var(--control) 92%, var(--ink))",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "control-press": {
+        "role": "derived",
+        "displayName": "control-press",
+        "canonical": "color-mix(in srgb, var(--control) 84%, var(--ink))",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "segment-hover": {
+        "role": "derived",
+        "displayName": "segment-hover",
+        "canonical": "color-mix(in srgb, var(--surface) 45%, var(--control))",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "field-placeholder": {
+        "role": "derived",
+        "displayName": "field-placeholder",
+        "canonical": "var(--muted)",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "focus-ring": {
+        "role": "derived",
+        "displayName": "focus-ring",
+        "canonical": "var(--accent)",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "selection": {
+        "role": "derived",
+        "displayName": "selection",
+        "canonical": "var(--accent-tint)",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      },
+      "scrollbar-thumb": {
+        "role": "derived",
+        "displayName": "scrollbar-thumb",
+        "canonical": "color-mix(in srgb, var(--muted) 40%, var(--ground))",
+        "note": "Alias or mix of named tokens in tokens.css; not a separate hue, not in the frontmatter."
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Page title; 34 px desktop, 32 px phone (title-phone); line height 1.15 in the page header."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "\"Shelfmark\" in the desktop top bar."
+      },
+      "row-title": {
+        "displayName": "Row title",
+        "purpose": "A book's title in a table row; a card heading on the book page."
+      },
+      "action-large": {
+        "displayName": "Action large",
+        "purpose": "A sheet's 48 px primary action."
+      },
+      "input-phone": {
+        "displayName": "Input on a phone",
+        "purpose": "Every phone field, so iOS does not zoom."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text and captions; line height 1.45 desktop, 1.4 phone (body-phone)."
+      },
+      "meta": {
+        "displayName": "Meta",
+        "purpose": "Table cells, authors, desktop controls, menu items."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Small segmented controls, filter chips, grid titles, hints."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Column heads and menu section labels, sentence case."
+      },
+      "tab": {
+        "displayName": "Tab",
+        "purpose": "Tab bar labels; 600 when current."
+      },
+      "add-local": {
+        "displayName": "Add a book locals",
+        "purpose": "Feature-scoped in add/add.css, not system tokens: --text-result-title 20px/700, --text-sheet-heading 17px/600, --text-isbn 22px/600 with 0.04em tracking."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-cover",
+        "value": "0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2)",
+        "purpose": "Every book cover, real or placeholder. The only resting shadow in the app."
+      },
+      {
+        "name": "shadow-float",
+        "value": "0 16px 40px rgba(27, 27, 29, 0.18)",
+        "purpose": "What floats: menus, sheets, Filter/Columns panels, the password dialog, the update prompt, the account notice, the focused skip link."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.22, 1, 0.36, 1)",
+        "purpose": "The one curve for every state change."
+      },
+      {
+        "name": "duration-fast",
+        "value": "120ms",
+        "purpose": "Colour changes on buttons, segments, chips, tabs, rows."
+      },
+      {
+        "name": "duration",
+        "value": "180ms",
+        "purpose": "Menus dropping 4 px, the in-page result rising 8 px, a cover lifting 3 px on hover."
+      },
+      {
+        "name": "duration-sheet",
+        "value": "240ms",
+        "purpose": "A sheet rising from below its edge."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "1ms",
+        "purpose": "Under prefers-reduced-motion every animation and transition collapses to 1 ms."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone-max",
+        "value": "767.98px"
+      },
+      {
+        "name": "desktop",
+        "value": "768px"
+      }
+    ],
+    "zIndex": [
+      {
+        "name": "z-bar",
+        "value": "10"
+      },
+      {
+        "name": "z-float",
+        "value": "100"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The accent action: \"Add a book\" (as a pill), Save, a sheet's large action.",
+      "html": "<button class=\"ds-btn-primary\">Save</button> <button class=\"ds-btn-primary ds-pill\">Add a book</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; min-height: var(--control-height); padding: 0 16px; border: 0; border-radius: var(--radius-control); background: var(--accent); color: var(--on-accent); font: var(--weight-semibold) var(--text-meta)/var(--leading-tight) var(--font-sans); cursor: pointer; transition: background-color var(--duration-fast) var(--ease-out); } .ds-btn-primary.ds-pill { border-radius: var(--radius-pill); } .ds-btn-primary:hover, .ds-btn-primary:active { background: var(--accent-press); } .ds-btn-primary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Flat control-grey toolbar buttons (Filter, Columns, Export); teal wash while their menu is open.",
+      "html": "<button class=\"ds-btn-secondary\">Filter</button> <button class=\"ds-btn-secondary\" aria-expanded=\"true\">Export</button>",
+      "css": ".ds-btn-secondary { display: inline-flex; align-items: center; min-height: var(--control-height); padding: 0 12px; border: 0; border-radius: var(--radius-control); background: var(--control); color: var(--ink); font: var(--weight-regular) var(--text-meta)/var(--leading-tight) var(--font-sans); cursor: pointer; transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out); } .ds-btn-secondary:hover { background: var(--control-hover); } .ds-btn-secondary:active { background: var(--control-press); } .ds-btn-secondary[aria-expanded=\"true\"] { background: var(--accent-tint); color: var(--accent-press); font-weight: var(--weight-semibold); } .ds-btn-secondary:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Accent text on nothing: the phone toolbar's \"Filter and sort\" and \"Export\".",
+      "html": "<button class=\"ds-btn-quiet\">Filter and sort</button> <button class=\"ds-btn-quiet\">Export</button>",
+      "css": ".ds-btn-quiet { min-height: var(--touch); padding: 0 4px; border: 0; background: none; color: var(--accent); font: var(--weight-regular) var(--text-body)/var(--leading-tight) var(--font-sans); cursor: pointer; transition: color var(--duration-fast) var(--ease-out); } .ds-btn-quiet:hover, .ds-btn-quiet:active { color: var(--accent-press); } .ds-btn-quiet:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; border-radius: var(--radius-control); }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "nav",
+      "refersTo": "segmented-track",
+      "description": "The two places in the top bar; Table / Covers; Add a book's three modes.",
+      "html": "<div class=\"ds-seg\" role=\"group\"><button class=\"ds-seg__item\" aria-pressed=\"true\">Library</button><button class=\"ds-seg__item\" aria-pressed=\"false\">Add a book</button></div>",
+      "css": ".ds-seg { display: inline-flex; padding: 3px; border-radius: var(--radius-track); background: var(--control); font-family: var(--font-sans); } .ds-seg__item { min-height: var(--segment-height); padding: 0 18px; border: 0; border-radius: var(--radius-control); background: none; color: var(--ink-2); font-size: var(--text-meta); cursor: pointer; transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out); } .ds-seg__item:hover { background: var(--segment-hover); color: var(--ink); } .ds-seg__item[aria-pressed=\"true\"] { background: var(--surface); color: var(--ink); font-weight: var(--weight-semibold); } .ds-seg__item:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "search-field",
+      "description": "Field-grey, borderless, the ring on the box.",
+      "html": "<label class=\"ds-search\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"6.5\"/><path d=\"M20 20l-4-4\"/></svg><input class=\"ds-search__input\" type=\"search\" placeholder=\"Search\"></label>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 8px; width: 240px; min-height: var(--control-height); padding: 0 10px; border-radius: var(--radius-field); background: var(--field); color: var(--muted); font-family: var(--font-sans); } .ds-search:focus-within { outline: 2px solid var(--focus-ring); outline-offset: 0; } .ds-search__input { flex: 1; min-width: 0; height: var(--control-height); border: 0; padding: 0; background: transparent; color: var(--ink); font: inherit; font-size: var(--text-meta); outline: none; } .ds-search__input::placeholder { color: var(--field-placeholder); }"
+    },
+    {
+      "name": "Choice Chips",
+      "kind": "chip",
+      "refersTo": "choice-chip",
+      "description": "Shelf and status picks in Add a book; selected turns teal wash.",
+      "html": "<div class=\"ds-chips\"><button class=\"ds-chip\" aria-pressed=\"true\">Living room · A2</button><button class=\"ds-chip\" aria-pressed=\"false\">Bedroom</button><button class=\"ds-chip ds-chip--new\">New shelf</button></div>",
+      "css": ".ds-chips { display: flex; flex-wrap: wrap; gap: 8px; font-family: var(--font-sans); } .ds-chip { min-height: 36px; padding: 0 14px; border: 0; border-radius: var(--radius-pill); background: var(--control); color: var(--ink); font-size: var(--text-meta); line-height: var(--leading-tight); cursor: pointer; transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out); } .ds-chip:hover { background: var(--control-hover); } .ds-chip[aria-pressed=\"true\"] { background: var(--accent-tint); color: var(--accent-press); font-weight: var(--weight-semibold); } .ds-chip--new { outline: 1px dashed var(--muted); outline-offset: -1px; background: transparent; color: var(--ink-2); } .ds-chip--new:hover { background: var(--control); } .ds-chip:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }"
+    },
+    {
+      "name": "Menu",
+      "kind": "custom",
+      "refersTo": "menu",
+      "description": "The account and Export menus: white, float shadow, faint teal row hover.",
+      "html": "<div class=\"ds-menu\" role=\"menu\"><div class=\"ds-menu__label\">What you see now</div><button class=\"ds-menu__item\" role=\"menuitem\">Excel <span class=\"ds-menu__detail\">.xlsx</span></button><button class=\"ds-menu__item\" role=\"menuitem\">CSV <span class=\"ds-menu__detail\">.csv</span></button></div>",
+      "css": ".ds-menu { display: flex; flex-direction: column; min-width: 224px; padding: 6px; border-radius: var(--radius-menu); background: var(--surface); box-shadow: var(--shadow-float); color: var(--ink); font-family: var(--font-sans); } .ds-menu__label { padding: 6px 10px 2px; color: var(--muted); font-size: var(--text-label); font-weight: var(--weight-semibold); } .ds-menu__item { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 36px; padding: 0 10px; border: 0; border-radius: var(--radius-menu-item); background: none; color: var(--ink); font: inherit; font-size: var(--text-meta); text-align: left; cursor: pointer; } .ds-menu__item:hover, .ds-menu__item:focus { background: var(--accent-tint-soft); } .ds-menu__item:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; } .ds-menu__detail { color: var(--muted); font-size: var(--text-small); }"
+    },
+    {
+      "name": "Book Cover and Placeholder",
+      "kind": "custom",
+      "refersTo": "cover",
+      "description": "The signature: the only object with a shadow; without an image, a typographic cover on the title's tint.",
+      "html": "<div class=\"ds-covers\"><span class=\"ds-cover\" style=\"--tint-bg: var(--cover-3-bg); --tint-ink: var(--cover-3-ink)\"><span class=\"ds-cover__face\"><span class=\"ds-cover__title\">O vară cu Isidor</span><span class=\"ds-cover__byline\"><span class=\"ds-cover__author\">Veronica D. Niculescu</span></span></span></span><span class=\"ds-cover\" style=\"--tint-bg: var(--cover-8-bg); --tint-ink: var(--cover-8-ink)\"><span class=\"ds-cover__face\"><span class=\"ds-cover__title\">Inocenții</span><span class=\"ds-cover__byline\"><span class=\"ds-cover__author\">Ioana Pârvulescu</span></span></span></span></div>",
+      "css": ".ds-covers { display: flex; gap: 20px; padding: 16px; background: var(--ground); font-family: var(--font-sans); } .ds-cover { position: relative; display: block; width: 120px; aspect-ratio: 2 / 3; overflow: hidden; border-radius: var(--radius-cover); background: var(--tint-bg); color: var(--tint-ink); box-shadow: var(--shadow-cover); container: cover / inline-size; transition: transform var(--duration) var(--ease-out); } .ds-cover:hover { transform: translateY(-3px); } .ds-cover__face { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 6cqi; padding: 12cqi 10cqi 11cqi 16cqi; line-height: 1.1; } .ds-cover__face::before { content: \"\"; position: absolute; inset-block: 0; inset-inline-start: 7cqi; border-inline-start: 1px solid color-mix(in srgb, var(--tint-ink) 24%, transparent); } .ds-cover__title { font-size: 12.5cqi; font-weight: var(--weight-bold); letter-spacing: -0.015em; text-wrap: balance; } .ds-cover__byline { display: flex; flex-direction: column; gap: 4.5cqi; } .ds-cover__byline::before { content: \"\"; width: 16cqi; border-top: max(1px, 0.8cqi) solid currentColor; } .ds-cover__author { font-size: 7.5cqi; font-weight: var(--weight-semibold); line-height: 1.3; letter-spacing: 0.06em; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lit Shelf",
+    "overview": "Shelfmark is the familiar table app played straight, in its Covers variant: the book's cover leads and everything around it recedes. A quiet off-white ground, flat grey controls, white containers with no shadow, one teal for everything that can be pressed, and the system font. The only object in the app that sits up off the page is a book's cover. Navigation is conventional on purpose (the owner rejected a metaphor-driven UI elsewhere as hard to navigate): exactly two places, Library and Add a book, a top bar on the desktop and a two-tab bar on a phone, account items in a menu rather than a Settings page.\n\nThe density is that of a working tool. The desktop Library is a table of 94 px rows inside one white rounded container; the phone defaults to a three-column grid of covers. Because free databases miss most Romanian covers, many books wear the no-cover placeholder, a typographic cover on one of eight tints picked from the title, so a library with few real covers still reads as a shelf rather than a wall of grey boxes.\n\nThe theme is light only. No dark theme exists or is planned; `color-scheme: light` is set at the root. The camera view is dark because it is a camera, not because the system has a dark mode.\n\nThe app icon carries the same world: books on a shelf in the accent on the ground, spines of different widths and heights, the last one leaning 15° on its neighbour, a ground-coloured label band low on three spines. No text, no gradients, the mark inside the maskable safe zone so one image serves both purposes.",
+    "keyCharacteristics": [
+      "Light only; the ground is a neutral off-white, containers are white.",
+      "One interactive colour, the teal accent; everything else is ink, greys, and white.",
+      "The cover is the only thing with a shadow, besides what floats (menus, sheets, dialogs).",
+      "Flat fills, no borders on controls, hairlines only on the bars and dividers in the table.",
+      "The system font at a small set of sizes; tabular figures for years, counts and ISBNs.",
+      "Two places only; account items live in a menu."
+    ],
+    "rules": [
+      {
+        "name": "The Token-Only Rule",
+        "body": "Every colour comes from `tokens.css`. No stylesheet or script outside it writes a colour literal; a new need is met by a mix or alias of existing tokens, never a new hue.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Interactive Colour Rule",
+        "body": "The accent is the only colour that means \"press this\". Nothing decorative is teal, and nothing pressable is any other hue. The status \"Reading\" is the single non-control use, and it is semibold so it reads as state, not as a link.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Danger Hue Rule",
+        "body": "There is no red. An error is ink, semibold, with its mark; a block error sits on the field grey; an invalid field gets a 1.5 px ink-2 outline. Destructive actions are separated by placement, not colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Years, counts, ISBNs, dates and number columns use `font-variant-numeric: tabular-nums` so they line up; number columns are right-aligned.",
+        "section": "typography"
+      },
+      {
+        "name": "The Steady Width Rule",
+        "body": "A label that turns semibold when selected (segments, chips, menu buttons) reserves its semibold width with a hidden copy of itself, so a choice never shifts its neighbours.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lit Object Rule",
+        "body": "The cover is the only thing with a shadow besides floating menus and sheets. A card, a button, a chip or a container never gets one; if something needs to separate from the ground, make it white.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** take every colour from `tokens.css`; meet a new need with a `color-mix` of existing tokens, never a new hue.",
+      "**Do** keep the accent as the only interactive colour: primary actions, links, quiet text buttons, the current tab, the focus ring.",
+      "**Do** give every book a cover: the stored image, or the typographic placeholder on its title's tint.",
+      "**Do** keep the cover's shadow (`0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2)`) on the cover and the float shadow (`0 16px 40px rgba(27, 27, 29, 0.18)`) on menus, sheets and dialogs, and nothing else.",
+      "**Do** separate surfaces by tone: white containers (16 px corners) on the ground, grey controls inside them.",
+      "**Do** keep exactly two places, Library and Add a book; the book page and login are routes inside them, and account items live in the account menu.",
+      "**Do** write English copy in the glossary's words: book, collection, shelf (written \"Room · shelf\"), status, lookup, draft.",
+      "**Do** keep the scanner one screen with internal states; nothing navigates while the camera runs.",
+      "**Do** give every phone target 44 px and every phone field 16 px text.",
+      "**Do** use tabular figures for years, counts, ISBNs and dates."
+    ],
+    "donts": [
+      "**Don't** add a dark theme. The app is light only; the camera is dark because it is a camera.",
+      "**Don't** put a shadow on a card, the table, a button, a chip or the in-page result.",
+      "**Don't** introduce a second interactive hue, or a red for errors or deletion.",
+      "**Don't** use the eight cover tints anywhere but the placeholder cover.",
+      "**Don't** add a third place or a Settings page.",
+      "**Don't** use decorative gradients; the camera's vignette is the one gradient, and it is functional.",
+      "**Don't** write \"item\", \"record\", \"entry\", \"location\", \"result\" or \"match\" for what the glossary calls a book, shelf or draft, or \"search\" for a lookup.",
+      "**Don't** fade a sheet in from nothing; it rises from its edge."
+    ]
+  }
+}

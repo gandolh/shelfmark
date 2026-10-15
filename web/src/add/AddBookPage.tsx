@@ -175,13 +175,16 @@ export function AddBookPage() {
     );
 
   return (
-    <Page title="Add a book" bleed caption={desktop ? status : undefined} toolbar={desktop ? switcher : undefined}>
+    <Page title="Add a book" bleed caption={desktop ? status : undefined}>
       <div className={`add add--${mode}`}>
         {/* Scan moves focus into each result; Type ISBN keeps it in the field, so results are read out from here. */}
         <p className="visually-hidden" role="status">
           {announcement(state, mode !== "scan")}
         </p>
-        {!desktop && (
+        {desktop ? (
+          // Desktop: the switch heads the content column, over the field or the camera it changes.
+          <div className="add-modes-row">{switcher}</div>
+        ) : (
           <div className="add-top" data-over-camera={mode === "scan" || undefined}>
             {switcher}
             {status}

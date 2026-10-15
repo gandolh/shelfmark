@@ -1,5 +1,5 @@
 import type { Book } from "@shelfmark/shared";
-import { useId, useMemo, useRef, useState, type ChangeEvent } from "react";
+import { useId, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { columnById, type ColumnId, type LibraryColumn } from "./columns";
 import {
@@ -73,18 +73,39 @@ export interface FilterPanelProps {
   onSortingChange: (sorting: Sorting) => void;
   /** Open on this column's filter (a chip was pressed). */
   startColumn?: ColumnId;
+  /** The phone's table: a "Columns" row that turns the sheet into the column picker. */
+  onColumns?: () => void;
+  /** Back from the column picker: focus lands on the "Columns" row again. */
+  focusColumns?: boolean;
   onClose: () => void;
 }
 
-export function FilterPanel({ books, filters, query, withSort, sorting, onSortingChange, startColumn, onClose }: FilterPanelProps) {
+export function FilterPanel({
+  books,
+  filters,
+  query,
+  withSort,
+  sorting,
+  onSortingChange,
+  startColumn,
+  onColumns,
+  focusColumns = false,
+  onClose,
+}: FilterPanelProps) {
   const [columnId, setColumnId] = useState<ColumnId | null>(startColumn ?? null);
   const [returnTo, setReturnTo] = useState<ColumnId | null>(null);
   // Bumped by "Remove this filter", so the editor starts over with empty fields.
   const [fresh, setFresh] = useState(0);
   const body = useRef<HTMLDivElement>(null);
+  const columnsRow = useRef<HTMLButtonElement>(null);
   useFocusOnChange(columnId, body);
+  useLayoutEffect(() => {
+    if (focusColumns) columnsRow.current?.focus();
+  }, [focusColumns]);
 
   const title = withSort ? "Filter and sort" : "Filter";
+  // Back from the column picker, and not since moved on to a column's filter.
+  const columnsFirst = focusColumns && returnTo === null;
 
   if (columnId !== null) {
     const column = columnById(columnId);
@@ -135,7 +156,28 @@ export function FilterPanel({ books, filters, query, withSort, sorting, onSortin
     <div ref={body} className="library-panel__content">
       <PanelHeader title={title} onDone={onClose} />
       <div className="library-panel__scroll">
-        {withSort && <SortSection sorting={sorting} onChange={onSortingChange} />}
+        {withSort && <SortSection sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />}
+        {onColumns && (
+          <section className="library-panel__section" aria-label="Table">
+            <h3 className="library-panel__label" aria-hidden="true">
+              Table
+            </h3>
+            <ul className="library-columns" role="list">
+              <li>
+                <button
+                  ref={columnsRow}
+                  type="button"
+                  className="library-columns__item"
+                  onClick={onColumns}
+                  data-autofocus={columnsFirst ? "" : undefined}
+                >
+                  <span className="library-columns__label">Columns</span>
+                  <ChevronIcon size={16} className="library-columns__chevron" />
+                </button>
+              </li>
+            </ul>
+          </section>
+        )}
         <section className="library-panel__section" aria-label="Filter by">
           {withSort && <h3 className="library-panel__label">Filter by</h3>}
           <ul className="library-columns" role="list">
@@ -167,7 +209,7 @@ export function FilterPanel({ books, filters, query, withSort, sorting, onSortin
 
 // --- Sort --------------------------------------------------------------------------
 
-function SortSection({ sorting, onChange }: { sorting: Sorting; onChange: (sorting: Sorting) => void }) {
+function SortSection({ sorting, onChange, takeFocus }: { sorting: Sorting; onChange: (sorting: Sorting) => void; takeFocus: boolean }) {
   const id = useId();
   const lead = sorting[0] ?? { id: "added" as const, desc: true };
   const column = columnById(lead.id);
@@ -184,7 +226,7 @@ function SortSection({ sorting, onChange }: { sorting: Sorting; onChange: (sorti
             className="library-select__input"
             aria-label="Sort by"
             value={lead.id}
-            data-autofocus=""
+            data-autofocus={takeFocus ? "" : undefined}
             onChange={(event: ChangeEvent<HTMLSelectElement>) => {
               const next = columnById(event.target.value as ColumnId);
               onChange([{ id: next.id, desc: firstSortDesc(next) }]);

@@ -1,12 +1,15 @@
 /* The update prompt and the offline notice: fixed, so neither moves the page. */
 
+/* Centred by its margins, not by left: 50%, which would halve the width it may wrap in. */
 .offline-notice {
   position: fixed;
   top: calc(env(safe-area-inset-top) + 8px);
-  left: 50%;
+  right: 0;
+  left: 0;
   z-index: var(--z-float);
+  width: fit-content;
   max-width: calc(100% - 2 * var(--gutter-phone));
-  margin: 0;
+  margin: 0 auto;
   padding: 6px 14px;
   border: 1px solid var(--hairline);
   border-radius: var(--radius-pill);
@@ -15,14 +18,11 @@
   font-size: var(--text-meta);
   line-height: var(--leading-tight);
   text-align: center;
-  transform: translateX(-50%);
 }
 
-/* The desktop top bar is there from 768 px (layout/viewport.ts): sit under it. */
-@media (min-width: 768px) {
-  .offline-notice {
-    top: calc(var(--topbar-height) + 8px);
-  }
+/* Under the desktop top bar where there is one; the login page has none, so it keeps the top. */
+:root:has(.topbar) .offline-notice {
+  top: calc(var(--topbar-height) + 8px);
 }
 
 .update-prompt {

@@ -34,8 +34,12 @@ async function saveXlsx(table: ExportTable): Promise<void> {
   save(await buildXlsx(table), exportFileName("xlsx"));
 }
 
-/** Export, under the toolbar: what the Library shows now, or every book and every field, as Excel or CSV. */
-export function ExportMenu({ view }: { view: LibraryView }) {
+/**
+ * Export, under the toolbar: what the Library shows now, or every book and
+ * every field, as Excel or CSV. `quiet` draws the button as accent text (the
+ * phone's toolbar) instead of the desktop's flat secondary fill.
+ */
+export function ExportMenu({ view, quiet = false }: { view: LibraryView; quiet?: boolean }) {
   const [failed, setFailed] = useState(false);
   const run = (job: () => Promise<void>) => () => {
     setFailed(false);
@@ -48,6 +52,7 @@ export function ExportMenu({ view }: { view: LibraryView }) {
       <Menu
         label="Export"
         trigger="Export"
+        triggerClassName={quiet ? "button button--quiet button--regular menu-trigger" : undefined}
         align="end"
         sections={[
           {
