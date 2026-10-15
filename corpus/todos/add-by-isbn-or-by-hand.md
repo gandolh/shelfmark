@@ -18,4 +18,4 @@ Many Romanian books will need the manual form; see [metadata-
 lookup.md](../wiki/metadata-lookup.md). Keyboard-wedge notes in
 [scanning.md](../wiki/scanning.md).
 
-Promoted to [brief 09](../briefs/todo/09-add-a-book-page.md) on 2026-10-14.
+Promoted to [brief 09](../briefs/done/09-add-a-book-page.md) on 2026-10-14.

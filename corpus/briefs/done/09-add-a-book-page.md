@@ -73,3 +73,33 @@ web/src/add/api.ts
   book already saved; type an ISBN on the laptop; record in the outcome note.
 - impeccable's detector run on `web/src/add`; `npm run typecheck && npm run
   lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Built, unit-tested (67 tests, 39 of them on `flow.ts`) and
+passed by impeccable's finish reviewer on its second round; the phone run is
+the owner's. Checked in headless Chrome at 1440 and 390 px, including the
+scan path with a fake camera playing generated EAN-13s: found and saved
+with its cover fetched, already owned (and another copy, which copies the
+stored cover), not found then saved by hand with a photo resized to
+675×900, a store sticker, a lookup failure and a save failure. The build now
+carries the scanner's `.wasm`. Departures: Scan is the default on a phone,
+Type ISBN on a desktop; the phone page uses `bleed` in all three modes, so
+the mode switch never moves and there is no visible title; "Found in Open
+Library" sits under the meta line rather than above the title (the reviewer
+read it as a kicker); a typed shelf normalises `-`, `/`, `|` to ` · ` and takes
+the library's spelling of an existing shelf; six recent shelves show as chips,
+the rest are suggested as you type; the not-found message says Google Books
+wasn't searched when it was skipped for want of a key. A non-ISBN barcode is
+kept as `barcode` only through "Add by hand". Known gap: `copyCover` uses a
+plain `fetch`, so after brief 06 a 401 there reads as "cover didn't download".
+
+**Owner checks** (`npm run dev:https` on a phone): scan a found English book
+and save (the scanner is live again with no tap, "1 added this session");
+scan a Romanian book that isn't found, type the title, take a cover photo and
+return (the scanner comes back without a new permission prompt), save, and
+see the cover in the Library without a reload; scan a saved book ("Already in
+your library", "Open the book" opens it); scan a price sticker ("This barcode
+isn't an ISBN"); switch Scan → Type ISBN → Scan without a new prompt; the
+torch where the phone has one; on a laptop, a USB scanner's digits+Enter look
+the book up and a repeat of the same ISBN does nothing.

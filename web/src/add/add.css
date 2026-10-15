@@ -1,0 +1,883 @@
+/*
+ * Add a book (web/src/add): the camera stage, the result sheet's content, the
+ * ISBN field, the by-hand form and its chips. Colours, radii and shadows come
+ * from tokens.css; the two sizes the shared scale doesn't have are named here.
+ * The shell picks phone or desktop in script (`.shell--desktop` from 768 px),
+ * so these rules follow its classes like shell.css does.
+ */
+
+.add {
+  --text-result-title: 20px; /* a result's title, 700 (the Covers-Add mock-up) */
+  --text-sheet-heading: 17px; /* a result without a book: "This barcode isn't an ISBN" */
+  --text-isbn: 22px; /* Type ISBN's one large field */
+  --add-top-room: 96px; /* what the phone's mode switch and counter take over the camera */
+
+  position: relative;
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.add__panel {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+/* --- The top of the phone screen: the mode switch, then the session line -------- */
+
+.add-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px var(--gutter-phone) 12px;
+}
+
+/* Over the camera it floats; only its controls take touches. */
+.add-top[data-over-camera] {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: calc(var(--z-bar) + 1);
+  pointer-events: none;
+}
+
+.add-top[data-over-camera] > * {
+  pointer-events: auto;
+}
+
+.add-modes .segmented__item[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+}
+
+/* On the camera the track sits on the page's ground, nearly opaque, so it reads over any picture. */
+.add-modes--over-camera {
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+}
+
+.add-modes--over-camera .segmented__item:hover {
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+/* The session counter, and what was just saved. Empty, it takes no room. */
+.add-session {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  min-width: 0;
+  font-size: var(--text-small);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+}
+
+.add-session svg {
+  flex: none;
+  color: var(--accent);
+}
+
+.add-session__title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--ink);
+}
+
+.add-session__count {
+  flex: none;
+  white-space: nowrap;
+}
+
+.add-top .add-session {
+  color: var(--muted);
+}
+
+.add-top[data-over-camera] .add-session[data-shown] {
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  color: var(--ink-2);
+}
+
+/* On the desktop it is the page's caption, under the title. */
+.page__caption .add-session {
+  font-size: inherit;
+}
+
+/* --- The camera stage ---------------------------------------------------------------- */
+
+.add-stage {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 420px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ink); /* the camera is dark because it is a camera */
+}
+
+/* A vignette, as drawn: the white sheet and controls hold their edge over a bright picture. */
+.add-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(ellipse at 50% 45%, transparent 55%, color-mix(in srgb, var(--ink) 50%, transparent));
+  pointer-events: none;
+}
+
+/* Two classes, so these win over CameraScanner.css whatever order the sheets load in. */
+.add-stage .add-camera {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  min-height: 0;
+}
+
+/* The viewfinder of the Covers-Add mock-up: 240 × 132, a 3 px white rim, 14 px corners. */
+.add-stage .scanner-frame {
+  top: 45%;
+  width: 240px;
+  aspect-ratio: 240 / 132;
+  border-width: 3px;
+  border-radius: 14px;
+}
+
+.add-stage .scanner-hit {
+  border-radius: 11px;
+}
+
+.add-stage .scanner-message {
+  padding-top: var(--add-top-room);
+}
+
+.add-torch {
+  position: absolute;
+  top: calc(var(--add-top-room) - 32px);
+  right: 12px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch);
+  height: var(--touch);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  color: var(--ink);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.add-torch[aria-pressed="true"] {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+}
+
+/* The sheet leaves the mode switch and the counter uncovered, however long it grows. */
+.add-stage .add-sheet {
+  max-height: calc(100% - var(--add-top-room) - 12px);
+}
+
+/* Desktop: the camera as a rounded stage under the title; the switch is in the header. */
+.shell--desktop .add {
+  --add-top-room: 0px;
+}
+
+.shell--desktop .add-stage {
+  flex: none;
+  height: clamp(420px, calc(100dvh - 260px), 660px);
+  border-radius: var(--radius-container);
+}
+
+.shell--desktop .add-torch {
+  top: 12px;
+}
+
+.shell--desktop .add-stage .add-sheet {
+  max-height: calc(100% - 24px);
+}
+
+/* --- Type ISBN and By hand: one column ------------------------------------------- */
+
+.add-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 4px var(--gutter-phone) 24px;
+}
+
+.shell--desktop .add-column {
+  gap: 20px;
+  max-width: 600px;
+  padding: 0;
+}
+
+.add-column__result:empty {
+  display: none;
+}
+
+/* A result in the page rather than over the camera: the same white, flat on the ground. */
+.add-result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-container);
+  background: var(--surface);
+  animation: add-rise var(--duration) var(--ease-out);
+}
+
+.shell--desktop .add-result {
+  gap: 16px;
+  padding: 20px;
+}
+
+@keyframes add-rise {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+/* --- What a result says ------------------------------------------------------------ */
+
+.add-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.add-head__cover {
+  flex: none;
+  width: 60px;
+}
+
+.add-head__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* The cover's place while the lookup runs. */
+.add-head__blank {
+  display: block;
+  width: 60px;
+  aspect-ratio: 2 / 3;
+  border-radius: var(--radius-cover);
+  background: var(--control);
+}
+
+/* Where the details came from: provenance, so it follows them rather than heading them. */
+.add-source {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+.add-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--accent);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+.add-title {
+  color: var(--ink);
+  font-size: var(--text-result-title);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.add-title:focus-visible {
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.add-title--small {
+  font-size: var(--text-sheet-heading);
+  font-weight: var(--weight-semibold);
+}
+
+.add-title__sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  letter-spacing: 0;
+}
+
+.add-byline {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: var(--text-body);
+}
+
+.add-meta {
+  color: var(--muted);
+  font-size: var(--text-meta);
+  font-variant-numeric: tabular-nums;
+}
+
+.add-code {
+  color: var(--ink-2);
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+/* A result without a book: an icon in a disc, then the heading and what to do. */
+.add-lead {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.add-lead__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: var(--control);
+  color: var(--ink-2);
+}
+
+.add-lead .add-meta {
+  margin-top: 2px;
+  color: var(--ink-2);
+  font-size: var(--text-body);
+}
+
+/* The lookup in flight: a short accent bar running along a flat track. */
+.add-progress {
+  position: relative;
+  height: 3px;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--control);
+}
+
+.add-progress::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 35%;
+  border-radius: inherit;
+  background: var(--accent);
+  animation: add-progress 1.2s var(--ease-out) infinite;
+}
+
+@keyframes add-progress {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(290%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-progress::after {
+    width: 100%;
+    animation: none;
+    opacity: 0.5;
+  }
+}
+
+/* --- Actions -------------------------------------------------------------------------- */
+
+/* The way out, under the primary action: centred alone, at the two ends with "Edit details". */
+.add-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: -4px;
+}
+
+.add-actions--split {
+  justify-content: space-between;
+}
+
+/* Plain ink, not the accent: leaving is never the action the sheet suggests. */
+.button--quiet.add-quiet-neutral {
+  color: var(--ink-2);
+}
+
+.button--quiet.add-quiet-neutral:hover,
+.button--quiet.add-quiet-neutral:active {
+  color: var(--ink);
+}
+
+/* Two secondary pills side by side, 44 px everywhere (the mock-up's "Add another copy", "Open the book"). */
+.add-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.add-pair .button {
+  min-height: var(--touch);
+  padding-inline: 12px;
+  font-size: var(--text-body);
+}
+
+/* --- Labels, hints and errors ------------------------------------------------------------ */
+
+.add-label {
+  display: block;
+  padding: 0; /* a legend's own inset would set it off its chips */
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.add-label__optional {
+  margin-left: 6px;
+  font-weight: var(--weight-regular);
+}
+
+.add-hint {
+  color: var(--muted);
+  font-size: var(--text-small);
+  line-height: var(--leading-tight);
+}
+
+/* No danger colour exists (design.md): an error is ink, semibold, with its mark. */
+.add-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+}
+
+.add-error svg {
+  flex: none;
+  margin-top: -1px;
+}
+
+.add-error--block {
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--field);
+  font-size: var(--text-meta);
+}
+
+.add-error--block svg {
+  margin-top: 0;
+}
+
+/* --- The ISBN field --------------------------------------------------------------- */
+
+/* Label, field and button, then the hint under the field: one row on the
+   desktop and in a sheet, stacked on a phone with the button last. */
+.add-isbn {
+  display: grid;
+  grid-template-areas:
+    "label label"
+    "box submit"
+    "note note";
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 10px;
+}
+
+.add-isbn > .add-label {
+  grid-area: label;
+}
+
+.add-isbn > .add-hint,
+.add-isbn > .add-error {
+  grid-area: note;
+}
+
+.shell--phone .add-isbn--large {
+  grid-template-areas:
+    "label"
+    "box"
+    "note"
+    "submit";
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.shell--phone .add-isbn--large .add-isbn__submit {
+  margin-top: 6px;
+}
+
+.add-isbn__box {
+  position: relative;
+  grid-area: box;
+  min-width: 0;
+}
+
+.add-isbn__input {
+  width: 100%;
+  height: var(--control-height-large);
+  padding: 0 52px 0 16px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-isbn);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  appearance: none;
+}
+
+.add-isbn--regular .add-isbn__input {
+  font-size: var(--text-input-phone);
+  letter-spacing: 0.02em;
+}
+
+.add-isbn__input:focus-visible,
+.add-input:focus-visible,
+.add-chip__text:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}
+
+.add-isbn__input[aria-invalid="true"],
+.add-input[aria-invalid="true"] {
+  outline: 1.5px solid var(--ink-2);
+  outline-offset: -1.5px;
+}
+
+.add-isbn__input[aria-invalid="true"]:focus-visible,
+.add-input[aria-invalid="true"]:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}
+
+/* The number pad has no X: a key for it, once nine digits are in. */
+.add-isbn__x {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+  transform: translateY(-50%);
+}
+
+.add-isbn__x::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+}
+
+.add-isbn__x:hover {
+  background: var(--control);
+}
+
+.add-isbn__submit {
+  grid-area: submit;
+}
+
+/* --- The by-hand form ------------------------------------------------------------------ */
+
+.add-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.add-form__fields,
+.add-choice {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.add-form__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.add-form__submit {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Over the camera a long form scrolls inside the sheet; its save stays in reach at the bottom. */
+.add-sheet .add-form__submit {
+  position: sticky;
+  bottom: -16px;
+  z-index: 1;
+  margin: 0 -16px -16px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid var(--hairline); /* the fields scroll under it, visibly */
+  background: var(--surface);
+}
+
+.add-form__pair {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.add-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.add-input {
+  width: 100%;
+  height: 42px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--field);
+  color: var(--ink);
+  font-size: var(--text-input-phone); /* 16 px: iOS doesn't zoom into the field */
+  appearance: none;
+}
+
+.add-field--year .add-input,
+.add-field--isbn .add-input {
+  font-variant-numeric: tabular-nums;
+}
+
+.shell--desktop .add-field--isbn {
+  max-width: 280px;
+}
+
+.add-notice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  color: var(--ink);
+  font-size: var(--text-body);
+}
+
+.add-notice strong {
+  font-weight: var(--weight-semibold);
+}
+
+.add-notice__retry {
+  margin-left: -4px;
+}
+
+/* --- Chips: shelf and status ------------------------------------------------------------- */
+
+.add-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.add-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  max-width: 100%;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--control);
+  color: var(--ink);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.add-chip:hover {
+  background: var(--control-hover);
+}
+
+.add-chip[aria-pressed="true"],
+.add-chip:has(.add-chip__input:checked) {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+  font-weight: var(--weight-semibold);
+}
+
+.add-chip:has(.add-chip__input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+fieldset:disabled .add-chip {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* A real radio over the whole chip: the chip's look, the radio's keys. */
+.add-chip__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+/* The label again in the chosen weight, flat and hidden, so choosing doesn't move the row. */
+.add-chip__label {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.add-chip__label::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--weight-semibold);
+  user-select: none;
+  pointer-events: none;
+}
+
+.add-chip--new {
+  padding-left: 11px;
+  box-shadow: none;
+  outline: 1px dashed var(--muted);
+  outline-offset: -1px;
+  background: transparent;
+  color: var(--ink-2);
+}
+
+.add-chip--new:hover {
+  background: var(--control);
+}
+
+.add-chip--new:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.add-chip--field {
+  width: min(100%, 260px);
+  padding: 0;
+  background: var(--field);
+  cursor: text;
+}
+
+.add-chip--field:hover {
+  background: var(--field);
+}
+
+.add-chip__text {
+  width: 100%;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-input-phone);
+  appearance: none;
+}
+
+.add-choice .add-hint {
+  margin-top: 6px;
+}
+
+/* --- Take a photo of the front ------------------------------------------------------------ */
+
+.add-cover {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 10px 12px;
+  border-radius: var(--radius-menu);
+  outline: 1.5px dashed color-mix(in srgb, var(--muted) 55%, transparent);
+  outline-offset: -1.5px;
+}
+
+.add-cover--taken {
+  outline-style: solid;
+  outline-color: var(--divider);
+}
+
+.add-cover__icon {
+  display: flex;
+  flex: none;
+  color: var(--muted);
+}
+
+.add-cover__thumb {
+  --cover-width: 36px;
+}
+
+.add-cover__text {
+  flex: 1;
+  min-width: 0;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+}
+
+.add-cover__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-cover__pick {
+  cursor: pointer;
+}
+
+.add-cover__pick:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* --- Phone: 44 px targets and the phone's type sizes ------------------------------------- */
+
+.shell--phone .add-chip {
+  font-size: var(--text-body);
+}
+
+.shell--phone .add-chip::before {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+
+.shell--phone .add-chip--field::before {
+  content: none;
+}
+
+.shell--phone .add-chip--field,
+.shell--phone .add-chip__text {
+  min-height: var(--touch);
+}
+
+.shell--phone .add-input {
+  height: var(--touch);
+}
