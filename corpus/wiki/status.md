@@ -39,7 +39,7 @@ started 2026-10-14.
 | 06 | [Accounts and sign-in](../briefs/done/06-accounts-and-sign-in.md) | 4 | done |
 | 08 | [Library page](../briefs/done/08-library-page.md) | 4 | done |
 | 09 | [Add a book page](../briefs/done/09-add-a-book-page.md) | 4 | done |
-| 10 | [Book page](../briefs/todo/10-book-page.md) | 5 | todo |
+| 10 | [Book page](../briefs/done/10-book-page.md) | 5 | done |
 | 11 | [Export and backup](../briefs/done/11-export-and-backup.md) | 5 | done |
 | 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
 | 13 | [Design finish and DESIGN.md](../briefs/todo/13-design-finish.md) | 6 | todo |

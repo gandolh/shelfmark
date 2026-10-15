@@ -1,0 +1,618 @@
+/*
+ * The book page (web/src/book): the cover on the ground, the facts in white
+ * cards as the Library's table is, one accent. Colours, radii and the cover's
+ * shadow come from tokens.css. The shell picks phone or desktop in script
+ * (`.shell--desktop` from 768 px), so these rules follow its classes.
+ */
+
+.book {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.shell--desktop .book {
+  grid-template-columns: 260px minmax(0, 720px);
+  gap: 40px;
+  padding-top: 6px;
+}
+
+/* --- The cover column --------------------------------------------------------- */
+
+.book__cover {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(100%, 168px);
+  margin-inline: auto;
+}
+
+.shell--desktop .book__cover {
+  position: sticky;
+  top: calc(var(--topbar-height) + 24px);
+  width: 100%;
+  margin: 0;
+}
+
+.book__main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+/* Subtitle over authors, in the page's caption under the title. */
+.book-sub,
+.book-by {
+  display: block;
+}
+
+.book-sub {
+  color: var(--ink-2);
+  font-size: var(--text-body);
+}
+
+.book-by {
+  color: var(--muted);
+  font-size: var(--text-body);
+}
+
+.page__caption:has(.book-sub) {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* What just happened: "Saved." Empty, it takes no room. */
+.book-notice {
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+}
+
+.book-notice:empty {
+  display: none;
+}
+
+.book-empty {
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+/* --- Cards ------------------------------------------------------------------------ */
+
+.book-card {
+  min-width: 0;
+  margin: 0;
+  padding: 20px;
+  border: 0;
+  border-radius: var(--radius-container);
+  background: var(--surface);
+}
+
+.shell--phone .book-card {
+  padding: 16px;
+}
+
+.book-card__title {
+  padding: 0;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+}
+
+legend.book-card__title {
+  float: left; /* a fieldset's legend otherwise sits on its border */
+  width: 100%;
+}
+
+legend.book-card__title + * {
+  clear: both;
+}
+
+.book-card--form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.book-card--form > legend + * {
+  margin-top: 0;
+}
+
+/* --- Facts: a term and its value per row ------------------------------------------- */
+
+.book-facts {
+  display: flex;
+  flex-direction: column;
+}
+
+.book-fact {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding: 11px 0;
+  border-top: 1px solid var(--divider);
+  font-size: var(--text-body);
+}
+
+.book-fact:first-child {
+  border-top: 0;
+}
+
+.book-fact dt {
+  padding-top: 1px;
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.book-fact dd {
+  min-width: 0;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.shell--phone .book-fact {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+}
+
+.shell--phone .book-fact dt {
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.book-long {
+  display: block;
+  white-space: pre-line;
+}
+
+.book-none {
+  color: var(--muted);
+}
+
+/* "Reading" is the one status that is accent and semibold (design.md). */
+.book-reading {
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+
+.book-stars {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+  color: var(--accent);
+}
+
+.book-stars__text {
+  margin-left: 8px;
+  color: var(--ink-2);
+}
+
+.book-star:not(.book-star--on) {
+  color: var(--muted);
+}
+
+.book-tags,
+.book-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-tag,
+.book-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--control);
+  color: var(--ink);
+  font-size: var(--text-meta);
+}
+
+/* --- The cover panel ----------------------------------------------------------------- */
+
+.book-coverpanel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.book-coverpanel__note {
+  color: var(--ink);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+}
+
+.book-coverpanel__note:empty {
+  display: none;
+}
+
+.book-card--cover {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px;
+}
+
+.shell--desktop .book-card--cover {
+  padding: 14px;
+}
+
+/* The panel is wider than the narrow phone cover column: it spans the page. */
+.shell--phone .book__cover:has(.book-card--cover) {
+  width: 100%;
+}
+
+.shell--phone .book__cover:has(.book-card--cover) > .cover {
+  width: 168px;
+  align-self: center;
+}
+
+.book-filepick {
+  cursor: pointer;
+}
+
+.book-filepick:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.book-candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.book-candidates__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.book-candidate {
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-cover);
+  background: none;
+}
+
+.book-candidate:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.book-candidate:disabled {
+  opacity: 0.45;
+}
+
+.book-confirm-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  font-size: var(--text-meta);
+}
+
+/* --- Re-run lookup ----------------------------------------------------------------------- */
+
+.book-lookup__line {
+  margin-bottom: 8px;
+  color: var(--ink-2);
+  font-size: var(--text-body);
+}
+
+.book-diff {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.book-diff li {
+  border-top: 1px solid var(--divider);
+}
+
+.book-diff__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 12px 0;
+  cursor: pointer;
+}
+
+.book-diff__row input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+
+.book-diff__row:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+  border-radius: var(--radius-control);
+}
+
+.book-diff__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.book-diff__label {
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+}
+
+.book-diff__pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shell--phone .book-diff__pair {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+.book-diff__side {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.book-diff__who {
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.book-diff__text {
+  max-height: 9em;
+  overflow: auto;
+  font-size: var(--text-body);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+/* --- Actions -------------------------------------------------------------------------------- */
+
+.book-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.shell--phone .book-actions .button {
+  min-height: var(--touch);
+}
+
+/* --- Delete: at the foot, apart --------------------------------------------------------------- */
+
+.book-delete {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--hairline);
+}
+
+.book-delete__title {
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.book-delete__ask {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.book-delete__q {
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+}
+
+.book-delete__q:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.shell--phone .book-delete .button {
+  min-height: var(--touch);
+}
+
+/* --- Missing ---------------------------------------------------------------------------------- */
+
+.book-missing {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.book-missing__title {
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+}
+
+/* --- The edit form ------------------------------------------------------------------------------ */
+
+.book-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.book-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.book-area {
+  height: auto;
+  min-height: 96px;
+  padding: 10px 12px;
+  line-height: var(--leading-body);
+  resize: vertical;
+}
+
+.book-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--touch);
+  font-size: var(--text-body);
+  cursor: pointer;
+}
+
+.book-check input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+.book-check:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-control);
+}
+
+.book-rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+.book-rating__star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--muted);
+}
+
+.book-rating__star:hover {
+  background: var(--control);
+}
+
+.book-rating__star:has(.book-star--on) {
+  color: var(--accent);
+}
+
+.book-rating__star:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}
+
+.shell--phone .book-rating__star {
+  width: var(--touch);
+  height: var(--touch);
+}
+
+.book-rating__text {
+  margin-left: 10px;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+}
+
+/* Tags and subjects: the chips, then the field to add one. */
+.book-chip {
+  gap: 2px;
+  padding-right: 4px;
+}
+
+.book-chip__remove {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink-2);
+}
+
+.book-chip__remove::before {
+  content: "";
+  position: absolute;
+  inset: -10px -6px; /* a 44 px target around a 24 px mark */
+}
+
+.book-chip__remove:hover {
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.book-chip__remove:focus-visible {
+  outline: 2px solid var(--focus-ring);
+}
+
+.book-chips + .book-chips__input,
+.book-chips__input {
+  margin-top: 8px;
+}
+
+/* Save and Cancel stay in reach while a long form scrolls under them. */
+.book-savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  gap: 10px;
+  padding: 12px 0;
+  border-top: 1px solid var(--hairline);
+  background: var(--ground);
+}
+
+.shell--phone .book-savebar {
+  bottom: calc(var(--tabbar-height) - 10px + max(10px, env(safe-area-inset-bottom)));
+  margin-inline: calc(var(--gutter-phone) * -1);
+  padding-inline: var(--gutter-phone);
+}
+
+.shell--phone .book-savebar .button--primary {
+  flex: 1;
+}

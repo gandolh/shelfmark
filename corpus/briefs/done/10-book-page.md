@@ -53,3 +53,20 @@ web/src/book/DeleteBook.tsx
   delete; the Library reflects each change without a reload.
 - impeccable's detector run on `web/src/book`; `npm run typecheck && npm run
   lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Done. Checked live at 1280 px (and the phone layout in a
+390 px frame): editing title, rating, price (`19,99` → 1999 bani) and tags
+sent one PATCH with only those fields; re-run lookup showed a diff with
+nothing ticked and applied only the ticked fields; a cover taken from the
+lookup's candidates, one uploaded from a file, then removed; delete with a
+confirmation naming the book, back to the Library; the Library reflected each
+change without a reload; an unknown id shows "This book isn't in your
+library". The camera photo path, a failed save and the form's validation
+errors weren't exercised in the browser (the logic is unit-tested). Pure
+logic is in `relookup.ts`, `patch.ts` and `money.ts`; extra pieces are
+`RatingField.tsx`, `TagsField.tsx`, `useLookup.ts` (one lookup feeds both the
+diff and the cover candidates) and `book.css`. Cover candidates need an ISBN,
+so a book entered by hand gets a cover from a photo or a file only. Currency,
+barcode and `author_sort` aren't editable. 34 tests; detector clean.
