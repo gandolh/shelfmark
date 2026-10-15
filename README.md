@@ -19,3 +19,6 @@ Open `http://localhost:5176/shelfmark/`. To try the scanner on a phone, run
 HTTPS (the camera needs a secure origin).
 
 ## Owner setup
+
+The first deploy, the Ward registration, creating your account, backups and the
+checks that wait on a phone: [docs/owner-setup.md](docs/owner-setup.md).

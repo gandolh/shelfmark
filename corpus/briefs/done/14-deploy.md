@@ -78,3 +78,22 @@ in the outcome note). Other stacks in vps-deploy.
   --dry-run` prints the actions without running them.
 - `docs/owner-setup.md` covers every step above; `grep` finds no secret value
   and no production domain in either repo's changes.
+
+## Outcome
+
+_2026-10-15_. Prepared; the deploy and the local container check are the
+owner's, in [docs/owner-setup.md](../../../docs/owner-setup.md). Docker isn't
+reachable from this WSL distro, so `docker compose … up --build` didn't run
+here; the Dockerfile and compose file are Satchel's tested ones with the
+names and port 8796, without the CLI workspace. In `../vps-deploy` (committed
+there): `stacks/shelfmark.ts`, the `SourceRepo` entry, the stack and
+`useWard` in `app.ts`, and the regenerated Caddyfile. `npm run typecheck` and
+`npm run check` pass (no port, path or directory clash), and `node cli.ts
+shelfmark deploy --dry-run` prints every action without running one; the
+server phase's dry run stops at the missing `WARD_OIDC_CLIENT_KEY`, as
+expected until `secrets/shelfmark.env` exists. `AUTH_TRUSTED_PROXIES` comes
+from `useWard` (the estate's `172.16.0.0/12`). The vps-deploy constructs can't
+set response headers, so `sw.js`, the manifest and `index.html` are served
+without `no-cache` and `assets/` without `immutable`; Caddy's ETag and
+Last-Modified still make browsers revalidate, which is enough for updates to
+arrive.

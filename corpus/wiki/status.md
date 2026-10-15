@@ -43,7 +43,7 @@ started 2026-10-14.
 | 11 | [Export and backup](../briefs/done/11-export-and-backup.md) | 5 | done |
 | 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
 | 13 | [Design finish and DESIGN.md](../briefs/todo/13-design-finish.md) | 6 | todo |
-| 14 | [Deploy](../briefs/todo/14-deploy.md) | 6 | todo (the deploy itself is the owner's) |
+| 14 | [Deploy](../briefs/done/14-deploy.md) | 6 | done |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
