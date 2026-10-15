@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Shelfmark's icon: three spines on a shelf, in the accent on the ground
+       (design.md: #0E6E8C on #F5F5F3). The mark stays inside the middle 60% so the
+       same image serves as the maskable icon. No text, no gradients. -->
+  <rect width="512" height="512" fill="#F5F5F3"/>
+  <g fill="#0E6E8C">
+    <rect x="150" y="172" width="56" height="210" rx="8"/>
+    <rect x="228" y="130" width="56" height="252" rx="8"/>
+    <rect x="306" y="202" width="56" height="180" rx="8"/>
+    <rect x="120" y="382" width="272" height="20" rx="10"/>
+  </g>
+  <!-- The label band that makes it a shelfmark. -->
+  <rect x="228" y="172" width="56" height="22" fill="#F5F5F3"/>
+</svg>

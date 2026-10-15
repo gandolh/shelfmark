@@ -16,4 +16,4 @@ for the network until the v1.x offline todos land.
 The owner asked for a website with PWA. iOS standalone camera quirks in
 [scanning.md](../wiki/scanning.md).
 
-Promoted to [brief 12](../briefs/todo/12-pwa.md) on 2026-10-14.
+Promoted to [brief 12](../briefs/done/12-pwa.md) on 2026-10-14.

@@ -112,9 +112,12 @@ describe("lines", () => {
 describe("failures", () => {
   it("marks a lookup or save that never reached the server", () => {
     const offline = new ApiError(0, "network", "Shelfmark can't be reached. Check your connection.");
-    expect(lookupFailure(offline)).toMatchObject({ network: true });
+    expect(lookupFailure(offline)).toEqual({
+      message: "Looking up a book needs the network, and Shelfmark can't be reached. Try again when you're back online.",
+      network: true,
+    });
     expect(saveFailure(offline)).toEqual({
-      message: "Not saved: Shelfmark can't be reached. Check the connection and try again.",
+      message: "Not saved: saving needs the network, and Shelfmark can't be reached. Try again when you're back online.",
       network: true,
     });
   });

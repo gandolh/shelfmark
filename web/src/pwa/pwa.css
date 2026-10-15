@@ -1,0 +1,61 @@
+/* The update prompt and the offline notice: fixed, so neither moves the page. */
+
+.offline-notice {
+  position: fixed;
+  top: calc(env(safe-area-inset-top) + 8px);
+  left: 50%;
+  z-index: var(--z-float);
+  max-width: calc(100% - 2 * var(--gutter-phone));
+  margin: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+/* The desktop top bar is there from 768 px (layout/viewport.ts): sit under it. */
+@media (min-width: 768px) {
+  .offline-notice {
+    top: calc(var(--topbar-height) + 8px);
+  }
+}
+
+.update-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  pointer-events: none;
+}
+
+/* Over the tab bar on a phone, at the corner of the window on the desktop. */
+.update-prompt .update-prompt__sheet {
+  bottom: calc(var(--tabbar-height) + env(safe-area-inset-bottom) + 12px);
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  z-index: var(--z-float);
+  box-shadow: var(--shadow-float);
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .update-prompt .update-prompt__sheet {
+    right: 24px;
+    bottom: 24px;
+    left: auto;
+    width: 360px;
+    margin-inline: 0;
+  }
+}
+
+.update-prompt__text {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}

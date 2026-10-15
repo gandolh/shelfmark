@@ -41,7 +41,7 @@ started 2026-10-14.
 | 09 | [Add a book page](../briefs/done/09-add-a-book-page.md) | 4 | done |
 | 10 | [Book page](../briefs/todo/10-book-page.md) | 5 | todo |
 | 11 | [Export and backup](../briefs/todo/11-export-and-backup.md) | 5 | todo |
-| 12 | [PWA](../briefs/todo/12-pwa.md) | 5 | todo |
+| 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
 | 13 | [Design finish and DESIGN.md](../briefs/todo/13-design-finish.md) | 6 | todo |
 | 14 | [Deploy](../briefs/todo/14-deploy.md) | 6 | todo (the deploy itself is the owner's) |
 

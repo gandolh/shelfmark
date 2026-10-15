@@ -3,6 +3,7 @@ import { fileURLToPath } from "node:url";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type ProxyOptions } from "vite";
+import { VitePWA } from "vite-plugin-pwa";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -56,7 +57,49 @@ export default defineConfig(({ mode }) => {
 
   return {
     base,
-    plugins: [react(), ...(https ? [basicSsl()] : [])],
+    plugins: [
+      react(),
+      ...(https ? [basicSsl()] : []),
+      VitePWA({
+        // Our own worker, src/sw.ts: precache plus a covers cache. workbox only
+        // injects the file list.
+        strategies: "injectManifest",
+        srcDir: "src",
+        filename: "sw.ts",
+        // A new worker waits; pwa/register.ts applies it when "Reload" is pressed.
+        registerType: "prompt",
+        // pwa/register.ts registers it (workbox-window).
+        injectRegister: false,
+        // The icons are in public/ and the glob below precaches them once.
+        includeManifestIcons: false,
+        manifest: {
+          id: base,
+          name: "Shelfmark",
+          short_name: "Shelfmark",
+          description: "A catalog of the physical books at home.",
+          lang: "en",
+          display: "standalone",
+          scope: base,
+          start_url: base,
+          // Raw hex: the manifest can't read CSS tokens. Keep in step with
+          // --ground (#F5F5F3) in src/styles/tokens.css and design.md's table.
+          theme_color: "#F5F5F3",
+          background_color: "#F5F5F3",
+          // Relative, so they resolve against the manifest under `base`.
+          icons: [
+            { src: "icons/icon-192.png", sizes: "192x192", type: "image/png" },
+            { src: "icons/icon-512.png", sizes: "512x512", type: "image/png" },
+            { src: "icons/maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          ],
+        },
+        injectManifest: {
+          // The app shell, and the scanner's zxing .wasm (1.09 MB, under
+          // workbox's 2 MiB limit) so scanning starts offline. Nothing of the
+          // API is cached here.
+          globPatterns: ["**/*.{js,css,html,png,svg,ico,wasm}"],
+        },
+      }),
+    ],
     // The scanner imports the barcode ponyfill lazily; listing it here bundles it
     // at dev-server start, so opening the scanner never triggers Vite's
     // "new dependency, reload" (a reload would restart the camera). Its .wasm
@@ -70,5 +113,7 @@ export default defineConfig(({ mode }) => {
       ...(https ? { host: "0.0.0.0" } : {}),
       proxy: devProxy(env, https),
     },
+    // `vite preview` serves the built app and its service worker, behind the same proxy.
+    preview: { port: 4176, strictPort: true, proxy: devProxy(env, https) },
   };
 });

@@ -62,3 +62,30 @@ The pages, the scanner, the server.
   outcome note).
 - Rebuilding shows the update prompt in an open app.
 - `npm run typecheck && npm run lint && npm test && npm run build` pass.
+
+## Outcome
+
+_2026-10-15_. Built; the install checks on phones and Lighthouse are the
+owner's (Lighthouse isn't available here; installability was checked by
+hand: manifest fields, 192/512 and maskable icons, a fetch handler,
+`start_url` within scope). `vite-plugin-pwa` 1.3.0, since 2.0.0 was under two
+weeks old; Workbox 7.4.1; `@vite-pwa/assets-generator` 1.0.4 (1.3.0's peer
+range rules out 2.0), with `npm run icons -w @shelfmark/web` to redraw the
+PNGs from `web/public/icon.svg`. The precache holds 15 entries (1.7 MiB),
+including the scanner's `.wasm` and the lazy Excel chunk. Checked against a
+preview build in a browser: the worker registers at `/shelfmark/`, the shell
+loads offline, `.wasm` is served as `application/wasm`, and a rebuild shows
+"A new version is ready", which reloads only when Reload is pressed. The
+worker is registered from `UpdatePrompt`, mounted outside the auth gate with
+`OfflineNotice` so the login page has both. Lookups and saves now say they
+need the network. Left for the design finish: the offline pill overlaps the
+login page's heading at desktop width, and the icon's three spines on a shelf
+can read as a bar chart. Cached covers stay on the device after sign-out
+until they expire (30 days).
+
+**Owner checks:** after the deploy, on an iPhone (Share → Add to Home Screen)
+and an Android phone (Install app): the app opens standalone, signs in, and
+Add a book scans, then switches Scan → Type ISBN → Scan with no second camera
+prompt (note the device and OS version); in airplane mode the shell opens with
+"You're offline…"; after the next deploy the update sheet appears and the app
+reloads only on Reload.

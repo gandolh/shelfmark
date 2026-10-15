@@ -155,7 +155,7 @@ export interface Failure {
 /** Why a lookup didn't run or didn't answer. */
 export function lookupFailure(error: unknown): Failure {
   if (isApiError(error, "network")) {
-    return { message: "Shelfmark can't be reached, so the lookup didn't run. Check the connection and try again.", network: true };
+    return { message: "Looking up a book needs the network, and Shelfmark can't be reached. Try again when you're back online.", network: true };
   }
   if (isApiError(error)) return { message: `The lookup didn't work: ${error.message}`, network: false };
   return { message: "The lookup didn't work. Try again.", network: false };
@@ -164,7 +164,7 @@ export function lookupFailure(error: unknown): Failure {
 /** Why a book wasn't saved. Nothing was saved when this shows. */
 export function saveFailure(error: unknown): Failure {
   if (isApiError(error, "network")) {
-    return { message: "Not saved: Shelfmark can't be reached. Check the connection and try again.", network: true };
+    return { message: "Not saved: saving needs the network, and Shelfmark can't be reached. Try again when you're back online.", network: true };
   }
   if (isApiError(error)) return { message: `Not saved: ${error.message}`, network: false };
   return { message: "Not saved. Try again.", network: false };
