@@ -31,6 +31,13 @@ export default defineConfig(({ mode }) => {
   return {
     base,
     plugins: [react(), ...(https ? [basicSsl()] : [])],
+    // The scanner imports the barcode ponyfill lazily; listing it here bundles it
+    // at dev-server start, so opening the scanner never triggers Vite's
+    // "new dependency, reload" (a reload would restart the camera). Its .wasm
+    // is not configured here: scanner/detector.ts imports it with `?url`, so
+    // Vite serves it from our origin in dev and emits it under the base path
+    // in the build, where the service worker can precache it.
+    optimizeDeps: { include: ["barcode-detector/ponyfill"] },
     server: {
       port: 5176,
       strictPort: true,

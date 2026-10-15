@@ -23,4 +23,4 @@ in [scanning.md](../wiki/scanning.md).
 
 Scanning a book's barcode on a phone ends with the book saved in SQLite.
 
-Promoted to [brief 07](../briefs/todo/07-camera-scanner.md) on 2026-10-14.
+Promoted to [brief 07](../briefs/done/07-camera-scanner.md) on 2026-10-14.

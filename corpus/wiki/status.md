@@ -35,7 +35,7 @@ started 2026-10-14.
 | 03 | [ISBN utilities](../briefs/done/03-isbn-utilities.md) | 2 | done |
 | 04 | [App shell, tokens, books client](../briefs/todo/04-app-shell-and-tokens.md) | 3 | todo |
 | 05 | [Lookup and covers](../briefs/done/05-lookup-and-covers.md) | 3 | done |
-| 07 | [Camera scanner](../briefs/todo/07-camera-scanner.md) | 3 | todo |
+| 07 | [Camera scanner](../briefs/done/07-camera-scanner.md) | 3 | done |
 | 06 | [Accounts and sign-in](../briefs/todo/06-accounts-and-sign-in.md) | 4 | todo |
 | 08 | [Library page](../briefs/todo/08-library-page.md) | 4 | todo |
 | 09 | [Add a book page](../briefs/todo/09-add-a-book-page.md) | 4 | todo |

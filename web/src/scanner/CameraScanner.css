@@ -1,0 +1,124 @@
+/*
+ * Minimal on purpose: brief 09 places the scanner in the design. The camera
+ * view is dark because it is a camera (design.md), so the ground behind the
+ * video is --ink, the palette's near-black, and text on it is --surface.
+ */
+.scanner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 16rem;
+  height: 100%;
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.scanner-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Until the stream runs the video is a black box; the message stands alone. */
+.scanner:not([data-state="scanning"]) .scanner-video {
+  opacity: 0;
+}
+
+/* The viewfinder: a rounded frame about the shape of a book's barcode. */
+.scanner-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: min(78%, 22rem);
+  aspect-ratio: 3 / 2;
+  transform: translate(-50%, -50%);
+  border: 2px solid var(--surface);
+  border-radius: 16px;
+  pointer-events: none;
+  transition: opacity 150ms ease-out;
+}
+
+.scanner[data-paused] .scanner-frame {
+  opacity: 0.4;
+}
+
+/* A read flashes the frame: the cue that still works with the sound off. */
+.scanner-hit {
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  background: var(--accent-tint);
+  opacity: 0;
+  animation: scanner-hit 450ms ease-out;
+}
+
+@keyframes scanner-hit {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.scanner-message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.scanner-message p {
+  margin: 0;
+  max-width: 28rem;
+}
+
+.scanner-message-title {
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.scanner-message-detail {
+  font-size: 15px;
+}
+
+.scanner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.scanner-actions button {
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scanner-fallback {
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.scanner-fallback:active {
+  background: var(--accent-press);
+}
+
+.scanner-retry {
+  border: 1px solid var(--surface);
+  background: transparent;
+  color: var(--surface);
+}

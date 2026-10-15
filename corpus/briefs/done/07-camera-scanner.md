@@ -69,3 +69,33 @@ The Add a book page (brief 09), the shell, anything server-side.
   the network panel shows the `.wasm` loaded from our own origin.
 - `npm run typecheck && npm run lint && npm test` pass; production build
   contains no `/dev/scanner` route.
+
+## Outcome
+
+_2026-10-15_. Built and unit-tested (33 tests); the phone checks are the
+owner's. `barcode-detector` 3.2.2 (2026-08-16) and its `zxing-wasm` 3.1.3,
+now declared directly so the pinned `.wasm` can't drift. The `.wasm` is
+self-hosted through a `?url` import in `scanner/detector.ts` instead of a copy
+step in `vite.config.ts`: Vite serves it from our origin in dev and emits
+`assets/zxing_reader-<hash>.wasm` under the base path in the build, once a
+production page imports the scanner (brief 09). The config only pre-bundles
+the ponyfill so opening the scanner never triggers a dev reload that would
+restart the camera. Checked in headless Chrome with a fake camera: the states,
+about 7 reads a second, add-ons dropped, the 3-second window, pause, the
+track stopped when hidden and restarted when shown, and the `.wasm` fetched
+from our origin only. Departures: a sixth state, `error` (camera held by
+another app, or the reader failed to load), with "Try again"; optional props
+`feedback`, `onStateChange`, `onTorchAvailable`, `className`; the 3-second
+window counts from when a code fired. `armFeedback()` runs in `main.tsx` so
+the tap that opens the scanner already unlocks the beep on iOS. `/dev/scanner`
+is registered in the router's `DEV_ROUTES` and dropped from the build.
+
+**Owner checks** (`npm run dev:https`, open
+`https://<laptop LAN address>:5176/shelfmark/dev/scanner`, accept the
+certificate): on Android Chrome (engine `native`) and iPhone Safari (engine
+`zxing`), scan a 978 book and a Romanian one (each listed once, with a beep;
+again only after 3 s), the 5-digit price add-on (ignored), a store sticker
+(`other`); torch on Android; switch apps and back (camera light off, then the
+camera restarts); refuse the camera once (both buttons shown); plain `http`
+shows "The camera needs https". On the iPhone the demo's "Fetched" list
+should show the `.wasm` from the LAN address with "Other origins: none".
