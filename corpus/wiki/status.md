@@ -1,30 +1,33 @@
 ---
-summary: Snapshot as of 2026-10-14. Feature research filed, product questions answered (one user, on the VPS, English UI), UI chosen (the familiar table app, Covers variant), one row per copy, no loans, wishlist wanted, Google Books key accepted; 14 v1 briefs written in 6 waves; no code yet. One line per brief, the waves, and the todos left by tier.
-updated: 2026-10-14
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), not pushed and not deployed. What waits on the owner (push, Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+updated: 2026-10-15
 ---
 
 # Status
 
-_2026-10-14_. The repo holds the corpus and `PRODUCT.md`. The owner answered
-the product questions (one user, deployed on the VPS, English interface; one
-row per copy, no loans, a wishlist, Google Books with a free key; the name
-stays Shelfmark) and
-chose the UI after two mock-up rounds: the familiar table app in its Covers
-variant, light, with two places (Library, Add a book); see
-[design.md](design.md) and [decisions.md](decisions.md). The research is filed in
-[features.md](features.md), [metadata-lookup.md](metadata-lookup.md),
-[scanning.md](scanning.md), [library-table.md](library-table.md),
-[export.md](export.md), [data-model.md](data-model.md) and
-[architecture.md](architecture.md). The remote is the
-GitHub repo gandolh/shelfmark (set 2026-10-14); the owner pushes. Building
-started 2026-10-14.
+_2026-10-15_. v1 is built. All 14 briefs were built on 2026-10-14 and
+2026-10-15 with `plan-split-dispatch`, one commit per brief on `main`,
+followed by a three-finder review and two fix rounds, then impeccable's
+design finish ([DESIGN.md](../../DESIGN.md)). 515 tests pass; typecheck,
+lint and build are clean. Nothing is pushed or deployed. The remote is the
+GitHub repo gandolh/shelfmark (set 2026-10-14); the owner pushes. The
+product calls are in [decisions.md](decisions.md), the look in
+[design.md](design.md), and the run's rulings in [log.md](../log.md).
 
-## Next
+## Next (owner)
 
-1. Owner step before brief 05: create the Google Books API key (steps in
-   [brief 05](../briefs/done/05-lookup-and-covers.md)).
-2. Build the briefs wave by wave (`plan-split-dispatch`), with a typecheck,
-   lint and test gate between waves.
+1. Push `main` (Shelfmark), plus the commits made today in `../vps-deploy`
+   (the Shelfmark stack) and `../wzd_auth` (the local seed entry).
+2. Create the Google Books API key and put it in `.env` as
+   `GOOGLE_BOOKS_API_KEY`; then run the Romanian measurement in
+   [brief 05](../briefs/done/05-lookup-and-covers.md)'s outcome.
+3. Deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
+4. The checks no agent could run here, listed in owner-setup: the scanner on
+   an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
+   local Ward round trip (06, needs Docker Desktop's WSL integration), the
+   exports opened in Excel (11), the container build (14).
+5. After v1 ships, promote the v1.x todos below; the wishlist is first in
+   line, since the Library already leaves room for its Owned / Wishlist tabs.
 
 ## Briefs
 

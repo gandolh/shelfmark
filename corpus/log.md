@@ -95,3 +95,63 @@ keeping:
 - Owner checks waiting: the scanner on an Android phone and an iPhone (steps in
   [brief 07's outcome](briefs/done/07-camera-scanner.md)); the Google
   measurement once `GOOGLE_BOOKS_API_KEY` is in `.env`.
+
+## [2026-10-15] build | Wave 4 built: briefs 08, 09, then 06
+
+The Library page and the Add a book page were built side by side, then
+accounts alone; 465 tests after the wave. Rulings:
+
+- Brief 09 moved "Found in Open Library" under the meta line, against the
+  Calm-Add mock-up, after impeccable's finish reviewer called it a kicker.
+  The Covers world redraws that artboard anyway.
+- Brief 06 vendors Ward's library twice (`server/vendor/ward`,
+  `web/vendor/ward` for the React hooks), as Satchel does, and rewrites
+  `Origin` in the Vite dev proxy for `npm run dev:https` on a phone, because
+  the library's login compares `Origin` to the fixed PUBLIC_ORIGIN inside the
+  vendored bundle. Production has no Vite.
+- Satchel's seed has the same hidden-prompt bug Shelfmark's had (the
+  `_writeToOutput` trick throws on Node 24's `readline/promises`); not fixed
+  there.
+- Shelfmark's entry in Ward's local `seed.mjs` and its README row are
+  committed in `../wzd_auth`. The live Ward round trip waits for Docker.
+
+## [2026-10-15] build | Wave 5, the deploy and the review gate
+
+Briefs 10, 11, 12 built side by side, then 14 (the deploy, prepared only;
+committed in `../vps-deploy` too). Then three review finders (server
+security, web integration, conventions) and two fix rounds; 515 tests.
+
+Fixed from the review: covers keyed by `Book.coverUpdatedAt` instead of an
+in-memory version (a replaced cover stayed stale after a reload, and a
+reused id showed a deleted book's cover); the book page's wishlist option
+removed (the book vanished from the Library with no way back until the v1.x
+wishlist); the scanner re-reading the book just saved; the Library stuck on
+loading after a stray 401; a prototype key from Open Library poisoning a
+cached draft; a 500 when a book is deleted mid cover download; the backup
+copy left in WAL mode; cached covers kept after sign-out; the README's local
+run missing the seed step. The server finder found the auth guard, the
+SSRF guard, uploads and the backup sound under probes.
+
+Accepted, not fixed (Minor): a CSV ISBN opens in Excel as a number (the XLSX
+keeps it as text); `STATUS_LABELS`, `bookId` and the `AlertIcon`/`Icon`
+wrappers exist in two places; `ManualForm` writes `aria-invalid="false"`;
+comments still name brief numbers; the 513 kB main chunk (React and zod
+dominate; lazy pages would save little); the auth library's 401 body is
+`{ error: "unauthorized" }`, not the app's envelope; `refreshBooks` is
+exported and unused; the 3,000-book timing test (best of three, 100 ms) can
+still fail on a heavily loaded machine; every app in the estate shares one
+origin, so script injected into another app passes the Origin check
+(architectural). The vps-deploy constructs can't set cache headers for
+`sw.js` and `index.html`; ETag revalidation covers it.
+
+## [2026-10-15] build | Brief 13, the design finish; v1 built
+
+impeccable's finish reviewer passed the app after one fix round of seven
+items (phone toolbar, book page alignment, desktop Add switch, Year header,
+offline notice, icon); `DESIGN.md` and `.impeccable/design.json` record the
+built system. All 14 v1 briefs are in `briefs/done/`. Nothing is pushed or
+deployed; [status.md](wiki/status.md) lists what waits on the owner. Left
+open from the review for the owner to decide: whether the table's 46×69
+placeholder should be a simpler mark, the desktop Add result's small cover,
+and the not-found copy ("No match for …"), which came from the Grid-Add
+mock-up and uses a word the glossary avoids.

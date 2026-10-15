@@ -1,12 +1,12 @@
 ---
-summary: How Shelfmark will be put together, specified in briefs 01-14 on 2026-10-14 before any code. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
-updated: 2026-10-14
+summary: How Shelfmark is put together, as built by briefs 01-14 on 2026-10-14 and 2026-10-15. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
+updated: 2026-10-15
 ---
 
-# Architecture (proposed)
+# Architecture
 
-Nothing is built. This is the intended shape; briefs 01 to 14 build it
-([status.md](status.md) has the order).
+Built by briefs 01 to 14 ([status.md](status.md)). The code wins where this
+page and it disagree.
 
 ## Pieces
 
@@ -17,7 +17,7 @@ npm workspaces, the Satchel layout (`../satchel`), Node 24, exact versions
   parsing and validation (ISBN-10 ↔ 13, check digits). Used by both sides.
 - `server`: Fastify + better-sqlite3. Owns the store (the only module that
   runs SQL, apart from the vendored auth library), the lookup queue and cache
-  ([metadata-lookup.md](metadata-lookup.md)), cover files, backup, and the
+  ([metadata-lookup.md](metadata-lookup.md)), covers (BLOBs in SQLite), backup, and the
   `/api/*` and `/auth/*` routes.
 - `web`: Vite + React PWA (vite-plugin-pwa, Workbox). The library table
   ([library-table.md](library-table.md)), the scanner
@@ -42,7 +42,7 @@ No CLI workspace: nothing outside the browser needs the data yet.
 As Satchel: Caddy on the shared VPS serves the PWA at `/shelfmark/*` and
 forwards `/shelfmark-api/*` with `handle_path` to the API container on
 `127.0.0.1:<port>`, deployed by `../vps-deploy` as a `WebServiceStack`. The
-port is picked when the deploy brief is written. Deploying is an owner step.
+port is 8796. Deploying is an owner step ([docs/owner-setup.md](../../docs/owner-setup.md)).
 
 ## Dev
 

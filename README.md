@@ -4,8 +4,9 @@ A catalog of the physical books the owner has at home. Scan a book's barcode wit
 the phone, and it lands in a table you can sort, filter and export to CSV or
 Excel. A React PWA on a Fastify + SQLite API.
 
-It is being built brief by brief. The plan, the research and the work queue
-live in [corpus/](corpus/index.md).
+Version 1 is built and not yet deployed. The plan, the research, the
+decisions and the work queue live in [corpus/](corpus/index.md); the design
+system as built is in [DESIGN.md](DESIGN.md).
 
 ## Run it locally
 
