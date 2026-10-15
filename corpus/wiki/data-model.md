@@ -10,7 +10,7 @@ Shipped by brief 02 on 2026-10-14 as migration 1 in
 copy** is the owner's decision ([decisions.md](decisions.md)); the rest came
 from the 2026-10-14 research. Column names follow [glossary.md](glossary.md).
 The API's `Book` ([book.ts](../../shared/src/book.ts)) is a row in camelCase
-plus `tags` and `hasCover`; [books.ts](../../server/src/store/books.ts) is the
+plus `tags`, `hasCover` and `coverUpdatedAt`; [books.ts](../../server/src/store/books.ts) is the
 only module that runs SQL on `books`, `tags` and `book_tags`.
 
 ## `books`: one row per copy (owned or wished)
@@ -51,7 +51,8 @@ but doubles the join and the edit UI for a case that hardly happens.
 - **`covers`**: `book_id` INTEGER PK, FK to `books` with `ON DELETE CASCADE`;
   `mime`, `bytes` BLOB, `source`, `updated_at`, all NOT NULL. Covers live in
   the database, not in a folder ([decisions.md](decisions.md)); `Book.hasCover`
-  is derived from it. Brief 02 created the table; brief 05 fills and serves it.
+  and `Book.coverUpdatedAt` (its `updated_at`, the web app's `?v=` for the
+  image URL) are derived from it. Brief 02 created the table; brief 05 fills and serves it.
 - **`lookup_cache`** (migration 2, brief 05): `isbn13`, `source`, `outcome`
   (`found` or `not_found`, CHECK), `response` (the source's answer as JSON),
   `fetched_at`; primary key `(isbn13, source)`, `WITHOUT ROWID`. The

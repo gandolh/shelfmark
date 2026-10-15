@@ -41,6 +41,7 @@ export function book(fields: Partial<Book> = {}): Book {
     metadataSource: "manual",
     tags: [],
     hasCover: false,
+    coverUpdatedAt: null,
     createdAt: `2026-01-01T10:00:${String(id % 60).padStart(2, "0")}.000Z`,
     updatedAt: "2026-01-01T10:00:00.000Z",
     ...fields,

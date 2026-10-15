@@ -1,6 +1,6 @@
 import type { Book } from "@shelfmark/shared";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ApiError, apiRequest, booksApi, coverUrl, isApiError, onSignedOut } from "./api";
+import { ApiError, apiBlob, apiRequest, booksApi, coverPath, coverUrl, isApiError, onSignedOut } from "./api";
 
 const book: Book = {
   id: 1,
@@ -33,6 +33,7 @@ const book: Book = {
   metadataSource: "manual",
   tags: ["Romanian"],
   hasCover: false,
+  coverUpdatedAt: null,
   createdAt: "2026-10-14T09:00:00.000Z",
   updatedAt: "2026-10-14T09:00:00.000Z",
 };
@@ -126,7 +127,25 @@ describe("the books routes", () => {
 
   it("knows where a cover is, and how to get past a cached one", () => {
     expect(coverUrl(7)).toBe("/shelfmark-api/api/books/7/cover");
+    expect(coverUrl(7, null)).toBe("/shelfmark-api/api/books/7/cover");
     expect(coverUrl(7, "2026-10-14T09:00:00.000Z")).toBe("/shelfmark-api/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z");
+    expect(coverPath(7, "2026-10-14T09:00:00.000Z")).toBe("/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z");
+  });
+
+  it("fetches a cover's bytes, and a 401 there signs out like any call", async () => {
+    serve(() => new Response(new Uint8Array([0xff, 0xd8, 0xff]), { status: 200, headers: { "content-type": "image/jpeg" } }));
+    const image = await apiBlob(coverPath(7, "2026-10-14T09:00:00.000Z"));
+    expect(image.type).toBe("image/jpeg");
+    expect(image.size).toBe(3);
+    expect(calls[0]?.url).toBe("/shelfmark-api/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z");
+    expect(calls[0]?.init.credentials).toBe("same-origin");
+
+    serve(() => new Response(null, { status: 401 }));
+    expect((await failure(apiBlob(coverPath(7)))).code).toBe("signed_out");
+    expect(signedOutCount).toBe(1);
+
+    serve(() => json(404, { error: { code: "not_found", message: "This book has no cover." } }));
+    expect(await failure(apiBlob(coverPath(7)))).toMatchObject({ status: 404, code: "not_found" });
   });
 });
 

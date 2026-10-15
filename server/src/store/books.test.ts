@@ -67,6 +67,7 @@ describe("create", () => {
       metadataSource: "manual",
       tags: [],
       hasCover: false,
+      coverUpdatedAt: null,
       createdAt: "2026-10-14T09:00:00.000Z",
       updatedAt: "2026-10-14T09:00:00.000Z",
     });
@@ -122,10 +123,10 @@ describe("list and get", () => {
     addCover(a.id);
 
     const list = store.list();
-    expect(list.map((book) => [book.title, book.collection, book.tags, book.hasCover])).toEqual([
-      ["A", "owned", ["Poetry", "Romanian"], true],
-      ["B", "wishlist", ["Romanian"], false],
-      ["C", "owned", [], false],
+    expect(list.map((book) => [book.title, book.collection, book.tags, book.hasCover, book.coverUpdatedAt])).toEqual([
+      ["A", "owned", ["Poetry", "Romanian"], true, "2026-10-14T09:00:00.000Z"],
+      ["B", "wishlist", ["Romanian"], false, null],
+      ["C", "owned", [], false, null],
     ]);
     expect(store.get(a.id)).toEqual(list[0]);
     expect(store.get(b.id)?.tags).toEqual(["Romanian"]);

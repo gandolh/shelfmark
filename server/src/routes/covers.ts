@@ -170,8 +170,8 @@ const isCoverMime = (value: string): value is CoverMime => (COVER_MIME_TYPES as 
 /**
  * The cover routes (brief 05). `PUT` takes the raw image; `POST …/fetch`
  * downloads a draft's candidate; both answer `CoverInfo`. `GET` serves the
- * bytes with an `ETag` and a day of private caching, so a client that
- * replaces a cover adds `?v=<updatedAt>` to the image URL.
+ * bytes with an `ETag` and a day of private caching, so a client adds
+ * `?v=<Book.coverUpdatedAt>` to the image URL (ignored here).
  */
 export const coverRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db, books, fetch }) => {
   const covers = createCoverStore(db);
@@ -217,6 +217,9 @@ export const coverRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db,
     const { url } = coverFetchRequestSchema.parse(request.body);
     if (!books.get(id)) throw noSuchBook();
     const cover = await downloadCover(url, { fetch });
+    // Again: the book may have been deleted during the download (up to 10 s),
+    // and the insert would then fail its foreign key as a 500.
+    if (!books.get(id)) throw noSuchBook();
     return covers.put(id, cover);
   });
 

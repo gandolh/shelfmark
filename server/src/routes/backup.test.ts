@@ -51,11 +51,15 @@ describe("GET /api/backup", () => {
     expect(res.headers["content-disposition"]).toBe(`attachment; filename="${backupFileName()}"`);
     expect(backupFileName(new Date(2026, 9, 5))).toBe("shelfmark-2026-10-05.db");
 
+    // The file format's write/read versions (bytes 18 and 19): 1 is a rollback journal, 2 is WAL.
+    expect([res.rawPayload[18], res.rawPayload[19]]).toEqual([1, 1]);
+
     dir = await mkdtemp(join(tmpdir(), "shelfmark-copy-test-"));
     const path = join(dir, "copy.db");
     await writeFile(path, res.rawPayload);
     const copy = new Database(path, { readonly: true });
     try {
+      expect(copy.pragma("journal_mode", { simple: true })).toBe("delete");
       const books = copy.prepare("SELECT id, title FROM books ORDER BY id").all() as { id: number; title: string }[];
       expect(books).toEqual([
         { id: ids[0], title: "Orbitor" },

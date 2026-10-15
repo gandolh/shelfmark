@@ -80,9 +80,11 @@ export async function getJson(
 /**
  * MARC language codes (ISO 639-2/B, as Open Library's `/languages/<code>`
  * keys use them, plus the 639-2/T spellings) to ISO 639-1. A code missing
- * here leaves the language empty.
+ * here leaves the language empty. A Map, not an object, because the code is
+ * upstream data: `/languages/constructor` or `__proto__` would find an
+ * object's built-ins.
  */
-const MARC_TO_ISO6391: Record<string, string> = {
+const MARC_TO_ISO6391: ReadonlyMap<string, string> = new Map(Object.entries({
   alb: "sq", ara: "ar", arm: "hy", baq: "eu", bel: "be", bos: "bs", bul: "bg", cat: "ca", ces: "cs",
   chi: "zh", cym: "cy", cze: "cs", dan: "da", deu: "de", dut: "nl", ell: "el", eng: "en", epo: "eo",
   est: "et", eus: "eu", fas: "fa", fin: "fi", fra: "fr", fre: "fr", geo: "ka", ger: "de", gle: "ga",
@@ -91,13 +93,13 @@ const MARC_TO_ISO6391: Record<string, string> = {
   mkd: "mk", mol: "ro", msa: "ms", nld: "nl", nor: "no", per: "fa", pol: "pl", por: "pt", ron: "ro",
   rum: "ro", rus: "ru", slk: "sk", slo: "sk", slv: "sl", spa: "es", sqi: "sq", srp: "sr", swe: "sv",
   tha: "th", tur: "tr", ukr: "uk", vie: "vi", wel: "cy", yid: "yi", zho: "zh",
-};
+}));
 
 /** `/languages/rum` (or `rum`) → `ro`. */
 export function languageOf(key: unknown): string | null {
   if (typeof key !== "string") return null;
   const code = key.replace(/^\/languages\//, "").trim().toLowerCase();
-  return MARC_TO_ISO6391[code] ?? null;
+  return MARC_TO_ISO6391.get(code) ?? null;
 }
 
 /** The large cover by cover ID. */

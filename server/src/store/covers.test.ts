@@ -56,6 +56,22 @@ describe("createCoverStore", () => {
     expect(books.get(book.id)?.hasCover).toBe(false);
   });
 
+  it("gives the book its cover's time: set on each put, moved on a replace, null once removed", () => {
+    const book = books.create({ title: "Orbitor" });
+    expect(book.coverUpdatedAt).toBeNull();
+    const first = covers.put(book.id, { mime: "image/jpeg", bytes: imageBytes("image/jpeg"), source: "openlibrary" });
+    expect(books.get(book.id)?.coverUpdatedAt).toBe(first.updatedAt);
+    expect(books.list().find((b) => b.id === book.id)?.coverUpdatedAt).toBe(first.updatedAt);
+
+    clock = new Date("2026-10-15T08:00:01.000Z");
+    const second = covers.put(book.id, { mime: "image/png", bytes: imageBytes("image/png"), source: "upload" });
+    expect(second.updatedAt).not.toBe(first.updatedAt);
+    expect(books.get(book.id)?.coverUpdatedAt).toBe(second.updatedAt);
+
+    covers.remove(book.id);
+    expect(books.get(book.id)?.coverUpdatedAt).toBeNull();
+  });
+
   it("goes with its book", () => {
     const book = books.create({ title: "Levantul" });
     covers.put(book.id, { mime: "image/jpeg", bytes: imageBytes("image/jpeg"), source: "upload" });

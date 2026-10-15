@@ -1,6 +1,7 @@
 import type { Book, BookCreate, BookPatch } from "@shelfmark/shared";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
-import { ApiError, booksApi, isApiError, onSignedOut } from "../api";
+import { ApiError, booksApi, isApiError } from "../api";
+import { authClient } from "../auth/session";
 
 /**
  * The books client: `GET /api/books` once per session, the whole list kept in
@@ -125,9 +126,18 @@ export function createBooksStore(source: BooksSource) {
       apply((books) => books.filter((b) => b.id !== id));
     },
 
-    /** A cover was stored or removed outside these calls (brief 05's cover routes). */
-    setHasCover(id: number, hasCover: boolean): void {
-      apply((books) => books.map((b) => (b.id === id && b.hasCover !== hasCover ? { ...b, hasCover } : b)));
+    /**
+     * A cover was stored (`updatedAt`, its `CoverInfo`'s) or removed (`null`)
+     * outside these calls (brief 05's cover routes): the book's `hasCover` and
+     * `coverUpdatedAt` follow, as the next fetch would say.
+     */
+    setCover(id: number, updatedAt: string | null): void {
+      const hasCover = updatedAt !== null;
+      apply((books) =>
+        books.map((b) =>
+          b.id === id && (b.hasCover !== hasCover || b.coverUpdatedAt !== updatedAt) ? { ...b, hasCover, coverUpdatedAt: updatedAt } : b,
+        ),
+      );
     },
 
     /** Forget the list (signed out): the next `ensureLoaded` fetches it afresh. */
@@ -144,6 +154,29 @@ export function createBooksStore(source: BooksSource) {
 
 export type BooksStore = ReturnType<typeof createBooksStore>;
 
+/** What `resetWhenSignedOut` reads of the session; the vendored auth client fits. */
+export interface SessionSource {
+  getState(): { status: string };
+  subscribe(listener: () => void): () => void;
+}
+
+/**
+ * The list belongs to a session: reset the store when the session turns
+ * signed out, so the next one fetches its own. On the session's word, not on
+ * any 401: a 401 makes session.ts ask the server again, and when the answer
+ * is still "signed in" the shell stays mounted and nothing would refetch a
+ * list reset there, leaving the Library loading for good. Returns the
+ * unsubscribe function.
+ */
+export function resetWhenSignedOut(store: Pick<BooksStore, "reset">, session: SessionSource): () => void {
+  let previous = session.getState().status;
+  return session.subscribe(() => {
+    const status = session.getState().status;
+    if (status === "signed_out" && previous !== "signed_out") store.reset();
+    previous = status;
+  });
+}
+
 function replace(books: readonly Book[], book: Book): readonly Book[] {
   return books.map((b) => (b.id === book.id ? book : b));
 }
@@ -157,8 +190,7 @@ function toApiError(error: unknown): ApiError {
 
 const store = createBooksStore(booksApi);
 
-// Signed out: the list belongs to the session, and the next one fetches its own.
-onSignedOut(() => store.reset());
+resetWhenSignedOut(store, authClient());
 
 export interface BooksView extends BooksState {
   /** Fetch the list again; resolves when the answer is in (it never rejects). */
@@ -201,31 +233,12 @@ export function refreshBooks(): Promise<void> {
 
 // --- Covers ---------------------------------------------------------------------
 
-// A cover's version per book, for the image address: the server caches a
-// cover for a day, so a replaced one needs a new address to show.
-const coverVersions = new Map<number, string>();
-const coverListeners = new Set<() => void>();
-
-function subscribeCovers(listener: () => void): () => void {
-  coverListeners.add(listener);
-  return () => {
-    coverListeners.delete(listener);
-  };
-}
-
 /**
  * Tell the app a book's cover changed: after `PUT` or `POST …/cover/fetch`
  * (pass the `CoverInfo` they answer) or `DELETE …/cover` (pass `null`). The
- * list's `hasCover` follows, and every `CoverImage` of the book shows the new
- * image, past the browser's cache.
+ * book's `hasCover` and `coverUpdatedAt` follow in the list, so every
+ * `CoverImage` of it gets the new image's address.
  */
 export function coverChanged(id: number, cover: { updatedAt: string } | null): void {
-  coverVersions.set(id, cover?.updatedAt ?? new Date().toISOString());
-  for (const listener of coverListeners) listener();
-  store.setHasCover(id, cover !== null);
-}
-
-/** The version `coverChanged` last gave a book's cover, if any (CoverImage's default `version`). */
-export function useCoverVersion(id: number | undefined): string | undefined {
-  return useSyncExternalStore(subscribeCovers, () => (id === undefined ? undefined : coverVersions.get(id)));
+  store.setCover(id, cover?.updatedAt ?? null);
 }

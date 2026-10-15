@@ -86,7 +86,19 @@ describe("readOpenLibrary", () => {
     expect(languageOf("/languages/ger")).toBe("de");
     expect(languageOf("/languages/hun")).toBe("hu");
     expect(languageOf("/languages/xyz")).toBeNull();
+    // Upstream data, so never an object's built-ins.
+    expect(languageOf("/languages/__proto__")).toBeNull();
+    expect(languageOf("/languages/constructor")).toBeNull();
     expect(languageOf(undefined)).toBeNull();
+  });
+
+  it.each(["/languages/__proto__", "/languages/constructor"])("leaves the language empty for %s", (key) => {
+    const { data, details } = recorded("9780547928227") as { data: unknown; details: Record<string, { details: object }> };
+    const entry = details["ISBN:9780547928227"]!;
+    const changed = { "ISBN:9780547928227": { ...entry, details: { ...entry.details, languages: [{ key }] } } };
+    const draft = readOpenLibrary("9780547928227", { data, details: changed });
+    expect(draft?.title).toBe("The Hobbit");
+    expect(draft?.language).toBeNull();
   });
 });
 

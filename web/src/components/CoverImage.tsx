@@ -1,6 +1,5 @@
 import { useState, type CSSProperties } from "react";
 import { coverUrl } from "../api";
-import { useCoverVersion } from "../books/store";
 import { authorLine, coverTint } from "./cover";
 
 /** What a cover needs from a book; a lookup's draft fits as well as a saved `Book`. */
@@ -12,17 +11,14 @@ export interface CoverBook {
   /** With `hasCover`, the stored cover is shown. */
   id?: number;
   hasCover?: boolean;
+  /** The stored cover's version (`Book.coverUpdatedAt`), in its address so no cache shows an old one. */
+  coverUpdatedAt?: string | null;
 }
 
 export interface CoverImageProps {
   book: CoverBook;
   /** An image to show instead of the stored cover: a lookup's candidate, a photo before upload. */
   src?: string;
-  /**
-   * Changes the stored cover's address after it was replaced. Usually not
-   * needed: `coverChanged` (books/store.ts) versions every CoverImage of the book.
-   */
-  version?: string | number;
   /** CSS width (a number is px); the height follows at 2:3. Default: the width of the container. */
   width?: number | string;
   /** Empty by default: wherever a cover appears, its title is written beside it. */
@@ -38,9 +34,8 @@ export interface CoverImageProps {
  * picked from the title, so a library of Romanian books with no covers in
  * the free databases still reads as a shelf.
  */
-export function CoverImage({ book, src, version, width, alt = "", loading = "lazy", className }: CoverImageProps) {
-  const changed = useCoverVersion(book.id);
-  const url = src ?? (book.hasCover && book.id !== undefined ? coverUrl(book.id, version ?? changed) : null);
+export function CoverImage({ book, src, width, alt = "", loading = "lazy", className }: CoverImageProps) {
+  const url = src ?? (book.hasCover && book.id !== undefined ? coverUrl(book.id, book.coverUpdatedAt) : null);
   // The address that failed; a new address gets a fresh try.
   const [failed, setFailed] = useState<string | null>(null);
   const style = width === undefined ? undefined : ({ "--cover-width": typeof width === "number" ? `${width}px` : width } as CSSProperties);

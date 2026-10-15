@@ -52,6 +52,14 @@ const fetchCover = (app: SignedInTestApp, id: number, url: unknown) =>
 const hasCover = async (app: SignedInTestApp, id: number) =>
   ((await app.inject({ method: "GET", url: `/api/books/${id}` })).json() as Book).hasCover;
 
+/** `coverUpdatedAt` as both `GET /api/books/:id` and the list say it. */
+async function coverTime(app: SignedInTestApp, id: number): Promise<string | null> {
+  const one = (await app.inject({ method: "GET", url: `/api/books/${id}` })).json() as Book;
+  const list = (await app.inject({ method: "GET", url: "/api/books" })).json() as { books: Book[] };
+  expect(list.books.find((b) => b.id === id)?.coverUpdatedAt).toBe(one.coverUpdatedAt);
+  return one.coverUpdatedAt;
+}
+
 describe("PUT and GET /api/books/:id/cover", () => {
   it("round-trips an upload: the bytes, the type, an ETag, a day of private caching", async () => {
     const app = await start();
@@ -126,6 +134,36 @@ describe("PUT and GET /api/books/:id/cover", () => {
     const missing = await app.inject({ method: "GET", url: "/api/books/999/cover" });
     expect(expectError(missing, 404, "not_found")).toBe("There is no such book.");
     expectError(await app.inject({ method: "GET", url: "/api/books/abc/cover" }), 404, "not_found");
+  });
+});
+
+describe("Book.coverUpdatedAt", () => {
+  // Two writes in one millisecond may share a time, so each is checked against
+  // the CoverInfo its write answered rather than against the one before.
+  it("is the stored cover's time: set by PUT and fetch, followed on a replace, null after DELETE", async () => {
+    const app = await start();
+    const { id, coverUpdatedAt } = await book(app);
+    expect(coverUpdatedAt).toBeNull();
+
+    const uploaded = coverInfoSchema.parse((await put(app, id, imageBytes("image/png"), "image/png")).json());
+    expect(await coverTime(app, id)).toBe(uploaded.updatedAt);
+
+    const fetched = coverInfoSchema.parse((await fetchCover(app, id, "https://covers.openlibrary.org/b/id/12003329-L.jpg")).json());
+    expect(await coverTime(app, id)).toBe(fetched.updatedAt);
+
+    await app.inject({ method: "DELETE", url: `/api/books/${id}/cover` });
+    expect(await coverTime(app, id)).toBeNull();
+  });
+
+  it("starts empty for a new book that reuses a deleted book's id", async () => {
+    const app = await start();
+    const first = await book(app);
+    await put(app, first.id, imageBytes("image/jpeg"));
+    await app.inject({ method: "DELETE", url: `/api/books/${first.id}` });
+
+    const second = await book(app);
+    expect(second.id).toBe(first.id);
+    expect(second).toMatchObject({ hasCover: false, coverUpdatedAt: null });
   });
 });
 
@@ -239,6 +277,19 @@ describe("POST /api/books/:id/cover/fetch", () => {
     const { id } = await book(app);
     const message = expectError(await fetchCover(app, id, "https://covers.openlibrary.org/b/id/1-L.jpg"), 502, "upstream");
     expect(message).toBe("The cover host answered 404.");
+  });
+
+  it("answers 404, not 500, when the book is deleted while its cover downloads", async () => {
+    let id = 0;
+    const app = await start(async () => {
+      // The owner deletes the book from another tab meanwhile.
+      await t!.inject({ method: "DELETE", url: `/api/books/${id}` });
+      return image(RECORDED_COVER);
+    });
+    id = (await book(app)).id;
+    const res = await fetchCover(app, id, "https://books.google.com/books/content?id=a");
+    expect(expectError(res, 404, "not_found")).toBe("There is no such book.");
+    expect(fetch.calls).toHaveLength(1);
   });
 
   it("answers 404 for a book that doesn't exist, without a request", async () => {

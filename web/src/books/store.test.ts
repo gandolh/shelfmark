@@ -1,7 +1,7 @@
 import type { Book, BookCreate, BookPatch } from "@shelfmark/shared";
 import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api";
-import { createBooksStore, type BooksSource } from "./store";
+import { createBooksStore, resetWhenSignedOut, type BooksSource } from "./store";
 
 function makeBook(id: number, title: string, extra: Partial<Book> = {}): Book {
   return {
@@ -35,6 +35,7 @@ function makeBook(id: number, title: string, extra: Partial<Book> = {}): Book {
     metadataSource: "manual",
     tags: [],
     hasCover: false,
+    coverUpdatedAt: null,
     createdAt: "2026-10-14T09:00:00.000Z",
     updatedAt: "2026-10-14T09:00:00.000Z",
     ...extra,
@@ -223,14 +224,34 @@ describe("changes", () => {
     expect(store.getState().books).toEqual([]);
   });
 
-  it("marks a book's cover as stored or removed", async () => {
-    const { store } = await loadedStore([makeBook(1, "Solenoid"), makeBook(2, "Orbitor")]);
+  it("updates a book's cover in place: stored, replaced, removed", async () => {
+    const { server, store } = await loadedStore([makeBook(1, "Solenoid"), makeBook(2, "Orbitor")]);
     const before = store.getState().books;
-    store.setHasCover(1, true);
-    expect(store.getState().books.map((b) => b.hasCover)).toEqual([true, false]);
-    expect(store.getState().books[1]).toBe(before[1]);
-    store.setHasCover(1, false);
-    expect(store.getState().books[0]?.hasCover).toBe(false);
+    const cover = (b: Book | undefined) => [b?.hasCover, b?.coverUpdatedAt];
+
+    store.setCover(1, "2026-10-15T08:00:00.000Z");
+    expect(store.getState().books.map(cover)).toEqual([
+      [true, "2026-10-15T08:00:00.000Z"],
+      [false, null],
+    ]);
+    expect(store.getState().books[1]).toBe(before[1]); // untouched rows keep their identity
+
+    // A replaced cover is a new version: a new image address everywhere the book shows.
+    store.setCover(1, "2026-10-15T08:05:00.000Z");
+    expect(cover(store.getState().books[0])).toEqual([true, "2026-10-15T08:05:00.000Z"]);
+
+    store.setCover(1, null);
+    expect(cover(store.getState().books[0])).toEqual([false, null]);
+    expect(server.source.list).toHaveBeenCalledTimes(1);
+  });
+
+  it("replays a cover change made while the list was loading onto the answer", async () => {
+    const server = fakeSource([makeBook(1, "Solenoid")]);
+    const store = createBooksStore(server.source);
+    store.ensureLoaded();
+    store.setCover(1, "2026-10-15T08:00:00.000Z");
+    await server.answerList([makeBook(1, "Solenoid")]); // read before the cover landed
+    expect(store.getState().books[0]).toMatchObject({ hasCover: true, coverUpdatedAt: "2026-10-15T08:00:00.000Z" });
   });
 
   it("leaves the list alone when a change fails", async () => {
@@ -279,5 +300,73 @@ describe("reset (signed out)", () => {
     expect(server.source.list).toHaveBeenCalledTimes(2);
     await server.answerList();
     expect(store.getState().status).toBe("ready");
+  });
+});
+
+describe("resetWhenSignedOut", () => {
+  /** A session the test moves by hand, shaped like the auth client. */
+  function fakeSession(status: string) {
+    const listeners = new Set<() => void>();
+    return {
+      getState: () => ({ status }),
+      subscribe(listener: () => void) {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+      move(next: string) {
+        status = next;
+        for (const listener of listeners) listener();
+      },
+    };
+  }
+
+  it("keeps the list through a 401 the session survives", async () => {
+    const server = fakeSource([makeBook(1, "Solenoid")]);
+    const store = createBooksStore(server.source);
+    const session = fakeSession("signed_in");
+    resetWhenSignedOut(store, session);
+    store.ensureLoaded();
+    await server.answerList();
+
+    // A 401 makes session.ts ask again; the answer is still "signed in".
+    session.move("signed_in");
+    expect(store.getState()).toMatchObject({ status: "ready" });
+    expect(titles(store.getState().books)).toEqual(["Solenoid"]);
+  });
+
+  it("forgets the list once the session ends, and the next session fetches its own", async () => {
+    const server = fakeSource([makeBook(1, "Solenoid")]);
+    const store = createBooksStore(server.source);
+    const session = fakeSession("signed_in");
+    const stop = resetWhenSignedOut(store, session);
+    store.ensureLoaded();
+    await server.answerList();
+
+    session.move("signed_out");
+    expect(store.getState()).toMatchObject({ status: "loading", books: [] });
+
+    session.move("signed_in");
+    store.ensureLoaded(); // the shell mounts again
+    await server.answerList();
+    expect(store.getState().status).toBe("ready");
+    expect(server.source.list).toHaveBeenCalledTimes(2);
+
+    stop();
+    session.move("signed_out");
+    expect(store.getState().status).toBe("ready");
+  });
+
+  it("resets once per sign-out, not on every word from a signed-out session", () => {
+    const server = fakeSource();
+    const store = createBooksStore(server.source);
+    const session = fakeSession("loading");
+    resetWhenSignedOut(store, session);
+    const heard = vi.fn();
+    store.subscribe(heard);
+    session.move("signed_out");
+    session.move("signed_out");
+    expect(heard).toHaveBeenCalledTimes(1);
   });
 });

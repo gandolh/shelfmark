@@ -3,7 +3,8 @@ import type { Db } from "../db/open.js";
 
 /**
  * The books store: the only module that runs SQL on `books`, `tags` and
- * `book_tags` (it reads `covers` only to say whether a book has one). Other
+ * `book_tags` (it reads `covers` only to say whether a book has one, and
+ * since when). Other
  * features read books through it.
  *
  * Inputs are already parsed with the shared schemas; the store applies the
@@ -22,8 +23,8 @@ export interface BookStore {
   findByIsbn(isbn13: string): Book[];
 }
 
-/** The stored fields: everything in `Book` but the id, the tags, the cover flag and the times. */
-type BookFields = Omit<Book, "id" | "tags" | "hasCover" | "createdAt" | "updatedAt">;
+/** The stored fields: everything in `Book` but the id, the tags, the cover's facts and the times. */
+type BookFields = Omit<Book, "id" | "tags" | "hasCover" | "coverUpdatedAt" | "createdAt" | "updatedAt">;
 
 /** Each field's column. Typed against `Book`, so a field the shared schema gains fails here until it has one. */
 const COLUMNS: Record<keyof BookFields, string> = {
@@ -104,7 +105,7 @@ interface TagRow {
 const SELECT_BOOKS = `
   SELECT b.id AS id, ${FIELDS.map((key) => `b.${COLUMNS[key]} AS ${key}`).join(", ")},
          b.created_at AS createdAt, b.updated_at AS updatedAt,
-         c.book_id IS NOT NULL AS hasCover
+         c.book_id IS NOT NULL AS hasCover, c.updated_at AS coverUpdatedAt
   FROM books b LEFT JOIN covers c ON c.book_id = b.id`;
 
 // book_tags.rowid is insertion order, which keeps a book's tags in the order they were given.

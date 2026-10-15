@@ -169,7 +169,7 @@ function proposalCover(proposal: Proposal, photo: CoverPhoto | null): { book: Co
   const book: CoverBook = { title: details.title, authors: details.authors ?? [], language: details.language ?? null };
   if (photo) return { book, src: photo.preview };
   if (cover.kind === "candidates") return { book, src: cover.urls[0] };
-  if (cover.kind === "copy") return { book: { ...book, id: cover.fromId, hasCover: true } };
+  if (cover.kind === "copy") return { book: { ...book, id: cover.fromId, hasCover: true, coverUpdatedAt: cover.coverUpdatedAt } };
   return { book };
 }
 

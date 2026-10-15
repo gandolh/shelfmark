@@ -38,7 +38,7 @@ registerRoute(
 );
 
 // Covers: cache-first, so the library's covers survive a bad connection. The
-// address carries `?v=` once a cover is replaced, so a new cover is a new key.
+// address carries `?v=<Book.coverUpdatedAt>`, so a replaced cover is a new key.
 // Only 200s are stored (the default), never a 401 from a lapsed session.
 registerRoute(
   ({ url, request }) => request.method === "GET" && isApiPath(url.pathname) && isCoverPath(url.pathname),

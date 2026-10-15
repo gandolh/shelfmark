@@ -32,6 +32,7 @@ const book: Book = {
   metadataSource: "manual",
   tags: ["Romanian"],
   hasCover: false,
+  coverUpdatedAt: null,
   createdAt: "2026-10-14T09:00:00.000Z",
   updatedAt: "2026-10-14T09:00:00.000Z",
 };
@@ -133,6 +134,10 @@ describe("bookPatchSchema", () => {
   it("validates what it is given", () => {
     expect(issue(bookPatchSchema.safeParse({ rating: 0 }))).toBe("rating: must be 1 to 5");
     expect(issue(bookPatchSchema.safeParse({ hasCover: true }))).toMatch(/Unrecognized key/);
+    expect(issue(bookPatchSchema.safeParse({ coverUpdatedAt: null }))).toMatch(/Unrecognized key/);
+    expect(issue(bookCreateSchema.safeParse({ title: "t", coverUpdatedAt: "2026-10-14T09:00:00.000Z" }))).toMatch(
+      /Unrecognized key/,
+    );
   });
 });
 

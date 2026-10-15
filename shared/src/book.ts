@@ -78,6 +78,12 @@ export const bookSchema = z.object({
   tags: z.array(z.string()),
   /** Whether `GET /api/books/:id/cover` has an image. */
   hasCover: z.boolean(),
+  /**
+   * When the cover was last stored (UTC ISO), `null` without one. The web app
+   * puts it in the image URL (`?v=`), so a replaced cover, or a new book that
+   * reuses a deleted one's id, is never shown from a cache.
+   */
+  coverUpdatedAt: z.iso.datetime().nullable(),
   /** UTC ISO timestamps, set by the server. */
   createdAt: z.iso.datetime(),
   updatedAt: z.iso.datetime(),

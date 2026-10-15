@@ -112,10 +112,7 @@ export async function apiRequest<T>(
 
   const response = await send(apiUrl(path), init, signal);
 
-  if (response.status === 401 && !noSignOut) {
-    signedOut();
-    throw new ApiError(401, "signed_out", "You're signed out. Sign in to carry on.");
-  }
+  if (response.status === 401 && !noSignOut) throw sessionEnded();
   if (!response.ok) throw await failure(response);
   if (!schema) return;
 
@@ -125,6 +122,24 @@ export async function apiRequest<T>(
     throw new ApiError(response.status, "bad_response", "Shelfmark sent an answer this app doesn't understand. Reload the page.");
   }
   return parsed.data;
+}
+
+/**
+ * A `GET` whose answer is bytes (a stored cover), as a `Blob`. Fails as
+ * `apiRequest` does: a 401 tells the `onSignedOut` listeners.
+ */
+export async function apiBlob(path: string, options: Pick<RequestOptions, "signal"> = {}): Promise<Blob> {
+  const { signal } = options;
+  const response = await send(apiUrl(path), { credentials: "same-origin", signal }, signal);
+  if (response.status === 401) throw sessionEnded();
+  if (!response.ok) throw await failure(response);
+  return response.blob();
+}
+
+/** A 401: tell the listeners, and the caller gets this. */
+function sessionEnded(): ApiError {
+  signedOut();
+  return new ApiError(401, "signed_out", "You're signed out. Sign in to carry on.");
 }
 
 async function send(url: string, init: RequestInit, signal: AbortSignal | undefined): Promise<Response> {
@@ -183,11 +198,17 @@ export const booksApi = {
 };
 
 /**
- * Where a book's stored cover is (brief 05 serves it, cached for a day).
- * `version` changes the address after the cover is replaced, so the browser
- * doesn't show the old one from its cache.
+ * A book's stored cover as an API path (brief 05 serves it, cached for a day,
+ * and the service worker keeps it for 30 days). `version` is the book's
+ * `coverUpdatedAt`: a replaced cover, or a new book on a deleted one's id,
+ * gets a new address, so no cache shows the old image. The server ignores it.
  */
-export function coverUrl(id: number, version?: string | number): string {
-  const url = apiUrl(`/api/books/${id}/cover`);
-  return version === undefined ? url : `${url}?v=${encodeURIComponent(String(version))}`;
+export function coverPath(id: number, version?: string | number | null): string {
+  const path = `/api/books/${id}/cover`;
+  return version === undefined || version === null ? path : `${path}?v=${encodeURIComponent(String(version))}`;
+}
+
+/** Where a book's stored cover is, for an `<img>`: `coverPath` under the API's base. */
+export function coverUrl(id: number, version?: string | number | null): string {
+  return apiUrl(coverPath(id, version));
 }

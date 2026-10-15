@@ -93,6 +93,7 @@ function book(extra: Partial<Book> = {}): Book {
     metadataSource: "openlibrary",
     tags: ["Favourite"],
     hasCover: true,
+    coverUpdatedAt: "2026-03-04T08:00:00.000Z",
     createdAt: "2026-03-03T10:00:00.000Z",
     updatedAt: "2026-03-03T10:00:00.000Z",
     ...extra,
@@ -188,7 +189,8 @@ describe("the scan flow", () => {
     state = flowReducer(state, { type: "another-copy", proposal: proposalFromBook(book(), OWNED.draft) });
     const found = expectStep(state, "found");
     expect(found.proposal.origin).toBe("copy");
-    expect(found.proposal.cover).toEqual({ kind: "copy", fromId: 7 });
+    // With the first copy's cover version, so the copy is of the cover it has now.
+    expect(found.proposal.cover).toEqual({ kind: "copy", fromId: 7, coverUpdatedAt: "2026-03-04T08:00:00.000Z" });
 
     state = flowReducer(state, { type: "save" });
     state = flowReducer(state, { type: "saved", book: { id: 14, title: "The Hobbit", shelf: "Bedroom" } });
@@ -477,17 +479,17 @@ describe("proposals", () => {
   it("copies a saved book's facts but not the owner's own fields", () => {
     const proposal = proposalFromBook(book(), null);
     expect(proposal.details).toMatchObject({ title: "The Hobbit, or There and Back Again", isbn13: HOBBIT });
-    for (const key of ["shelf", "status", "rating", "notes", "tags", "format", "condition", "authorSort", "id", "hasCover"]) {
+    for (const key of ["shelf", "status", "rating", "notes", "tags", "format", "condition", "authorSort", "id", "hasCover", "coverUpdatedAt"]) {
       expect(proposal.details).not.toHaveProperty(key);
     }
   });
 
   it("takes the draft's cover for a copy whose first copy has none", () => {
-    expect(proposalFromBook(book({ hasCover: false }), draft()).cover).toEqual({
+    expect(proposalFromBook(book({ hasCover: false, coverUpdatedAt: null }), draft()).cover).toEqual({
       kind: "candidates",
       urls: ["https://covers.openlibrary.org/b/id/1-L.jpg"],
     });
-    expect(proposalFromBook(book({ hasCover: false }), null).cover).toEqual({ kind: "none" });
+    expect(proposalFromBook(book({ hasCover: false, coverUpdatedAt: null }), null).cover).toEqual({ kind: "none" });
   });
 
   it("builds another copy from the newest saved copy, else the draft, else nothing", () => {

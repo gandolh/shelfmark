@@ -2,6 +2,7 @@ import { createReadStream } from "node:fs";
 import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import Database from "better-sqlite3";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { ApiError } from "../errors.js";
@@ -25,6 +26,14 @@ export const backupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db
     const cleanup = () => rm(dir, { recursive: true, force: true }).catch(() => undefined);
     try {
       await db.backup(file);
+      // The copy's header still says WAL, so opening it read-only would want a
+      // -shm file beside it; a plain rollback journal opens anywhere.
+      const copy = new Database(file);
+      try {
+        copy.pragma("journal_mode = DELETE");
+      } finally {
+        copy.close();
+      }
       const { size } = await stat(file);
       const stream = createReadStream(file);
       // `close` fires on finish, on error and when the client goes away.

@@ -1,5 +1,5 @@
 import { coverInfoSchema, lookupResponseSchema, type CoverInfo, type LookupResponse } from "@shelfmark/shared";
-import { apiRequest, coverUrl, isApiError } from "../api";
+import { apiBlob, apiRequest, coverPath, isApiError } from "../api";
 import { coverChanged } from "../books/store";
 import type { CoverPlan } from "./flow";
 
@@ -46,11 +46,18 @@ export async function removeCover(bookId: number, options: CallOptions = {}): Pr
   coverChanged(bookId, null);
 }
 
-/** One book's stored cover onto another: another copy wears the first copy's cover. */
-export async function copyCover(fromId: number, toId: number, options: CallOptions = {}): Promise<CoverInfo> {
-  const response = await fetch(coverUrl(fromId), { credentials: "same-origin", signal: options.signal });
-  if (!response.ok) throw new Error(`The first copy's cover answered ${response.status}.`);
-  return uploadCover(toId, await response.blob(), options);
+/**
+ * One book's stored cover onto another: another copy wears the first copy's
+ * cover. `from.coverUpdatedAt` versions the address, so a cache never hands
+ * over an older image.
+ */
+export async function copyCover(
+  from: { id: number; coverUpdatedAt: string | null },
+  toId: number,
+  options: CallOptions = {},
+): Promise<CoverInfo> {
+  const image = await apiBlob(coverPath(from.id, from.coverUpdatedAt), options);
+  return uploadCover(toId, image, options);
 }
 
 export type CoverOutcome = "stored" | "none" | "failed";
@@ -71,7 +78,7 @@ export async function attachCover(bookId: number, plan: CoverPlan, photo: Blob |
       case "none":
         return "none";
       case "copy":
-        await copyCover(plan.fromId, bookId);
+        await copyCover({ id: plan.fromId, coverUpdatedAt: plan.coverUpdatedAt }, bookId);
         return "stored";
       case "candidates":
         for (const url of plan.urls) {

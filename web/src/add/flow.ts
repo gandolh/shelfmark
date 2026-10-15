@@ -26,8 +26,8 @@ export type Mode = "scan" | "isbn" | "manual";
 /** Where a new book's cover comes from once it is saved. A photo the owner takes wins over all of these. */
 export type CoverPlan =
   | { kind: "candidates"; urls: readonly string[] }
-  /** Another copy: the first copy's stored cover, copied across. */
-  | { kind: "copy"; fromId: number }
+  /** Another copy: the first copy's stored cover, copied across; `coverUpdatedAt` is its version. */
+  | { kind: "copy"; fromId: number; coverUpdatedAt: string | null }
   | { kind: "none" };
 
 /** The fields a confirm step saves; shelf and status are the owner's to pick. */
@@ -226,7 +226,7 @@ export function proposalFromBook(book: Book, draft: Draft | null): Proposal {
     },
     origin: "copy",
     cover: book.hasCover
-      ? { kind: "copy", fromId: book.id }
+      ? { kind: "copy", fromId: book.id, coverUpdatedAt: book.coverUpdatedAt }
       : candidates.length > 0
         ? { kind: "candidates", urls: candidates }
         : { kind: "none" },
