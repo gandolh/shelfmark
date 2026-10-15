@@ -1,0 +1,492 @@
+/*
+ * The small components every page uses (web/src/components): Button,
+ * SegmentedControl, Menu, Sheet, CoverImage. Colours, sizes and shadows come
+ * from tokens.css. Below 768 px is the phone, where every target is 44 px.
+ */
+
+/* --- Button ------------------------------------------------------------------ */
+
+.button {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--control-height);
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-align: center;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.button--pill {
+  border-radius: var(--radius-pill);
+}
+
+/* The whole row in a column; an equal share of it in a row of block buttons. */
+.button--block {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.button--primary {
+  padding: 0 16px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: var(--weight-semibold);
+}
+
+.button--primary:hover,
+.button--primary:active {
+  background: var(--accent-press);
+  color: var(--on-accent);
+}
+
+.button--secondary {
+  background: var(--control);
+  color: var(--ink);
+}
+
+.button--secondary:hover {
+  background: var(--control-hover);
+  color: var(--ink);
+}
+
+.button--secondary:active {
+  background: var(--control-press);
+}
+
+/* A menu's button while its menu is open (Export in the mock-up). */
+.button--secondary[aria-expanded="true"] {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+  font-weight: var(--weight-semibold);
+}
+
+.button--quiet {
+  padding: 0 4px;
+  color: var(--accent);
+  font-size: var(--text-body);
+}
+
+.button--quiet:hover,
+.button--quiet:active {
+  color: var(--accent-press);
+}
+
+.button--large {
+  min-height: var(--control-height-large);
+  padding: 0 24px;
+  font-size: var(--text-action-large);
+  font-weight: var(--weight-semibold);
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.button svg {
+  flex: none;
+}
+
+@media (max-width: 767.98px) {
+  .button--regular {
+    min-height: var(--touch);
+    padding-inline: 18px;
+    font-size: var(--text-body);
+  }
+
+  .button--quiet.button--regular {
+    padding-inline: 4px;
+  }
+
+  /* A compact button keeps its 34 px look and gets a 44 px target. */
+  .button--compact::before {
+    content: "";
+    position: absolute;
+    inset: calc((var(--control-height) - var(--touch)) / 2) 0;
+  }
+}
+
+/* --- SegmentedControl (and the top bar's two places) -------------------------- */
+
+.segmented {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  border-radius: var(--radius-track);
+  background: var(--control);
+}
+
+.segmented__item {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--segment-height);
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+/* The label again in the selected weight, invisible and flat, so a segment
+   is as wide chosen as not and nothing shifts when the choice moves. */
+.segmented__item::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--weight-semibold);
+  user-select: none;
+  pointer-events: none;
+}
+
+.segmented__item:hover {
+  background: var(--segment-hover);
+  color: var(--ink);
+}
+
+.segmented__item[aria-pressed="true"],
+.segmented__item[aria-current] {
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: var(--weight-semibold);
+}
+
+.segmented--nav .segmented__item {
+  padding: 0 18px;
+}
+
+.segmented--small {
+  padding: 2px;
+  border-radius: var(--radius-control);
+}
+
+.segmented--small .segmented__item {
+  min-height: var(--segment-height-small);
+  padding: 0 12px;
+  border-radius: var(--radius-segment);
+  font-size: var(--text-small);
+}
+
+@media (max-width: 767.98px) {
+  .segmented--small .segmented__item {
+    padding: 0 14px;
+  }
+
+  /* 44 px targets, the track's look unchanged. */
+  .segmented__item::before {
+    content: "";
+    position: absolute;
+    inset: calc((var(--segment-height) - var(--touch)) / 2) 0;
+  }
+
+  .segmented--small .segmented__item::before {
+    inset-block: calc((var(--segment-height-small) - var(--touch)) / 2);
+  }
+}
+
+/* --- Menu ---------------------------------------------------------------------- */
+
+.menu-trigger__label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.menu-trigger__label::after {
+  content: attr(data-label);
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--weight-semibold);
+  user-select: none;
+  pointer-events: none;
+}
+
+.menu {
+  position: fixed;
+  z-index: var(--z-float);
+  display: flex;
+  flex-direction: column;
+  min-width: 224px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  border-radius: var(--radius-menu);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  visibility: hidden; /* until it is placed by its button */
+}
+
+.menu[data-placed] {
+  visibility: visible;
+  animation: menu-in var(--duration) var(--ease-out);
+}
+
+@keyframes menu-in {
+  from {
+    transform: translateY(-4px);
+  }
+}
+
+.menu__section {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__label {
+  padding: 6px 10px 2px;
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.menu__section + .menu__section > .menu__label {
+  padding-top: 10px;
+}
+
+.menu__separator {
+  height: 1px;
+  margin: 5px 4px;
+  background: var(--divider);
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--radius-menu-item);
+  background: none;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  text-align: left;
+}
+
+.menu__item:hover,
+.menu__item:focus {
+  background: var(--accent-tint-soft);
+}
+
+.menu__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.menu__item:disabled {
+  color: var(--muted);
+  background: none;
+}
+
+.menu__item-detail {
+  color: var(--muted);
+  font-size: var(--text-small);
+}
+
+@media (max-width: 767.98px) {
+  .menu__item {
+    min-height: var(--touch);
+    font-size: var(--text-body);
+  }
+}
+
+/* --- Sheet ---------------------------------------------------------------------- */
+
+.sheet {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  z-index: var(--z-bar);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 440px;
+  max-height: calc(100% - 24px);
+  margin-inline: auto;
+  padding: 16px;
+  overflow-y: auto;
+  border-radius: var(--radius-sheet);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  animation: sheet-in var(--duration-sheet) var(--ease-out);
+}
+
+/* Rises from below its edge, as a sheet does; never fades in from nothing. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(calc(100% + 12px));
+  }
+}
+
+/* --- CoverImage ------------------------------------------------------------------ */
+
+.cover {
+  position: relative;
+  display: block;
+  flex: none;
+  inline-size: var(--cover-width, 100%);
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-cover);
+  background: var(--control); /* while the image loads */
+  box-shadow: var(--shadow-cover);
+}
+
+.cover__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The no-cover placeholder: a typographic cover, sized off its own width. */
+.cover--placeholder {
+  container: cover / inline-size;
+  background: var(--tint-bg);
+  color: var(--tint-ink);
+}
+
+.cover[data-tint="1"] {
+  --tint-bg: var(--cover-1-bg);
+  --tint-ink: var(--cover-1-ink);
+}
+
+.cover[data-tint="2"] {
+  --tint-bg: var(--cover-2-bg);
+  --tint-ink: var(--cover-2-ink);
+}
+
+.cover[data-tint="3"] {
+  --tint-bg: var(--cover-3-bg);
+  --tint-ink: var(--cover-3-ink);
+}
+
+.cover[data-tint="4"] {
+  --tint-bg: var(--cover-4-bg);
+  --tint-ink: var(--cover-4-ink);
+}
+
+.cover[data-tint="5"] {
+  --tint-bg: var(--cover-5-bg);
+  --tint-ink: var(--cover-5-ink);
+}
+
+.cover[data-tint="6"] {
+  --tint-bg: var(--cover-6-bg);
+  --tint-ink: var(--cover-6-ink);
+}
+
+.cover[data-tint="7"] {
+  --tint-bg: var(--cover-7-bg);
+  --tint-ink: var(--cover-7-ink);
+}
+
+.cover[data-tint="8"] {
+  --tint-bg: var(--cover-8-bg);
+  --tint-ink: var(--cover-8-ink);
+}
+
+.cover__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6cqi;
+  padding: 12cqi 10cqi 11cqi 16cqi;
+  line-height: 1.1;
+  text-align: left;
+}
+
+/* The hinge of a hardback, one hairline from the spine. */
+.cover__face::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 7cqi;
+  border-inline-start: 1px solid color-mix(in srgb, var(--tint-ink) 24%, transparent);
+}
+
+.cover__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 5;
+  overflow: hidden;
+  font-size: var(--cover-title-size, 12.5cqi);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+  hyphens: auto;
+  overflow-wrap: break-word;
+}
+
+.cover__author {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 7.5cqi;
+  font-weight: var(--weight-semibold);
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  overflow-wrap: break-word;
+}
+
+.cover__byline {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5cqi;
+}
+
+/* A short rule over the author. */
+.cover__byline::before {
+  content: "";
+  width: 16cqi;
+  border-top: max(1px, 0.8cqi) solid currentColor;
+}
+
+/* At a table row's 46 px there is room for the title only. */
+@container cover (max-width: 72px) {
+  .cover__face {
+    padding: 12cqi 9cqi 9cqi 16cqi;
+  }
+
+  .cover__title {
+    -webkit-line-clamp: 4;
+  }
+
+  .cover__byline {
+    display: none;
+  }
+}

@@ -1,0 +1,132 @@
+/*
+ * Shelfmark's design tokens: the one place a colour, a size of type, a radius
+ * or a shadow is written down (corpus/wiki/design.md). Every other stylesheet
+ * reads these; none writes a colour of its own.
+ *
+ * The world: the familiar table app in its Covers variant. Light, the system
+ * font, one teal accent, and the cover is the only thing with a shadow.
+ */
+
+:root {
+  /* --- Colour: design.md's table, value for value ------------------------ */
+
+  --ground: #F5F5F3; /* page background */
+  --surface: #FFFFFF; /* table container, menus, sheets */
+  --control: #E6E6E2; /* segmented controls, secondary buttons */
+  --field: #E9E9E6; /* search field */
+  --hairline: #E2E2DF; /* top bar and tab bar borders */
+  --divider: #ECECE9; /* table row dividers */
+  --ink: #1B1B1D; /* primary text */
+  --ink-2: #45454A; /* secondary text */
+  --muted: #5F5F65; /* captions, counts (5.6:1 on ground) */
+  --accent: #0E6E8C; /* the one interactive colour */
+  --accent-press: #0A4F65; /* pressed, link hover */
+  --accent-tint: #DCEDF2; /* an open menu button */
+  --accent-tint-soft: #EDF5F8; /* the selected menu row (same table row) */
+
+  /* --- Derived: mixes and aliases of the table, never a new hue ---------- */
+
+  --on-accent: var(--surface); /* text on the accent */
+  /* The tab bar's ground, a shade lighter than the page (#F9F9F7 in the mock-up). */
+  --bar: color-mix(in srgb, var(--surface) 40%, var(--ground));
+  --control-hover: color-mix(in srgb, var(--control) 92%, var(--ink));
+  --control-press: color-mix(in srgb, var(--control) 84%, var(--ink));
+  /* The unselected half of a segmented track, under the pointer. */
+  --segment-hover: color-mix(in srgb, var(--surface) 45%, var(--control));
+  --field-placeholder: var(--muted); /* 5.2:1 on field */
+  --focus-ring: var(--accent);
+  --selection: var(--accent-tint);
+  --scrollbar-thumb: color-mix(in srgb, var(--muted) 40%, var(--ground));
+
+  /* --- No-cover placeholder: eight tints, each with its text -------------- */
+  /*
+   * A book without a cover gets a typographic one on a tint picked from its
+   * title (components/cover.ts). Every ink passes 4.5:1 on its tint
+   * (components/cover.test.ts reads these lines).
+   */
+
+  --cover-1-bg: #7B2D35; /* oxblood */
+  --cover-1-ink: #F7EEE6;
+  --cover-2-bg: #D4A23A; /* ochre */
+  --cover-2-ink: #2A1F10;
+  --cover-3-bg: #33503E; /* forest */
+  --cover-3-ink: #EEF0E2;
+  --cover-4-bg: #2C3E57; /* slate */
+  --cover-4-ink: #EAEFF5;
+  --cover-5-bg: #5C3F78; /* plum */
+  --cover-5-ink: #F2ECF7;
+  --cover-6-bg: #DCCDB0; /* sand */
+  --cover-6-ink: #3A2E22;
+  --cover-7-bg: #B9C3A5; /* sage */
+  --cover-7-ink: #26301F;
+  --cover-8-bg: #2E2E30; /* charcoal, gold letters */
+  --cover-8-ink: #E8C66C;
+
+  /* --- Type --------------------------------------------------------------- */
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-title: 34px; /* page title, 700, -0.02em */
+  --text-title-phone: 32px;
+  --text-wordmark: 17px; /* "Shelfmark" in the top bar, 600 */
+  --text-row-title: 16px; /* a book's title in a row, 600 */
+  --text-action-large: 16px; /* a sheet's primary action, 600 */
+  --text-input-phone: 16px; /* fields on a phone: below 16 px iOS zooms in */
+  --text-body: 15px;
+  --text-meta: 14px; /* authors, publishers, controls on the desktop */
+  --text-small: 13px; /* small segmented controls, grid titles */
+  --text-label: 12px; /* column heads, menu section labels, 600 */
+  --text-tab: 11px; /* tab bar labels */
+
+  --weight-regular: 400;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-title: -0.02em;
+  --tracking-wordmark: -0.01em;
+
+  --leading-body: 1.45;
+  --leading-phone: 1.4;
+  --leading-tight: 1.25;
+
+  /* --- Radii -------------------------------------------------------------- */
+
+  --radius-cover: 3px;
+  --radius-segment: 6px; /* the selected half of a small segmented control */
+  --radius-menu-item: 7px;
+  --radius-control: 8px; /* buttons, segments, a small segmented track */
+  --radius-field: 10px; /* the search field */
+  --radius-track: 10px; /* a segmented track */
+  --radius-menu: 12px;
+  --radius-container: 16px; /* the table's white container */
+  --radius-sheet: 20px; /* the floating sheet */
+  --radius-pill: 999px;
+
+  /* --- Elevation: the cover, and what floats. Nothing else casts a shadow - */
+
+  --shadow-cover: 0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2);
+  --shadow-float: 0 16px 40px rgba(27, 27, 29, 0.18); /* menus and the scan sheet */
+
+  /* --- Sizes -------------------------------------------------------------- */
+
+  --touch: 44px; /* the smallest target on a phone */
+  --control-height: 34px; /* buttons and the search field on the desktop */
+  --control-height-large: 48px; /* a sheet's primary action */
+  --segment-height: 32px;
+  --segment-height-small: 30px;
+  --topbar-height: 63px; /* 12 + 38 + 12 + the hairline: sticky things sit under it */
+  --tabbar-height: 76px; /* 66 of targets + 10 at the bottom, before the safe area */
+  --page-width: 1180px;
+  --gutter-desktop: 40px;
+  --gutter-phone: 16px;
+
+  /* --- Motion: state changes only, short, ease-out ------------------------ */
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-sheet: 240ms;
+
+  --z-bar: 10;
+  --z-float: 100;
+}

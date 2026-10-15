@@ -1,0 +1,411 @@
+/*
+ * The shell (web/src/layout): the desktop top bar, the phone tab bar, the
+ * page frame, the search box and the account button. The shell picks the
+ * desktop or phone layout in script (`.shell--desktop` from 768 px), so these
+ * rules follow its classes rather than repeating the media query.
+ */
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.shell--phone {
+  padding-top: env(safe-area-inset-top);
+  line-height: var(--leading-phone);
+}
+
+.shell__main {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.shell__main:focus {
+  outline: none;
+}
+
+.skip-link {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: calc(var(--z-float) + 1);
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  transform: translateY(calc(-100% - 24px));
+}
+
+.skip-link:focus-visible {
+  box-shadow: var(--shadow-float);
+  transform: none;
+}
+
+/* --- Top bar (desktop) ------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-bar);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  height: var(--topbar-height);
+  padding: 0 var(--gutter-desktop);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--ground);
+}
+
+.topbar__wordmark {
+  justify-self: start;
+  color: var(--ink);
+  font-size: var(--text-wordmark);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-wordmark);
+  text-decoration: none;
+  border-radius: var(--radius-control);
+}
+
+.topbar__wordmark:hover {
+  color: var(--ink);
+}
+
+.topbar__end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* --- Search box ---------------------------------------------------------------- */
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 0 10px;
+  border-radius: var(--radius-field);
+  background: var(--field);
+  color: var(--muted);
+}
+
+.search:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 0;
+}
+
+.search--bar {
+  flex: 0 1 240px;
+  min-height: var(--control-height);
+}
+
+.search--header {
+  min-height: 40px;
+}
+
+.search__icon {
+  display: flex;
+  flex: none;
+  cursor: text;
+}
+
+.search__input {
+  flex: 1;
+  min-width: 0;
+  height: var(--control-height);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  appearance: none;
+}
+
+.search__input:focus-visible {
+  outline: none; /* the box carries the ring */
+}
+
+.search--header .search__input {
+  height: 40px;
+  font-size: var(--text-input-phone);
+}
+
+.search__input::-webkit-search-cancel-button,
+.search__input::-webkit-search-decoration {
+  appearance: none;
+}
+
+/* Our own clear button, drawn like the field's other marks. */
+.search__clear {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+  color: var(--field);
+}
+
+.search__clear:hover {
+  background: var(--ink-2);
+}
+
+.search__clear::before {
+  content: "";
+  position: absolute;
+  inset: -13px;
+}
+
+/* --- Account button and menu ----------------------------------------------------- */
+
+.account {
+  position: relative;
+  display: flex;
+  flex: none;
+}
+
+.account__button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--ink-2);
+}
+
+.account__disc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.account--bar .account__button {
+  width: var(--control-height);
+  height: var(--control-height);
+}
+
+.account--bar .account__disc {
+  width: 100%;
+  height: 100%;
+  background: var(--control);
+}
+
+/* On a phone the disc is 32 px and the target 44; the disc lines up with the gutter. */
+.account--header .account__button {
+  width: var(--touch);
+  height: var(--touch);
+  margin-right: -6px;
+}
+
+.account--header .account__disc {
+  width: 32px;
+  height: 32px;
+  background: var(--control);
+}
+
+.account__button:hover .account__disc {
+  background: var(--control-hover);
+}
+
+.account__button[aria-expanded="true"] .account__disc {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+}
+
+/* What an account action had to say. Takes no room while empty. */
+.account__notice {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: var(--z-float);
+  width: max-content;
+  max-width: min(300px, calc(100vw - 32px));
+  color: var(--ink);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+}
+
+.account__notice[data-shown] {
+  padding: 10px 12px;
+  border-radius: var(--radius-menu);
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  animation: menu-in var(--duration) var(--ease-out);
+}
+
+/* --- Tab bar (phone) --------------------------------------------------------------- */
+
+.tabbar {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--z-bar);
+  display: flex;
+  flex: none;
+  /* 76 px as drawn, the bottom 10 of it growing into the home-indicator area. */
+  height: calc(var(--tabbar-height) - 10px + max(10px, env(safe-area-inset-bottom)));
+  padding: 0 env(safe-area-inset-right) max(10px, env(safe-area-inset-bottom)) env(safe-area-inset-left);
+  border-top: 1px solid var(--hairline);
+  background: var(--bar);
+}
+
+.tabbar__item {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--muted);
+  font-size: var(--text-tab);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+.tabbar__item svg {
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.tabbar__item:hover {
+  color: var(--ink-2);
+}
+
+.tabbar__item:active svg {
+  transform: scale(0.92);
+}
+
+.tabbar__item[aria-current],
+.tabbar__item[aria-current]:hover {
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+}
+
+.tabbar__item:focus-visible {
+  border-radius: var(--radius-track);
+  outline-offset: -6px;
+}
+
+/* --- Page frame --------------------------------------------------------------------- */
+
+.page {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.page__header {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.page__headrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.page__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.page__title {
+  font-size: var(--text-title);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-title);
+  line-height: 1.15;
+}
+
+.page__caption {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.page__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.page__back {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 2px;
+  min-height: 32px;
+  margin-left: -6px;
+  padding-right: 6px;
+  border-radius: var(--radius-control);
+  font-size: var(--text-body);
+  text-decoration: none;
+}
+
+/* Desktop: one centred column under the top bar. */
+.shell--desktop .page {
+  gap: 18px;
+  width: 100%;
+  max-width: var(--page-width);
+  margin: 0 auto;
+  padding: 36px var(--gutter-desktop) 48px;
+}
+
+/* Phone: the large title with the account button, then search and toolbar. */
+.shell--phone .page__header {
+  padding: 14px var(--gutter-phone) 12px;
+}
+
+.shell--phone .page__headrow {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.shell--phone .page__title {
+  font-size: var(--text-title-phone);
+}
+
+.shell--phone .page__toolbar {
+  justify-content: space-between;
+}
+
+.shell--phone .page__back {
+  min-height: var(--touch);
+  margin-block: -6px -4px;
+}
+
+.shell--phone .page__body {
+  padding: 4px var(--gutter-phone) 24px;
+}
+
+/* Phone, `bleed`: the content fills the screen down to the tab bar. */
+.page--bleed .page__body,
+.shell--phone .page--bleed .page__body {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+  padding: 0;
+}

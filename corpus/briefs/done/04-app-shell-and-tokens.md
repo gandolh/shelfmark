@@ -87,3 +87,25 @@ Anything under `server/`, `shared/`, `corpus/` (except the outcome note).
 - `node <impeccable>/scripts/detect.mjs --json web/src` reports nothing
   material, or the outcome note says why a finding stays.
 - `npm run typecheck && npm run lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Done. impeccable's detector reports nothing on `web/src`, and
+no colour is written outside `web/src/styles/tokens.css`. Looked at in a
+browser at 1440, 768 and 390 px: the top bar against `Covers-Desktop`, the
+phone title, covers grid and 76 px tab bar, menus by keyboard, 44 px targets,
+navigation without a reload. Tokens beyond design.md's table, all from it:
+`--accent-tint-soft` (`#EDF5F8`, named in the same cell), `color-mix()`
+shades for the tab bar and control hover/press, `--on-accent`, and eight
+cover tints with their inks, each 4.5:1 or better. There is no danger
+colour yet, so a delete stays neutral unless a brief adds one. Pages wrap
+their content in `layout/Page.tsx` (title, caption, toolbar, phone search,
+back link, `bleed` for the camera). The desktop search lives in the top bar
+(`layout/search.ts`); typing on another page goes to the Library. Extra
+files beyond the list: `components/Link.tsx`, `components/icons.tsx`,
+`components/cover.ts`, `layout/Page.tsx`, `layout/SearchField.tsx`,
+`layout/search.ts`, `layout/viewport.ts`, `styles/components.css`,
+`styles/shell.css`. After a cover changes, call `coverChanged()` so the
+image URL gains `?v=` and skips the day's cache. Focus does not move to a new
+page's heading on navigation, so brief 09's ISBN field keeps it. The
+`color-scheme` meta in `web/index.html` now says `light`. 51 tests.
