@@ -21,4 +21,4 @@ The owner asked for export to Excel/CSV. Details and the rejected libraries in
 
 Exported files open in Excel with Romanian diacritics intact.
 
-Promoted to [brief 11](../briefs/todo/11-export-and-backup.md) on 2026-10-14.
+Promoted to [brief 11](../briefs/done/11-export-and-backup.md) on 2026-10-14.

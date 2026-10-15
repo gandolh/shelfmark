@@ -5,6 +5,7 @@ import { registerOriginGuard } from "./auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
+import { backupRoutes } from "./routes/backup.js";
 import { bookRoutes } from "./routes/books.js";
 import { coverRoutes } from "./routes/covers.js";
 import { lookupRoutes } from "./routes/lookup.js";
@@ -96,6 +97,7 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(bookRoutes, ctx),
   (app, ctx) => app.register(lookupRoutes, ctx),
   (app, ctx) => app.register(coverRoutes, ctx),
+  (app, ctx) => app.register(backupRoutes, ctx),
 ];
 
 export interface BuildAppOptions {

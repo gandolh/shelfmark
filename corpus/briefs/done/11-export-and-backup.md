@@ -57,3 +57,23 @@ The rest of the library page, the server store.
 - Manual: the CSV opens in Excel (or LibreOffice) with ă, â, î, ș, ț intact;
   the XLSX opens with dates and numbers typed.
 - `npm run typecheck && npm run lint && npm test` pass.
+
+## Outcome
+
+_2026-10-15_. Done; opening the files in Excel or LibreOffice is the owner's
+check. `write-excel-file` 4.1.1 is loaded only when an export runs (its own
+70 kB chunk). `fields.ts` builds on brief 08's `COLUMNS` and `exportValue`,
+so "What you see now" is exactly the Library's rows and visible columns (an
+Author column is added after the title when Author is hidden) and "Every
+book, every field" is all 29 columns. In the CSV, booleans are Yes/No and
+dates are `YYYY-MM-DD` or ISO timestamps; in the XLSX they are typed cells,
+dates as real dates (Added and Changed with the local time). An ISBN in the
+CSV is bare digits, so Excel may still show it as 9.78E+12 when opening a CSV
+(the `="…"` trick was left out); the XLSX keeps it as text.
+`GET /api/backup` copies the database with `db.backup()` into a temp
+directory, streams it with `Cache-Control: no-store`, and removes the copy
+when the stream closes, finishes or fails. The backup is the whole database,
+password hashes and sessions included, so a downloaded file is sensitive.
+The account menu's "Download a backup" saves it under the server's file name;
+a 401 goes to the login page. 15 tests, among them the XLSX read back with
+`read-excel-file` and the backup opened with better-sqlite3.

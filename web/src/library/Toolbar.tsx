@@ -1,6 +1,7 @@
 import type { ReactNode, RefObject } from "react";
 import { ButtonLink } from "../components/Button";
 import { SegmentedControl } from "../components/SegmentedControl";
+import { ExportMenu } from "../export/ExportMenu";
 import { ADD_BOOK } from "../router";
 import { activeFilters } from "./filters";
 import type { ViewMode } from "./prefs";
@@ -28,7 +29,7 @@ export interface ToolbarProps {
  */
 export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
   // EXPORT SLOT (brief 11): replace `null` with `<ExportMenu view={view} />`.
-  const exportMenu: ReactNode = null;
+  const exportMenu: ReactNode = <ExportMenu view={view} />;
 
   const count = activeFilters(view.filters).length;
   const badge =

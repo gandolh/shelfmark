@@ -1,4 +1,5 @@
 import { useSession, useWardResult, type SessionState } from "../../vendor/ward/ward-auth-react.js";
+import { apiUrl } from "../api";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
 import { LOGIN, pathFor } from "../router";
@@ -64,9 +65,34 @@ export async function unlinkWard(): Promise<void> {
   if (client.getState().status === "signed_out") window.location.replace(pathFor(LOGIN));
 }
 
-/** Download the whole database, the SQLite file, as a backup (brief 11). */
+/**
+ * Download the whole database, the SQLite file, as a backup. Fetched rather
+ * than navigated to, so a signed-out session (401) takes the same road as any
+ * other call and a failure reaches the menu as a message. The file's name is
+ * the server's (`shelfmark-<date>.db`).
+ */
 export async function downloadBackup(): Promise<void> {
-  throw new NotYet("backups come with export.");
+  let response: Response;
+  try {
+    response = await fetch(apiUrl("/api/backup"), { credentials: "same-origin" });
+  } catch {
+    throw new Error("The backup could not be downloaded. Check the connection and try again.");
+  }
+  if (response.status === 401) {
+    window.location.replace(pathFor(LOGIN));
+    throw new Error("You are signed out. Sign in and try again.");
+  }
+  if (!response.ok) throw new Error("The backup could not be made. Try again.");
+
+  const name = /filename="([^"]+)"/.exec(response.headers.get("Content-Disposition") ?? "")?.[1] ?? "shelfmark.db";
+  const url = URL.createObjectURL(await response.blob());
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10_000);
 }
 
 /**
