@@ -18,4 +18,4 @@ Decided: one owner account, deployed ([decisions.md](../wiki/decisions.md)).
 The estate rule is `../wzd_auth` decisions-oidc; Satchel's brief 26 is the
 worked example.
 
-Promoted to [brief 06](../briefs/todo/06-accounts-and-sign-in.md) on 2026-10-14.
+Promoted to [brief 06](../briefs/done/06-accounts-and-sign-in.md) on 2026-10-14.

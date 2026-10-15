@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { changePassword, downloadBackup, linkWard, signOut, unlinkWard, useWardLink } from "../account/actions";
+import { changePassword, downloadBackup, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
+import { AlertIcon } from "../auth/icons";
 import { AccountIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/Menu";
 
@@ -15,8 +16,18 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
   const ward = useWardLink();
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  // A Ward link comes back to this page with its result; it shows here like an action's, then goes.
+  const { message: wardMessage, failed: wardFailed, clear: clearWardMessage } = useWardNotice();
 
   useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (wardMessage === "") return;
+    const wardTimer = setTimeout(clearWardMessage, NOTICE_MS);
+    return () => clearTimeout(wardTimer);
+  }, [wardMessage, clearWardMessage]);
+  const shown = notice || wardMessage;
+  // Every action's notice is a failure; a Ward round trip's may be good news.
+  const failed = notice !== "" || wardFailed;
 
   // An action that fails (or isn't built yet) says so here, for a few seconds.
   const run = (action: () => Promise<void>) => () => {
@@ -61,8 +72,13 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
         }
         sections={sections}
       />
-      <p className="account__notice" role="status" data-shown={notice !== "" || undefined}>
-        {notice}
+      <p
+        className={failed ? "account__notice account__notice--error" : "account__notice"}
+        role="status"
+        data-shown={shown !== "" || undefined}
+      >
+        {failed && shown !== "" && <AlertIcon size={16} />}
+        {shown}
       </p>
     </div>
   );

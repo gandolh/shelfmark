@@ -2,19 +2,19 @@ import { bookListSchema, bookSchema, type Book } from "@shelfmark/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { createBookStore } from "../store/books.js";
-import { startTestApp, type TestApp } from "../testing/testApp.js";
+import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
 
-let t: TestApp;
+let t: SignedInTestApp;
 
 beforeEach(async () => {
-  t = await startTestApp();
+  t = await startSignedInApp();
 });
 
 afterEach(async () => {
   await t.close();
 });
 
-type Response = Awaited<ReturnType<TestApp["app"]["inject"]>>;
+type Response = Awaited<ReturnType<SignedInTestApp["inject"]>>;
 
 function expectError(res: Response, status: number, code: string): string {
   expect(res.statusCode).toBe(status);
@@ -26,14 +26,14 @@ function expectError(res: Response, status: number, code: string): string {
 }
 
 async function create(payload: object): Promise<Book> {
-  const res = await t.app.inject({ method: "POST", url: "/api/books", payload });
+  const res = await t.inject({ method: "POST", url: "/api/books", payload });
   expect(res.statusCode).toBe(201);
   return bookSchema.parse(res.json());
 }
 
 describe("GET /api/books", () => {
   it("answers { books: [] } on an empty library", async () => {
-    const res = await t.app.inject({ method: "GET", url: "/api/books" });
+    const res = await t.inject({ method: "GET", url: "/api/books" });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual({ books: [] });
   });
@@ -41,7 +41,7 @@ describe("GET /api/books", () => {
   it("lists every book of both collections", async () => {
     const owned = await create({ title: "Solenoid", tags: ["Romanian"] });
     const wished = await create({ title: "Orbitor", collection: "wishlist" });
-    const res = await t.app.inject({ method: "GET", url: "/api/books" });
+    const res = await t.inject({ method: "GET", url: "/api/books" });
     expect(res.statusCode).toBe(200);
     expect(bookListSchema.parse(res.json())).toEqual({ books: [owned, wished] });
   });
@@ -75,7 +75,7 @@ describe("GET /api/books", () => {
     db.close();
 
     const started = performance.now();
-    const res = await t.app.inject({ method: "GET", url: "/api/books" });
+    const res = await t.inject({ method: "GET", url: "/api/books" });
     const elapsed = performance.now() - started;
 
     expect(res.statusCode).toBe(200);
@@ -91,14 +91,14 @@ describe("GET /api/books", () => {
 describe("GET /api/books/:id", () => {
   it("answers the book", async () => {
     const book = await create({ title: "Solenoid" });
-    const res = await t.app.inject({ method: "GET", url: `/api/books/${book.id}` });
+    const res = await t.inject({ method: "GET", url: `/api/books/${book.id}` });
     expect(res.statusCode).toBe(200);
     expect(res.json()).toEqual(book);
   });
 
   it("is a 404 for an unknown or malformed id", async () => {
     for (const id of ["999", "abc", "0", "-1", "1.5", "01", "99999999999999999999"]) {
-      const res = await t.app.inject({ method: "GET", url: `/api/books/${id}` });
+      const res = await t.inject({ method: "GET", url: `/api/books/${id}` });
       expect(expectError(res, 404, "not_found"), id).toBe("There is no such book.");
     }
   });
@@ -106,7 +106,7 @@ describe("GET /api/books/:id", () => {
 
 describe("POST /api/books", () => {
   it("creates a book and answers 201 with it", async () => {
-    const res = await t.app.inject({
+    const res = await t.inject({
       method: "POST",
       url: "/api/books",
       payload: { title: " Solenoid ", authors: ["Mircea Cărtărescu"], isbn13: "9789734647262" },
@@ -120,7 +120,7 @@ describe("POST /api/books", () => {
       status: "unread",
       hasCover: false,
     });
-    const again = await t.app.inject({ method: "GET", url: `/api/books/${book.id}` });
+    const again = await t.inject({ method: "GET", url: `/api/books/${book.id}` });
     expect(again.json()).toEqual(book);
   });
 
@@ -134,17 +134,17 @@ describe("POST /api/books", () => {
       [[{ title: "t" }], /expected object/],
     ];
     for (const [payload, message] of cases) {
-      const res = await t.app.inject({ method: "POST", url: "/api/books", payload: payload as object });
+      const res = await t.inject({ method: "POST", url: "/api/books", payload: payload as object });
       expect(expectError(res, 400, "validation")).toMatch(message);
     }
   });
 
   it("is a 400 for a missing or broken JSON body", async () => {
-    const empty = await t.app.inject({ method: "POST", url: "/api/books", headers: { "content-type": "application/json" } });
+    const empty = await t.inject({ method: "POST", url: "/api/books", headers: { "content-type": "application/json" } });
     expectError(empty, 400, "validation");
-    const none = await t.app.inject({ method: "POST", url: "/api/books" });
+    const none = await t.inject({ method: "POST", url: "/api/books" });
     expectError(none, 400, "validation");
-    const broken = await t.app.inject({
+    const broken = await t.inject({
       method: "POST",
       url: "/api/books",
       headers: { "content-type": "application/json" },
@@ -157,7 +157,7 @@ describe("POST /api/books", () => {
 describe("PATCH /api/books/:id", () => {
   it("changes the book and answers it", async () => {
     const book = await create({ title: "Solenoid", shelf: "Bedroom", tags: ["Romanian"] });
-    const res = await t.app.inject({
+    const res = await t.inject({
       method: "PATCH",
       url: `/api/books/${book.id}`,
       payload: { shelf: null, status: "read", tags: ["Romanian", "Favourites"] },
@@ -171,13 +171,13 @@ describe("PATCH /api/books/:id", () => {
   it("is a 400 for a bad body", async () => {
     const book = await create({ title: "Solenoid" });
     for (const payload of [{ title: null }, { rating: 0 }, { id: 7 }]) {
-      const res = await t.app.inject({ method: "PATCH", url: `/api/books/${book.id}`, payload });
+      const res = await t.inject({ method: "PATCH", url: `/api/books/${book.id}`, payload });
       expectError(res, 400, "validation");
     }
   });
 
   it("is a 404 for an unknown book", async () => {
-    const res = await t.app.inject({ method: "PATCH", url: "/api/books/999", payload: { title: "x" } });
+    const res = await t.inject({ method: "PATCH", url: "/api/books/999", payload: { title: "x" } });
     expectError(res, 404, "not_found");
   });
 });
@@ -186,26 +186,26 @@ describe("DELETE /api/books/:id", () => {
   it("deletes the book and answers 204", async () => {
     const book = await create({ title: "Solenoid" });
     // A client that sends the JSON header with no body is fine.
-    const res = await t.app.inject({
+    const res = await t.inject({
       method: "DELETE",
       url: `/api/books/${book.id}`,
       headers: { "content-type": "application/json" },
     });
     expect(res.statusCode).toBe(204);
     expect(res.body).toBe("");
-    const gone = await t.app.inject({ method: "GET", url: `/api/books/${book.id}` });
+    const gone = await t.inject({ method: "GET", url: `/api/books/${book.id}` });
     expectError(gone, 404, "not_found");
   });
 
   it("is a 404 for an unknown book", async () => {
-    const res = await t.app.inject({ method: "DELETE", url: "/api/books/999" });
+    const res = await t.inject({ method: "DELETE", url: "/api/books/999" });
     expectError(res, 404, "not_found");
   });
 });
 
 describe("errors", () => {
   it("answers an unknown route with the shared error shape", async () => {
-    const res = await t.app.inject({ method: "GET", url: "/api/nothing" });
+    const res = await t.inject({ method: "GET", url: "/api/nothing" });
     expect(expectError(res, 404, "not_found")).toBe("There is no such route.");
   });
 });

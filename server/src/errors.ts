@@ -10,6 +10,8 @@ import { z } from "zod";
  */
 export const ERROR_STATUS = {
   validation: 400,
+  /** A browser sent a change from a page on another origin (`auth/guard.ts`). */
+  forbidden: 403,
   not_found: 404,
   internal: 500,
   /** A host the server called (a cover download) failed or timed out. */

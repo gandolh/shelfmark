@@ -11,15 +11,15 @@ import {
   type FakeFetch,
   type FakeHandler,
 } from "../testing/fakeFetch.js";
-import { startTestApp, type TestApp } from "../testing/testApp.js";
+import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
 import { downloadCover, sniffImage } from "./covers.js";
 
-let t: TestApp | undefined;
+let t: SignedInTestApp | undefined;
 let fetch: FakeFetch;
 
-async function start(handler: FakeHandler = recordedInternet): Promise<TestApp> {
+async function start(handler: FakeHandler = recordedInternet): Promise<SignedInTestApp> {
   fetch = fakeFetch(handler);
-  t = await startTestApp({}, { fetch });
+  t = await startSignedInApp({}, { fetch });
   return t;
 }
 
@@ -28,7 +28,7 @@ afterEach(async () => {
   t = undefined;
 });
 
-type Response = Awaited<ReturnType<TestApp["app"]["inject"]>>;
+type Response = Awaited<ReturnType<SignedInTestApp["inject"]>>;
 
 function expectError(res: Response, status: number, code: string): string {
   expect(res.statusCode).toBe(status);
@@ -37,20 +37,20 @@ function expectError(res: Response, status: number, code: string): string {
   return body.error.message;
 }
 
-async function book(app: TestApp): Promise<Book> {
-  const res = await app.app.inject({ method: "POST", url: "/api/books", payload: { title: "The Hobbit" } });
+async function book(app: SignedInTestApp): Promise<Book> {
+  const res = await app.inject({ method: "POST", url: "/api/books", payload: { title: "The Hobbit" } });
   expect(res.statusCode).toBe(201);
   return res.json() as Book;
 }
 
-const put = (app: TestApp, id: number, body: Buffer, contentType = "image/jpeg") =>
-  app.app.inject({ method: "PUT", url: `/api/books/${id}/cover`, headers: { "content-type": contentType }, payload: body });
+const put = (app: SignedInTestApp, id: number, body: Buffer, contentType = "image/jpeg") =>
+  app.inject({ method: "PUT", url: `/api/books/${id}/cover`, headers: { "content-type": contentType }, payload: body });
 
-const fetchCover = (app: TestApp, id: number, url: unknown) =>
-  app.app.inject({ method: "POST", url: `/api/books/${id}/cover/fetch`, payload: { url } });
+const fetchCover = (app: SignedInTestApp, id: number, url: unknown) =>
+  app.inject({ method: "POST", url: `/api/books/${id}/cover/fetch`, payload: { url } });
 
-const hasCover = async (app: TestApp, id: number) =>
-  ((await app.app.inject({ method: "GET", url: `/api/books/${id}` })).json() as Book).hasCover;
+const hasCover = async (app: SignedInTestApp, id: number) =>
+  ((await app.inject({ method: "GET", url: `/api/books/${id}` })).json() as Book).hasCover;
 
 describe("PUT and GET /api/books/:id/cover", () => {
   it("round-trips an upload: the bytes, the type, an ETag, a day of private caching", async () => {
@@ -63,7 +63,7 @@ describe("PUT and GET /api/books/:id/cover", () => {
     expect(coverInfoSchema.parse(saved.json())).toMatchObject({ mime: "image/png", size: 5000, source: "upload" });
     expect(await hasCover(app, id)).toBe(true);
 
-    const got = await app.app.inject({ method: "GET", url: `/api/books/${id}/cover` });
+    const got = await app.inject({ method: "GET", url: `/api/books/${id}/cover` });
     expect(got.statusCode).toBe(200);
     expect(got.rawPayload.equals(png)).toBe(true);
     expect(got.headers["content-type"]).toBe("image/png");
@@ -72,7 +72,7 @@ describe("PUT and GET /api/books/:id/cover", () => {
     const etag = got.headers.etag as string;
     expect(etag).toMatch(/^"[\w-]+"$/);
 
-    const again = await app.app.inject({
+    const again = await app.inject({
       method: "GET",
       url: `/api/books/${id}/cover?v=1`,
       headers: { "if-none-match": etag },
@@ -82,7 +82,7 @@ describe("PUT and GET /api/books/:id/cover", () => {
 
     // A replaced cover has a new ETag.
     await put(app, id, imageBytes("image/jpeg", 5000));
-    const replaced = await app.app.inject({ method: "GET", url: `/api/books/${id}/cover`, headers: { "if-none-match": etag } });
+    const replaced = await app.inject({ method: "GET", url: `/api/books/${id}/cover`, headers: { "if-none-match": etag } });
     expect(replaced.statusCode).toBe(200);
     expect(replaced.headers["content-type"]).toBe("image/jpeg");
   });
@@ -121,11 +121,11 @@ describe("PUT and GET /api/books/:id/cover", () => {
     const app = await start();
     expect(expectError(await put(app, 999, imageBytes("image/jpeg")), 404, "not_found")).toBe("There is no such book.");
     const { id } = await book(app);
-    const none = await app.app.inject({ method: "GET", url: `/api/books/${id}/cover` });
+    const none = await app.inject({ method: "GET", url: `/api/books/${id}/cover` });
     expect(expectError(none, 404, "not_found")).toBe("This book has no cover.");
-    const missing = await app.app.inject({ method: "GET", url: "/api/books/999/cover" });
+    const missing = await app.inject({ method: "GET", url: "/api/books/999/cover" });
     expect(expectError(missing, 404, "not_found")).toBe("There is no such book.");
-    expectError(await app.app.inject({ method: "GET", url: "/api/books/abc/cover" }), 404, "not_found");
+    expectError(await app.inject({ method: "GET", url: "/api/books/abc/cover" }), 404, "not_found");
   });
 });
 
@@ -134,19 +134,19 @@ describe("DELETE /api/books/:id/cover", () => {
     const app = await start();
     const { id } = await book(app);
     await put(app, id, imageBytes("image/jpeg"));
-    const removed = await app.app.inject({ method: "DELETE", url: `/api/books/${id}/cover` });
+    const removed = await app.inject({ method: "DELETE", url: `/api/books/${id}/cover` });
     expect(removed.statusCode).toBe(204);
     expect(await hasCover(app, id)).toBe(false);
-    expectError(await app.app.inject({ method: "GET", url: `/api/books/${id}/cover` }), 404, "not_found");
-    expectError(await app.app.inject({ method: "DELETE", url: `/api/books/${id}/cover` }), 404, "not_found");
+    expectError(await app.inject({ method: "GET", url: `/api/books/${id}/cover` }), 404, "not_found");
+    expectError(await app.inject({ method: "DELETE", url: `/api/books/${id}/cover` }), 404, "not_found");
   });
 
   it("goes with the book", async () => {
     const app = await start();
     const { id } = await book(app);
     await put(app, id, imageBytes("image/jpeg"));
-    await app.app.inject({ method: "DELETE", url: `/api/books/${id}` });
-    expectError(await app.app.inject({ method: "GET", url: `/api/books/${id}/cover` }), 404, "not_found");
+    await app.inject({ method: "DELETE", url: `/api/books/${id}` });
+    expectError(await app.inject({ method: "GET", url: `/api/books/${id}/cover` }), 404, "not_found");
   });
 });
 
@@ -165,7 +165,7 @@ describe("POST /api/books/:id/cover/fetch", () => {
     // Redirects are followed by hand, so each hop passes the guard.
     expect(fetch.calls.every((call) => call.redirect === "manual")).toBe(true);
 
-    const got = await app.app.inject({ method: "GET", url: `/api/books/${id}/cover` });
+    const got = await app.inject({ method: "GET", url: `/api/books/${id}/cover` });
     expect(got.rawPayload.equals(RECORDED_COVER)).toBe(true);
   });
 

@@ -78,3 +78,36 @@ Every other route file; the library, add and book pages.
   outcome note and show the button hidden when unset).
 - `npm run typecheck && npm run lint && npm test` pass; no secret value is in
   any committed file.
+
+## Outcome
+
+_2026-10-15_. Done, except the live Ward round trip: Docker isn't reachable
+from this WSL distro, so the local Ward container couldn't run. The button
+was checked with stand-in settings (shown when the five `WARD_OIDC_*` values
+are set, "Ward isn't answering" when the issuer is down) and stays hidden
+otherwise. Ward's library 0.3.1 is vendored byte-identical in
+`server/vendor/ward/` and, for its React hooks, `web/vendor/ward/`. The guard
+is the first entry in `FEATURES`; `GET /api/health` is the only public route,
+and a test walks Fastify's route list so any new route is checked for a 401
+without a session. Route tests sign in through the real login route with
+`startSignedInApp()`. Live: signed out, `/api/books` is 401 and the app shows
+the login page; after the seed, sign-in returns to the page the session ended
+on, the Library loads, the password changes (old one refused), sign out
+returns to the login page. The seed runs as `npm run seed -w
+@shelfmark/server` or compiled as `node server/dist/seed.js`; its hidden
+password prompt uses a muted output stream, because the `_writeToOutput`
+trick copied from Satchel throws on Node 24's `readline/promises` (Satchel's
+seed has the same bug). For `npm run dev:https` on a phone, the Vite dev
+proxy rewrites `Origin` to PUBLIC_ORIGIN only when it equals the address the
+browser opened the dev server at, because the library's own login compares
+`Origin` to the fixed PUBLIC_ORIGIN; production has no Vite. Also: a first
+"Sign in with Ward" creates the local user (the Ward grant is the gate), a
+user created that way can set a first password after confirming with Ward,
+and the guard's 401 body is the library's `{ error: "unauthorized" }`. The
+APPS entry and a README row are committed in `../wzd_auth`. 60 new tests;
+impeccable's finish reviewer passed the login page and password dialog.
+
+**Owner checks:** with Docker Desktop's WSL integration on, run Ward's local
+`seed.mjs` (it writes the `WARD_OIDC_*` values into `.env`), then at
+`http://localhost:5176/shelfmark/` press "Sign in with Ward" and land in the
+Library; link and unlink from the account menu.

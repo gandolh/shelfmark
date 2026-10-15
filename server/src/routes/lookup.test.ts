@@ -1,15 +1,15 @@
 import { lookupResponseSchema, type Book, type LookupResponse } from "@shelfmark/shared";
 import { afterEach, describe, expect, it } from "vitest";
 import { fakeFetch, recordedInternet, type FakeFetch } from "../testing/fakeFetch.js";
-import { startTestApp, type TestApp } from "../testing/testApp.js";
+import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
 
-let t: TestApp | undefined;
+let t: SignedInTestApp | undefined;
 let fetch: FakeFetch;
 
 /** The app over the recorded sources. Without a key, as the server runs until the owner creates one. */
-async function start(env: NodeJS.ProcessEnv = {}): Promise<TestApp> {
+async function start(env: NodeJS.ProcessEnv = {}): Promise<SignedInTestApp> {
   fetch = fakeFetch(recordedInternet);
-  t = await startTestApp(env, { fetch });
+  t = await startSignedInApp(env, { fetch });
   return t;
 }
 
@@ -18,14 +18,14 @@ afterEach(async () => {
   t = undefined;
 });
 
-async function lookup(app: TestApp, isbn: unknown): Promise<LookupResponse> {
-  const res = await app.app.inject({ method: "POST", url: "/api/lookup", payload: { isbn } });
+async function lookup(app: SignedInTestApp, isbn: unknown): Promise<LookupResponse> {
+  const res = await app.inject({ method: "POST", url: "/api/lookup", payload: { isbn } });
   expect(res.statusCode).toBe(200);
   return lookupResponseSchema.parse(res.json());
 }
 
-async function create(app: TestApp, payload: object): Promise<Book> {
-  const res = await app.app.inject({ method: "POST", url: "/api/books", payload });
+async function create(app: SignedInTestApp, payload: object): Promise<Book> {
+  const res = await app.inject({ method: "POST", url: "/api/books", payload });
   expect(res.statusCode).toBe(201);
   return res.json() as Book;
 }
@@ -102,7 +102,7 @@ describe("POST /api/lookup", () => {
   it("saves nothing", async () => {
     const app = await start();
     await lookup(app, "9780547928227");
-    const res = await app.app.inject({ method: "GET", url: "/api/books" });
+    const res = await app.inject({ method: "GET", url: "/api/books" });
     expect(res.json()).toEqual({ books: [] });
   });
 
@@ -116,7 +116,7 @@ describe("POST /api/lookup", () => {
 
   it("answers 200 with an error outcome when a source fails", async () => {
     fetch = fakeFetch(() => undefined);
-    t = await startTestApp({}, { fetch });
+    t = await startSignedInApp({}, { fetch });
     const body = await lookup(t, "9780547928227");
     expect(body.draft).toBeNull();
     expect(body.tried).toEqual([
@@ -133,7 +133,7 @@ describe("POST /api/lookup", () => {
     [{}, "isbn: send the ISBN as a string"],
   ])("refuses %j with 400 validation", async (payload, message) => {
     const app = await start();
-    const res = await app.app.inject({ method: "POST", url: "/api/lookup", payload });
+    const res = await app.inject({ method: "POST", url: "/api/lookup", payload });
     expect(res.statusCode).toBe(400);
     expect(res.json()).toEqual({ error: { code: "validation", message } });
     expect(fetch.calls).toHaveLength(0);
@@ -141,9 +141,9 @@ describe("POST /api/lookup", () => {
 
   it("refuses an unknown key and an empty body", async () => {
     const app = await start();
-    const extra = await app.app.inject({ method: "POST", url: "/api/lookup", payload: { isbn: "9780547928227", x: 1 } });
+    const extra = await app.inject({ method: "POST", url: "/api/lookup", payload: { isbn: "9780547928227", x: 1 } });
     expect(extra.statusCode).toBe(400);
-    const empty = await app.app.inject({ method: "POST", url: "/api/lookup", headers: { "content-type": "application/json" } });
+    const empty = await app.inject({ method: "POST", url: "/api/lookup", headers: { "content-type": "application/json" } });
     expect(empty.statusCode).toBe(400);
     expect(empty.json().error.code).toBe("validation");
   });

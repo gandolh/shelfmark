@@ -8,13 +8,39 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * Local dev on one origin, the way Caddy serves the deploy: `/shelfmark-api` is
- * the API with the prefix stripped, so paths match production.
+ * the API with the prefix stripped, so paths match production. The session
+ * cookie is scoped to that prefix, and so are the auth routes and Ward's
+ * callback (`/shelfmark-api/auth/ward/callback`), so this one rule carries all
+ * of it. Ward itself is reached at its own origin and needs no rule.
+ *
+ * The server refuses a write whose `Origin` isn't its PUBLIC_ORIGIN
+ * (`http://localhost:5176` by default): the auth plugin on `/auth/*`,
+ * `server/src/auth/guard.ts` on the rest. `npm run dev:https` is opened from a
+ * phone at `https://<LAN address>:5176`, another origin for the same dev
+ * server. So a request whose `Origin` is exactly the address the browser
+ * opened this server at (its `Host`, or HTTP/2's `:authority`, in this
+ * server's scheme) reaches the API with PUBLIC_ORIGIN instead. Any other
+ * `Origin` passes through untouched and is refused, as in production, where
+ * there is no Vite. (`changeOrigin` stays off: it would replace the `Host`
+ * this compares against.) "Sign in with Ward" still only works at
+ * PUBLIC_ORIGIN: Ward sends the browser back there.
  */
-function devProxy(env: Record<string, string>): Record<string, ProxyOptions> {
+function devProxy(env: Record<string, string>, https: boolean): Record<string, ProxyOptions> {
+  const publicOrigin = env.PUBLIC_ORIGIN || "http://localhost:5176";
+  const scheme = https ? "https" : "http";
   return {
     "/shelfmark-api": {
       target: `http://127.0.0.1:${env.PORT || 8808}`,
       rewrite: (url) => url.replace(/^\/shelfmark-api/, ""),
+      configure: (proxy) => {
+        proxy.on("proxyReq", (proxyReq, req) => {
+          // Over HTTPS the browser speaks HTTP/2, which names the host in `:authority`, not `Host`.
+          const { origin, host = req.headers[":authority"] } = req.headers;
+          if (typeof origin === "string" && typeof host === "string" && origin === `${scheme}://${host}`) {
+            proxyReq.setHeader("origin", publicOrigin);
+          }
+        });
+      },
     },
   };
 }
@@ -42,7 +68,7 @@ export default defineConfig(({ mode }) => {
       port: 5176,
       strictPort: true,
       ...(https ? { host: "0.0.0.0" } : {}),
-      proxy: devProxy(env),
+      proxy: devProxy(env, https),
     },
   };
 });

@@ -1,4 +1,11 @@
 import { z } from "zod";
+import { parseTrustedProxies, wardClientOptionsFromEnv, type WardClientOptions } from "../vendor/ward/ward-auth.js";
+
+/** Where the auth plugin's routes sit as Fastify sees them (`app.ts`); the browser reaches them under the API prefix. */
+export const AUTH_ROUTE_PREFIX = "/auth";
+
+/** The Ward callback, under the API prefix: `WARD_OIDC_REDIRECT_URI` is the origin, the prefix, then this. */
+export const WARD_CALLBACK_PATH = `${AUTH_ROUTE_PREFIX}/ward/callback`;
 
 /** The server's settings, read once at startup from the environment (and the repo's `.env`). */
 export interface Config {
@@ -14,6 +21,20 @@ export interface Config {
   webBase: string;
   /** Optional: lookups skip Google Books when unset. */
   googleBooksApiKey: string | undefined;
+  /**
+   * "Sign in with Ward": the five `WARD_OIDC_*` settings, or `undefined` when
+   * `WARD_OIDC_ISSUER` is unset, and then the server has local accounts only
+   * and the login page shows no Ward button. `clientKey` is a secret: never log it.
+   */
+  ward: WardClientOptions | undefined;
+  /**
+   * `AUTH_TRUSTED_PROXIES`, comma-separated: the peers besides loopback (addresses
+   * or CIDR ranges) whose `X-Forwarded-For` the login lockout believes. Empty
+   * means loopback only, which is right under the Vite dev proxy and for a
+   * server on loopback. In a container it is the network the host's proxy
+   * reaches it from, or every client shares one lockout.
+   */
+  trustedProxies: string[];
 }
 
 /** The environment cannot run the server. The message names every key at fault. */
@@ -57,11 +78,53 @@ function describe(issue: z.core.$ZodIssue): string {
   return issue.message.startsWith(key) ? issue.message : `${key}: ${issue.message}`;
 }
 
+/**
+ * The Ward settings, read by the library's own reader so the rules are its
+ * (an empty `WARD_OIDC_ISSUER` means off; with it set, the client id, key and
+ * redirect URI must be too). On top: the redirect URI must be the callback
+ * under the API prefix, where the session cookie and the dev proxy are.
+ * Messages never repeat the key.
+ */
+function wardSettings(env: NodeJS.ProcessEnv, apiPrefix: string | undefined, problems: string[]): WardClientOptions | undefined {
+  let ward: WardClientOptions | undefined;
+  try {
+    ward = wardClientOptionsFromEnv(env);
+  } catch (error) {
+    problems.push(`${error instanceof Error ? error.message : String(error)}. Set all of them, or leave WARD_OIDC_ISSUER empty for local accounts only.`);
+    return undefined;
+  }
+  if (ward === undefined || apiPrefix === undefined) return ward;
+  const expected = `${apiPrefix}${WARD_CALLBACK_PATH}`;
+  if (!URL.canParse(ward.redirectUri) || new URL(ward.redirectUri).pathname !== expected) {
+    problems.push(`WARD_OIDC_REDIRECT_URI must be the callback as the browser reaches it: the app's origin, then ${expected}.`);
+  }
+  return ward;
+}
+
+/** `AUTH_TRUSTED_PROXIES` as a list, checked by the library's own parser (a malformed entry or a /0 is refused). */
+function trustedProxies(value: string, problems: string[]): string[] {
+  const entries = value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter((entry) => entry !== "");
+  try {
+    parseTrustedProxies(entries);
+  } catch (error) {
+    problems.push(`AUTH_TRUSTED_PROXIES: ${error instanceof Error ? error.message : String(error)}.`);
+  }
+  return entries;
+}
+
 /** Parse and validate the environment. Throws `ConfigError` listing every problem; never exits. */
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
   const parsed = envSchema.safeParse(env);
-  if (!parsed.success) {
-    throw new ConfigError(parsed.error.issues.map(describe).join("\n"));
+  const problems = parsed.success ? [] : parsed.error.issues.map(describe);
+  // Read on their own too, so one run names every key at fault.
+  const apiPrefix = envSchema.shape.SHELFMARK_API_PREFIX.safeParse(env.SHELFMARK_API_PREFIX);
+  const ward = wardSettings(env, apiPrefix.success ? apiPrefix.data : undefined, problems);
+  const proxies = trustedProxies(env.AUTH_TRUSTED_PROXIES ?? "", problems);
+  if (!parsed.success || problems.length > 0) {
+    throw new ConfigError(problems.join("\n"));
   }
   const values = parsed.data;
   return {
@@ -72,5 +135,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     apiPrefix: values.SHELFMARK_API_PREFIX,
     webBase: values.SHELFMARK_BASE,
     googleBooksApiKey: values.GOOGLE_BOOKS_API_KEY,
+    ward,
+    trustedProxies: proxies,
   };
 }

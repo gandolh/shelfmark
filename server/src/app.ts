@@ -1,5 +1,8 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
-import type { Config } from "./config.js";
+import { createWardClient, wardAuth } from "../vendor/ward/ward-auth.js";
+import { OWNER_ROLE, openAccounts } from "./auth/accounts.js";
+import { registerOriginGuard } from "./auth/guard.js";
+import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
 import { bookRoutes } from "./routes/books.js";
@@ -14,9 +17,65 @@ export interface FeatureContext {
   db: Db;
   /** Books go through this store, never through another module's SQL. */
   books: BookStore;
-  /** Every outbound request: the lookup's sources and cover downloads. Tests pass a fake (`startTestApp`). */
+  /** Every outbound request: the lookup's sources, cover downloads and Ward. Tests pass a fake (`startTestApp`). */
   fetch: typeof globalThis.fetch;
 }
+
+/** The session cookie's name. Unique in the estate: every app shares one origin. */
+export const SESSION_COOKIE = "shelfmark_session";
+
+/**
+ * Where the auth plugin's routes sit as Fastify sees them (`/auth`). The proxy
+ * strips the API prefix, so the browser reaches them at `/shelfmark-api/auth/...`,
+ * and the Ward callback at `/shelfmark-api/auth/ward/callback`.
+ */
+export { AUTH_ROUTE_PREFIX };
+
+/** The only routes with no session, as `"METHOD /pattern"`. The plugin adds its own public `/auth/*` routes. */
+export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
+
+/**
+ * Accounts and the guard (brief 06). The vendored `wardAuth` plugin keeps the
+ * local accounts in this database and serves `/auth/*`: login, logout, the
+ * session, the password, and "Sign in with Ward" when `config.ward` is set.
+ * Its `onRequest` hook refuses every other route without a live session
+ * (`401 { error: "unauthorized" }`); `auth/guard.ts` then refuses a write
+ * from another origin. Both are root hooks, so this feature goes first.
+ */
+const signIn: Feature = async (app, { config, db, fetch }) => {
+  const accounts = openAccounts(db);
+  // Checks the settings and imports the key now; talks to Ward only on first use, so the app starts while Ward is down.
+  const ward = config.ward && (await createWardClient({ ...config.ward, fetch }));
+  if (ward === undefined) {
+    app.log.info("WARD_OIDC_ISSUER is not set: local accounts only, no Sign in with Ward.");
+  } else if (new URL(ward.redirectUri).origin !== config.publicOrigin) {
+    // Only Sign in with Ward breaks (its cookie lands on the other origin), so this warns rather than refusing to start.
+    app.log.warn(`WARD_OIDC_REDIRECT_URI is not on PUBLIC_ORIGIN (${config.publicOrigin}): Sign in with Ward will not work.`);
+  }
+
+  await app.register(wardAuth, {
+    accounts,
+    cookieName: SESSION_COOKIE,
+    // The API prefix as the browser sees it: every request that needs the session is under it, cover images included.
+    cookiePath: config.apiPrefix,
+    publicOrigin: config.publicOrigin,
+    routePrefix: AUTH_ROUTE_PREFIX,
+    publicRoutes: PUBLIC_ROUTES,
+    // From the config (AUTH_TRUSTED_PROXIES), so the plugin never reads the environment itself.
+    trustedProxies: config.trustedProxies,
+    ...(ward && {
+      ward: {
+        client: ward,
+        // Browser paths. There is no settings page: the account menu is on every page, so a link comes back to the Library.
+        loginPath: `${config.webBase}login`,
+        settingsPath: config.webBase,
+        afterSignInPath: config.webBase,
+        roleFor: () => OWNER_ROLE,
+      },
+    }),
+  });
+  registerOriginGuard(app, { publicOrigin: config.publicOrigin, authRoutePrefix: AUTH_ROUTE_PREFIX });
+};
 
 /**
  * A feature sets itself up on the root app. Usually that is registering its
@@ -27,8 +86,13 @@ export interface FeatureContext {
  */
 export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike<unknown>;
 
-/** Every feature, set up in this order. A later brief adds its entry here and nowhere else in this file. */
+/**
+ * Every feature, set up in this order. A later brief adds its entry here and
+ * nowhere else in this file. `signIn` stays first: a route set up before it
+ * would have no guard.
+ */
 const FEATURES: Feature[] = [
+  signIn,
   (app, ctx) => app.register(bookRoutes, ctx),
   (app, ctx) => app.register(lookupRoutes, ctx),
   (app, ctx) => app.register(coverRoutes, ctx),
@@ -41,7 +105,11 @@ export interface BuildAppOptions {
   fetch?: typeof globalThis.fetch;
 }
 
-/** The app, not listening, with `<dataDir>/shelfmark.db` open and migrated. Closing the app closes the database. */
+/**
+ * The app, not listening, with `<dataDir>/shelfmark.db` open and migrated (the
+ * accounts' tables too). Closing the app closes the database. Every route but
+ * `GET /api/health` needs a session (`signIn` above).
+ */
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({ logger: options.logger ?? false });
 
