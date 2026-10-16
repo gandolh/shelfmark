@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), not pushed and not deployed. What waits on the owner (push, Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-15
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+updated: 2026-10-16
 ---
 
 # Status
@@ -9,24 +9,25 @@ _2026-10-15_. v1 is built. All 14 briefs were built on 2026-10-14 and
 2026-10-15 with `plan-split-dispatch`, one commit per brief on `main`,
 followed by a three-finder review and two fix rounds, then impeccable's
 design finish ([DESIGN.md](../../DESIGN.md)). 515 tests pass; typecheck,
-lint and build are clean. Nothing is pushed or deployed. The remote is the
-GitHub repo gandolh/shelfmark (set 2026-10-14); the owner pushes. The
+lint and build are clean. `main` is pushed to the GitHub repo
+gandolh/shelfmark, and so is `../wzd_auth`'s local seed entry (`55cf336`).
+`../vps-deploy` has no remote; its Shelfmark stack (`1c5438b`) is a local
+commit, which is where the deploy runs from. Nothing is deployed. The README
+and `docs/` follow the readme-docs standard since 2026-10-16. The
 product calls are in [decisions.md](decisions.md), the look in
 [design.md](design.md), and the run's rulings in [log.md](../log.md).
 
 ## Next (owner)
 
-1. Push `main` (Shelfmark), plus the commits made today in `../vps-deploy`
-   (the Shelfmark stack) and `../wzd_auth` (the local seed entry).
-2. Create the Google Books API key and put it in `.env` as
+1. Create the Google Books API key and put it in `.env` as
    `GOOGLE_BOOKS_API_KEY`; then run the Romanian measurement in
    [brief 05](../briefs/done/05-lookup-and-covers.md)'s outcome.
-3. Deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
-4. The checks no agent could run here, listed in owner-setup: the scanner on
+2. Deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
+3. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
    local Ward round trip (06, needs Docker Desktop's WSL integration), the
    exports opened in Excel (11), the container build (14).
-5. After v1 ships, promote the v1.x todos below; the wishlist is first in
+4. After v1 ships, promote the v1.x todos below; the wishlist is first in
    line, since the Library already leaves room for its Owned / Wishlist tabs.
 
 ## Briefs

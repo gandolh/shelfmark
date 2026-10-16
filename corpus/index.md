@@ -23,7 +23,7 @@ Start here. Triage on the summary lines and open at most 2-3 pages.
 - [wiki/open-questions.md](wiki/open-questions.md) - Genuinely unresolved questions. As of 2026-10-14 there are none; the last one (an existing list to import) was answered no. Add a question here the moment one opens, delete it the moment it is answered.
 - [wiki/overview.md](wiki/overview.md) - What Shelfmark is in a paragraph. A catalog of the owner's physical books, filled by scanning barcodes with a phone, shown as a sortable, filterable table that exports to CSV and Excel. Who uses it, what it deliberately leaves out, and how it relates to Atrium and Satchel.
 - [wiki/scanning.md](wiki/scanning.md) - How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-- [wiki/status.md](wiki/status.md) - Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), not pushed and not deployed. What waits on the owner (push, Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+- [wiki/status.md](wiki/status.md) - Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
 
 <!-- END CATALOG -->
 

@@ -155,3 +155,18 @@ open from the review for the owner to decide: whether the table's 46×69
 placeholder should be a simpler mark, the desktop Add result's small cover,
 and the not-found copy ("No match for …"), which came from the Grid-Add
 mock-up and uses a word the glossary avoids.
+
+## [2026-10-16] docs | README and docs/ to the readme-docs standard
+
+The README is now a landing page: one-liner, the Covers view as the hero,
+status, what it does and leaves out, four screenshots, how it works, run it
+locally, layout, docs, license (none yet). New in `docs/`: `README.md` (the
+index), `getting-started.md` (the README's old run section, the env vars, and
+`npm run dev:https` for scanning from a phone), `architecture.md`, and
+`images/` with `shots.md` and `demo-seed.mjs`; owner-setup now points at
+getting-started for local development. The images come from a throwaway
+clone with a made-up `demo` account and 27 classics with no cover files. The
+scanner and the "Already in your library" card were not captured (no camera;
+the card pulls the publisher's cover from Open Library). [status.md](wiki/status.md)
+caught up: `main` is pushed, `../wzd_auth`'s `55cf336` too, and
+`../vps-deploy` has no remote.
