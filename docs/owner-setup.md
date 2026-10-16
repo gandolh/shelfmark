@@ -3,8 +3,8 @@
 Everything you do by hand to put Shelfmark on the VPS, and the checks that wait
 on a phone or a spreadsheet program. Nothing in the repo deploys or writes a
 secret for you. Commands run on your machine unless a step says otherwise. The
-deploy builds the API image on the VPS. Local development is in the
-[README](../README.md#run-it-locally).
+deploy builds the API image on the VPS. Local development is in
+[getting-started.md](getting-started.md).
 
 `<production origin>` below means `https://` plus your site's host, with no path.
 
