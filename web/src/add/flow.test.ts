@@ -34,7 +34,7 @@ function draft(extra: Partial<Draft> = {}): Draft {
     description: null,
     subjects: ["Fantasy"],
     coverCandidates: [{ url: "https://covers.openlibrary.org/b/id/1-L.jpg", source: "openlibrary" }],
-    source: "openlibrary",
+    sources: ["openlibrary"],
     ...extra,
   };
 }
@@ -135,7 +135,7 @@ describe("the scan flow", () => {
 
     state = flowReducer(state, { type: "looked-up", id: state.step.id, lookup: lookup() });
     const found = expectStep(state, "found");
-    expect(found.proposal.origin).toBe("openlibrary");
+    expect(found.proposal.origin).toEqual(["openlibrary"]);
     expect(scannerPaused(state)).toBe(true);
 
     state = flowReducer(state, { type: "save" });
@@ -462,18 +462,24 @@ describe("modes", () => {
 
 describe("proposals", () => {
   it("maps a draft to create fields, never the draft's own keys", () => {
-    const proposal = proposalFromDraft({ ...draft({ source: "both" }), title: "The Hobbit" });
+    const proposal = proposalFromDraft({ ...draft({ sources: ["openlibrary", "googlebooks"] }), title: "The Hobbit" });
     expect(proposal.details).not.toHaveProperty("coverCandidates");
-    expect(proposal.details).not.toHaveProperty("source");
+    expect(proposal.details).not.toHaveProperty("sources");
     expect(proposal.details.metadataSource).toBe("openlibrary");
-    expect(proposal.origin).toBe("both");
+    expect(proposal.origin).toEqual(["openlibrary", "googlebooks"]);
     expect(bodyFromProposal(proposal, "Bedroom", "unread")).toMatchObject({ title: "The Hobbit", shelf: "Bedroom", status: "unread" });
   });
 
   it("takes a Google-only draft's source and an absent cover", () => {
-    const proposal = proposalFromDraft({ ...draft({ source: "googlebooks", coverCandidates: [] }), title: "t" });
+    const proposal = proposalFromDraft({ ...draft({ sources: ["googlebooks"], coverCandidates: [] }), title: "t" });
     expect(proposal.details.metadataSource).toBe("googlebooks");
     expect(proposal.cover).toEqual({ kind: "none" });
+  });
+
+  it("credits a library catalog as the book's metadata source", () => {
+    const proposal = proposalFromDraft({ ...draft({ sources: ["bcucluj"], coverCandidates: [] }), title: "Piramida roșie" });
+    expect(proposal.details.metadataSource).toBe("bcucluj");
+    expect(proposal.origin).toEqual(["bcucluj"]);
   });
 
   it("copies a saved book's facts but not the owner's own fields", () => {

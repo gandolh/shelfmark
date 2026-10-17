@@ -2,14 +2,15 @@ import type { CoverCandidate, Draft, LookupOutcome, LookupResponse, LookupSource
 import type { LookupCache } from "./cache.js";
 
 /**
- * The lookup (corpus/wiki/metadata-lookup.md): cache, then Open Library, then
- * Google Books only when Open Library missed or came back thin (no title, or
- * no cover); the answers merge field by field, the first non-empty value
- * winning. The result is a draft; nothing is saved.
+ * The lookup (corpus/wiki/metadata-lookup.md): for each source in order, the
+ * cache, else the source itself, and the next source only while no answer so
+ * far has a title (decisions.md, 2026-10-17: Google Books is asked last, and
+ * not for a missing cover). The answers merge field by field, the first
+ * non-empty value winning. The result is a draft; nothing is saved.
  */
 
 /** One source's answer as draft fields, before the merge. Empty is `null` or `[]`. */
-export type SourceDraft = Omit<Draft, "isbn13" | "source">;
+export type SourceDraft = Omit<Draft, "isbn13" | "sources">;
 
 /** A metadata source as the lookup sees it (openlibrary.ts, googlebooks.ts). */
 export interface LookupSourceClient {
@@ -38,7 +39,7 @@ export interface Lookup {
 }
 
 export interface LookupOptions {
-  /** In the order they are asked: Open Library, then Google Books. */
+  /** In the order they are asked (`LOOKUP_SOURCES`). */
   sources: readonly LookupSourceClient[];
   cache: LookupCache;
   /** Called for each source that failed; the lookup goes on without it. */
@@ -123,11 +124,6 @@ export function pagesOf(value: unknown): number | null {
   return typeof pages === "number" && Number.isInteger(pages) && pages > 0 && pages <= PAGES_MAX ? pages : null;
 }
 
-/** No answer, or one without a title or a cover: worth asking the next source. */
-export function isThin(draft: SourceDraft | null): boolean {
-  return draft === null || draft.title === null || draft.coverCandidates.length === 0;
-}
-
 type Field = Exclude<keyof SourceDraft, "coverCandidates">;
 const FIELDS: readonly Field[] = [
   "title",
@@ -147,9 +143,8 @@ function filled(value: SourceDraft[Field]): boolean {
 
 /**
  * Field by field, the first non-empty value wins, in the order given; the cover
- * candidates are every source's, in that order, without repeats. `source` names
- * whoever supplied a value: `both` when each did. `null` when no source found
- * the book.
+ * candidates are every source's, in that order, without repeats. `sources`
+ * names whoever supplied a value. `null` when no source found the book.
  */
 export function mergeDrafts(
   isbn13: string,
@@ -175,10 +170,9 @@ export function mergeDrafts(
     }
   }
 
-  const sources = [...contributors];
   // A source that found the book but added nothing new still counts if nobody else added anything.
-  const source = sources.length > 1 ? "both" : (sources[0] ?? found[0]!.source);
-  return { isbn13, ...merged, source };
+  const sources = contributors.size > 0 ? [...contributors] : [found[0]!.source];
+  return { isbn13, ...merged, sources };
 }
 
 /** The lookup over a list of sources and the cache. */
@@ -213,8 +207,8 @@ export function createLookup({ sources, cache, onError }: LookupOptions): Lookup
       const tried: Tried[] = [];
       const answers: { source: LookupSource; draft: SourceDraft | null }[] = [];
       for (const client of sources) {
-        // The next source only while what we have is thin.
-        if (answers.length > 0 && !isThin(mergeDrafts(isbn13, answers))) break;
+        // The next source only while nothing so far has a title.
+        if (mergeDrafts(isbn13, answers)?.title) break;
         const { outcome, draft } = await ask(client, isbn13);
         tried.push({ source: client.source, outcome });
         answers.push({ source: client.source, draft });

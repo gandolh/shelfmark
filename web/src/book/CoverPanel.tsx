@@ -3,7 +3,7 @@ import { useId, useState, type ChangeEvent } from "react";
 import { fetchCover, removeCover, uploadCover } from "../add/api";
 import { CoverCapture } from "../add/CoverCapture";
 import { ImageReadError, resizeImage } from "../add/resize";
-import { saveFailure } from "../add/words";
+import { saveFailure, SOURCE_NAMES } from "../add/words";
 import { Button } from "../components/Button";
 import { CoverImage } from "../components/CoverImage";
 import type { BookLookup } from "./useLookup";
@@ -92,7 +92,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
                         type="button"
                         className="book-candidate"
                         disabled={busy}
-                        aria-label={`Use this cover from ${candidate.source === "openlibrary" ? "Open Library" : "Google Books"}`}
+                        aria-label={`Use this cover from ${SOURCE_NAMES[candidate.source]}`}
                         onClick={() => void act(() => fetchCover(book.id, candidate.url), "Cover replaced.")}
                       >
                         <CoverImage book={book} src={candidate.url} width={72} />

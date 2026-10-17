@@ -4,13 +4,16 @@ import { openDb, type Db } from "../db/open.js";
 import { fakeFetch, json, recordedInternet, type FakeHandler } from "../testing/fakeFetch.js";
 import { createLookupCache, NOT_FOUND_TTL_MS } from "./cache.js";
 import { createGoogleBooksSource, readGoogleBooks } from "./googlebooks.js";
-import { createLookup, emptySourceDraft, isThin, mergeDrafts, text, yearOf, type SourceDraft } from "./merge.js";
+import { fakeLibraries, type FixtureName } from "../testing/fakeLibraries.js";
+import { createLibrarySource, LIBRARY_ORDER } from "./libraries.js";
+import { createLookup, emptySourceDraft, mergeDrafts, text, yearOf, type SourceDraft } from "./merge.js";
 import { createOpenLibrarySource } from "./openlibrary.js";
 import { createQueue } from "./queue.js";
 
 const HOBBIT = "9780547928227"; // Open Library: complete
 const OMUL = "9789735066109"; // Open Library: no cover; Google: a cover
 const UNKNOWN = "9786063205583"; // nowhere
+const PIRAMIDA = "9786068044873"; // the library catalogs only
 
 let db: Db;
 let clock: Date;
@@ -24,21 +27,32 @@ afterEach(() => {
   db.close();
 });
 
-/** The lookup as the route builds it, over a fake fetch and an instant queue. */
-function setup(handler: FakeHandler = recordedInternet, { withKey = true } = {}) {
+/**
+ * The lookup as the route builds it, over a fake fetch and instant queues.
+ * The library catalogs are in it only when `libraries` is given: the fixtures
+ * they answer from, every other ISBN being "0 hits".
+ */
+function setup(
+  handler: FakeHandler = recordedInternet,
+  { withKey = true, libraries }: { withKey?: boolean; libraries?: FixtureName[] } = {},
+) {
   const fetch = fakeFetch(handler);
   const apiKey = withKey ? "test-key" : undefined;
   const errors: string[] = [];
+  const catalogs = fakeLibraries(libraries ?? []);
   const lookup = createLookup({
     sources: [
       createOpenLibrarySource({ fetch, queue: createQueue(0) }),
+      ...(libraries
+        ? LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) }))
+        : []),
       createGoogleBooksSource({ apiKey, fetch, queue: createQueue(0) }),
     ],
     cache: createLookupCache(db, () => clock),
     onError: (source, isbn13, error) => errors.push(`${source} ${isbn13}: ${(error as Error).message}`),
   });
   const hosts = () => fetch.calls.map((call) => call.url.host);
-  return { lookup, fetch, errors, hosts };
+  return { lookup, fetch, errors, hosts, catalogs };
 }
 
 function source(fields: Partial<SourceDraft>): SourceDraft {
@@ -83,25 +97,28 @@ describe("mergeDrafts", () => {
         { url: "https://covers.openlibrary.org/b/id/10842140-L.jpg", source: "openlibrary" },
         { url: "https://books.google.com/books/content?id=x", source: "googlebooks" },
       ],
-      source: "both",
+      sources: ["openlibrary", "googlebooks"],
     });
   });
 
   it("names the one source that supplied values", () => {
-    expect(mergeDrafts("9789735054694", [{ source: "openlibrary", draft: ol }])?.source).toBe("openlibrary");
+    expect(mergeDrafts("9789735054694", [{ source: "openlibrary", draft: ol }])?.sources).toEqual(["openlibrary"]);
     expect(
       mergeDrafts("9789735054694", [
         { source: "openlibrary", draft: null },
+        { source: "bcucluj", draft: null },
         { source: "googlebooks", draft: google },
-      ])?.source,
-    ).toBe("googlebooks");
+      ])?.sources,
+    ).toEqual(["googlebooks"]);
     // Google found the book but had nothing Open Library lacked.
     expect(
       mergeDrafts("9789735054694", [
         { source: "openlibrary", draft: ol },
         { source: "googlebooks", draft: source({ title: "Inocenții", pages: 1 }) },
-      ])?.source,
-    ).toBe("openlibrary");
+      ])?.sources,
+    ).toEqual(["openlibrary"]);
+    // A source that found the book with nothing at all still names it.
+    expect(mergeDrafts("9789735054694", [{ source: "biblacad", draft: source({}) }])?.sources).toEqual(["biblacad"]);
   });
 
   it("is null when no source found the book", () => {
@@ -112,13 +129,6 @@ describe("mergeDrafts", () => {
         { source: "googlebooks", draft: null },
       ]),
     ).toBeNull();
-  });
-
-  it("calls an answer thin without a title or without a cover", () => {
-    expect(isThin(null)).toBe(true);
-    expect(isThin(source({ title: "Inocentii" }))).toBe(true);
-    expect(isThin(source({ coverCandidates: ol.coverCandidates }))).toBe(true);
-    expect(isThin(ol)).toBe(false);
   });
 });
 
@@ -153,7 +163,7 @@ describe("text helpers", () => {
     expect(huge?.authors).toHaveLength(100);
     expect(huge?.subjects).toEqual(["Fiction", "Fiction / Fantasy"]);
     const draft = mergeDrafts(HOBBIT, [{ source: "googlebooks", draft: huge }])!;
-    const { coverCandidates: _covers, source: _source, title, ...fields } = draft;
+    const { coverCandidates: _covers, sources: _sources, title, ...fields } = draft;
     expect(() => bookCreateSchema.parse({ ...fields, title })).not.toThrow();
   });
 });
@@ -163,13 +173,28 @@ describe("createLookup", () => {
     const { lookup, hosts } = setup();
     const { draft, tried } = await lookup.lookup(HOBBIT);
     expect(tried).toEqual([{ source: "openlibrary", outcome: "found" }]);
-    expect(draft?.source).toBe("openlibrary");
+    expect(draft?.sources).toEqual(["openlibrary"]);
     expect(draft?.coverCandidates[0]?.url).toBe("https://covers.openlibrary.org/b/id/12003329-L.jpg");
     expect(hosts()).toEqual(["openlibrary.org", "openlibrary.org"]);
   });
 
-  it("asks Google when Open Library came back thin, and merges", async () => {
+  it("does not ask Google just for a missing cover (decisions.md, 2026-10-17)", async () => {
     const { lookup, hosts } = setup();
+    const { draft, tried } = await lookup.lookup(OMUL);
+    expect(tried).toEqual([{ source: "openlibrary", outcome: "found" }]);
+    expect(hosts()).toEqual(["openlibrary.org", "openlibrary.org"]);
+    expect(draft).toMatchObject({ title: "Omul care mută norii", pages: 258, coverCandidates: [], sources: ["openlibrary"] });
+  });
+
+  it("asks Google when nothing earlier found a title, and merges", async () => {
+    // Open Library knows the ISBN but has no title for it.
+    const { lookup, hosts } = setup((url, init) =>
+      url.host === "openlibrary.org" && url.searchParams.get("jscmd") === "data"
+        ? json({ [`ISBN:${OMUL}`]: { number_of_pages: 258 } })
+        : url.host === "openlibrary.org"
+          ? json({})
+          : recordedInternet(url, init),
+    );
     const { draft, tried } = await lookup.lookup(OMUL);
     expect(tried).toEqual([
       { source: "openlibrary", outcome: "found" },
@@ -177,12 +202,10 @@ describe("createLookup", () => {
     ]);
     expect(hosts()).toEqual(["openlibrary.org", "openlibrary.org", "www.googleapis.com"]);
     expect(draft).toMatchObject({
-      title: "Omul care mută norii", // Open Library's
-      subtitle: "şapte întâmplări", // Open Library's, though Google spells it otherwise
+      title: "Omul care mută norii", // Google's: Open Library had none
       pages: 258, // Open Library's 258, not Google's 260
-      description: "Șapte povestiri despre oameni obișnuiți.", // Google's: Open Library had none
-      subjects: ["Fiction"], // Google's
-      source: "both",
+      description: "Șapte povestiri despre oameni obișnuiți.", // Google's
+      sources: ["openlibrary", "googlebooks"],
     });
     expect(draft?.coverCandidates).toEqual([
       {
@@ -192,16 +215,54 @@ describe("createLookup", () => {
     ]);
   });
 
+  it("asks the library catalogs in order when Open Library misses, and stops at the first title", async () => {
+    const { lookup, hosts, catalogs } = setup(recordedInternet, { libraries: ["bcucluj-piramida"] });
+    const { draft, tried } = await lookup.lookup(PIRAMIDA);
+    expect(tried).toEqual([
+      { source: "openlibrary", outcome: "not_found" },
+      { source: "biblacad", outcome: "not_found" },
+      { source: "bcucluj", outcome: "found" },
+    ]);
+    expect(catalogs.calls.map((call) => call.library)).toEqual(["biblacad", "bcucluj"]);
+    expect(hosts()).toEqual(["openlibrary.org"]); // Google is never asked
+    expect(draft).toMatchObject({ title: "Piramida roșie", pages: 543, sources: ["bcucluj"] });
+  });
+
+  it("goes on to the next library, and to Google, when a library fails", async () => {
+    const fetch = fakeFetch(recordedInternet);
+    const catalogs = fakeLibraries([], { refused: ["biblacad", "bcucluj", "bcutimisoara"] });
+    const errors: string[] = [];
+    const lookup = createLookup({
+      sources: [
+        createOpenLibrarySource({ fetch, queue: createQueue(0) }),
+        ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) })),
+        createGoogleBooksSource({ apiKey: "test-key", fetch, queue: createQueue(0) }),
+      ],
+      cache: createLookupCache(db, () => clock),
+      onError: (source) => errors.push(source),
+    });
+    const { draft, tried } = await lookup.lookup(HOBBIT);
+    expect(tried.map((t) => t.outcome)).toEqual(["found"]); // Open Library had it: nobody else asked
+    expect(draft?.title).toBe("The Hobbit");
+
+    const missing = await lookup.lookup(UNKNOWN);
+    expect(missing.tried).toEqual([
+      { source: "openlibrary", outcome: "not_found" },
+      { source: "biblacad", outcome: "error" },
+      { source: "bcucluj", outcome: "error" },
+      { source: "bcutimisoara", outcome: "error" },
+      { source: "googlebooks", outcome: "not_found" },
+    ]);
+    expect(errors).toEqual(["biblacad", "bcucluj", "bcutimisoara"]);
+    // The errors aren't cached; the not-found answers are.
+    expect(db.prepare("SELECT source FROM lookup_cache WHERE isbn13 = ? ORDER BY source").all(UNKNOWN)).toEqual([
+      { source: "googlebooks" },
+      { source: "openlibrary" },
+    ]);
+  });
+
   it("reports Google skipped_no_key when it was needed and there is no key", async () => {
     const { lookup, hosts } = setup(recordedInternet, { withKey: false });
-    const thin = await lookup.lookup(OMUL);
-    expect(thin.tried).toEqual([
-      { source: "openlibrary", outcome: "found" },
-      { source: "googlebooks", outcome: "skipped_no_key" },
-    ]);
-    expect(thin.draft?.coverCandidates).toEqual([]);
-    expect(thin.draft?.source).toBe("openlibrary");
-
     const missing = await lookup.lookup(UNKNOWN);
     expect(missing).toEqual({
       draft: null,
@@ -222,7 +283,7 @@ describe("createLookup", () => {
       { source: "openlibrary", outcome: "error" },
       { source: "googlebooks", outcome: "found" },
     ]);
-    expect(draft?.source).toBe("googlebooks");
+    expect(draft?.sources).toEqual(["googlebooks"]);
     expect(errors).toEqual([`openlibrary ${HOBBIT}: Open Library answered 503`]);
   });
 

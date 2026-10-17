@@ -33,7 +33,7 @@ optional; an empty value counts as not set.
 | `DATA_DIR` | Folder for `shelfmark.db`, which holds the covers too. A relative path is taken from the repo root | `./data` |
 | `PUBLIC_ORIGIN` | The app's own origin as the browser sees it, with no path. Leave it empty for `npm run dev:https` | `http://localhost:5176` |
 | `SHELFMARK_API_PREFIX`, `SHELFMARK_BASE` | The API prefix and the web base path as the browser sees them | `/shelfmark-api`, `/shelfmark/` |
-| `GOOGLE_BOOKS_API_KEY` | Lets lookups ask Google Books after Open Library. A secret | your Google Cloud project |
+| `GOOGLE_BOOKS_API_KEY` | Lets lookups ask Google Books, last, when no other source found a title. A secret | your Google Cloud project |
 | `SEED_USERNAME`, `SEED_PASSWORD` | The account the seed creates; it asks for whichever is empty | you choose |
 | `AUTH_TRUSTED_PROXIES` | Peers besides loopback whose `X-Forwarded-For` the login lockout believes. Empty is right locally | empty |
 | `WARD_OIDC_ISSUER`, `WARD_OIDC_CLIENT_ID`, `WARD_OIDC_CLIENT_KEY`, `WARD_OIDC_REDIRECT_URI`, `WARD_OIDC_POST_LOGOUT_REDIRECT_URI` | Optional. "Sign in with Ward". The key is a secret | Ward's local seed writes all five |
@@ -115,4 +115,8 @@ npm run build       # tsc for shared and server, then the web app
 - **Port 5176 is in use.** The dev server won't pick another port. Stop
   whatever holds it.
 - **The add form says Google Books "isn't set up yet".** `GOOGLE_BOOKS_API_KEY`
-  is empty, so only Open Library was asked.
+  is empty, so Google was skipped after the other sources missed.
+- **A library "didn't answer".** The library catalogs are reached over TCP
+  port 9991. A network that blocks it makes every library lookup an error;
+  BCU Timișoara also misses the 10 s deadline now and then. Errors aren't
+  cached, so "Look it up again" asks once more.

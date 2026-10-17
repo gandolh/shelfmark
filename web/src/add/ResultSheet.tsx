@@ -13,7 +13,7 @@ import { IsbnField } from "./IsbnField";
 import { FailureLine, ManualForm } from "./ManualForm";
 import { ShelfPicker } from "./ShelfPicker";
 import { StatusPicker } from "./StatusPicker";
-import { bylineLine, metaLine, notFoundWording, ownedLine, SOURCE_NAMES, sourceLine } from "./words";
+import { bylineLine, draftSources, metaLine, notFoundWording, ownedLine, sourceLine } from "./words";
 
 /** What the sheet's buttons ask the page to do. */
 export interface SheetActions {
@@ -392,7 +392,7 @@ function FormIntro({
         <h2 id={headingId} className="add-title add-title--small">
           Edit details
         </h2>
-        {lookup?.draft && <p className="add-source">{sourceLine(lookup.draft.source)}</p>}
+        {lookup?.draft && <p className="add-source">{sourceLine(lookup.draft.sources)}</p>}
       </div>
     );
   }
@@ -422,7 +422,7 @@ function FormIntro({
     case "untitled":
       notice = (
         <>
-          {lookup?.draft ? `Found in ${draftSources(lookup.draft.source)}` : "Found"}, but without a title. {REST_CAN_WAIT}
+          {lookup?.draft ? `Found in ${draftSources(lookup.draft.sources)}` : "Found"}, but without a title. {REST_CAN_WAIT}
         </>
       );
       break;
@@ -455,10 +455,6 @@ function FormIntro({
       )}
     </div>
   );
-}
-
-function draftSources(source: "openlibrary" | "googlebooks" | "both"): string {
-  return source === "both" ? `${SOURCE_NAMES.openlibrary} and ${SOURCE_NAMES.googlebooks}` : SOURCE_NAMES[source];
 }
 
 const COVER_PROMPTS: Record<FormReason, string> = {

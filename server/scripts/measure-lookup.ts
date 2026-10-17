@@ -3,15 +3,17 @@
  * how many ISBNs it found, how many came with a cover and with a page count
  * (the tables in corpus/wiki/metadata-lookup.md).
  *
- *     npx tsx server/scripts/measure-lookup.ts samples/ro-2019.txt samples/ro-2026.txt
+ *     npx tsx server/scripts/measure-lookup.ts [--google] samples/ro-2019.txt samples/ro-2026.txt
  *
  * Each file holds ISBNs, one per line, in any spelling `parseIsbn` accepts;
  * blank lines and lines starting with `#` are skipped, anything else that
  * isn't an ISBN is counted and reported. Every source is asked about every
  * ISBN (not only when Open Library misses), through the app's own clients and
- * queues, with no cache, so the numbers are each source's own. Google Books is
- * measured only if `GOOGLE_BOOKS_API_KEY` is set (the repo's `.env` is read);
- * otherwise its row says it was skipped. Prints Markdown.
+ * queues, with no cache, so the numbers are each source's own. The library
+ * catalogs keep their 5-10 s pause, so 40 ISBNs take about five minutes.
+ * Google Books is asked only with `--google`, since the owner wants the key
+ * spared, and only if `GOOGLE_BOOKS_API_KEY` is set (the repo's `.env` is
+ * read). Prints Markdown.
  *
  * Never point it at the national library's catalog: its CIP search sits
  * behind a CAPTCHA, and the app does not work around it. ISBN lists from its
@@ -22,6 +24,7 @@ import { basename } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseIsbn, type LookupSource } from "@shelfmark/shared";
 import { createGoogleBooksSource } from "../src/lookup/googlebooks.js";
+import { createLibrarySource, LIBRARY_ORDER } from "../src/lookup/libraries.js";
 import type { LookupSourceClient, SourceDraft } from "../src/lookup/merge.js";
 import { createOpenLibrarySource } from "../src/lookup/openlibrary.js";
 
@@ -33,15 +36,27 @@ try {
   if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
 }
 
-const files = process.argv.slice(2);
+const args = process.argv.slice(2);
+const askGoogle = args.includes("--google");
+const files = args.filter((arg) => arg !== "--google");
 if (files.length === 0) {
-  console.error("Usage: npx tsx server/scripts/measure-lookup.ts <isbn-list> [<isbn-list> ...]");
+  console.error("Usage: npx tsx server/scripts/measure-lookup.ts [--google] <isbn-list> [<isbn-list> ...]");
   process.exit(2);
 }
 
 const apiKey = process.env.GOOGLE_BOOKS_API_KEY?.trim() || undefined;
-const sources: LookupSourceClient[] = [createOpenLibrarySource(), createGoogleBooksSource({ apiKey })];
-const LABELS: Record<LookupSource, string> = { openlibrary: "Open Library", googlebooks: "Google Books" };
+const sources: LookupSourceClient[] = [
+  createOpenLibrarySource(),
+  ...LIBRARY_ORDER.map((library) => createLibrarySource(library)),
+  ...(askGoogle ? [createGoogleBooksSource({ apiKey })] : []),
+];
+const LABELS: Record<LookupSource, string> = {
+  openlibrary: "Open Library",
+  biblacad: "Romanian Academy Library",
+  bcucluj: "BCU Cluj",
+  bcutimisoara: "BCU Timișoara",
+  googlebooks: "Google Books",
+};
 
 interface Tally {
   found: number;
@@ -81,17 +96,20 @@ for (const file of files) {
 
   for (const [i, isbn13] of isbns.entries()) {
     process.stderr.write(`\r${basename(file)}: ${i + 1}/${n}`);
-    const drafts: (SourceDraft | null)[] = [];
-    for (const source of asked) {
-      const tally = tallies.get(source.source)!;
-      try {
-        const draft = source.read(isbn13, await source.fetch(isbn13));
-        count(tally, draft);
-        drafts.push(draft);
-      } catch {
-        tally.errors++;
-      }
-    }
+    // The sources at once: each has its own queue, so no server sees two requests at a time.
+    const drafts = await Promise.all(
+      asked.map(async (source): Promise<SourceDraft | null> => {
+        const tally = tallies.get(source.source)!;
+        try {
+          const draft = source.read(isbn13, await source.fetch(isbn13));
+          count(tally, draft);
+          return draft;
+        } catch {
+          tally.errors++;
+          return null;
+        }
+      }),
+    );
     const found = drafts.filter((draft) => draft !== null);
     // "Any": found by at least one; a cover or pages from at least one.
     const any = tallies.get("any")!;
@@ -113,6 +131,7 @@ for (const file of files) {
     }
     console.log(`| ${LABELS[source.source]} | ${cell(tally.found)} | ${cell(tally.cover)} | ${cell(tally.pages)} | ${tally.errors} |`);
   }
+  if (!askGoogle) console.log("| Google Books | not asked (pass --google) | | | |");
   const any = tallies.get("any")!;
   console.log(`| Any of them | ${cell(any.found)} | ${cell(any.cover)} | ${cell(any.pages)} | |`);
   for (const line of rejected) console.error(`skipped: ${line}`);

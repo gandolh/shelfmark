@@ -35,8 +35,11 @@ function appVersion(): string {
   }
 }
 
+/** The server's version, from its package.json. The library catalogs see it in the Z39.50 Init. */
+export const APP_VERSION = appVersion();
+
 /** Every outbound request names the app and a contact: Open Library asks for it, and allows 3 req/s with it. */
-export const USER_AGENT = `Shelfmark/${appVersion()} (${CONTACT})`;
+export const USER_AGENT = `Shelfmark/${APP_VERSION} (${CONTACT})`;
 
 export const OPEN_LIBRARY_ORIGIN = "https://openlibrary.org";
 export const COVERS_ORIGIN = "https://covers.openlibrary.org";

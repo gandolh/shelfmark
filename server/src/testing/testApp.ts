@@ -2,11 +2,13 @@ import { randomBytes } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { PassThrough } from "node:stream";
 import type { FastifyInstance, InjectOptions, LightMyRequestResponse } from "fastify";
 import { AUTH_ROUTE_PREFIX, SESSION_COOKIE, buildApp, type BuildAppOptions } from "../app.js";
 import { openAccounts, seedOwner } from "../auth/accounts.js";
 import { loadConfig, type Config } from "../config.js";
 import { databasePath, openDb } from "../db/open.js";
+import type { Connect } from "../lookup/z3950/client.js";
 
 /**
  * A whole app for tests, on a fresh temporary `DATA_DIR` so route tests never
@@ -30,10 +32,11 @@ import { databasePath, openDb } from "../db/open.js";
  * `Cookie` header value. The user's password is made up per app, at runtime.
  *
  * No test touches the network: the app's outbound `fetch` (lookups, cover
- * downloads, Ward) refuses every request unless the test passes its own,
- * answering from recorded fixtures:
+ * downloads, Ward) refuses every request, and its `connect` (the library
+ * catalogs) every connection, unless the test passes its own, answering from
+ * recorded fixtures:
  *
- *     const t = await startTestApp({}, { fetch: fakeFetch });
+ *     const t = await startTestApp({}, { fetch: fakeFetch, connect: fakeLibraries.connect });
  */
 
 export interface TestApp {
@@ -58,11 +61,22 @@ export interface SignedInTestApp extends TestApp {
 export interface TestAppOptions {
   /** The app's outbound `fetch`. Default: one that rejects every request. */
   fetch?: BuildAppOptions["fetch"];
+  /** The app's outbound TCP connections (the library catalogs). Default: one that refuses every connection. */
+  connect?: BuildAppOptions["connect"];
 }
 
 const refuseNetwork: typeof globalThis.fetch = (input) => {
   const url = input instanceof Request ? input.url : String(input);
   return Promise.reject(new Error(`A test tried to reach the network: ${url}. Pass a fake fetch to startTestApp.`));
+};
+
+/** A connection that fails at once, the way a refused one does. */
+export const refuseConnections: Connect = (host, port) => {
+  const socket = new PassThrough();
+  queueMicrotask(() =>
+    socket.destroy(new Error(`A test tried to reach ${host}:${port}. Pass a fake connect to startTestApp.`)),
+  );
+  return socket;
 };
 
 /** The `name=value` pair of the session cookie a response set, if it set one. */
@@ -75,7 +89,10 @@ export function sessionCookieFrom(res: LightMyRequestResponse): string | undefin
 export async function startTestApp(overrides: NodeJS.ProcessEnv = {}, options: TestAppOptions = {}): Promise<TestApp> {
   const dataDir = await mkdtemp(join(tmpdir(), "shelfmark-test-"));
   const config = loadConfig({ DATA_DIR: dataDir, ...overrides });
-  const app = await buildApp(config, { fetch: options.fetch ?? refuseNetwork });
+  const app = await buildApp(config, {
+    fetch: options.fetch ?? refuseNetwork,
+    connect: options.connect ?? refuseConnections,
+  });
   const owner = { username: "owner", password: randomBytes(12).toString("base64url") };
 
   let created = false;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createQueue, GOOGLE_BOOKS_SPACING_MS, OPEN_LIBRARY_SPACING_MS, type Clock } from "./queue.js";
+import { createQueue, GOOGLE_BOOKS_SPACING_MS, LIBRARY_SPACING, OPEN_LIBRARY_SPACING_MS, type Clock } from "./queue.js";
 
 /** A clock that moves only when the queue sleeps, so spacing is measured exactly and instantly. */
 function fakeClock(): Clock & { slept: number[] } {
@@ -72,6 +72,41 @@ describe("createQueue", () => {
     ]);
     expect(results.map((result) => result.status)).toEqual(["fulfilled", "rejected", "fulfilled"]);
     expect(results[2]).toEqual({ status: "fulfilled", value: "third" });
+  });
+
+  it("pauses a random 5-10 s after each library request ends, one at a time", async () => {
+    const clock = fakeClock();
+    const queue = createQueue(LIBRARY_SPACING, clock);
+    const spans: [number, number][] = [];
+    await Promise.all(
+      Array.from({ length: 50 }, () =>
+        queue.run(async () => {
+          const start = clock.now();
+          await clock.sleep(700); // a Z39.50 exchange takes most of a second
+          spans.push([start, clock.now()]);
+        }),
+      ),
+    );
+    expect(spans[0]![0]).toBe(1_000); // the first one goes at once
+    const pauses = spans.slice(1).map(([start], i) => start - spans[i]![1]);
+    expect(Math.min(...pauses)).toBeGreaterThanOrEqual(5_000);
+    expect(Math.max(...pauses)).toBeLessThan(10_000);
+    expect(new Set(pauses).size).toBeGreaterThan(1);
+  });
+
+  it("measures from the end even when a request fails", async () => {
+    const clock = fakeClock();
+    const queue = createQueue({ ms: () => 5_000, from: "end" }, clock);
+    const starts: number[] = [];
+    await Promise.allSettled([
+      queue.run(async () => {
+        starts.push(clock.now());
+        await clock.sleep(2_000);
+        throw new Error("BCU Cluj did not answer within 10 s");
+      }),
+      queue.run(async () => starts.push(clock.now())),
+    ]);
+    expect(starts).toEqual([1_000, 8_000]);
   });
 
   it("waits with real timers too", async () => {

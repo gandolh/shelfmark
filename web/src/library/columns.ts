@@ -176,6 +176,9 @@ const FORMAT_LABELS: Record<string, string> = { hardcover: "Hardcover", paperbac
 const CONDITION_LABELS: Record<string, string> = { new: "New", good: "Good", worn: "Worn", damaged: "Damaged" };
 const SOURCE_LABELS: Record<string, string> = {
   openlibrary: "Open Library",
+  biblacad: "Romanian Academy Library",
+  bcucluj: "BCU Cluj",
+  bcutimisoara: "BCU Timișoara",
   googlebooks: "Google Books",
   manual: "By hand",
   import: "Import",

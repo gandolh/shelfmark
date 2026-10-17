@@ -24,12 +24,14 @@ flowchart LR
     ward["Ward"]
   end
   ol["Open Library"]
+  libs["Romanian library catalogs<br/>Z39.50, port 9991"]
   gb["Google Books"]
   web -- "/shelfmark-api/* with the session cookie" --> caddy
   caddy --> api
   api --> db
   api -- "ISBN lookup" --> ol
-  api -. "only with a key" .-> gb
+  api -- "when Open Library has no title" --> libs
+  api -. "last, only with a key" .-> gb
   api -. "Sign in with Ward (OpenID Connect)" .-> ward
 ```
 
@@ -39,8 +41,13 @@ flowchart LR
    WebAssembly polyfill where the browser has none. You can also type the
    ISBN, or let a USB scanner type it. `shared` checks the digits.
 2. The web app sends `POST /api/lookup` with the ISBN.
-3. The server answers from its cache, or asks Open Library and then Google
-   Books, and returns a draft plus any book with that ISBN you already own.
+3. The server answers from its cache, or asks the sources in order: Open
+   Library, then three Romanian library catalogs over Z39.50 (the Romanian
+   Academy Library, BCU Cluj, BCU Timișoara), then Google Books. It stops at
+   the first source with a title. The libraries are asked one request at a
+   time each, with a random 5-10 s pause between requests, so a second
+   Romanian book scanned straight after the first can take ten seconds. The
+   server returns a draft plus any book with that ISBN you already own.
 4. If you own it, the app says so and offers "Open the book" or "Add another
    copy".
 5. If the draft is good, you pick a shelf and a status and save it with

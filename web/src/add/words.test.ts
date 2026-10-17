@@ -49,6 +49,21 @@ describe("notFoundWording", () => {
     });
   });
 
+  it("names every library searched, and capitalizes one that didn't answer", () => {
+    expect(
+      notFoundText(ISIDOR, [
+        { source: "openlibrary", outcome: "not_found" },
+        { source: "biblacad", outcome: "error" },
+        { source: "bcucluj", outcome: "not_found" },
+        { source: "bcutimisoara", outcome: "not_found" },
+        { source: "googlebooks", outcome: "not_found" },
+      ]),
+    ).toBe(
+      `No match for ${ISIDOR} in Open Library, BCU Cluj, BCU Timișoara or Google Books. ` +
+        "The Romanian Academy Library didn't answer, so it may still have it.",
+    );
+  });
+
   it("words a miss where no source answered at all", () => {
     expect(
       notFoundText(ISIDOR, [
@@ -73,9 +88,12 @@ describe("isbnProblem", () => {
 
 describe("lines", () => {
   it("says where a draft came from", () => {
-    expect(sourceLine("openlibrary")).toBe("Found in Open Library");
-    expect(sourceLine("googlebooks")).toBe("Found in Google Books");
-    expect(sourceLine("both")).toBe("Found in Open Library and Google Books");
+    expect(sourceLine(["openlibrary"])).toBe("Found in Open Library");
+    expect(sourceLine(["googlebooks"])).toBe("Found in Google Books");
+    expect(sourceLine(["openlibrary", "googlebooks"])).toBe("Found in Open Library and Google Books");
+    expect(sourceLine(["bcucluj"])).toBe("Found in the catalog of BCU Cluj");
+    expect(sourceLine(["biblacad"])).toBe("Found in the catalog of the Romanian Academy Library");
+    expect(sourceLine(["openlibrary", "bcutimisoara"])).toBe("Found in Open Library and the catalog of BCU Timișoara");
     expect(sourceLine("copy")).toBe("Another copy of a book you have");
   });
 

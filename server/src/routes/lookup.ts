@@ -4,6 +4,7 @@ import type { FeatureContext } from "../app.js";
 import { ApiError } from "../errors.js";
 import { createLookupCache } from "../lookup/cache.js";
 import { createGoogleBooksSource } from "../lookup/googlebooks.js";
+import { createLibrarySource, LIBRARY_ORDER } from "../lookup/libraries.js";
 import { createLookup } from "../lookup/merge.js";
 import { createOpenLibrarySource } from "../lookup/openlibrary.js";
 
@@ -16,11 +17,16 @@ const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string>
 /**
  * `POST /api/lookup { isbn }` (brief 05): an ISBN to a draft, plus the copies
  * already saved with it. Nothing is saved. The sources' queues live as long as
- * the app, so every lookup and every batch shares them.
+ * the app, so every lookup and every batch shares them: the library catalogs'
+ * pause between requests holds across lookups.
  */
-export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { config, db, books, fetch }) => {
+export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { config, db, books, fetch, connect }) => {
   const lookup = createLookup({
-    sources: [createOpenLibrarySource({ fetch }), createGoogleBooksSource({ apiKey: config.googleBooksApiKey, fetch })],
+    sources: [
+      createOpenLibrarySource({ fetch }),
+      ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect })),
+      createGoogleBooksSource({ apiKey: config.googleBooksApiKey, fetch }),
+    ],
     cache: createLookupCache(db),
     onError: (source, isbn13, error) => {
       app.log.warn({ source, isbn13, reason: error instanceof Error ? error.message : String(error) }, "lookup source failed");

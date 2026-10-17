@@ -3,7 +3,7 @@ import {
   type Book,
   type BookCreate,
   type Draft,
-  type DraftSource,
+  type LookupSource,
   type LookupResponse,
   type Status,
 } from "@shelfmark/shared";
@@ -36,7 +36,8 @@ export type Details = Omit<BookCreate, "shelf" | "status" | "collection">;
 /** A book ready to confirm: the found sheet's content. */
 export interface Proposal {
   details: Details;
-  origin: DraftSource | "copy";
+  /** The sources the details came from, or another copy of a book already saved. */
+  origin: readonly LookupSource[] | "copy";
   cover: CoverPlan;
 }
 
@@ -193,9 +194,9 @@ export function proposalFromDraft(draft: Draft & { title: string }): Proposal {
       description: draft.description,
       subjects: draft.subjects,
       isbn13: draft.isbn13,
-      metadataSource: draftMetadataSource(draft.source),
+      metadataSource: draftMetadataSource(draft.sources),
     },
-    origin: draft.source,
+    origin: draft.sources,
     cover: draft.coverCandidates.length > 0 ? { kind: "candidates", urls: draft.coverCandidates.map((c) => c.url) } : { kind: "none" },
   };
 }

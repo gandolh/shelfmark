@@ -5,6 +5,7 @@ import { registerOriginGuard } from "./auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
+import { netConnection, type Connect } from "./lookup/z3950/client.js";
 import { backupRoutes } from "./routes/backup.js";
 import { bookRoutes } from "./routes/books.js";
 import { coverRoutes } from "./routes/covers.js";
@@ -20,6 +21,8 @@ export interface FeatureContext {
   books: BookStore;
   /** Every outbound request: the lookup's sources, cover downloads and Ward. Tests pass a fake (`startTestApp`). */
   fetch: typeof globalThis.fetch;
+  /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake (`startTestApp`). */
+  connect: Connect;
 }
 
 /** The session cookie's name. Unique in the estate: every app shares one origin. */
@@ -105,6 +108,8 @@ export interface BuildAppOptions {
   logger?: FastifyServerOptions["logger"];
   /** What `FeatureContext.fetch` is. Default the global `fetch`. */
   fetch?: typeof globalThis.fetch;
+  /** What `FeatureContext.connect` is. Default a real TCP connection. */
+  connect?: Connect;
 }
 
 /**
@@ -138,7 +143,13 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
 
   app.get("/api/health", async () => ({ ok: true }));
 
-  const ctx: FeatureContext = { config, db, books: createBookStore(db), fetch: options.fetch ?? globalThis.fetch };
+  const ctx: FeatureContext = {
+    config,
+    db,
+    books: createBookStore(db),
+    fetch: options.fetch ?? globalThis.fetch,
+    connect: options.connect ?? netConnection,
+  };
   for (const feature of FEATURES) await feature(app, ctx);
 
   return app;

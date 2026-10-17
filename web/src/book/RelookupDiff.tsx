@@ -88,7 +88,7 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
       {state.kind === "done" && draft && (
         <>
           <p className="book-lookup__line">
-            {sourceLine(draft.source)}.{" "}
+            {sourceLine(draft.sources)}.{" "}
             {rows.length === 0 ? "It matches what you have; there is nothing to take." : "Tick the fields to take; the rest stay as they are."}
           </p>
           {rows.length > 0 && (

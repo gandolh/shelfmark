@@ -6,6 +6,9 @@ import { StarIcon } from "./RatingField";
 
 const SOURCES: Record<MetadataSource, string> = {
   openlibrary: "Open Library",
+  biblacad: "The Romanian Academy Library's catalog",
+  bcucluj: "BCU Cluj's catalog",
+  bcutimisoara: "BCU Timișoara's catalog",
   googlebooks: "Google Books",
   manual: "Typed in by hand",
   import: "Imported",

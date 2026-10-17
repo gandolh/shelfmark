@@ -22,8 +22,16 @@ export const COLLECTIONS = ["owned", "wishlist"] as const;
 export const collectionSchema = z.enum(COLLECTIONS);
 export type Collection = z.infer<typeof collectionSchema>;
 
-/** Where a book's details came from. */
-export const METADATA_SOURCES = ["openlibrary", "googlebooks", "manual", "import"] as const;
+/** Where a book's details came from: a lookup source (lookup.ts), the owner, or an import. */
+export const METADATA_SOURCES = [
+  "openlibrary",
+  "biblacad",
+  "bcucluj",
+  "bcutimisoara",
+  "googlebooks",
+  "manual",
+  "import",
+] as const;
 export const metadataSourceSchema = z.enum(METADATA_SOURCES);
 export type MetadataSource = z.infer<typeof metadataSourceSchema>;
 

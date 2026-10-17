@@ -8,23 +8,24 @@ import { isbn13Schema, type MetadataSource } from "./book.js";
  * corpus/wiki/metadata-lookup.md). A lookup saves nothing.
  */
 
-export const LOOKUP_SOURCES = ["openlibrary", "googlebooks"] as const;
+/**
+ * Every source, in the order a lookup asks them: Open Library, the three
+ * Romanian library catalogs (the Romanian Academy Library, BCU Cluj, BCU
+ * Timișoara), then Google Books. Each is asked only while no earlier one has
+ * found a title (decisions.md, 2026-10-17).
+ */
+export const LOOKUP_SOURCES = ["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "googlebooks"] as const;
 export const lookupSourceSchema = z.enum(LOOKUP_SOURCES);
 export type LookupSource = z.infer<typeof lookupSourceSchema>;
 
 /**
  * How one source did. `skipped_no_key`: Google Books was needed but the
- * server has no `GOOGLE_BOOKS_API_KEY`. A source that was not needed (Google
- * when Open Library's answer was complete) is not in `tried` at all.
+ * server has no `GOOGLE_BOOKS_API_KEY`. A source that was not needed (any
+ * after the one that found a title) is not in `tried` at all.
  */
 export const LOOKUP_OUTCOMES = ["found", "not_found", "error", "skipped_no_key"] as const;
 export const lookupOutcomeSchema = z.enum(LOOKUP_OUTCOMES);
 export type LookupOutcome = z.infer<typeof lookupOutcomeSchema>;
-
-/** Which sources a draft's values came from: `both` when each supplied at least one. */
-export const DRAFT_SOURCES = ["openlibrary", "googlebooks", "both"] as const;
-export const draftSourceSchema = z.enum(DRAFT_SOURCES);
-export type DraftSource = z.infer<typeof draftSourceSchema>;
 
 /** A cover the server can download with `POST /api/books/:id/cover/fetch`. Always `https`. */
 export const coverCandidateSchema = z.object({
@@ -35,10 +36,10 @@ export type CoverCandidate = z.infer<typeof coverCandidateSchema>;
 
 /**
  * The `BookCreate` fields a lookup can fill, `null` (or empty) where no source
- * had a value, plus the cover candidates (best first: Open Library's, then
- * Google's) and where the values came from. Text is already trimmed and within
- * `bookCreateSchema`'s limits, so the fields can be sent to `POST /api/books`
- * as they are once the owner has a title.
+ * had a value, plus the cover candidates (best first, in the order the sources
+ * were asked) and the sources the values came from. Text is already trimmed
+ * and within `bookCreateSchema`'s limits, so the fields can be sent to
+ * `POST /api/books` as they are once the owner has a title.
  */
 export const draftSchema = z.object({
   isbn13: isbn13Schema,
@@ -54,13 +55,14 @@ export const draftSchema = z.object({
   description: z.string().nullable(),
   subjects: z.array(z.string()),
   coverCandidates: z.array(coverCandidateSchema),
-  source: draftSourceSchema,
+  /** Every source that supplied a value, in the order asked. Never empty. */
+  sources: z.array(lookupSourceSchema).min(1),
 });
 export type Draft = z.infer<typeof draftSchema>;
 
-/** The `metadataSource` to save a book from this draft with: Open Library when both sources contributed. */
-export function draftMetadataSource(source: DraftSource): MetadataSource {
-  return source === "googlebooks" ? "googlebooks" : "openlibrary";
+/** The `metadataSource` to save a book from this draft with: the first source that supplied a value. */
+export function draftMetadataSource(sources: readonly LookupSource[]): MetadataSource {
+  return sources[0] ?? "openlibrary";
 }
 
 /** `POST /api/lookup`. Any ISBN-10 or ISBN-13 spelling `parseIsbn` accepts (hyphens, spaces). */

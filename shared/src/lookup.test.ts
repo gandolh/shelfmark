@@ -6,8 +6,10 @@ import {
   draftMetadataSource,
   draftSchema,
   LOOKUP_OUTCOMES,
+  LOOKUP_SOURCES,
   lookupRequestSchema,
   lookupResponseSchema,
+  METADATA_SOURCES,
   type Draft,
 } from "./index.js";
 
@@ -23,7 +25,7 @@ const draft: Draft = {
   description: null,
   subjects: ["Fantasy"],
   coverCandidates: [{ url: "https://covers.openlibrary.org/b/id/12003329-L.jpg", source: "openlibrary" }],
-  source: "openlibrary",
+  sources: ["openlibrary"],
 };
 
 describe("lookup contract", () => {
@@ -59,10 +61,17 @@ describe("lookup contract", () => {
     expect(draftSchema.safeParse(http).success).toBe(false);
   });
 
-  it("credits Open Library when both sources contributed", () => {
-    expect(draftMetadataSource("openlibrary")).toBe("openlibrary");
-    expect(draftMetadataSource("googlebooks")).toBe("googlebooks");
-    expect(draftMetadataSource("both")).toBe("openlibrary");
+  it("credits the first source that contributed", () => {
+    expect(draftMetadataSource(["openlibrary"])).toBe("openlibrary");
+    expect(draftMetadataSource(["bcucluj"])).toBe("bcucluj");
+    expect(draftMetadataSource(["openlibrary", "biblacad"])).toBe("openlibrary");
+  });
+
+  it("asks the library catalogs between Open Library and Google, and a draft names at least one source", () => {
+    expect(LOOKUP_SOURCES).toEqual(["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "googlebooks"]);
+    for (const source of LOOKUP_SOURCES) expect(METADATA_SOURCES).toContain(source);
+    expect(draftSchema.safeParse({ ...draft, sources: [] }).success).toBe(false);
+    expect(draftSchema.safeParse({ ...draft, sources: ["goodreads"] }).success).toBe(false);
   });
 
   it("takes the ISBN as a string and refuses unknown keys", () => {

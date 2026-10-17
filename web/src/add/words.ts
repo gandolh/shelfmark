@@ -1,4 +1,4 @@
-import { clean, type DraftSource, type LookupResponse, type ParseIsbnResult } from "@shelfmark/shared";
+import { clean, type LookupResponse, type LookupSource, type ParseIsbnResult } from "@shelfmark/shared";
 import { isApiError } from "../api";
 import { authorLine } from "../components/cover";
 import type { FlowState } from "./flow";
@@ -27,7 +27,16 @@ export function isbnProblem(input: string, reason: IsbnReason): string {
   }
 }
 
-export const SOURCE_NAMES = { openlibrary: "Open Library", googlebooks: "Google Books" } as const;
+/** How a sentence names each source; the library catalogs as the libraries call themselves. */
+export const SOURCE_NAMES: Record<LookupSource, string> = {
+  openlibrary: "Open Library",
+  biblacad: "the Romanian Academy Library",
+  bcucluj: "BCU Cluj",
+  bcutimisoara: "BCU Timișoara",
+  googlebooks: "Google Books",
+};
+
+const LIBRARIES: ReadonlySet<LookupSource> = new Set(["biblacad", "bcucluj", "bcutimisoara"]);
 
 /** "Open Library", "Open Library or Google Books", "A, B or C". */
 function either(names: readonly string[]): string {
@@ -35,18 +44,25 @@ function either(names: readonly string[]): string {
   return `${names.slice(0, -1).join(", ")} or ${names.at(-1)}`;
 }
 
+/** "A", "A and B", "A, B and C". */
+function both(names: readonly string[]): string {
+  if (names.length <= 1) return names.join("");
+  return `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+}
+
+/** At the start of a sentence: "The Romanian Academy Library didn't answer". */
+function sentence(text: string): string {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+/** Where a draft's details came from, crediting a library by its catalog: "the catalog of BCU Cluj". */
+export function draftSources(sources: readonly LookupSource[]): string {
+  return both(sources.map((source) => (LIBRARIES.has(source) ? `the catalog of ${SOURCE_NAMES[source]}` : SOURCE_NAMES[source])));
+}
+
 /** The found sheet's first line. `copy` is another copy of a book already saved. */
-export function sourceLine(origin: DraftSource | "copy"): string {
-  switch (origin) {
-    case "openlibrary":
-      return "Found in Open Library";
-    case "googlebooks":
-      return "Found in Google Books";
-    case "both":
-      return "Found in Open Library and Google Books";
-    case "copy":
-      return "Another copy of a book you have";
-  }
+export function sourceLine(origin: readonly LookupSource[] | "copy"): string {
+  return origin === "copy" ? "Another copy of a book you have" : `Found in ${draftSources(origin)}`;
 }
 
 export interface NotFoundWording {
@@ -70,11 +86,11 @@ export function notFoundWording(tried: LookupResponse["tried"]): NotFoundWording
   const skipped = named("skipped_no_key");
   const notes: string[] = [];
   if (failed.length > 0) {
-    notes.push(`${either(failed)} didn't answer, so ${failed.length === 1 ? "it" : "they"} may still have it.`);
+    notes.push(`${sentence(either(failed))} didn't answer, so ${failed.length === 1 ? "it" : "they"} may still have it.`);
   }
   if (skipped.length > 0) {
     const one = skipped.length === 1;
-    notes.push(`${either(skipped)} ${one ? "isn't" : "aren't"} set up yet, so ${one ? "it wasn't" : "they weren't"} searched.`);
+    notes.push(`${sentence(either(skipped))} ${one ? "isn't" : "aren't"} set up yet, so ${one ? "it wasn't" : "they weren't"} searched.`);
   }
   return { searchedIn: searched.length > 0 ? either(searched) : null, notes, uncertain: failed.length > 0 };
 }

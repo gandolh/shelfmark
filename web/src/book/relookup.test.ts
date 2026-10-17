@@ -15,7 +15,7 @@ const draft = (fields: Partial<Draft> = {}): Draft => ({
   description: null,
   subjects: [],
   coverCandidates: [],
-  source: "openlibrary",
+  sources: ["openlibrary"],
   ...fields,
 });
 
