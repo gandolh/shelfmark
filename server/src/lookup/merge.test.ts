@@ -296,6 +296,28 @@ describe("createLookup", () => {
     expect(second).toEqual(first);
   });
 
+  it("shares a lookup already running for the ISBN, so no source is asked twice", async () => {
+    const { lookup, fetch, catalogs } = setup(recordedInternet, { libraries: ["biblacad-piramida"] });
+    const [first, second] = await Promise.all([lookup.lookup(PIRAMIDA), lookup.lookup(PIRAMIDA)]);
+    expect(second).toEqual(first);
+    expect(first.draft?.sources).toEqual(["biblacad"]);
+    // One call to Open Library (it doesn't know the book), one search of the first library.
+    expect(fetch.calls).toHaveLength(1);
+    expect(catalogs.calls.map((call) => call.library)).toEqual(["biblacad"]);
+
+    // Once it has ended, the next lookup is a new one, answered from the cache.
+    await lookup.lookup(PIRAMIDA);
+    expect(fetch.calls).toHaveLength(1);
+    expect(catalogs.calls).toHaveLength(1);
+  });
+
+  it("keeps lookups of different ISBNs apart", async () => {
+    const { lookup } = setup();
+    const [hobbit, omul] = await Promise.all([lookup.lookup(HOBBIT), lookup.lookup(OMUL)]);
+    expect(hobbit.draft?.isbn13).toBe(HOBBIT);
+    expect(omul.draft?.isbn13).toBe(OMUL);
+  });
+
   it("reuses a found answer years later", async () => {
     const { lookup, fetch } = setup();
     await lookup.lookup(HOBBIT);

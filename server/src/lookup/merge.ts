@@ -204,18 +204,31 @@ export function createLookup({ sources, cache, onError }: LookupOptions): Lookup
     return { outcome, draft };
   }
 
+  async function run(isbn13: string): Promise<LookupResult> {
+    const tried: Tried[] = [];
+    const answers: { source: LookupSource; draft: SourceDraft | null }[] = [];
+    for (const client of sources) {
+      // The next source only while nothing so far has a title.
+      if (mergeDrafts(isbn13, answers)?.title) break;
+      const { outcome, draft } = await ask(client, isbn13);
+      tried.push({ source: client.source, outcome });
+      answers.push({ source: client.source, draft });
+    }
+    return { draft: mergeDrafts(isbn13, answers), tried };
+  }
+
+  // One lookup per ISBN at a time: a request for an ISBN already being looked
+  // up (the camera went to another book and back) waits for that lookup, so
+  // no source is asked twice. After it ends, the cache answers.
+  const running = new Map<string, Promise<LookupResult>>();
   return {
-    async lookup(isbn13) {
-      const tried: Tried[] = [];
-      const answers: { source: LookupSource; draft: SourceDraft | null }[] = [];
-      for (const client of sources) {
-        // The next source only while nothing so far has a title.
-        if (mergeDrafts(isbn13, answers)?.title) break;
-        const { outcome, draft } = await ask(client, isbn13);
-        tried.push({ source: client.source, outcome });
-        answers.push({ source: client.source, draft });
+    lookup(isbn13) {
+      let result = running.get(isbn13);
+      if (result === undefined) {
+        result = run(isbn13).finally(() => running.delete(isbn13));
+        running.set(isbn13, result);
       }
-      return { draft: mergeDrafts(isbn13, answers), tried };
+      return result;
     },
   };
 }

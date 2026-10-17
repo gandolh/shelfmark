@@ -12,6 +12,7 @@ import {
   proposalFromDraft,
   scannerPaused,
   scannerWatching,
+  SETTLE_MS,
   type FlowEvent,
   type FlowState,
   type Mode,
@@ -132,9 +133,12 @@ describe("the scan flow", () => {
 
   it("scan → found → save → scanning again with no extra tap", () => {
     let state = run("scan", scanIsbn(HOBBIT));
-    expect(expectStep(state, "looking").isbn13).toBe(HOBBIT);
-    // Loose: the camera watches for a different book.
+    expect(expectStep(state, "looking")).toMatchObject({ isbn13: HOBBIT, settling: true });
+    // Loose: the camera reads on at the looking pace while the lookup settles, then watches.
     expect(scannerPaused(state)).toBe(false);
+    expect(scannerWatching(state)).toBe(false);
+    state = flowReducer(state, { type: "settled", id: state.step.id });
+    expect(expectStep(state, "looking").settling).toBe(false);
     expect(scannerWatching(state)).toBe(true);
 
     state = flowReducer(state, { type: "looked-up", id: state.step.id, lookup: lookup() });
@@ -305,6 +309,46 @@ describe("a loose sheet: the camera keeps reading", () => {
       expect([label, state.loose]).toEqual([label, false]);
       expect([label, scannerPaused(state)]).toEqual([label, true]);
     }
+  });
+});
+
+describe("one lookup per ISBN", () => {
+  it("lets a camera lookup settle before it is sent, about two read cycles", () => {
+    expect(SETTLE_MS).toBe(600);
+    const state = run("scan", scanIsbn(HOBBIT));
+    const settled = flowReducer(state, { type: "settled", id: state.step.id });
+    // Same step, same id: the answer still lands on it.
+    expect(settled.step.id).toBe(state.step.id);
+    expect(settled.loose).toBe(true);
+    // A stale timer, or a second one, changes nothing.
+    expect(flowReducer(settled, { type: "settled", id: state.step.id })).toBe(settled);
+    expect(flowReducer(state, { type: "settled", id: state.step.id + 1 })).toBe(state);
+  });
+
+  it("drops a settling lookup when another ISBN replaces it, so it is never sent", () => {
+    const state = run("scan", scanIsbn("9786063205538"));
+    const corrected = flowReducer(state, scanIsbn(ISIDOR));
+    expect(expectStep(corrected, "looking")).toMatchObject({ isbn13: ISIDOR, settling: true });
+    expect(flowReducer(corrected, { type: "settled", id: state.step.id })).toBe(corrected);
+  });
+
+  it("sends a typed ISBN and a retry at once", () => {
+    expect(expectStep(run("isbn", { type: "submit-isbn", isbn13: HOBBIT }), "looking").settling).toBe(false);
+    const looking = run("scan", scanIsbn(HOBBIT));
+    const failed = flowReducer(looking, { type: "lookup-failed", id: looking.step.id, failure: { message: "offline", network: true } });
+    expect(expectStep(flowReducer(failed, { type: "retry" }), "looking").settling).toBe(false);
+  });
+
+  it("shows an answer the page already has at once, from the camera or typed", () => {
+    const scanned = run("scan", { type: "scanned", code: { kind: "isbn", isbn13: HOBBIT }, known: lookup() });
+    expect(expectStep(scanned, "found").proposal.details.title).toBe("The Hobbit");
+    expect(scanned.loose).toBe(true);
+    expect(scannerWatching(scanned)).toBe(true);
+    const typed = run("isbn", { type: "submit-isbn", isbn13: HOBBIT, known: OWNED });
+    expectStep(typed, "owned");
+    // On a loose sheet too, in place of the lookup.
+    const replaced = flowReducer(scanAndAnswer(NOT_FOUND), { type: "scanned", code: { kind: "isbn", isbn13: HOBBIT }, known: lookup() });
+    expectStep(replaced, "found");
   });
 });
 

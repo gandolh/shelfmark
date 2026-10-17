@@ -153,12 +153,19 @@ export function CameraScanner({
     };
   }, [cameraWanted, attempt]);
 
+  // Whether a code changed the page since the last read was scheduled.
+  const fired = useRef(false);
   const emit = useEffectEvent((code: ScannedCode) => {
     if (onCode(code) === false) return;
+    fired.current = true;
     if (feedback) signalScan();
     setHits((n) => n + 1);
   });
-  const nextInterval = useEffectEvent(() => readInterval(watching, sightings.pending()));
+  const nextInterval = useEffectEvent(() => {
+    const interval = readInterval({ watching, pending: sightings.pending(), fired: fired.current });
+    fired.current = false;
+    return interval;
+  });
 
   const reading = engine !== null && state === "scanning" && visible && !paused;
   // A book still in frame when the sheet closes (Save, Skip) must not fire

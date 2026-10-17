@@ -16,6 +16,7 @@ import {
   isSaving,
   scannerPaused,
   scannerWatching,
+  SETTLE_MS,
   type CoverPlan,
   type FlowState,
   type Mode,
@@ -23,6 +24,7 @@ import {
 } from "./flow";
 import { TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
+import { createLookupMemo } from "./memo";
 import { ModeSwitch, modeTabId } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
@@ -74,6 +76,8 @@ export function AddBookPage() {
   // A mode chosen by pointer puts the cursor in its field; one reached with
   // the tabs' arrow keys leaves focus on the tabs, as tabs should.
   const [focusOnEnter, setFocusOnEnter] = useState(true);
+  // The answers this visit has had: an ISBN again shows its answer with no request.
+  const [memo] = useState(createLookupMemo);
 
   useEffect(() => {
     session.mode = mode;
@@ -82,20 +86,30 @@ export function AddBookPage() {
   }, [mode, added, state.lastShelf]);
 
   // The lookup for the `looking` step, aborted when the step is left (a
-  // discard, a mode switch, another ISBN); its id drops a late answer.
+  // discard, a mode switch, another ISBN); its id drops a late answer. A
+  // camera's lookup settles first, and another ISBN in that time means it is
+  // never sent.
   const lookingId = step.kind === "looking" ? step.id : null;
   const lookingIsbn = step.kind === "looking" ? step.isbn13 : null;
+  const settling = step.kind === "looking" && step.settling;
   useEffect(() => {
     if (lookingId === null || lookingIsbn === null) return;
+    if (settling) {
+      const timer = setTimeout(() => dispatch({ type: "settled", id: lookingId }), SETTLE_MS);
+      return () => clearTimeout(timer);
+    }
     const controller = new AbortController();
     lookupIsbn(lookingIsbn, { signal: controller.signal }).then(
-      (lookup) => dispatch({ type: "looked-up", id: lookingId, lookup }),
+      (lookup) => {
+        memo.keep(lookup);
+        dispatch({ type: "looked-up", id: lookingId, lookup });
+      },
       (error: unknown) => {
         if (!controller.signal.aborted) dispatch({ type: "lookup-failed", id: lookingId, failure: lookupFailure(error) });
       },
     );
     return () => controller.abort();
-  }, [lookingId, lookingIsbn]);
+  }, [lookingId, lookingIsbn, settling, memo]);
 
   const noticeId = notice?.id;
   useEffect(() => {
@@ -124,6 +138,8 @@ export function AddBookPage() {
     } finally {
       saving.current = false;
     }
+    // Its ISBN is in the library now: the next lookup of it says so.
+    if (book.isbn13 !== null) memo.forget(book.isbn13);
     dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf } });
     // Type ISBN: the cursor is back in the empty field, so a USB scanner goes
     // straight on to the next book. By hand: the fresh form takes it.
@@ -149,7 +165,7 @@ export function AddBookPage() {
     typeIsbn: () => dispatch({ type: "type-isbn" }),
     byHand: () => dispatch({ type: "by-hand" }),
     retry: () => dispatch({ type: "retry" }),
-    submitIsbn: (isbn13) => dispatch({ type: "submit-isbn", isbn13 }),
+    submitIsbn: (isbn13) => dispatch({ type: "submit-isbn", isbn13, known: memo.get(isbn13) }),
   };
 
   const changeMode = (next: Mode, viaKeyboard = false) => {
@@ -201,9 +217,10 @@ export function AddBookPage() {
                 watching={scannerWatching(state)}
                 torch={torch}
                 onCode={(code) => {
+                  const event = { type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined } as const;
                   // The book the sheet already shows, or a sticker behind a result: no beep.
-                  if (flowReducer(state, { type: "scanned", code }) === state) return false;
-                  dispatch({ type: "scanned", code });
+                  if (flowReducer(state, event) === state) return false;
+                  dispatch(event);
                 }}
                 onFallback={() => changeMode("isbn")}
                 onTorchAvailable={setTorchAvailable}

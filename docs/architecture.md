@@ -44,7 +44,9 @@ flowchart LR
    ISBN, or let a USB scanner type it. `shared` checks the digits. A code
    counts once two reads agree. The camera keeps watching while a result is
    open, and a different ISBN replaces a result you haven't touched yet.
-2. The web app sends `POST /api/lookup` with the ISBN.
+2. The web app sends `POST /api/lookup` with the ISBN, after 600 ms for a
+   camera scan (a corrected misread is never sent). An ISBN the page already
+   looked up during this visit shows at once, with no request.
 3. The server answers from its cache, or asks the sources in order: Open
    Library, then three Romanian library catalogs over Z39.50 (the Romanian
    Academy Library, BCU Cluj, BCU Timișoara), then the CIP index, then Google
@@ -54,7 +56,8 @@ flowchart LR
    books from 2019 on, which the libraries take a year or so to catalogue. The libraries are asked one request at a
    time each, with a random 5-10 s pause between requests, so a second
    Romanian book scanned straight after the first can take ten seconds. The
-   server returns a draft plus any book with that ISBN you already own.
+   server runs one lookup per ISBN at a time, and returns a draft plus any
+   book with that ISBN you already own.
 4. If you own it, the app says so and offers "Open the book" or "Add another
    copy".
 5. If the draft is good, you pick a shelf and a status and save it with

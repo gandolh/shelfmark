@@ -144,8 +144,12 @@ export function codesFrom(
  */
 export const PACE = { search: 250, watch: 1000, confirm: 150 } as const;
 
-export function readInterval(watching: boolean, pending: boolean): number {
+export function readInterval({ watching, pending, fired }: { watching: boolean; pending: boolean; fired: boolean }): number {
   if (pending) return PACE.confirm;
+  // A code that just changed the sheet: the page hasn't drawn the new step
+  // yet, so `watching` is the old one's. A new camera step settles at the
+  // looking pace, so take that one, and the page's own from the next read on.
+  if (fired) return PACE.search;
   return watching ? PACE.watch : PACE.search;
 }
 

@@ -148,10 +148,15 @@ describe("codesFrom", () => {
 describe("readInterval", () => {
   it("reads four times a second looking, once a second watching, and soon to confirm", () => {
     expect(PACE).toEqual({ search: 250, watch: 1000, confirm: 150 });
-    expect(readInterval(false, false)).toBe(250);
-    expect(readInterval(true, false)).toBe(1000);
-    expect(readInterval(false, true)).toBe(150);
-    expect(readInterval(true, true)).toBe(150);
+    expect(readInterval({ watching: false, pending: false, fired: false })).toBe(250);
+    expect(readInterval({ watching: true, pending: false, fired: false })).toBe(1000);
+    expect(readInterval({ watching: false, pending: true, fired: false })).toBe(150);
+    expect(readInterval({ watching: true, pending: true, fired: false })).toBe(150);
+  });
+
+  it("reads at the looking pace right after a code changed the sheet, whatever the old step's pace", () => {
+    expect(readInterval({ watching: true, pending: false, fired: true })).toBe(250);
+    expect(readInterval({ watching: true, pending: true, fired: true })).toBe(150);
   });
 });
 
