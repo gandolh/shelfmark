@@ -94,6 +94,7 @@ describe("lines", () => {
     expect(sourceLine(["bcucluj"])).toBe("Found in the catalog of BCU Cluj");
     expect(sourceLine(["biblacad"])).toBe("Found in the catalog of the Romanian Academy Library");
     expect(sourceLine(["openlibrary", "bcutimisoara"])).toBe("Found in Open Library and the catalog of BCU Timișoara");
+    expect(sourceLine(["cip"])).toBe("Found in the national library's CIP lists (written before printing)");
     expect(sourceLine("copy")).toBe("Another copy of a book you have");
   });
 

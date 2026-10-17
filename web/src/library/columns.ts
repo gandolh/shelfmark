@@ -179,6 +179,7 @@ const SOURCE_LABELS: Record<string, string> = {
   biblacad: "Romanian Academy Library",
   bcucluj: "BCU Cluj",
   bcutimisoara: "BCU Timișoara",
+  cip: "CIP lists",
   googlebooks: "Google Books",
   manual: "By hand",
   import: "Import",

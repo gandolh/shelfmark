@@ -82,6 +82,8 @@ RUN cd node_modules \
 FROM node:24-alpine AS prod
 LABEL org.opencontainers.image.title="Shelfmark" \
       org.opencontainers.image.description="Shelfmark API: the book catalog"
+# pdftotext, for the CIP index's weekly refresh (server/src/cip/refresh.ts).
+RUN apk add --no-cache poppler-utils
 # wget, for the healthcheck below, ships in node:alpine's busybox.
 WORKDIR /app
 COPY --from=proddeps /app/node_modules ./node_modules

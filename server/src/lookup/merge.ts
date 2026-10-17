@@ -17,6 +17,8 @@ export interface LookupSourceClient {
   readonly source: LookupSource;
   /** `false` when the source can't be asked (Google Books without a key): reported as `skipped_no_key`. */
   readonly enabled: boolean;
+  /** `false` for a local source (the CIP index): its answers skip the lookup cache. */
+  readonly cached?: false;
   /**
    * The raw answer for an ISBN, through the source's queue: what the cache
    * stores. Throws on a network error, a timeout, a non-2xx answer or bad JSON;
@@ -182,7 +184,7 @@ export function createLookup({ sources, cache, onError }: LookupOptions): Lookup
     isbn13: string,
   ): Promise<{ outcome: LookupOutcome; draft: SourceDraft | null }> {
     // A cached answer costs nothing, so it is used even if the key has since gone.
-    const cached = cache.get(isbn13, client.source);
+    const cached = client.cached === false ? undefined : cache.get(isbn13, client.source);
     if (cached) {
       const draft = client.read(isbn13, cached.response);
       return { outcome: draft ? "found" : "not_found", draft };
@@ -198,7 +200,7 @@ export function createLookup({ sources, cache, onError }: LookupOptions): Lookup
     }
     const draft = client.read(isbn13, response);
     const outcome = draft ? "found" : "not_found";
-    cache.put(isbn13, client.source, { outcome, response });
+    if (client.cached !== false) cache.put(isbn13, client.source, { outcome, response });
     return { outcome, draft };
   }
 

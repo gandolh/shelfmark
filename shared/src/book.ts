@@ -28,6 +28,7 @@ export const METADATA_SOURCES = [
   "biblacad",
   "bcucluj",
   "bcutimisoara",
+  "cip",
   "googlebooks",
   "manual",
   "import",

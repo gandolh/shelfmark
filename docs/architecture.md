@@ -25,12 +25,14 @@ flowchart LR
   end
   ol["Open Library"]
   libs["Romanian library catalogs<br/>Z39.50, port 9991"]
+  bnr["National library's site<br/>CIP lists, weekly"]
   gb["Google Books"]
   web -- "/shelfmark-api/* with the session cookie" --> caddy
   caddy --> api
   api --> db
   api -- "ISBN lookup" --> ol
   api -- "when Open Library has no title" --> libs
+  api -. "weekly refresh of cip.db" .-> bnr
   api -. "last, only with a key" .-> gb
   api -. "Sign in with Ward (OpenID Connect)" .-> ward
 ```
@@ -43,8 +45,11 @@ flowchart LR
 2. The web app sends `POST /api/lookup` with the ISBN.
 3. The server answers from its cache, or asks the sources in order: Open
    Library, then three Romanian library catalogs over Z39.50 (the Romanian
-   Academy Library, BCU Cluj, BCU Timișoara), then Google Books. It stops at
-   the first source with a title. The libraries are asked one request at a
+   Academy Library, BCU Cluj, BCU Timișoara), then the CIP index, then Google
+   Books. It stops at the first source with a title. The CIP index is a local
+   copy of the national library's monthly lists of books announced before
+   printing, in `data/cip.db`, refreshed weekly from its site; it covers
+   books from 2019 on, which the libraries take a year or so to catalogue. The libraries are asked one request at a
    time each, with a random 5-10 s pause between requests, so a second
    Romanian book scanned straight after the first can take ten seconds. The
    server returns a draft plus any book with that ISBN you already own.

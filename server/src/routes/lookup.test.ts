@@ -1,6 +1,7 @@
 import { lookupResponseSchema, type Book, type LookupResponse } from "@shelfmark/shared";
 import { afterEach, describe, expect, it } from "vitest";
 import { fakeFetch, recordedInternet, type FakeFetch } from "../testing/fakeFetch.js";
+import { cipDatabasePath, openCipStore } from "../cip/store.js";
 import { fakeLibraries, type FakeLibraries, type FixtureName } from "../testing/fakeLibraries.js";
 import { startSignedInApp, type SignedInTestApp } from "../testing/testApp.js";
 
@@ -68,6 +69,7 @@ describe("POST /api/lookup", () => {
         { source: "biblacad", outcome: "not_found" },
         { source: "bcucluj", outcome: "not_found" },
         { source: "bcutimisoara", outcome: "not_found" },
+        { source: "cip", outcome: "not_found" },
         { source: "googlebooks", outcome: "skipped_no_key" },
       ],
       owned: [],
@@ -109,6 +111,25 @@ describe("POST /api/lookup", () => {
     expect(libraries.calls).toEqual([
       { library: "biblacad", requests: [20, 22, 24], isbns: ["9786068044873", "6068044874"] },
     ]);
+    expect(fetch.calls.some((call) => call.url.host === "www.googleapis.com")).toBe(false);
+  });
+
+  it("finds a book only the CIP lists know, after the libraries, without Google", async () => {
+    const app = await start({ GOOGLE_BOOKS_API_KEY: "test-key-not-a-real-one" });
+    const store = openCipStore(cipDatabasePath(app.dataDir));
+    store.importIssue({ month: "2026-02", url: "https://bibnat.ro/x/CIP_februarie-2026.pdf", uploaded: "2026-08-18" }, [
+      { isbn13: "9786063205583", entry: 9, title: "Isidor", subtitle: null, authors: ["Ana Pop"], publisher: "Polirom", city: "Iași", year: 2026 },
+    ]);
+    store.close();
+    const body = await lookup(app, "9786063205583");
+    expect(body.tried.map((t) => `${t.source} ${t.outcome}`)).toEqual([
+      "openlibrary not_found",
+      "biblacad not_found",
+      "bcucluj not_found",
+      "bcutimisoara not_found",
+      "cip found",
+    ]);
+    expect(body.draft).toMatchObject({ title: "Isidor", authors: ["Ana Pop"], publishedYear: 2026, sources: ["cip"] });
     expect(fetch.calls.some((call) => call.url.host === "www.googleapis.com")).toBe(false);
   });
 
@@ -167,6 +188,7 @@ describe("POST /api/lookup", () => {
       { source: "biblacad", outcome: "error" },
       { source: "bcucluj", outcome: "error" },
       { source: "bcutimisoara", outcome: "error" },
+      { source: "cip", outcome: "not_found" },
       { source: "googlebooks", outcome: "skipped_no_key" },
     ]);
   });

@@ -11,10 +11,11 @@ import { isbn13Schema, type MetadataSource } from "./book.js";
 /**
  * Every source, in the order a lookup asks them: Open Library, the three
  * Romanian library catalogs (the Romanian Academy Library, BCU Cluj, BCU
- * Timișoara), then Google Books. Each is asked only while no earlier one has
- * found a title (decisions.md, 2026-10-17).
+ * Timișoara), the CIP index (the national library's lists of books announced
+ * before printing), then Google Books. Each is asked only while no earlier
+ * one has found a title (decisions.md, 2026-10-17).
  */
-export const LOOKUP_SOURCES = ["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "googlebooks"] as const;
+export const LOOKUP_SOURCES = ["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "cip", "googlebooks"] as const;
 export const lookupSourceSchema = z.enum(LOOKUP_SOURCES);
 export type LookupSource = z.infer<typeof lookupSourceSchema>;
 

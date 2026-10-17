@@ -5,6 +5,7 @@ import { registerOriginGuard } from "./auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
+import { cipDatabasePath, openCipStore, type CipStore } from "./cip/store.js";
 import { netConnection, type Connect } from "./lookup/z3950/client.js";
 import { backupRoutes } from "./routes/backup.js";
 import { bookRoutes } from "./routes/books.js";
@@ -23,6 +24,8 @@ export interface FeatureContext {
   fetch: typeof globalThis.fetch;
   /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake (`startTestApp`). */
   connect: Connect;
+  /** The CIP index, `<dataDir>/cip.db`, closed with the app. Its weekly refresh is index.ts's. */
+  cip: CipStore;
 }
 
 /** The session cookie's name. Unique in the estate: every app shares one origin. */
@@ -121,8 +124,10 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
   const app = Fastify({ logger: options.logger ?? false });
 
   const db = openDb(databasePath(config.dataDir));
+  const cip = openCipStore(cipDatabasePath(config.dataDir));
   app.addHook("onClose", async () => {
     db.close();
+    cip.close();
   });
 
   // A request with `Content-Type: application/json` and no body (a client that
@@ -149,6 +154,7 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
     books: createBookStore(db),
     fetch: options.fetch ?? globalThis.fetch,
     connect: options.connect ?? netConnection,
+    cip,
   };
   for (const feature of FEATURES) await feature(app, ctx);
 

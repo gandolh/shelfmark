@@ -176,7 +176,8 @@ install checks are in [12-pwa.md](../corpus/briefs/done/12-pwa.md).
 
 Download one: account menu, Download a backup. It is the whole database file,
 covers included. It also holds the password hash and sessions, so keep it
-private.
+private. The CIP index (`data/cip.db`) isn't in it: it is the national
+library's public data, and the server fetches it again by itself.
 
 Restore one, on the VPS (same `ssh` and `DOCKER_HOST` lines as step 6):
 
@@ -191,6 +192,21 @@ docker compose -f infrastructure/docker-compose.yml start shelfmark-api
 Remove the `-wal` and `-shm` files before the copy: a stale one would be
 replayed onto the restored database. Copy the file onto the VPS first, for
 example with `scp`.
+
+## Romanian lookups after a deploy
+
+Two checks after the first deploy with briefs 15 and 16. Use the `ssh` and
+`DOCKER_HOST` lines from step 6.
+
+1. **The library catalogs.** Look up `9786068044873` in the app. The draft
+   should read "Found in the catalog of the Romanian Academy Library". "Didn't
+   answer" for all three libraries means the VPS can't reach TCP port 9991
+   outbound.
+2. **The first CIP refresh.** It starts a minute after the container starts
+   and takes about 15 minutes. Watch it from `/srv/shelfmark-api` with
+   `docker compose -f infrastructure/docker-compose.yml logs -f shelfmark-api | grep cip:`. Expect one line per issue
+   ("cip: imported 2026-08, 2,9xx records"). To run it by hand:
+   `docker compose -f infrastructure/docker-compose.yml exec shelfmark-api node server/dist/cip/cli.js refresh`.
 
 ## Owner checks waiting from earlier briefs
 

@@ -3,6 +3,7 @@ import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { ApiError } from "../errors.js";
 import { createLookupCache } from "../lookup/cache.js";
+import { createCipSource } from "../lookup/cip.js";
 import { createGoogleBooksSource } from "../lookup/googlebooks.js";
 import { createLibrarySource, LIBRARY_ORDER } from "../lookup/libraries.js";
 import { createLookup } from "../lookup/merge.js";
@@ -20,11 +21,12 @@ const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string>
  * the app, so every lookup and every batch shares them: the library catalogs'
  * pause between requests holds across lookups.
  */
-export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { config, db, books, fetch, connect }) => {
+export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { config, db, books, fetch, connect, cip }) => {
   const lookup = createLookup({
     sources: [
       createOpenLibrarySource({ fetch }),
       ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect })),
+      createCipSource(cip),
       createGoogleBooksSource({ apiKey: config.googleBooksApiKey, fetch }),
     ],
     cache: createLookupCache(db),

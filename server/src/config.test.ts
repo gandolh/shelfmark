@@ -21,9 +21,17 @@ describe("loadConfig", () => {
       apiPrefix: "/shelfmark-api",
       webBase: "/shelfmark/",
       googleBooksApiKey: undefined,
+      cipRefresh: true,
       ward: undefined,
       trustedProxies: [],
     });
+  });
+
+  it("turns the weekly CIP refresh off with CIP_REFRESH=off, and nothing else", () => {
+    expect(loadConfig({ CIP_REFRESH: "off" }).cipRefresh).toBe(false);
+    expect(loadConfig({ CIP_REFRESH: "on" }).cipRefresh).toBe(true);
+    expect(loadConfig({ CIP_REFRESH: "" }).cipRefresh).toBe(true);
+    expect(problems({ CIP_REFRESH: "no" })).toContain("CIP_REFRESH must be on or off.");
   });
 
   it("reads the overrides, and treats an empty value as unset", () => {

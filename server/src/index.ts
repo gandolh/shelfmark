@@ -1,6 +1,9 @@
 import { isAbsolute, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildApp } from "./app.js";
+import { startCipJob } from "./cip/job.js";
+import { refreshCip } from "./cip/refresh.js";
+import { cipDatabasePath, openCipStore } from "./cip/store.js";
 import { ConfigError, loadConfig, type Config } from "./config.js";
 
 /** `src/` (tsx in dev) and `dist/` (built) sit at the same depth, so this resolves the same from both. */
@@ -26,6 +29,17 @@ try {
 const dataDir = isAbsolute(config.dataDir) ? config.dataDir : resolve(REPO_ROOT, config.dataDir);
 
 const app = await buildApp({ ...config, dataDir }, { logger: true });
+
+// The weekly CIP refresh, on its own connection to cip.db: lookups read the app's.
+if (config.cipRefresh) {
+  const store = openCipStore(cipDatabasePath(dataDir));
+  const log = { info: (m: string) => app.log.info(m), warn: (m: string) => app.log.warn(m), error: (m: string) => app.log.error(m) };
+  const job = startCipJob(() => refreshCip({ store, fetch: globalThis.fetch, log }), log);
+  app.addHook("onClose", async () => {
+    job.stop();
+    store.close();
+  });
+}
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, () => {

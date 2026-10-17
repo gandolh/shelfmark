@@ -21,6 +21,8 @@ export interface Config {
   webBase: string;
   /** Optional: lookups skip Google Books when unset. */
   googleBooksApiKey: string | undefined;
+  /** `CIP_REFRESH`: whether the server refreshes the CIP index weekly (cip/job.ts). Default on; `off` stops it. */
+  cipRefresh: boolean;
   /**
    * "Sign in with Ward": the five `WARD_OIDC_*` settings, or `undefined` when
    * `WARD_OIDC_ISSUER` is unset, and then the server has local accounts only
@@ -71,6 +73,9 @@ const envSchema = z.object({
     }),
   ).transform((value) => value ?? "/shelfmark/"),
   GOOGLE_BOOKS_API_KEY: optional(z.string()),
+  CIP_REFRESH: optional(z.enum(["on", "off"], { error: "CIP_REFRESH must be on or off." })).transform(
+    (value) => value !== "off",
+  ),
 });
 
 function describe(issue: z.core.$ZodIssue): string {
@@ -135,6 +140,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     apiPrefix: values.SHELFMARK_API_PREFIX,
     webBase: values.SHELFMARK_BASE,
     googleBooksApiKey: values.GOOGLE_BOOKS_API_KEY,
+    cipRefresh: values.CIP_REFRESH,
     ward,
     trustedProxies: proxies,
   };

@@ -9,6 +9,7 @@ const SOURCES: Record<MetadataSource, string> = {
   biblacad: "The Romanian Academy Library's catalog",
   bcucluj: "BCU Cluj's catalog",
   bcutimisoara: "BCU Timișoara's catalog",
+  cip: "The national library's CIP lists",
   googlebooks: "Google Books",
   manual: "Typed in by hand",
   import: "Imported",

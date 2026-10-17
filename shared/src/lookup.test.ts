@@ -68,7 +68,7 @@ describe("lookup contract", () => {
   });
 
   it("asks the library catalogs between Open Library and Google, and a draft names at least one source", () => {
-    expect(LOOKUP_SOURCES).toEqual(["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "googlebooks"]);
+    expect(LOOKUP_SOURCES).toEqual(["openlibrary", "biblacad", "bcucluj", "bcutimisoara", "cip", "googlebooks"]);
     for (const source of LOOKUP_SOURCES) expect(METADATA_SOURCES).toContain(source);
     expect(draftSchema.safeParse({ ...draft, sources: [] }).success).toBe(false);
     expect(draftSchema.safeParse({ ...draft, sources: ["goodreads"] }).success).toBe(false);

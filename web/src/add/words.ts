@@ -33,6 +33,7 @@ export const SOURCE_NAMES: Record<LookupSource, string> = {
   biblacad: "the Romanian Academy Library",
   bcucluj: "BCU Cluj",
   bcutimisoara: "BCU Timișoara",
+  cip: "the national library's CIP lists",
   googlebooks: "Google Books",
 };
 
@@ -55,9 +56,19 @@ function sentence(text: string): string {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-/** Where a draft's details came from, crediting a library by its catalog: "the catalog of BCU Cluj". */
+/**
+ * Where a draft's details came from, crediting a library by its catalog ("the
+ * catalog of BCU Cluj") and saying the CIP lists were written before printing,
+ * so the printed book may differ.
+ */
 export function draftSources(sources: readonly LookupSource[]): string {
-  return both(sources.map((source) => (LIBRARIES.has(source) ? `the catalog of ${SOURCE_NAMES[source]}` : SOURCE_NAMES[source])));
+  const phrase = (source: LookupSource) =>
+    LIBRARIES.has(source)
+      ? `the catalog of ${SOURCE_NAMES[source]}`
+      : source === "cip"
+        ? `${SOURCE_NAMES.cip} (written before printing)`
+        : SOURCE_NAMES[source];
+  return both(sources.map(phrase));
 }
 
 /** The found sheet's first line. `copy` is another copy of a book already saved. */

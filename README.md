@@ -11,7 +11,7 @@ A catalog of the paper books on your shelves at home. Scan a barcode with your p
 ## What it does
 
 - Adds a book from its barcode, through the phone camera, a typed ISBN or a USB barcode scanner on a laptop, and warns you when the book is already on your shelves.
-- Looks the ISBN up in Open Library, then in three Romanian library catalogs (the Romanian Academy Library, BCU Cluj and BCU Timișoara), and last in Google Books if you give it a key. You confirm the draft before anything is saved. When the lookup finds nothing, a short form asks for what the cover says.
+- Looks the ISBN up in Open Library, then in three Romanian library catalogs (the Romanian Academy Library, BCU Cluj and BCU Timișoara), then in a local copy of the national library's CIP lists of new books, and last in Google Books if you give it a key. You confirm the draft before anything is saved. When the lookup finds nothing, a short form asks for what the cover says.
 - Shows the library as a table or as covers, with a sort on several columns, a filter on each column, and search that ignores diacritics, so `padurea` finds *Pădurea spânzuraților*. The columns you show, hide, reorder and resize are remembered.
 - Keeps your own details on every book: shelf, reading status, rating, tags, notes, format, condition, and where, when and for how much you got it.
 - Exports the current view or every book to Excel or CSV, and downloads a full backup as one SQLite file, covers included.
