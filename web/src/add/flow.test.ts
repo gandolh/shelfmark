@@ -11,6 +11,7 @@ import {
   proposalFromBook,
   proposalFromDraft,
   scannerPaused,
+  scannerWatching,
   type FlowEvent,
   type FlowState,
   type Mode,
@@ -125,18 +126,21 @@ describe("the scan flow", () => {
     const state = initialFlow("scan");
     expect(state.step.kind).toBe("ready");
     expect(scannerPaused(state)).toBe(false);
+    expect(scannerWatching(state)).toBe(false);
     expect(state.added).toBe(0);
   });
 
   it("scan → found → save → scanning again with no extra tap", () => {
     let state = run("scan", scanIsbn(HOBBIT));
     expect(expectStep(state, "looking").isbn13).toBe(HOBBIT);
-    expect(scannerPaused(state)).toBe(true);
+    // Loose: the camera watches for a different book.
+    expect(scannerPaused(state)).toBe(false);
+    expect(scannerWatching(state)).toBe(true);
 
     state = flowReducer(state, { type: "looked-up", id: state.step.id, lookup: lookup() });
     const found = expectStep(state, "found");
     expect(found.proposal.origin).toEqual(["openlibrary"]);
-    expect(scannerPaused(state)).toBe(true);
+    expect(scannerPaused(state)).toBe(false);
 
     state = flowReducer(state, { type: "save" });
     expect(expectStep(state, "found").save).toEqual({ saving: true, failure: null });
@@ -145,13 +149,15 @@ describe("the scan flow", () => {
     state = flowReducer(state, { type: "saved", book: { id: 12, title: "The Hobbit", shelf: "Study · B1" } });
     expect(state.step.kind).toBe("ready");
     expect(scannerPaused(state)).toBe(false);
+    expect(scannerWatching(state)).toBe(false);
     expect(state.added).toBe(1);
     expect(state.lastShelf).toBe("Study · B1");
     expect(state.notice).toMatchObject({ kind: "saved", bookId: 12, title: "The Hobbit" });
   });
 
-  it("ignores codes while a sheet is open, and in the other modes", () => {
-    const found = scanAndAnswer(lookup());
+  it("ignores codes while a held sheet is open, and in the other modes", () => {
+    const found = flowReducer(scanAndAnswer(lookup()), { type: "hold" });
+    expect(scannerPaused(found)).toBe(true);
     expect(flowReducer(found, scanIsbn(ISIDOR))).toBe(found);
     const typing = initialFlow("isbn");
     expect(flowReducer(typing, scanIsbn(ISIDOR))).toBe(typing);
@@ -213,17 +219,108 @@ describe("the scan flow", () => {
   });
 });
 
+describe("a loose sheet: the camera keeps reading", () => {
+  const sticker: FlowEvent = { type: "scanned", code: { kind: "other", code: "2000000000008" } };
+
+  it("gives way to a different ISBN until the owner touches it", () => {
+    const found = scanAndAnswer(lookup());
+    expect(found.loose).toBe(true);
+    const next = flowReducer(found, scanIsbn(ISIDOR));
+    const looking = expectStep(next, "looking");
+    expect(looking.isbn13).toBe(ISIDOR);
+    expect(looking.id).not.toBe(found.step.id);
+    expect(next.loose).toBe(true);
+    // The first lookup's answer, late, is dropped; the new one's lands loose.
+    expect(flowReducer(next, { type: "looked-up", id: found.step.id, lookup: lookup() })).toBe(next);
+    const answered = flowReducer(next, { type: "looked-up", id: looking.id, lookup: NOT_FOUND });
+    expect(expectStep(answered, "form").reason).toBe("not-found");
+    expect(answered.loose).toBe(true);
+  });
+
+  it.each([
+    ["looking it up", run("scan", scanIsbn(HOBBIT))],
+    ["found", scanAndAnswer(lookup())],
+    ["already owned", scanAndAnswer(OWNED)],
+    ["not found", scanAndAnswer(NOT_FOUND)],
+    ["found without a title", scanAndAnswer(lookup({ draft: draft({ title: null }) }))],
+    ["a failed lookup", (() => {
+      const state = run("scan", scanIsbn(HOBBIT));
+      return flowReducer(state, { type: "lookup-failed", id: state.step.id, failure: { message: "offline", network: true } });
+    })()],
+    ["a barcode that isn't an ISBN", run("scan", sticker)],
+  ])("replaces %s", (_label, state) => {
+    expect(state.loose).toBe(true);
+    expect(scannerPaused(state)).toBe(false);
+    expect(expectStep(flowReducer(state, scanIsbn("9789731000015")), "looking").isbn13).toBe("9789731000015");
+  });
+
+  it("changes nothing for the ISBN it already shows, except to retry a failed lookup", () => {
+    const looking = run("scan", scanIsbn(HOBBIT));
+    expect(flowReducer(looking, scanIsbn(HOBBIT))).toBe(looking);
+    const found = scanAndAnswer(lookup());
+    expect(flowReducer(found, scanIsbn(HOBBIT))).toBe(found);
+    const notFound = scanAndAnswer(NOT_FOUND);
+    expect(flowReducer(notFound, scanIsbn(ISIDOR))).toBe(notFound);
+
+    const failed = flowReducer(looking, { type: "lookup-failed", id: looking.step.id, failure: { message: "offline", network: true } });
+    const again = flowReducer(failed, scanIsbn(HOBBIT));
+    expect(expectStep(again, "looking").isbn13).toBe(HOBBIT);
+    expect(again.loose).toBe(true);
+  });
+
+  it("never gives way to a barcode that isn't an ISBN", () => {
+    const found = scanAndAnswer(lookup());
+    expect(flowReducer(found, sticker)).toBe(found);
+    const other = run("scan", sticker);
+    expect(flowReducer(other, { type: "scanned", code: { kind: "other", code: "036000291452" } })).toBe(other);
+  });
+
+  it("is held from the owner's first touch: the camera rests and the sheet stays", () => {
+    const found = scanAndAnswer(lookup());
+    const held = flowReducer(found, { type: "hold" });
+    expect(held.loose).toBe(false);
+    expect(held.step).toBe(found.step);
+    expect(scannerPaused(held)).toBe(true);
+    expect(flowReducer(held, scanIsbn(ISIDOR))).toBe(held);
+    // Touching it again, or a sheet that was never loose, changes nothing.
+    expect(flowReducer(held, { type: "hold" })).toBe(held);
+    const typing = initialFlow("isbn");
+    expect(flowReducer(typing, { type: "hold" })).toBe(typing);
+  });
+
+  it("holds the steps the owner opens", () => {
+    const failed = (() => {
+      const state = run("scan", scanIsbn(HOBBIT));
+      return flowReducer(state, { type: "lookup-failed", id: state.step.id, failure: { message: "offline", network: true } });
+    })();
+    const opened: [string, FlowState][] = [
+      ["Edit details", flowReducer(scanAndAnswer(lookup()), { type: "edit", shelf: null, status: "unread" })],
+      ["Add another copy", flowReducer(scanAndAnswer(OWNED), { type: "another-copy", proposal: null })],
+      ["Type the ISBN", flowReducer(run("scan", sticker), { type: "type-isbn" })],
+      ["Add by hand", flowReducer(run("scan", sticker), { type: "by-hand" })],
+      ["Try again", flowReducer(failed, { type: "retry" })],
+      ["Save", flowReducer(scanAndAnswer(lookup()), { type: "save" })],
+    ];
+    for (const [label, state] of opened) {
+      expect([label, state.loose]).toEqual([label, false]);
+      expect([label, scannerPaused(state)]).toEqual([label, true]);
+    }
+  });
+});
+
 describe("a barcode that isn't an ISBN", () => {
   const other: FlowEvent = { type: "scanned", code: { kind: "other", code: "2001234567890" } };
 
   it("says so, and can type the ISBN in the sheet", () => {
     let state = run("scan", other);
     expect(expectStep(state, "other").code).toBe("2001234567890");
-    expect(scannerPaused(state)).toBe(true);
+    // Loose until the owner acts: the ISBN beside the sticker may still read.
+    expect(scannerPaused(state)).toBe(false);
 
     state = flowReducer(state, { type: "type-isbn" });
     expect(state.mode).toBe("scan");
     expectStep(state, "typing");
+    expect(scannerPaused(state)).toBe(true);
 
     state = flowReducer(state, { type: "submit-isbn", isbn13: HOBBIT });
     expect(expectStep(state, "looking").isbn13).toBe(HOBBIT);

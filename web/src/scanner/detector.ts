@@ -4,7 +4,7 @@ import { classifyBarcode, type BarcodeClass } from "@shelfmark/shared";
 // it from jsDelivr instead. The version must match the ZXing glue the ponyfill
 // bundles; detector.test.ts checks the file's SHA-256 against it.
 import zxingWasmUrl from "zxing-wasm/reader/zxing_reader.wasm?url";
-import type { RepeatGuard } from "./debounce";
+import type { Sightings } from "./debounce";
 
 /** What a book carries: the EAN-13 ISBN, older or foreign codes, store stickers. */
 export const FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] as const;
@@ -117,39 +117,50 @@ function keyOf(code: ScannedCode): string {
 }
 
 /**
- * One frame's detections to the codes worth emitting: each raw value is
- * classified with its format, add-ons are dropped, and a code still in its
- * repeat window is skipped.
+ * One read's detections to the codes that fire now: each raw value is
+ * classified with its format, add-ons are dropped, and `sightings` decides
+ * (two reads must agree; a code that fired stays quiet while in view).
  */
 export function codesFrom(
   detections: readonly Detection[],
-  guard: RepeatGuard,
+  sightings: Sightings,
   now: number = Date.now(),
 ): ScannedCode[] {
-  const out: ScannedCode[] = [];
+  const codes = new Map<string, ScannedCode>();
   for (const { rawValue, format } of detections) {
     if (rawValue.trim() === "") continue;
     const code = classifyBarcode(rawValue, format);
-    if (code.kind === "addon") continue;
-    if (guard.accept(keyOf(code), now)) out.push(code);
+    if (code.kind !== "addon") codes.set(keyOf(code), code);
   }
-  return out;
+  return sightings.read([...codes.keys()], now).map((key) => codes.get(key)!);
 }
 
-/** About every 150 ms: enough to feel instant, far less work than every animation frame. */
-export const DETECT_INTERVAL_MS = 150;
+/**
+ * How often to read, from one read's start to the next's. Looking for a book,
+ * often enough that a code reads at once. While a result is open, once a
+ * second, only to notice the owner has moved to another book. After a read
+ * that saw a code still waiting for its second read, again soon, so the
+ * confirmation adds little to either.
+ */
+export const PACE = { search: 250, watch: 1000, confirm: 150 } as const;
+
+export function readInterval(watching: boolean, pending: boolean): number {
+  if (pending) return PACE.confirm;
+  return watching ? PACE.watch : PACE.search;
+}
 
 /**
- * Run `detect` about every `intervalMs` until the returned stop function is
- * called. A slow frame delays the next one instead of overlapping it, and a
- * failed frame (the video between states) is skipped, not fatal.
+ * Run `detect` until the returned stop function is called, waiting
+ * `interval()` from one read's start to the next's (asked after each read).
+ * A slow frame delays the next one instead of overlapping it, and a failed
+ * frame (the video between states) is skipped, not fatal.
  */
 export function startDetectLoop(options: {
   detect: () => Promise<readonly Detection[]>;
   onDetections: (detections: readonly Detection[]) => void;
-  intervalMs?: number;
+  interval: () => number;
 }): () => void {
-  const { detect, onDetections, intervalMs = DETECT_INTERVAL_MS } = options;
+  const { detect, onDetections, interval } = options;
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -163,7 +174,7 @@ export function startDetectLoop(options: {
       // One bad frame says nothing about the next.
     }
     if (stopped) return;
-    timer = setTimeout(() => void tick(), Math.max(0, intervalMs - (Date.now() - started)));
+    timer = setTimeout(() => void tick(), Math.max(0, interval() - (Date.now() - started)));
   };
 
   // The first frame goes at once, so a code already under the camera reads instantly.

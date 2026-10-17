@@ -15,6 +15,7 @@ import {
   initialFlow,
   isSaving,
   scannerPaused,
+  scannerWatching,
   type CoverPlan,
   type FlowState,
   type Mode,
@@ -171,6 +172,7 @@ export function AddBookPage() {
         defaultShelf={defaultShelf}
         books={books}
         on={on}
+        onTouch={() => dispatch({ type: "hold" })}
       />
     );
 
@@ -196,8 +198,13 @@ export function AddBookPage() {
               <CameraScanner
                 className="add-camera"
                 paused={scannerPaused(state)}
+                watching={scannerWatching(state)}
                 torch={torch}
-                onCode={(code) => dispatch({ type: "scanned", code })}
+                onCode={(code) => {
+                  // The book the sheet already shows, or a sticker behind a result: no beep.
+                  if (flowReducer(state, { type: "scanned", code }) === state) return false;
+                  dispatch({ type: "scanned", code });
+                }}
                 onFallback={() => changeMode("isbn")}
                 onTorchAvailable={setTorchAvailable}
               />

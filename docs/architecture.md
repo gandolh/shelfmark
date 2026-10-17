@@ -41,7 +41,9 @@ flowchart LR
 
 1. The phone camera reads a barcode with BarcodeDetector, or with the ZXing
    WebAssembly polyfill where the browser has none. You can also type the
-   ISBN, or let a USB scanner type it. `shared` checks the digits.
+   ISBN, or let a USB scanner type it. `shared` checks the digits. A code
+   counts once two reads agree. The camera keeps watching while a result is
+   open, and a different ISBN replaces a result you haven't touched yet.
 2. The web app sends `POST /api/lookup` with the ISBN.
 3. The server answers from its cache, or asks the sources in order: Open
    Library, then three Romanian library catalogs over Z39.50 (the Romanian

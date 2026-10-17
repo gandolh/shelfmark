@@ -112,11 +112,18 @@ export interface FlowState {
   /** The shelf of the last book saved here; `undefined` until one is. The next book defaults to it. */
   lastShelf: string | null | undefined;
   notice: Notice | null;
+  /**
+   * The sheet came from the camera and the owner hasn't touched it yet: the
+   * camera keeps reading, and a different ISBN in view replaces the sheet.
+   */
+  loose: boolean;
 }
 
 export type FlowEvent =
   | { type: "mode"; mode: Mode }
   | { type: "scanned"; code: ScannedCode }
+  /** The owner's first touch on a loose sheet: it is theirs now, and the camera rests. */
+  | { type: "hold" }
   | { type: "submit-isbn"; isbn13: string }
   | { type: "looked-up"; id: number; lookup: LookupResponse }
   | { type: "lookup-failed"; id: number; failure: Failure }
@@ -142,6 +149,7 @@ export function initialFlow(mode: Mode, carried?: Pick<FlowState, "added" | "las
     added: carried?.added ?? 0,
     lastShelf: carried?.lastShelf,
     notice: null,
+    loose: false,
   };
 }
 
@@ -153,9 +161,18 @@ function restingStep(mode: Mode, id: number): Step {
 
 const NO_BASE: FormBase = { details: {}, cover: { kind: "none" } };
 
-/** The scanner reads only while nothing is on the sheet: after a save it is live again with no extra tap. */
+/**
+ * The scanner reads while nothing is on the sheet, so after a save it is live
+ * again with no extra tap, and while the sheet is loose. A sheet the owner
+ * touched or opened themselves pauses it.
+ */
 export function scannerPaused(state: FlowState): boolean {
-  return state.mode !== "scan" || state.step.kind !== "ready";
+  return state.mode !== "scan" || (state.step.kind !== "ready" && !state.loose);
+}
+
+/** A loose sheet is open: the scanner reads slowly, only to notice a different book. */
+export function scannerWatching(state: FlowState): boolean {
+  return state.step.kind !== "ready";
 }
 
 /** True while a save is in flight: the sheet's buttons wait. */
@@ -325,7 +342,14 @@ function answered(lookup: LookupResponse, id: number): Step {
 export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
   const { step } = state;
   const id = state.next;
-  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({ ...state, ...extra, step: next, next: id + 1 });
+  // A step the owner moved to is theirs: only the camera's own steps are loose.
+  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({
+    ...state,
+    loose: false,
+    ...extra,
+    step: next,
+    next: id + 1,
+  });
   const saving = isSaving(step);
 
   switch (event.type) {
@@ -334,11 +358,23 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       // Leaving a mode drops its unsaved result; a save in flight still lands and counts.
       return go(restingStep(event.mode, id), { mode: event.mode });
 
-    case "scanned":
-      if (state.mode !== "scan" || step.kind !== "ready") return state;
-      return event.code.kind === "isbn"
-        ? go({ kind: "looking", id, isbn13: event.code.isbn13 })
-        : go({ kind: "other", id, code: event.code.code });
+    case "scanned": {
+      if (state.mode !== "scan") return state;
+      const { code } = event;
+      if (step.kind === "ready") {
+        return code.kind === "isbn"
+          ? go({ kind: "looking", id, isbn13: code.isbn13 }, { loose: true })
+          : go({ kind: "other", id, code: code.code }, { loose: true });
+      }
+      // A loose sheet gives way to another ISBN, never to a sticker. The same
+      // ISBN changes nothing, unless its lookup failed: then it tries again.
+      if (!state.loose || code.kind !== "isbn") return state;
+      if (currentIsbn(step) === code.isbn13 && step.kind !== "failed") return state;
+      return go({ kind: "looking", id, isbn13: code.isbn13 }, { loose: true });
+    }
+
+    case "hold":
+      return state.loose ? { ...state, loose: false } : state;
 
     case "submit-isbn":
       if (saving || state.mode === "manual") return state;
@@ -347,13 +383,14 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       if (currentIsbn(step) === event.isbn13 && step.kind !== "failed") return state;
       return go({ kind: "looking", id, isbn13: event.isbn13 });
 
+    // The answer to the camera's lookup is still the camera's.
     case "looked-up":
       if (step.kind !== "looking" || step.id !== event.id) return state;
-      return go(answered(event.lookup, id));
+      return go(answered(event.lookup, id), { loose: state.loose });
 
     case "lookup-failed":
       if (step.kind !== "looking" || step.id !== event.id) return state;
-      return go({ kind: "failed", id, isbn13: step.isbn13, failure: event.failure });
+      return go({ kind: "failed", id, isbn13: step.isbn13, failure: event.failure }, { loose: state.loose });
 
     case "retry":
       if (step.kind === "failed") return go({ kind: "looking", id, isbn13: step.isbn13 });
@@ -424,7 +461,7 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
 
     case "save":
       if ((step.kind !== "found" && step.kind !== "form") || saving) return state;
-      return { ...state, step: { ...step, save: { saving: true, failure: null } } };
+      return { ...state, loose: false, step: { ...step, save: { saving: true, failure: null } } };
 
     case "saved": {
       // Counted even when the owner has moved on: the book is in the library.

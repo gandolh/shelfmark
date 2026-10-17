@@ -211,8 +211,9 @@ Two checks after the first deploy with briefs 15 and 16. Use the `ssh` and
 ## Owner checks waiting from earlier briefs
 
 - **Scanner on Android and iPhone**: the steps are in the outcomes of
-  [07-camera-scanner.md](../corpus/briefs/done/07-camera-scanner.md) and
-  [09-add-a-book-page.md](../corpus/briefs/done/09-add-a-book-page.md). Once the
+  [07-camera-scanner.md](../corpus/briefs/done/07-camera-scanner.md),
+  [09-add-a-book-page.md](../corpus/briefs/done/09-add-a-book-page.md) and
+  [17-confirmed-reads.md](../corpus/briefs/done/17-confirmed-reads.md). Once the
   app is live, try them on the production site (HTTPS is already there).
 - **Ward round trip, locally**: needs Docker Desktop's WSL integration. See
   [06-accounts-and-sign-in.md](../corpus/briefs/done/06-accounts-and-sign-in.md).

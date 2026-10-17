@@ -1,7 +1,7 @@
 import { useEffect, useEffectEvent, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { cameraFailure, hasTorch, openCamera, setTorch, stopStream } from "./camera";
-import { createRepeatGuard } from "./debounce";
-import { codesFrom, getEngine, startDetectLoop, type EngineChoice, type ScannedCode } from "./detector";
+import { createSightings } from "./debounce";
+import { codesFrom, getEngine, readInterval, startDetectLoop, type EngineChoice, type ScannedCode } from "./detector";
 import { armFeedback, signalScan } from "./feedback";
 import "./CameraScanner.css";
 
@@ -13,14 +13,19 @@ import "./CameraScanner.css";
 export type ScannerState = "asking" | "scanning" | "denied" | "no-camera" | "insecure" | "error";
 
 export interface CameraScannerProps {
-  /** Stop reading codes but keep the camera live, e.g. while a result sheet is open. */
+  /** Stop reading codes but keep the camera live, e.g. while the owner works on a result. */
   paused?: boolean;
+  /** A result is open: read about once a second, only to notice a different book. */
+  watching?: boolean;
   /** The torch the parent wants; ignored when the camera has none (see `onTorchAvailable`). */
   torch?: boolean;
   /** Beep and vibrate on each code. Default true. */
   feedback?: boolean;
-  /** Each new code; the same code is quiet for 3 s after it fires. */
-  onCode: (code: ScannedCode) => void;
+  /**
+   * Each new code, once two reads agree on it; it stays quiet while in view.
+   * Return `false` when the code changed nothing, and there is no beep.
+   */
+  onCode: (code: ScannedCode) => boolean | void;
   /** "Type the ISBN instead", offered in every state but scanning. */
   onFallback: () => void;
   onStateChange?: (state: ScannerState) => void;
@@ -72,6 +77,7 @@ const MESSAGES: Record<Exclude<ScannerState, "scanning">, { title: string; detai
  */
 export function CameraScanner({
   paused = false,
+  watching = false,
   torch = false,
   feedback = true,
   onCode,
@@ -89,7 +95,7 @@ export function CameraScanner({
   const [track, setTrack] = useState<MediaStreamTrack | null>(null);
   // Bumped by "Try again" to rerun the engine and camera effects.
   const [attempt, setAttempt] = useState(0);
-  const [guard] = useState(createRepeatGuard);
+  const [sightings] = useState(() => createSightings());
   // Counts reads so the frame can flash: the iPhone's silent switch mutes the
   // beep and iOS cannot vibrate.
   const [hits, setHits] = useState(0);
@@ -148,17 +154,18 @@ export function CameraScanner({
   }, [cameraWanted, attempt]);
 
   const emit = useEffectEvent((code: ScannedCode) => {
+    if (onCode(code) === false) return;
     if (feedback) signalScan();
     setHits((n) => n + 1);
-    onCode(code);
   });
+  const nextInterval = useEffectEvent(() => readInterval(watching, sightings.pending()));
 
   const reading = engine !== null && state === "scanning" && visible && !paused;
   // A book still in frame when the sheet closes (Save, Skip) must not fire
-  // again: the 3 s window starts over from the moment the scanner resumes.
+  // again: its quiet window starts over from the moment the scanner resumes.
   useEffect(() => {
-    if (reading) guard.touch();
-  }, [reading, guard]);
+    if (reading) sightings.touch();
+  }, [reading, sightings]);
   useEffect(() => {
     const video = videoRef.current;
     if (!reading || engine === null || video === null) return;
@@ -170,10 +177,11 @@ export function CameraScanner({
           ? detector.detect(video)
           : Promise.resolve([]),
       onDetections: (detections) => {
-        for (const code of codesFrom(detections, guard)) emit(code);
+        for (const code of codesFrom(detections, sightings)) emit(code);
       },
+      interval: () => nextInterval(),
     });
-  }, [reading, engine, guard]);
+  }, [reading, engine, sightings]);
 
   const torchAvailable = useMemo(() => track !== null && hasTorch(track), [track]);
   useEffect(() => {

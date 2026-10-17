@@ -3,11 +3,12 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { ZXING_WASM_SHA256 } from "barcode-detector/ponyfill";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createRepeatGuard } from "./debounce";
+import { createSightings } from "./debounce";
 import {
   codesFrom,
-  DETECT_INTERVAL_MS,
   FORMATS,
+  PACE,
+  readInterval,
   selectEngine,
   startDetectLoop,
   zxingOverrides,
@@ -85,13 +86,20 @@ describe("selectEngine", () => {
 describe("codesFrom", () => {
   const isbn = { rawValue: "9786063205583", format: "ean_13" };
 
-  it("emits an ISBN from an EAN-13", () => {
-    expect(codesFrom([isbn], createRepeatGuard(), 0)).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
+  /** The frame read twice, 150 ms apart: what the second read fires. */
+  function confirmed(frame: readonly Detection[]) {
+    const sightings = createSightings();
+    expect(codesFrom(frame, sightings, 0)).toEqual([]);
+    return codesFrom(frame, sightings, 150);
+  }
+
+  it("emits an ISBN from an EAN-13 once a second read agrees", () => {
+    expect(confirmed([isbn])).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
   });
 
   it("drops add-ons and keeps the ISBN beside them", () => {
     const frame = [isbn, { rawValue: "51299", format: "ean_5" }, { rawValue: "12", format: "ean_2" }];
-    expect(codesFrom(frame, createRepeatGuard(), 0)).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
+    expect(confirmed(frame)).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
   });
 
   it("emits store stickers, UPCs and labels as other, raw value kept", () => {
@@ -100,7 +108,7 @@ describe("codesFrom", () => {
       { rawValue: "036000291452", format: "upc_a" },
       { rawValue: "51299", format: "code_128" },
     ];
-    expect(codesFrom(frame, createRepeatGuard(), 0)).toEqual([
+    expect(confirmed(frame)).toEqual([
       { kind: "other", code: "2000000000008" },
       { kind: "other", code: "036000291452" },
       { kind: "other", code: "51299" },
@@ -108,28 +116,42 @@ describe("codesFrom", () => {
   });
 
   it("passes the format through: 13 digits in a Code-128 are not an ISBN", () => {
-    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }], createRepeatGuard(), 0)).toEqual([
-      { kind: "other", code: "9786063205583" },
-    ]);
+    expect(confirmed([{ rawValue: "9786063205583", format: "code_128" }])).toEqual([{ kind: "other", code: "9786063205583" }]);
   });
 
   it("skips empty values", () => {
-    expect(codesFrom([{ rawValue: " ", format: "code_128" }], createRepeatGuard(), 0)).toEqual([]);
+    expect(confirmed([{ rawValue: " ", format: "code_128" }])).toEqual([]);
   });
 
-  it("emits a code once per window, across frames and within one", () => {
-    const guard = createRepeatGuard();
-    expect(codesFrom([isbn, isbn], guard, 0)).toHaveLength(1);
-    expect(codesFrom([isbn], guard, 150)).toEqual([]);
-    expect(codesFrom([isbn], guard, 2999)).toEqual([]);
-    expect(codesFrom([isbn], guard, 3000)).toHaveLength(1);
+  it("doesn't confirm a code with a second copy of it in the same frame", () => {
+    const sightings = createSightings();
+    expect(codesFrom([isbn, isbn], sightings, 0)).toEqual([]);
+    expect(codesFrom([isbn, isbn], sightings, 150)).toHaveLength(1);
+  });
+
+  it("emits a code once while it stays in view", () => {
+    const sightings = createSightings();
+    codesFrom([isbn], sightings, 0);
+    expect(codesFrom([isbn], sightings, 150)).toHaveLength(1);
+    for (let now = 1150; now < 20_000; now += 1000) expect(codesFrom([isbn], sightings, now)).toEqual([]);
   });
 
   it("keys ISBNs and other codes apart", () => {
-    const guard = createRepeatGuard();
-    expect(codesFrom([isbn], guard, 0)).toHaveLength(1);
-    // The same digits read as a Code-128 are another code.
-    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }], guard, 10)).toHaveLength(1);
+    const sightings = createSightings();
+    codesFrom([isbn], sightings, 0);
+    // The same digits read as a Code-128 are another code, not the ISBN's second read.
+    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }], sightings, 150)).toEqual([]);
+    expect(codesFrom([isbn], sightings, 300)).toHaveLength(1);
+  });
+});
+
+describe("readInterval", () => {
+  it("reads four times a second looking, once a second watching, and soon to confirm", () => {
+    expect(PACE).toEqual({ search: 250, watch: 1000, confirm: 150 });
+    expect(readInterval(false, false)).toBe(250);
+    expect(readInterval(true, false)).toBe(1000);
+    expect(readInterval(false, true)).toBe(150);
+    expect(readInterval(true, true)).toBe(150);
   });
 });
 
@@ -141,18 +163,38 @@ describe("startDetectLoop", () => {
     vi.useRealTimers();
   });
 
-  it("reads the first frame at once, then about every 150 ms", async () => {
+  it("reads the first frame at once, then every interval", async () => {
     const detect = vi.fn(() => Promise.resolve<Detection[]>([]));
-    const stop = startDetectLoop({ detect, onDetections: () => {} });
-    expect(DETECT_INTERVAL_MS).toBe(150);
+    const stop = startDetectLoop({ detect, onDetections: () => {}, interval: () => 250 });
     await vi.advanceTimersByTimeAsync(0);
     expect(detect).toHaveBeenCalledTimes(1);
-    await vi.advanceTimersByTimeAsync(149);
+    await vi.advanceTimersByTimeAsync(249);
     expect(detect).toHaveBeenCalledTimes(1);
     await vi.advanceTimersByTimeAsync(1);
     expect(detect).toHaveBeenCalledTimes(2);
     await vi.advanceTimersByTimeAsync(1500);
-    expect(detect).toHaveBeenCalledTimes(12);
+    expect(detect).toHaveBeenCalledTimes(8);
+    stop();
+  });
+
+  it("asks for the interval after each read, so the pace follows what the read saw", async () => {
+    const frames: Detection[][] = [[], [{ rawValue: "x", format: "code_128" }], []];
+    const detect = vi.fn(() => Promise.resolve(frames.shift() ?? []));
+    let seen = false;
+    const stop = startDetectLoop({
+      detect,
+      onDetections: () => {
+        seen = true;
+      },
+      // Watching: once a second, but soon after a read that saw something.
+      interval: () => (seen ? 150 : 1000),
+    });
+    await vi.advanceTimersByTimeAsync(0);
+    expect(detect).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(detect).toHaveBeenCalledTimes(2);
+    await vi.advanceTimersByTimeAsync(150);
+    expect(detect).toHaveBeenCalledTimes(3);
     stop();
   });
 
@@ -166,7 +208,7 @@ describe("startDetectLoop", () => {
       inFlight--;
       return [];
     });
-    const stop = startDetectLoop({ detect, onDetections: () => {} });
+    const stop = startDetectLoop({ detect, onDetections: () => {}, interval: () => 150 });
     await vi.advanceTimersByTimeAsync(1000);
     expect(most).toBe(1);
     // A 400 ms frame starts the next one straight away: 0, 400, 800.
@@ -181,7 +223,7 @@ describe("startDetectLoop", () => {
       return next instanceof Error ? Promise.reject(next) : Promise.resolve(next);
     });
     const onDetections = vi.fn();
-    const stop = startDetectLoop({ detect, onDetections });
+    const stop = startDetectLoop({ detect, onDetections, interval: () => 150 });
     await vi.advanceTimersByTimeAsync(300);
     expect(detect).toHaveBeenCalledTimes(3);
     expect(onDetections).toHaveBeenCalledOnce();
@@ -195,7 +237,7 @@ describe("startDetectLoop", () => {
     let resolveFrame: (value: Detection[]) => void = () => {};
     const detect = () => new Promise<Detection[]>((resolve) => (resolveFrame = resolve));
     const onDetections = vi.fn();
-    const stop = startDetectLoop({ detect, onDetections });
+    const stop = startDetectLoop({ detect, onDetections, interval: () => 150 });
     await vi.advanceTimersByTimeAsync(0);
     stop();
     resolveFrame([{ rawValue: "x", format: "code_128" }]);
