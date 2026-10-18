@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-16
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-19 (confirmed reads, one lookup per ISBN, scan on a press) written and built 2026-10-17/18 (624 tests), not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+updated: 2026-10-18
 ---
 
 # Status
@@ -19,14 +19,18 @@ product calls are in [decisions.md](decisions.md), the look in
 
 ## Next (owner)
 
-1. Create the Google Books API key and put it in `.env` as
-   `GOOGLE_BOOKS_API_KEY`; then run the Romanian measurement in
-   [brief 05](../briefs/done/05-lookup-and-covers.md)'s outcome.
-2. Deploy, following [docs/owner-setup.md](../../docs/owner-setup.md).
+1. The Google Books key is in the deploy secrets, and the Romanian
+   measurement ran on 2026-10-17 (Google found none of 80;
+   [metadata-lookup.md](metadata-lookup.md)).
+2. Redeploy to ship briefs 15 to 19, then run the two checks in
+   owner-setup's "Romanian lookups after a deploy": the libraries over port
+   9991, and the first CIP refresh in the logs. The phone checks of briefs 18
+   and 19 are in their outcomes.
 3. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
    local Ward round trip (06, needs Docker Desktop's WSL integration), the
-   exports opened in Excel (11), the container build (14).
+   exports opened in Excel (11). The container build (14) was checked locally
+   on 2026-10-17, poppler-utils included.
 4. After v1 ships, promote the v1.x todos below; the wishlist is first in
    line, since the Library already leaves room for its Owned / Wishlist tabs.
 
@@ -48,6 +52,11 @@ product calls are in [decisions.md](decisions.md), the look in
 | 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
 | 13 | [Design finish and DESIGN.md](../briefs/done/13-design-finish.md) | 6 | done |
 | 14 | [Deploy](../briefs/done/14-deploy.md) | 6 | done |
+| 15 | [Romanian library catalogs](../briefs/done/15-library-catalogs.md) | 7 | done |
+| 16 | [The CIP index](../briefs/done/16-cip-index.md) | 8 | done |
+| 17 | [Confirmed reads and live rescans](../briefs/done/17-confirmed-reads.md) | 9 | done; live rescans undone by 19 |
+| 18 | [One lookup per ISBN](../briefs/done/18-one-lookup-per-isbn.md) | 10 | done; the settle undone by 19 |
+| 19 | [Scan on a press](../briefs/done/19-scan-on-a-press.md) | 11 | done |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
@@ -66,7 +75,6 @@ test then moves to a signed-in session in one place.
 | v1.x | [saved-views](../todos/saved-views.md) |
 | later | [stats-page](../todos/stats-page.md) |
 | later | [cip-photo-capture](../todos/cip-photo-capture.md) |
-| later | [cip-bibliography-index](../todos/cip-bibliography-index.md) |
 | later | [atrium-link](../todos/atrium-link.md) |
 
 Every v1 todo is promoted (see the briefs above). The v1.x todos are promoted

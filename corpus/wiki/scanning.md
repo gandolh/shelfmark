@@ -1,6 +1,6 @@
 ---
-summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-updated: 2026-10-14
+summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, scanning on a press (two agreeing reads, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+updated: 2026-10-18
 ---
 
 # Scanning
@@ -37,12 +37,40 @@ reads better).
 - Ask for the rear camera (`facingMode: "environment"`), turn on the torch when
   the track supports it, and stop the stream when the view is hidden.
 
-## Continuous mode
+## Scanning on a press
 
-Scan, beep or vibrate, show the result card, keep the camera on. The same code
-is ignored for ~3 seconds so one book does not register five times. A scanned
-ISBN already in the library shows "Already on <shelf>" with "add another
-copy" and "skip".
+Since brief 19 (2026-10-18), the camera reads only when the owner taps *Scan
+the barcode* (decisions.md, "The camera reads only on a press"). The picture
+runs so the owner can aim, but nothing is decoded and nothing is looked up
+between presses. A beep or vibration and the frame's flash mark a read. A
+scanned ISBN already in the library shows "Already in your library" with
+"Add another copy" and "Open the book".
+
+- **A press reads every 150 ms until two reads agree, for at most 3 s**
+  ([detector.ts](../../web/src/scanner/detector.ts) `readCode`).
+  - Why two reads: the check digit misses two wrong digits that cancel out,
+    and a swap of neighbouring digits that differ by 5 (`…5583` read as
+    `…5538` passes). One bad frame almost never matches the next. The second
+    read must come within 700 ms of the first
+    ([confirm.ts](../../web/src/scanner/confirm.ts)).
+  - An ISBN ends the reading, usually two reads (about 0.2 s) after the
+    press.
+  - A barcode that isn't an ISBN, agreed first, waits two more reads
+    (450 ms, decode time included) for an ISBN beside it.
+  - Nothing in 3 s: "No barcode read", and no lookup.
+- **The button shows only while no result is open.** A result is the
+  owner's until they act on it, and its own buttons bring the camera back. A
+  misread is corrected with *Not this book* and another press.
+- **What a press costs.** Between presses the scanner decodes nothing. A
+  book seen again this visit shows its answer with no request (`memo.ts`).
+  The server runs one lookup per ISBN at a time, with every answer cached
+  ([metadata-lookup.md](metadata-lookup.md)).
+- **History.** Briefs 07 to 18 read continuously, at first every 150 ms.
+  Brief 17 then added two agreeing reads, plus a result that the next book in
+  view replaced until the owner touched it. Brief 18 added a 600 ms wait
+  before a camera lookup. The owner then chose the press: no read or call
+  happens without one. Of those briefs, two agreeing reads, the memo, and one
+  lookup per ISBN remain.
 
 ## What a code means
 

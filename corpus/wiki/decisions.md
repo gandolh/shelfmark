@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite. Research recommendations live on the concept pages until the owner confirms them.
-updated: 2026-10-14
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press. Research recommendations live on the concept pages until the owner confirms them.
+updated: 2026-10-18
 ---
 
 # Decisions
@@ -99,3 +99,34 @@ deletes its cover in the same transaction, and the backup is the database file
 alone. Rejected: a covers folder (the first design), which needs its own
 clean-up on delete and a zip to back up. At a few thousand covers of
 30-100 KB the database stays well under a gigabyte.
+
+## Romanian books: library catalogs and the CIP lists before Google
+_2026-10-17_. A lookup asks Open Library, then three Romanian library catalogs
+over Z39.50 (the Romanian Academy Library, BCU Cluj, BCU Timișoara), then a
+local index of the national library's CIP lists, and Google Books last. Each
+later source is asked only while no earlier one has found a title, so Google
+is no longer asked just for a missing cover. The owner wants the Google key
+used as little as possible, and on 2026-10-17 Google found none of 80 recent
+Romanian trade books. The libraries found 33 of 40 books from 2012-2015, and
+the CIP lists cover the newest books, which libraries catalogue a year or so
+late. The libraries are asked politely: one request at a time per library,
+a random 5-10 s pause between requests, every answer cached. The owner is
+grateful for their work. There's no email for now, but the owner may contact
+them later about working together. Rejected: scraping
+bookshop sites or Goodreads (against their terms, fragile; the owner said no
+again on 2026-10-17), ISBNdb (paid), the national library's catalog (CAPTCHA,
+and its Z39.50 port did not answer). Measurements in
+[metadata-lookup.md](metadata-lookup.md).
+
+## The camera reads only on a press
+_2026-10-18_. Scan mode shows the live camera and a *Scan the barcode*
+button. The camera decodes nothing and sends no lookup until it is pressed.
+A press reads until two reads agree, for at most 3 s
+([scanning.md](scanning.md)). The owner asked for it after briefs 17 and 18
+had made continuous reading safer. They want nothing read or sent without
+a deliberate act, which also spares the libraries and the Google key the
+calls of a misread or a book the camera only passed over.
+Rejected: continuous reading (briefs 07-18: no tap per book, but every book
+in view is read and looked up), with or without brief 17's replaceable
+result and brief 18's 600 ms wait before a lookup. The cost is one tap per
+book.

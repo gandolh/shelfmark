@@ -170,3 +170,96 @@ scanner and the "Already in your library" card were not captured (no camera;
 the card pulls the publisher's cover from Open Library). [status.md](wiki/status.md)
 caught up: `main` is pushed, `../wzd_auth`'s `55cf336` too, and
 `../vps-deploy` has no remote.
+
+## [2026-10-17] research | Romanian lookups: Google misses, three library catalogs answer
+
+The owner's Google key found none of the Romanian books they tried, e.g.
+9786064031365. Google has no record of that ISBN, and its API was degraded
+that day (503s; `isbn:` queries empty even for *The Hobbit*). Open Library
+and the keyed Google run found 0 of 80 trade books from 2024 and 2026. The
+book was in the February 2026 CIP list. Three library catalogs answer ISBN
+searches over Z39.50 and found 33 of 40 trade books from 2012-2015. The owner
+rejected scraping again, said yes to the CIP index, and asked that the Google
+key be used as little as possible. Findings in
+[metadata-lookup.md](wiki/metadata-lookup.md), new todo
+[z3950-library-source](todos/z3950-library-source.md).
+
+## [2026-10-17] plan | Briefs 15 and 16: library catalogs and the CIP index
+
+The owner approved the lookup order (Open Library, three library catalogs,
+the CIP index, then Google only when nothing has a title) and asked for the
+plan in writing before any code. Recorded as a decision, two glossary terms
+(*Library catalog*, *CIP index*) and two briefs. Rules from the owner: one
+request at a time per server, a random 5-10 s pause between requests, every
+answer cached, and the libraries' work acknowledged; no email to them for
+now. Checked live before writing: one `@or` query covers the ISBN-13 and
+ISBN-10, no library sends records with the search reply, and BCU Cluj sends
+UNIMARC content labelled USMARC.
+
+## [2026-10-17] build | Brief 15: the library catalogs
+
+Built inline (no subagents). Lookups ask the Romanian Academy Library, BCU Cluj
+and BCU Timișoara over Z39.50 after Open Library and before Google Books, and
+each source is asked only while nothing has a title. Checked against the real
+servers: three Romanian books found, Google never asked. BCU Timișoara
+sometimes misses the 10 s deadline; that is an uncached error. 563 tests.
+Outcome in [brief 15](briefs/done/15-library-catalogs.md).
+
+## [2026-10-17] build | Brief 16: the CIP index
+
+Built inline. The national library's CIP lists are now a lookup source after
+the library catalogs, held in their own `cip.db` (a departure from the brief,
+to keep the owner's backup small) and refreshed weekly at the polite pace.
+Against the real site, two issues imported (2,951 and 3,000 records), and a
+2026 book no library holds came from the index without asking Google. The
+image build was checked once the owner started Docker: the same 3,000
+records inside it, healthy. 610
+tests. Outcome in [brief 16](briefs/done/16-cip-index.md).
+
+## [2026-10-17] build | Brief 17: confirmed reads and live rescans
+
+The owner reported that the camera sometimes reads wrong digits. They asked
+for it to keep reading, so that repositioning the book corrects the result,
+at a slow pace that doesn't feel laggy (they suggested about 2 s). Built
+inline after the brief was written:
+
+- A code fires once two reads agree, which filters out the misreads the
+  check digit misses.
+- It stays quiet while in view.
+- A result sheet the camera opened stays loose until the owner touches it,
+  and a different ISBN replaces it.
+- The pace is 250 ms looking, 1 s watching, and 150 ms to confirm. 1 s
+  rather than 2 s, so a correction lands in about a second.
+
+Checked in headless Chrome with a fake camera. 629 tests. Outcome in
+[brief 17](briefs/done/17-confirmed-reads.md).
+
+## [2026-10-17] build | Brief 18: one lookup per ISBN
+
+The owner asked for no outside calls when an ISBN is the same as before, and
+for the ISBNs tried to be kept, with a debounce. The server's lookup cache
+already answers a repeated ISBN with no outside call. Three gaps remained:
+
+- Two lookups of one ISBN at the same time: the server now runs one per ISBN.
+- A camera lookup sent the moment its ISBN was confirmed: it now waits 600
+  ms first, so a corrected misread is never sent.
+- A request even for an answer the page just had: the Add page now keeps
+  each visit's answers.
+
+The browser check found the scanner skipping reads during the settle; that
+is fixed. 639 tests. Outcome in [brief 18](briefs/done/18-one-lookup-per-isbn.md).
+
+## [2026-10-18] decision + build | Brief 19: scan on a press
+
+The owner asked for a button instead of automatic scanning: the read and the
+lookup only on a press. Recorded as the decision "The camera reads only on a
+press". The camera still shows, so the owner can aim. *Scan the barcode*
+reads until two reads agree, for up to 3 s; "No barcode read" after that,
+with nothing sent.
+
+This undoes brief 17's replaceable result and read pace, and brief 18's
+600 ms wait. Kept from them: two agreeing reads, the page's memo, and one
+lookup per ISBN on the server. The glossary drops *Loose sheet*. Checked in
+headless Chrome with a fake camera: no reads between presses, two reads and
+one lookup per press. 624 tests. Outcome in
+[brief 19](briefs/done/19-scan-on-a-press.md).
