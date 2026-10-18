@@ -1,7 +1,6 @@
-import { useEffect, useEffectEvent, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useEffectEvent, useImperativeHandle, useMemo, useRef, useState, useSyncExternalStore, type Ref } from "react";
 import { cameraFailure, hasTorch, openCamera, setTorch, stopStream } from "./camera";
-import { createSightings } from "./debounce";
-import { codesFrom, getEngine, readInterval, startDetectLoop, type EngineChoice, type ScannedCode } from "./detector";
+import { getEngine, readCode, type EngineChoice, type Reading, type ScannedCode } from "./detector";
 import { armFeedback, signalScan } from "./feedback";
 import "./CameraScanner.css";
 
@@ -12,20 +11,27 @@ import "./CameraScanner.css";
  */
 export type ScannerState = "asking" | "scanning" | "denied" | "no-camera" | "insecure" | "error";
 
+/** What the parent asks of a running scanner. */
+export interface ScannerHandle {
+  /**
+   * Read the barcode in view: a code once two reads agree, or `null` when
+   * none is read within 3 s (detector.ts `readCode`). A second call while one
+   * runs gets the same answer. Rejects with an `AbortError` when the camera
+   * stops or the scanner is paused meanwhile, and at once when it isn't
+   * scanning.
+   */
+  read(): Promise<ScannedCode | null>;
+}
+
 export interface CameraScannerProps {
-  /** Stop reading codes but keep the camera live, e.g. while the owner works on a result. */
+  /** The handle the page reads through: the camera reads nothing until asked. */
+  ref?: Ref<ScannerHandle>;
+  /** Keep the camera live but refuse to read, e.g. while a result is open: the frame dims. */
   paused?: boolean;
-  /** A result is open: read about once a second, only to notice a different book. */
-  watching?: boolean;
   /** The torch the parent wants; ignored when the camera has none (see `onTorchAvailable`). */
   torch?: boolean;
-  /** Beep and vibrate on each code. Default true. */
+  /** Beep and vibrate on each code read. Default true. */
   feedback?: boolean;
-  /**
-   * Each new code, once two reads agree on it; it stays quiet while in view.
-   * Return `false` when the code changed nothing, and there is no beep.
-   */
-  onCode: (code: ScannedCode) => boolean | void;
   /** "Type the ISBN instead", offered in every state but scanning. */
   onFallback: () => void;
   onStateChange?: (state: ScannerState) => void;
@@ -70,17 +76,17 @@ const MESSAGES: Record<Exclude<ScannerState, "scanning">, { title: string; detai
 };
 
 /**
- * The phone camera as a stream of classified codes. One view, mounted and
+ * The phone camera, read on request: the picture runs so the owner can aim,
+ * and a code is read only when the parent asks (`ref.read()`). One view, mounted and
  * unmounted by its parent: it never navigates or touches the URL, because in
  * an iOS home-screen app a route change can kill the camera and re-prompt
  * (scanning.md). The stream stops on unmount and while the page is hidden.
  */
 export function CameraScanner({
+  ref,
   paused = false,
-  watching = false,
   torch = false,
   feedback = true,
-  onCode,
   onFallback,
   onStateChange,
   onTorchAvailable,
@@ -95,7 +101,6 @@ export function CameraScanner({
   const [track, setTrack] = useState<MediaStreamTrack | null>(null);
   // Bumped by "Try again" to rerun the engine and camera effects.
   const [attempt, setAttempt] = useState(0);
-  const [sightings] = useState(() => createSightings());
   // Counts reads so the frame can flash: the iPhone's silent switch mutes the
   // beep and iOS cannot vibrate.
   const [hits, setHits] = useState(0);
@@ -153,42 +158,49 @@ export function CameraScanner({
     };
   }, [cameraWanted, attempt]);
 
-  // Whether a code changed the page since the last read was scheduled.
-  const fired = useRef(false);
-  const emit = useEffectEvent((code: ScannedCode) => {
-    if (onCode(code) === false) return;
-    fired.current = true;
-    if (feedback) signalScan();
-    setHits((n) => n + 1);
-  });
-  const nextInterval = useEffectEvent(() => {
-    const interval = readInterval({ watching, pending: sightings.pending(), fired: fired.current });
-    fired.current = false;
-    return interval;
-  });
+  // The reading a press started, until it ends.
+  const current = useRef<{ reading: Reading; result: Promise<ScannedCode | null> } | null>(null);
+  const canRead = engine !== null && state === "scanning" && visible && !paused;
+  // Pausing, a hidden page or unmounting stops a reading in progress.
+  useEffect(() => {
+    if (!canRead) return;
+    return () => {
+      current.current?.reading.cancel();
+      current.current = null;
+    };
+  }, [canRead]);
 
-  const reading = engine !== null && state === "scanning" && visible && !paused;
-  // A book still in frame when the sheet closes (Save, Skip) must not fire
-  // again: its quiet window starts over from the moment the scanner resumes.
-  useEffect(() => {
-    if (reading) sightings.touch();
-  }, [reading, sightings]);
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!reading || engine === null || video === null) return;
-    const { detector } = engine;
-    return startDetectLoop({
-      // A video between streams has no frame to read.
-      detect: () =>
-        video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0
-          ? detector.detect(video)
-          : Promise.resolve([]),
-      onDetections: (detections) => {
-        for (const code of codesFrom(detections, sightings)) emit(code);
+  useImperativeHandle(
+    ref,
+    () => ({
+      read() {
+        const video = videoRef.current;
+        if (!canRead || engine === null || video === null) {
+          return Promise.reject(new DOMException("The scanner isn't reading.", "AbortError"));
+        }
+        if (current.current !== null) return current.current.result;
+        const { detector } = engine;
+        const reading = readCode(() =>
+          // A video between streams has no frame to read.
+          video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0 ? detector.detect(video) : Promise.resolve([]),
+        );
+        const result = reading.result
+          .then((code) => {
+            if (code !== null) {
+              if (feedback) signalScan();
+              setHits((n) => n + 1);
+            }
+            return code;
+          })
+          .finally(() => {
+            if (current.current?.reading === reading) current.current = null;
+          });
+        current.current = { reading, result };
+        return result;
       },
-      interval: () => nextInterval(),
-    });
-  }, [reading, engine, sightings]);
+    }),
+    [canRead, engine, feedback],
+  );
 
   const torchAvailable = useMemo(() => track !== null && hasTorch(track), [track]);
   useEffect(() => {

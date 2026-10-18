@@ -1,17 +1,17 @@
-import { useEffect, useState } from "react";
-import { CameraScanner, type ScannerState } from "./CameraScanner";
+import { useEffect, useRef, useState } from "react";
+import { CameraScanner, type ScannerHandle, type ScannerState } from "./CameraScanner";
 import { getEngine, type Engine, type ScannedCode } from "./detector";
 
 /**
- * Dev only (`/dev/scanner`): the scanner with every control, and a list of the
- * codes it reads. It also lists what the page fetched, so a phone without a
+ * Dev only (`/dev/scanner`): the scanner with every control, a Read button,
+ * and a list of what each read came to. It also lists what the page fetched, so a phone without a
  * network panel can still show the .wasm came from our own origin.
  */
 
 interface Read {
   id: number;
   at: string;
-  code: ScannedCode;
+  code: ScannedCode | null;
 }
 
 interface Fetched {
@@ -31,7 +31,9 @@ function fetched(): Fetched {
 const layout = { display: "grid", gap: 12, padding: 16, maxWidth: 640, margin: "0 auto" } as const;
 
 export function ScannerDemo() {
+  const scanner = useRef<ScannerHandle>(null);
   const [reads, setReads] = useState<Read[]>([]);
+  const [reading, setReading] = useState(false);
   const [paused, setPaused] = useState(false);
   const [torch, setTorch] = useState(false);
   const [torchAvailable, setTorchAvailable] = useState(false);
@@ -51,8 +53,17 @@ export function ScannerDemo() {
     );
   }, []);
 
-  const onCode = (code: ScannedCode): void => {
-    setReads((list) => [{ id: Date.now() + Math.random(), at: new Date().toLocaleTimeString(), code }, ...list]);
+  const read = async (): Promise<void> => {
+    if (scanner.current === null) return;
+    setReading(true);
+    try {
+      const code = await scanner.current.read();
+      setReads((list) => [{ id: Date.now() + Math.random(), at: new Date().toLocaleTimeString(), code }, ...list]);
+    } catch {
+      // Stopped: paused or hidden.
+    } finally {
+      setReading(false);
+    }
   };
 
   return (
@@ -65,15 +76,18 @@ export function ScannerDemo() {
       </p>
       <div style={{ height: "55vh" }}>
         <CameraScanner
+          ref={scanner}
           paused={paused}
           torch={torch}
-          onCode={onCode}
           onFallback={() => setFallbacks((n) => n + 1)}
           onStateChange={setState}
           onTorchAvailable={setTorchAvailable}
         />
       </div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <button type="button" onClick={() => void read()} disabled={reading || paused}>
+          {reading ? "Reading…" : "Read"}
+        </button>
         <button type="button" onClick={() => setPaused((p) => !p)}>
           {paused ? "Resume" : "Pause"}
         </button>
@@ -90,12 +104,19 @@ export function ScannerDemo() {
       <section>
         <h2 style={{ fontSize: 17, margin: "0 0 4px" }}>Read ({reads.length})</h2>
         {reads.length === 0 ? (
-          <p style={{ margin: 0 }}>Nothing yet. Hold a book's back cover in the frame.</p>
+          <p style={{ margin: 0 }}>Nothing yet. Hold a book's back cover in the frame and press Read.</p>
         ) : (
           <ol style={{ margin: 0, paddingLeft: 20 }}>
             {reads.map(({ id, at, code }) => (
               <li key={id}>
-                {at} · <strong>{code.kind}</strong> · {code.kind === "isbn" ? code.isbn13 : code.code}
+                {at} ·{" "}
+                {code === null ? (
+                  "nothing read in 3 s"
+                ) : (
+                  <>
+                    <strong>{code.kind}</strong> · {code.kind === "isbn" ? code.isbn13 : code.code}
+                  </>
+                )}
               </li>
             ))}
           </ol>

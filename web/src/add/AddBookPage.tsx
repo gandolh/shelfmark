@@ -4,7 +4,9 @@ import { createBook, useBooks } from "../books/store";
 import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
-import { CameraScanner } from "../scanner/CameraScanner";
+import { Button } from "../components/Button";
+import { CameraScanner, type ScannerHandle, type ScannerState } from "../scanner/CameraScanner";
+import type { ScannedCode } from "../scanner/detector";
 import { attachCover, lookupIsbn } from "./api";
 import type { CoverPhoto } from "./CoverCapture";
 import {
@@ -15,14 +17,12 @@ import {
   initialFlow,
   isSaving,
   scannerPaused,
-  scannerWatching,
-  SETTLE_MS,
   type CoverPlan,
   type FlowState,
   type Mode,
   type Notice,
 } from "./flow";
-import { TorchIcon } from "./icons";
+import { BarcodeIcon, TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
 import { createLookupMemo } from "./memo";
 import { ModeSwitch, modeTabId } from "./ModeSwitch";
@@ -78,6 +78,11 @@ export function AddBookPage() {
   const [focusOnEnter, setFocusOnEnter] = useState(true);
   // The answers this visit has had: an ISBN again shows its answer with no request.
   const [memo] = useState(createLookupMemo);
+  const scanner = useRef<ScannerHandle>(null);
+  const pressButton = useRef<HTMLButtonElement>(null);
+  const [scannerState, setScannerState] = useState<ScannerState>("asking");
+  // What the last press of "Scan the barcode" came to.
+  const [press, setPress] = useState<"idle" | "reading" | "missed">("idle");
 
   useEffect(() => {
     session.mode = mode;
@@ -86,18 +91,11 @@ export function AddBookPage() {
   }, [mode, added, state.lastShelf]);
 
   // The lookup for the `looking` step, aborted when the step is left (a
-  // discard, a mode switch, another ISBN); its id drops a late answer. A
-  // camera's lookup settles first, and another ISBN in that time means it is
-  // never sent.
+  // discard, a mode switch, another ISBN); its id drops a late answer.
   const lookingId = step.kind === "looking" ? step.id : null;
   const lookingIsbn = step.kind === "looking" ? step.isbn13 : null;
-  const settling = step.kind === "looking" && step.settling;
   useEffect(() => {
     if (lookingId === null || lookingIsbn === null) return;
-    if (settling) {
-      const timer = setTimeout(() => dispatch({ type: "settled", id: lookingId }), SETTLE_MS);
-      return () => clearTimeout(timer);
-    }
     const controller = new AbortController();
     lookupIsbn(lookingIsbn, { signal: controller.signal }).then(
       (lookup) => {
@@ -109,7 +107,29 @@ export function AddBookPage() {
       },
     );
     return () => controller.abort();
-  }, [lookingId, lookingIsbn, settling, memo]);
+  }, [lookingId, lookingIsbn, memo]);
+
+  // The camera reads only on a press, and only while nothing is on the sheet:
+  // a result is the owner's until they act on it.
+  const canPress = mode === "scan" && step.kind === "ready" && scannerState === "scanning";
+  const scan = async () => {
+    if (press === "reading" || scanner.current === null) return;
+    setPress("reading");
+    let code: ScannedCode | null;
+    try {
+      code = await scanner.current.read();
+    } catch {
+      // Stopped: the page was hidden, or the owner moved on.
+      setPress("idle");
+      return;
+    }
+    setPress(code === null ? "missed" : "idle");
+    if (code !== null) dispatch({ type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined });
+  };
+  // A result's buttons bring the scan button back; focus, lost with the sheet, goes to it.
+  useEffect(() => {
+    if (canPress && document.activeElement === document.body) pressButton.current?.focus({ preventScroll: true });
+  }, [canPress]);
 
   const noticeId = notice?.id;
   useEffect(() => {
@@ -171,6 +191,7 @@ export function AddBookPage() {
   const changeMode = (next: Mode, viaKeyboard = false) => {
     setTorch(false);
     setTorchAvailable(false);
+    setPress("idle");
     setFocusOnEnter(!viaKeyboard);
     dispatch({ type: "mode", mode: next });
   };
@@ -188,7 +209,6 @@ export function AddBookPage() {
         defaultShelf={defaultShelf}
         books={books}
         on={on}
-        onTouch={() => dispatch({ type: "hold" })}
       />
     );
 
@@ -212,17 +232,12 @@ export function AddBookPage() {
           {mode === "scan" && (
             <div className="add-stage">
               <CameraScanner
+                ref={scanner}
                 className="add-camera"
                 paused={scannerPaused(state)}
-                watching={scannerWatching(state)}
                 torch={torch}
-                onCode={(code) => {
-                  const event = { type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined } as const;
-                  // The book the sheet already shows, or a sticker behind a result: no beep.
-                  if (flowReducer(state, event) === state) return false;
-                  dispatch(event);
-                }}
                 onFallback={() => changeMode("isbn")}
+                onStateChange={setScannerState}
                 onTorchAvailable={setTorchAvailable}
               />
               {torchAvailable && (
@@ -235,6 +250,24 @@ export function AddBookPage() {
                 >
                   <TorchIcon size={20} on={torch} />
                 </button>
+              )}
+              {canPress && (
+                <div className="add-press">
+                  <p className="add-press__note" role="status" data-shown={press === "missed" || undefined}>
+                    {press === "missed" ? "No barcode read. Hold it inside the frame and try again." : ""}
+                  </p>
+                  <Button
+                    ref={pressButton}
+                    variant="primary"
+                    size="large"
+                    block
+                    icon={<BarcodeIcon size={20} />}
+                    aria-disabled={press === "reading" || undefined}
+                    onClick={() => void scan()}
+                  >
+                    {press === "reading" ? "Reading the barcode…" : "Scan the barcode"}
+                  </Button>
+                </div>
               )}
               {sheet(true, true)}
             </div>

@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import { Link, type LinkProps } from "./Link";
 
 /**
@@ -39,7 +39,9 @@ function buttonClass({ variant = "secondary", size = "regular", pill, block }: B
     .join(" ");
 }
 
-export interface ButtonProps extends ButtonLook, ButtonHTMLAttributes<HTMLButtonElement> {}
+export interface ButtonProps extends ButtonLook, ButtonHTMLAttributes<HTMLButtonElement> {
+  ref?: Ref<HTMLButtonElement>;
+}
 
 /** A real `<button>`, `type="button"` unless a form asks for `submit`. */
 export function Button({ variant, size, pill, icon, block, className, type = "button", children, ...rest }: ButtonProps) {

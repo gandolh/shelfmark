@@ -372,7 +372,7 @@ Flat fills, no borders, no shadow.
 - **Primary:** accent fill, white semibold text, 16 px side padding; hover and press go to accent-press.
 - **Secondary:** control fill, ink text; hover and press darken by a mix toward ink. While its menu is open (Export, the account disc) it turns teal wash with accent-press semibold text.
 - **Quiet:** accent text on nothing, 15 px, 4 px side padding; hover accent-press. A leaving action ("Not this book", "Discard this scan") is a quiet button in plain ink, apart from the primary.
-- **Large:** 48 px, 24 px side padding, 16 px semibold: a sheet's primary action ("Save and scan the next one").
+- **Large:** 48 px, 24 px side padding, 16 px semibold: a sheet's primary action ("Save and scan the next one") and the camera's *Scan the barcode*.
 - **Disabled:** 45% opacity, no pointer.
 - **Focus:** the one ring, 2 px accent, 2 px offset, keyboard only.
 
@@ -410,7 +410,7 @@ The workhorse switch: the two places in the top bar, Table / Covers, Add a book'
 Every book is shown by its cover at 2:3 with 3 px corners and the cover shadow, at 46 px in a table row, in the grid, 168 to 260 px on the book page. Without an image (or when it fails to load) it becomes the **typographic placeholder**: the title in 700 over a short rule and the author in uppercase 600 with 0.06em tracking, on the book's tint, sized off the cover's own width (container query units) so it reads the same at every size; a hairline 7% in from the left edge suggests a hardback's hinge. The title shrinks only as far as needed to keep its longest word whole. At 72 px wide or less (a table row) the author is dropped and the title takes up to four lines. In the grid, a cover lifts 3 px on hover.
 
 ### The camera stage
-The camera fills its stage on an ink ground with a soft radial vignette so the white sheet and controls hold their edge over a bright picture. A 240 x 132 viewfinder with a 3 px white rim; a read flashes the frame teal wash, the cue that works with the sound off; a torch toggle sits top right. The result floats over the camera in the sheet: the cover, the draft's details, then the action. The scanner never navigates while the camera runs: the three outcomes (found, not found, already owned) are states of one screen.
+The camera fills its stage on an ink ground with a soft radial vignette so the white sheet and controls hold their edge over a bright picture. A 240 x 132 viewfinder with a 3 px white rim; a read flashes the frame teal wash, the cue that works with the sound off; a torch toggle sits top right. The camera reads only on a press: while no result is open, a large accent pill, *Scan the barcode*, sits where the sheet will (12 px from the edges, at most 440 px wide). It reads *Reading the barcode…* while it reads, and "No barcode read" shows above it as a pill on the ground. The result floats over the camera in the sheet: the cover, the draft's details, then the action. The scanner never navigates while the camera runs: the three outcomes (found, not found, already owned) are states of one screen.
 
 ### Motion
 State changes only, short, one curve: `cubic-bezier(0.22, 1, 0.36, 1)` at 120 ms for colour changes, 180 ms for menus and the in-page result's 8 px rise, 240 ms for sheets. Under `prefers-reduced-motion: reduce` every animation and transition collapses to 1 ms.

@@ -70,8 +70,7 @@ export interface SaveState {
  *
  * - `ready`: nothing; the scanner reads (Scan) or the field waits (Type ISBN).
  * - `typing`: Scan mode's sheet asking for the ISBN after a non-ISBN barcode.
- * - `looking`: a lookup in flight, or a camera's lookup still `settling`
- *   (`SETTLE_MS`) before it is sent.
+ * - `looking`: a lookup in flight.
  * - `other`: a barcode that isn't an ISBN.
  * - `failed`: the lookup didn't answer.
  * - `owned`: the ISBN is already in the library.
@@ -81,7 +80,7 @@ export interface SaveState {
 export type Step =
   | { kind: "ready"; id: number }
   | { kind: "typing"; id: number; code: string }
-  | { kind: "looking"; id: number; isbn13: string; settling: boolean }
+  | { kind: "looking"; id: number; isbn13: string }
   | { kind: "other"; id: number; code: string }
   | { kind: "failed"; id: number; isbn13: string; failure: Failure }
   | { kind: "owned"; id: number; lookup: LookupResponse }
@@ -113,22 +112,13 @@ export interface FlowState {
   /** The shelf of the last book saved here; `undefined` until one is. The next book defaults to it. */
   lastShelf: string | null | undefined;
   notice: Notice | null;
-  /**
-   * The sheet came from the camera and the owner hasn't touched it yet: the
-   * camera keeps reading, and a different ISBN in view replaces the sheet.
-   */
-  loose: boolean;
 }
 
 export type FlowEvent =
   | { type: "mode"; mode: Mode }
   /** `known`: the answer the page already has for this ISBN (memo.ts), shown without a request. */
   | { type: "scanned"; code: ScannedCode; known?: LookupResponse }
-  /** The owner's first touch on a loose sheet: it is theirs now, and the camera rests. */
-  | { type: "hold" }
   | { type: "submit-isbn"; isbn13: string; known?: LookupResponse }
-  /** A camera lookup has settled: send it. */
-  | { type: "settled"; id: number }
   | { type: "looked-up"; id: number; lookup: LookupResponse }
   | { type: "lookup-failed"; id: number; failure: Failure }
   | { type: "retry" }
@@ -153,7 +143,6 @@ export function initialFlow(mode: Mode, carried?: Pick<FlowState, "added" | "las
     added: carried?.added ?? 0,
     lastShelf: carried?.lastShelf,
     notice: null,
-    loose: false,
   };
 }
 
@@ -166,26 +155,11 @@ function restingStep(mode: Mode, id: number): Step {
 const NO_BASE: FormBase = { details: {}, cover: { kind: "none" } };
 
 /**
- * The scanner reads while nothing is on the sheet, so after a save it is live
- * again with no extra tap, and while the sheet is loose. A sheet the owner
- * touched or opened themselves pauses it.
+ * The scanner can read only while nothing is on the sheet: a result is the
+ * owner's until they act on it, and its buttons bring the camera back.
  */
 export function scannerPaused(state: FlowState): boolean {
-  return state.mode !== "scan" || (state.step.kind !== "ready" && !state.loose);
-}
-
-/**
- * How long a camera's lookup waits before it is sent, the scanner reading at
- * its looking pace meanwhile: a misread corrected a read or two later, or a
- * book the camera only passed over, is replaced before it costs the sources
- * anything. Two read cycles, with a blurred frame to spare.
- */
-export const SETTLE_MS = 600;
-
-/** A loose sheet is open, its lookup sent: the scanner reads slowly, only to notice a different book. */
-export function scannerWatching(state: FlowState): boolean {
-  const { step } = state;
-  return step.kind !== "ready" && !(step.kind === "looking" && step.settling);
+  return state.mode !== "scan" || state.step.kind !== "ready";
 }
 
 /** True while a save is in flight: the sheet's buttons wait. */
@@ -355,14 +329,7 @@ function answered(lookup: LookupResponse, id: number): Step {
 export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
   const { step } = state;
   const id = state.next;
-  // A step the owner moved to is theirs: only the camera's own steps are loose.
-  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({
-    ...state,
-    loose: false,
-    ...extra,
-    step: next,
-    next: id + 1,
-  });
+  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({ ...state, ...extra, step: next, next: id + 1 });
   const saving = isSaving(step);
 
   switch (event.type) {
@@ -372,48 +339,31 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       return go(restingStep(event.mode, id), { mode: event.mode });
 
     case "scanned": {
-      if (state.mode !== "scan") return state;
-      const { code } = event;
-      if (step.kind !== "ready") {
-        // A loose sheet gives way to another ISBN, never to a sticker. The same
-        // ISBN changes nothing, unless its lookup failed: then it tries again.
-        if (!state.loose || code.kind !== "isbn") return state;
-        if (currentIsbn(step) === code.isbn13 && step.kind !== "failed") return state;
-      }
-      if (code.kind !== "isbn") return go({ kind: "other", id, code: code.code }, { loose: true });
-      const next: Step = event.known
-        ? answered(event.known, id)
-        : { kind: "looking", id, isbn13: code.isbn13, settling: true };
-      return go(next, { loose: true });
+      if (state.mode !== "scan" || step.kind !== "ready") return state;
+      const { code, known } = event;
+      if (code.kind !== "isbn") return go({ kind: "other", id, code: code.code });
+      return go(known ? answered(known, id) : { kind: "looking", id, isbn13: code.isbn13 });
     }
-
-    case "settled":
-      if (step.kind !== "looking" || step.id !== event.id || !step.settling) return state;
-      return { ...state, step: { ...step, settling: false } };
-
-    case "hold":
-      return state.loose ? { ...state, loose: false } : state;
 
     case "submit-isbn":
       if (saving || state.mode === "manual") return state;
       if (state.mode === "scan" && step.kind !== "typing") return state;
       // A double read from a USB scanner, or Enter pressed again: the answer is already here.
       if (currentIsbn(step) === event.isbn13 && step.kind !== "failed") return state;
-      return go(event.known ? answered(event.known, id) : { kind: "looking", id, isbn13: event.isbn13, settling: false });
+      return go(event.known ? answered(event.known, id) : { kind: "looking", id, isbn13: event.isbn13 });
 
-    // The answer to the camera's lookup is still the camera's.
     case "looked-up":
       if (step.kind !== "looking" || step.id !== event.id) return state;
-      return go(answered(event.lookup, id), { loose: state.loose });
+      return go(answered(event.lookup, id));
 
     case "lookup-failed":
       if (step.kind !== "looking" || step.id !== event.id) return state;
-      return go({ kind: "failed", id, isbn13: step.isbn13, failure: event.failure }, { loose: state.loose });
+      return go({ kind: "failed", id, isbn13: step.isbn13, failure: event.failure });
 
     case "retry":
-      if (step.kind === "failed") return go({ kind: "looking", id, isbn13: step.isbn13, settling: false });
+      if (step.kind === "failed") return go({ kind: "looking", id, isbn13: step.isbn13 });
       if (step.kind === "form" && step.reason === "not-found" && step.lookup && !saving) {
-        return go({ kind: "looking", id, isbn13: step.lookup.isbn13, settling: false });
+        return go({ kind: "looking", id, isbn13: step.lookup.isbn13 });
       }
       return state;
 
@@ -479,7 +429,7 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
 
     case "save":
       if ((step.kind !== "found" && step.kind !== "form") || saving) return state;
-      return { ...state, loose: false, step: { ...step, save: { saving: true, failure: null } } };
+      return { ...state, step: { ...step, save: { saving: true, failure: null } } };
 
     case "saved": {
       // Counted even when the owner has moved on: the book is in the library.

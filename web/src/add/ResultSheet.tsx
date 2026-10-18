@@ -41,8 +41,6 @@ export interface ResultSheetProps {
   /** The library, for an already-owned book's details and cover. */
   books: readonly Book[];
   on: SheetActions;
-  /** The owner's first pointer-down, key-down or input inside the sheet. */
-  onTouch?: () => void;
 }
 
 /** The primary actions, worded for the mode: the owner's next move is in the label. */
@@ -59,7 +57,7 @@ const WORDS: Record<Mode, { save: string; next: string; discard: string }> = {
  * way out ("Not this book", "Discard this scan") sits apart, under it, in
  * plain ink.
  */
-export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultShelf, books, on, onTouch }: ResultSheetProps) {
+export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultShelf, books, on }: ResultSheetProps) {
   const headingId = useId();
   const words = WORDS[mode];
   const shared = { headingId, takeFocus, words, on };
@@ -89,14 +87,12 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       break;
   }
 
-  // Capture, so the touch counts before the button or field it lands on acts.
-  const touch = onTouch && { onPointerDownCapture: onTouch, onKeyDownCapture: onTouch, onInputCapture: onTouch };
   return floating ? (
-    <Sheet className="add-sheet" aria-labelledby={headingId} {...touch}>
+    <Sheet className="add-sheet" aria-labelledby={headingId}>
       {content}
     </Sheet>
   ) : (
-    <section className="add-result" aria-labelledby={headingId} {...touch}>
+    <section className="add-result" aria-labelledby={headingId}>
       {content}
     </section>
   );

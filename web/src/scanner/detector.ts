@@ -4,7 +4,7 @@ import { classifyBarcode, type BarcodeClass } from "@shelfmark/shared";
 // it from jsDelivr instead. The version must match the ZXing glue the ponyfill
 // bundles; detector.test.ts checks the file's SHA-256 against it.
 import zxingWasmUrl from "zxing-wasm/reader/zxing_reader.wasm?url";
-import type { Sightings } from "./debounce";
+import { createConfirmer, type Confirmer } from "./confirm";
 
 /** What a book carries: the EAN-13 ISBN, older or foreign codes, store stickers. */
 export const FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] as const;
@@ -117,13 +117,12 @@ function keyOf(code: ScannedCode): string {
 }
 
 /**
- * One read's detections to the codes that fire now: each raw value is
- * classified with its format, add-ons are dropped, and `sightings` decides
- * (two reads must agree; a code that fired stays quiet while in view).
+ * One read's detections to the codes two reads now agree on: each raw value
+ * is classified with its format, and add-ons are dropped.
  */
 export function codesFrom(
   detections: readonly Detection[],
-  sightings: Sightings,
+  confirmer: Confirmer,
   now: number = Date.now(),
 ): ScannedCode[] {
   const codes = new Map<string, ScannedCode>();
@@ -132,39 +131,88 @@ export function codesFrom(
     const code = classifyBarcode(rawValue, format);
     if (code.kind !== "addon") codes.set(keyOf(code), code);
   }
-  return sightings.read([...codes.keys()], now).map((key) => codes.get(key)!);
+  return confirmer.read([...codes.keys()], now).map((key) => codes.get(key)!);
 }
 
+/** A press reads this often: two agreeing reads take about 150 ms. */
+export const READ_EVERY_MS = 150;
+/** How long a press keeps reading before it says nothing was read. */
+export const READ_FOR_MS = 3000;
 /**
- * How often to read, from one read's start to the next's. Looking for a book,
- * often enough that a code reads at once. While a result is open, once a
- * second, only to notice the owner has moved to another book. After a read
- * that saw a code still waiting for its second read, again soon, so the
- * confirmation adds little to either.
+ * A sticker agreed on first waits this long for an ISBN beside it: two more
+ * reads, one to see it and one to agree, with room for their decode time.
  */
-export const PACE = { search: 250, watch: 1000, confirm: 150 } as const;
+export const ISBN_GRACE_MS = 450;
 
-export function readInterval({ watching, pending, fired }: { watching: boolean; pending: boolean; fired: boolean }): number {
-  if (pending) return PACE.confirm;
-  // A code that just changed the sheet: the page hasn't drawn the new step
-  // yet, so `watching` is the old one's. A new camera step settles at the
-  // looking pace, so take that one, and the page's own from the next read on.
-  if (fired) return PACE.search;
-  return watching ? PACE.watch : PACE.search;
+/** One press's reading. `result` is the code, or `null` when nothing was read in time. */
+export interface Reading {
+  result: Promise<ScannedCode | null>;
+  /** Stop now: `result` rejects with an `AbortError` (the camera stopped, the page moved on). */
+  cancel(): void;
 }
 
 /**
- * Run `detect` until the returned stop function is called, waiting
- * `interval()` from one read's start to the next's (asked after each read).
+ * Read until two reads agree on a code, for at most `forMs`. An ISBN ends the
+ * reading at once; a barcode that isn't one (a store sticker) waits `graceMs`
+ * for an ISBN beside it, then counts.
+ */
+export function readCode(
+  detect: () => Promise<readonly Detection[]>,
+  { everyMs = READ_EVERY_MS, forMs = READ_FOR_MS, graceMs = ISBN_GRACE_MS } = {},
+): Reading {
+  const confirmer = createConfirmer();
+  let settle: (code: ScannedCode | null) => void = () => {};
+  let abort: (error: Error) => void = () => {};
+  const result = new Promise<ScannedCode | null>((resolve, reject) => {
+    settle = resolve;
+    abort = reject;
+  });
+  let other: ScannedCode | null = null;
+  const timers: ReturnType<typeof setTimeout>[] = [];
+  let stopLoop = (): void => {};
+  const end = (): void => {
+    stopLoop();
+    timers.forEach(clearTimeout);
+  };
+  const finish = (code: ScannedCode | null): void => {
+    end();
+    settle(code);
+  };
+
+  stopLoop = startDetectLoop({
+    detect,
+    intervalMs: everyMs,
+    onDetections: (detections) => {
+      const agreed = codesFrom(detections, confirmer);
+      const isbn = agreed.find((code) => code.kind === "isbn");
+      if (isbn) return finish(isbn);
+      if (other === null && agreed.length > 0) {
+        other = agreed[0]!;
+        timers.push(setTimeout(() => finish(other), graceMs));
+      }
+    },
+  });
+  timers.push(setTimeout(() => finish(other), forMs));
+  return {
+    result,
+    cancel() {
+      end();
+      abort(new DOMException("The reading was stopped.", "AbortError"));
+    },
+  };
+}
+
+/**
+ * Run `detect` every `intervalMs` until the returned stop function is called.
  * A slow frame delays the next one instead of overlapping it, and a failed
  * frame (the video between states) is skipped, not fatal.
  */
 export function startDetectLoop(options: {
   detect: () => Promise<readonly Detection[]>;
   onDetections: (detections: readonly Detection[]) => void;
-  interval: () => number;
+  intervalMs?: number;
 }): () => void {
-  const { detect, onDetections, interval } = options;
+  const { detect, onDetections, intervalMs = READ_EVERY_MS } = options;
   let stopped = false;
   let timer: ReturnType<typeof setTimeout> | undefined;
 
@@ -178,7 +226,7 @@ export function startDetectLoop(options: {
       // One bad frame says nothing about the next.
     }
     if (stopped) return;
-    timer = setTimeout(() => void tick(), Math.max(0, interval() - (Date.now() - started)));
+    timer = setTimeout(() => void tick(), Math.max(0, intervalMs - (Date.now() - started)));
   };
 
   // The first frame goes at once, so a code already under the camera reads instantly.

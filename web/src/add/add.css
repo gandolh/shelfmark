@@ -887,3 +887,35 @@ fieldset:disabled .add-chip {
 .shell--phone .add-input {
   height: var(--touch);
 }
+
+/* --- Scan the barcode: the camera reads only on this press -------------------------- */
+
+/* Where the sheet sits, as wide as it; the sheet takes its place once a code is read. */
+.add-press {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+/* "No barcode read": like the session line over the camera. Empty, it takes no room. */
+.add-press__note {
+  margin: 0;
+  font-size: var(--text-small);
+  line-height: var(--leading-tight);
+  text-align: center;
+}
+
+.add-press__note[data-shown] {
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  color: var(--ink-2);
+}
