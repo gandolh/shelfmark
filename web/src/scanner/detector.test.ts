@@ -3,7 +3,6 @@ import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { ZXING_WASM_SHA256 } from "barcode-detector/ponyfill";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { createConfirmer } from "./confirm";
 import {
   codesFrom,
   FORMATS,
@@ -88,20 +87,13 @@ describe("selectEngine", () => {
 describe("codesFrom", () => {
   const isbn = { rawValue: "9786063205583", format: "ean_13" };
 
-  /** The frame read twice, 150 ms apart: what the second read agrees on. */
-  function confirmed(frame: readonly Detection[]) {
-    const confirmer = createConfirmer();
-    expect(codesFrom(frame, confirmer, 0)).toEqual([]);
-    return codesFrom(frame, confirmer, 150);
-  }
-
-  it("emits an ISBN from an EAN-13 once a second read agrees", () => {
-    expect(confirmed([isbn])).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
+  it("emits an ISBN from an EAN-13", () => {
+    expect(codesFrom([isbn])).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
   });
 
   it("drops add-ons and keeps the ISBN beside them", () => {
     const frame = [isbn, { rawValue: "51299", format: "ean_5" }, { rawValue: "12", format: "ean_2" }];
-    expect(confirmed(frame)).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
+    expect(codesFrom(frame)).toEqual([{ kind: "isbn", isbn13: "9786063205583" }]);
   });
 
   it("emits store stickers, UPCs and labels as other, raw value kept", () => {
@@ -110,7 +102,7 @@ describe("codesFrom", () => {
       { rawValue: "036000291452", format: "upc_a" },
       { rawValue: "51299", format: "code_128" },
     ];
-    expect(confirmed(frame)).toEqual([
+    expect(codesFrom(frame)).toEqual([
       { kind: "other", code: "2000000000008" },
       { kind: "other", code: "036000291452" },
       { kind: "other", code: "51299" },
@@ -118,25 +110,15 @@ describe("codesFrom", () => {
   });
 
   it("passes the format through: 13 digits in a Code-128 are not an ISBN", () => {
-    expect(confirmed([{ rawValue: "9786063205583", format: "code_128" }])).toEqual([{ kind: "other", code: "9786063205583" }]);
+    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }])).toEqual([{ kind: "other", code: "9786063205583" }]);
   });
 
   it("skips empty values", () => {
-    expect(confirmed([{ rawValue: " ", format: "code_128" }])).toEqual([]);
+    expect(codesFrom([{ rawValue: " ", format: "code_128" }])).toEqual([]);
   });
 
-  it("doesn't confirm a code with a second copy of it in the same frame", () => {
-    const confirmer = createConfirmer();
-    expect(codesFrom([isbn, isbn], confirmer, 0)).toEqual([]);
-    expect(codesFrom([isbn, isbn], confirmer, 150)).toHaveLength(1);
-  });
-
-  it("keys ISBNs and other codes apart", () => {
-    const confirmer = createConfirmer();
-    codesFrom([isbn], confirmer, 0);
-    // The same digits read as a Code-128 are another code, not the ISBN's second read.
-    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }], confirmer, 150)).toEqual([]);
-    expect(codesFrom([isbn], confirmer, 300)).toHaveLength(1);
+  it("counts a code twice in the frame once", () => {
+    expect(codesFrom([isbn, isbn])).toHaveLength(1);
   });
 });
 
@@ -156,34 +138,40 @@ describe("readCode", () => {
     return vi.fn(() => Promise.resolve(list.length > 1 ? list.shift()! : (list[0] ?? [])));
   }
 
-  it("reads every 150 ms and ends on the read that agrees on an ISBN", async () => {
+  it("reads every 150 ms and ends on the first read with an ISBN", async () => {
     expect([READ_EVERY_MS, READ_FOR_MS, ISBN_GRACE_MS]).toEqual([150, 3000, 450]);
-    const detect = frames([], [isbn], [isbn]);
+    const detect = frames([], [isbn]);
     const reading = readCode(detect);
-    await vi.advanceTimersByTimeAsync(300);
+    await vi.advanceTimersByTimeAsync(150);
     await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205583" });
-    expect(detect).toHaveBeenCalledTimes(3);
+    expect(detect).toHaveBeenCalledTimes(2);
     await vi.advanceTimersByTimeAsync(3000);
-    expect(detect).toHaveBeenCalledTimes(3);
+    expect(detect).toHaveBeenCalledTimes(2);
   });
 
-  it("doesn't take a misread that the next read disagrees with", async () => {
+  it("takes a misread as read: the owner sees it and presses again", async () => {
     const misread: Detection = { rawValue: "9786063205538", format: "ean_13" };
-    const reading = readCode(frames([misread], [isbn], [isbn]));
-    await vi.advanceTimersByTimeAsync(300);
+    const reading = readCode(frames([misread], [isbn]));
+    await vi.advanceTimersByTimeAsync(0);
+    await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205538" });
+  });
+
+  it("prefers the ISBN when one read has both", async () => {
+    const reading = readCode(frames([sticker, isbn]));
+    await vi.advanceTimersByTimeAsync(0);
     await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205583" });
   });
 
-  it("gives a sticker agreed on first two more reads for an ISBN beside it", async () => {
-    const reading = readCode(frames([sticker], [sticker], [sticker, isbn], [sticker, isbn]));
-    await vi.advanceTimersByTimeAsync(450);
+  it("gives a sticker read first two more reads for an ISBN beside it", async () => {
+    const reading = readCode(frames([sticker], [sticker], [sticker, isbn]));
+    await vi.advanceTimersByTimeAsync(300);
     await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205583" });
   });
 
   it("takes the sticker when no ISBN comes in that time", async () => {
     const detect = frames([sticker]);
     const reading = readCode(detect);
-    await vi.advanceTimersByTimeAsync(150);
+    await vi.advanceTimersByTimeAsync(0);
     let result: unknown = "pending";
     void reading.result.then((code) => (result = code));
     await vi.advanceTimersByTimeAsync(449);

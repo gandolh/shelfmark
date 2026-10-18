@@ -14,7 +14,7 @@ export type ScannerState = "asking" | "scanning" | "denied" | "no-camera" | "ins
 /** What the parent asks of a running scanner. */
 export interface ScannerHandle {
   /**
-   * Read the barcode in view: a code once two reads agree, or `null` when
+   * Read the barcode in view: the first code read, or `null` when
    * none is read within 3 s (detector.ts `readCode`). A second call while one
    * runs gets the same answer. Rejects with an `AbortError` when the camera
    * stops or the scanner is paused meanwhile, and at once when it isn't

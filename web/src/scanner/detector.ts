@@ -4,7 +4,6 @@ import { classifyBarcode, type BarcodeClass } from "@shelfmark/shared";
 // it from jsDelivr instead. The version must match the ZXing glue the ponyfill
 // bundles; detector.test.ts checks the file's SHA-256 against it.
 import zxingWasmUrl from "zxing-wasm/reader/zxing_reader.wasm?url";
-import { createConfirmer, type Confirmer } from "./confirm";
 
 /** What a book carries: the EAN-13 ISBN, older or foreign codes, store stickers. */
 export const FORMATS = ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] as const;
@@ -117,31 +116,24 @@ function keyOf(code: ScannedCode): string {
 }
 
 /**
- * One read's detections to the codes two reads now agree on: each raw value
- * is classified with its format, and add-ons are dropped.
+ * One read's detections as codes: each raw value is classified with its
+ * format, add-ons are dropped, and a code seen twice in the frame is one.
  */
-export function codesFrom(
-  detections: readonly Detection[],
-  confirmer: Confirmer,
-  now: number = Date.now(),
-): ScannedCode[] {
+export function codesFrom(detections: readonly Detection[]): ScannedCode[] {
   const codes = new Map<string, ScannedCode>();
   for (const { rawValue, format } of detections) {
     if (rawValue.trim() === "") continue;
     const code = classifyBarcode(rawValue, format);
     if (code.kind !== "addon") codes.set(keyOf(code), code);
   }
-  return confirmer.read([...codes.keys()], now).map((key) => codes.get(key)!);
+  return [...codes.values()];
 }
 
-/** A press reads this often: two agreeing reads take about 150 ms. */
+/** A press reads this often until a code is read. */
 export const READ_EVERY_MS = 150;
 /** How long a press keeps reading before it says nothing was read. */
 export const READ_FOR_MS = 3000;
-/**
- * A sticker agreed on first waits this long for an ISBN beside it: two more
- * reads, one to see it and one to agree, with room for their decode time.
- */
+/** A sticker read first waits this long for an ISBN beside it: two more reads, with room for their decode time. */
 export const ISBN_GRACE_MS = 450;
 
 /** One press's reading. `result` is the code, or `null` when nothing was read in time. */
@@ -152,15 +144,15 @@ export interface Reading {
 }
 
 /**
- * Read until two reads agree on a code, for at most `forMs`. An ISBN ends the
- * reading at once; a barcode that isn't one (a store sticker) waits `graceMs`
- * for an ISBN beside it, then counts.
+ * Read until a code is read, for at most `forMs`. The first ISBN ends the
+ * reading: the owner sees it, and presses again if it looks wrong. A barcode
+ * that isn't one (a store sticker) waits `graceMs` for an ISBN beside it,
+ * then counts.
  */
 export function readCode(
   detect: () => Promise<readonly Detection[]>,
   { everyMs = READ_EVERY_MS, forMs = READ_FOR_MS, graceMs = ISBN_GRACE_MS } = {},
 ): Reading {
-  const confirmer = createConfirmer();
   let settle: (code: ScannedCode | null) => void = () => {};
   let abort: (error: Error) => void = () => {};
   const result = new Promise<ScannedCode | null>((resolve, reject) => {
@@ -183,11 +175,11 @@ export function readCode(
     detect,
     intervalMs: everyMs,
     onDetections: (detections) => {
-      const agreed = codesFrom(detections, confirmer);
-      const isbn = agreed.find((code) => code.kind === "isbn");
+      const codes = codesFrom(detections);
+      const isbn = codes.find((code) => code.kind === "isbn");
       if (isbn) return finish(isbn);
-      if (other === null && agreed.length > 0) {
-        other = agreed[0]!;
+      if (other === null && codes.length > 0) {
+        other = codes[0]!;
         timers.push(setTimeout(() => finish(other), graceMs));
       }
     },

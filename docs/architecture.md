@@ -41,7 +41,7 @@ flowchart LR
 
 1. You aim the phone camera and tap *Scan the barcode*. Only then does it
    read, with BarcodeDetector, or with the ZXing WebAssembly polyfill where
-   the browser has none, until two reads agree, for up to 3 s. You can also
+   the browser has none, until it reads a code, for up to 3 s. You can also
    type the ISBN, or let a USB scanner type it. `shared` checks the digits.
 2. The web app sends `POST /api/lookup` with the ISBN. An ISBN the page
    already looked up during this visit shows at once, with no request.
