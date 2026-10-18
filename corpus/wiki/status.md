@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-19 (confirmed reads, one lookup per ISBN, scan on a press) written and built 2026-10-17/18 (624 tests), not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
 updated: 2026-10-18
 ---
 
@@ -22,10 +22,10 @@ product calls are in [decisions.md](decisions.md), the look in
 1. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-2. Redeploy to ship briefs 15 to 19, then run the two checks in
+2. Redeploy to ship briefs 15 to 20, then run the two checks in
    owner-setup's "Romanian lookups after a deploy": the libraries over port
    9991, and the first CIP refresh in the logs. The phone checks of briefs 18
-   and 19 are in their outcomes.
+   to 20 are in their outcomes.
 3. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
    local Ward round trip (06, needs Docker Desktop's WSL integration), the
@@ -54,9 +54,10 @@ product calls are in [decisions.md](decisions.md), the look in
 | 14 | [Deploy](../briefs/done/14-deploy.md) | 6 | done |
 | 15 | [Romanian library catalogs](../briefs/done/15-library-catalogs.md) | 7 | done |
 | 16 | [The CIP index](../briefs/done/16-cip-index.md) | 8 | done |
-| 17 | [Confirmed reads and live rescans](../briefs/done/17-confirmed-reads.md) | 9 | done; live rescans undone by 19 |
+| 17 | [Confirmed reads and live rescans](../briefs/superseded/17-confirmed-reads.md) | 9 | superseded by 19 and 20 |
 | 18 | [One lookup per ISBN](../briefs/done/18-one-lookup-per-isbn.md) | 10 | done; the settle undone by 19 |
 | 19 | [Scan on a press](../briefs/done/19-scan-on-a-press.md) | 11 | done |
+| 20 | [The first read wins](../briefs/done/20-first-read-wins.md) | 12 | done |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for

@@ -29,7 +29,7 @@ Shelfmark keeps all of it except loans.
 
 | Feature | Notes |
 |---|---|
-| Camera scan | Reads only on a press of *Scan the barcode*: two agreeing reads within 3 s, beep/vibrate per read, an "already owned" warning. See [scanning.md](scanning.md). |
+| Camera scan | Reads only on a press of *Scan the barcode*: the first code read within 3 s, beep/vibrate per read, an "already owned" warning. See [scanning.md](scanning.md). |
 | ISBN typing and USB scanner | One input field; a keyboard-wedge scanner types digits plus Enter, so it works for free on a laptop. |
 | Manual entry | For books with no barcode or no metadata. Must be fast: Romanian books will often land here. |
 | Metadata lookup + covers | Open Library, then Google Books; covers stored on our disk. See [metadata-lookup.md](metadata-lookup.md). |

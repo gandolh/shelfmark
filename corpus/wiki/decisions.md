@@ -121,11 +121,13 @@ and its Z39.50 port did not answer). Measurements in
 ## The camera reads only on a press
 _2026-10-18_. Scan mode shows the live camera and a *Scan the barcode*
 button. The camera decodes nothing and sends no lookup until it is pressed.
-A press reads until two reads agree, for at most 3 s
-([scanning.md](scanning.md)). The owner asked for it after briefs 17 and 18
-had made continuous reading safer. They want nothing read or sent without
-a deliberate act, which also spares the libraries and the Google key the
-calls of a misread or a book the camera only passed over.
+A press takes the first code it reads, for at most 3 s
+([scanning.md](scanning.md)). Until brief 20, the same day, it waited for
+two agreeing reads; now the owner presses again when an ISBN looks wrong.
+The owner asked for the press after briefs 17 and 18 had made continuous
+reading safer. They want nothing read or sent without a deliberate act,
+which also spares the libraries and the Google key the calls of a misread or
+a book the camera only passed over.
 Rejected: continuous reading (briefs 07-18: no tap per book, but every book
 in view is read and looked up), with or without brief 17's replaceable
 result and brief 18's 600 ms wait before a lookup. The cost is one tap per

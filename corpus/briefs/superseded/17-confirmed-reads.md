@@ -1,3 +1,5 @@
+_Superseded 2026-10-18: briefs 19 (scan on a press) and 20 (the first read wins) undid all of it._
+
 # Task 17: Confirmed reads and live rescans
 
 ## Context

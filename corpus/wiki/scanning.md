@@ -1,5 +1,5 @@
 ---
-summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, scanning on a press (two agreeing reads, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, scanning on a press (the first code read, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
 updated: 2026-10-18
 ---
 
@@ -46,17 +46,15 @@ between presses. A beep or vibration and the frame's flash mark a read. A
 scanned ISBN already in the library shows "Already in your library" with
 "Add another copy" and "Open the book".
 
-- **A press reads every 150 ms until two reads agree, for at most 3 s**
+- **A press reads every 150 ms until it reads a code, for at most 3 s**
   ([detector.ts](../../web/src/scanner/detector.ts) `readCode`).
-  - Why two reads: the check digit misses two wrong digits that cancel out,
-    and a swap of neighbouring digits that differ by 5 (`…5583` read as
-    `…5538` passes). One bad frame almost never matches the next. The second
-    read must come within 700 ms of the first
-    ([confirm.ts](../../web/src/scanner/confirm.ts)).
-  - An ISBN ends the reading, usually two reads (about 0.2 s) after the
-    press.
-  - A barcode that isn't an ISBN, agreed first, waits two more reads
-    (450 ms, decode time included) for an ISBN beside it.
+  - The first ISBN read ends it, usually on the first read after the press.
+    The owner sees the ISBN and presses again if it looks wrong (brief 20).
+    Brief 17 required two agreeing reads because the check digit misses some
+    misreads (two wrong digits that cancel out, neighbouring digits that
+    differ by 5 swapped). That mattered while the camera read by itself.
+  - In one read, an ISBN wins over a sticker. A sticker read first waits
+    two more reads (450 ms, decode time included) for an ISBN beside it.
   - Nothing in 3 s: "No barcode read", and no lookup.
 - **The button shows only while no result is open.** A result is the
   owner's until they act on it, and its own buttons bring the camera back. A
@@ -69,8 +67,8 @@ scanned ISBN already in the library shows "Already in your library" with
   Brief 17 then added two agreeing reads, plus a result that the next book in
   view replaced until the owner touched it. Brief 18 added a 600 ms wait
   before a camera lookup. The owner then chose the press: no read or call
-  happens without one. Of those briefs, two agreeing reads, the memo, and one
-  lookup per ISBN remain.
+  happens without one. Of those briefs, the memo and one lookup per ISBN remain; brief 20
+  dropped the two agreeing reads.
 
 ## What a code means
 

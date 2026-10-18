@@ -232,7 +232,7 @@ inline after the brief was written:
   rather than 2 s, so a correction lands in about a second.
 
 Checked in headless Chrome with a fake camera. 629 tests. Outcome in
-[brief 17](briefs/done/17-confirmed-reads.md).
+[brief 17](briefs/superseded/17-confirmed-reads.md).
 
 ## [2026-10-17] build | Brief 18: one lookup per ISBN
 
@@ -263,3 +263,11 @@ lookup per ISBN on the server. The glossary drops *Loose sheet*. Checked in
 headless Chrome with a fake camera: no reads between presses, two reads and
 one lookup per press. 624 tests. Outcome in
 [brief 19](briefs/done/19-scan-on-a-press.md).
+
+## [2026-10-18] revisit + build | Brief 20: the first read wins
+
+The owner said a press doesn't need two agreeing reads: if the ISBN looks
+wrong, they press again. A press now takes the first code it reads, and the
+ISBN still wins over a sticker. The decision "The camera reads only on a
+press" is updated to match. 618 tests. Outcome in
+[brief 20](briefs/done/20-first-read-wins.md).
