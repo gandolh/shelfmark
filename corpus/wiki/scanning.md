@@ -1,6 +1,6 @@
 ---
-summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, scanning on a press (the first code read, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-updated: 2026-10-18
+summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (our 720p stream, iPhone's lens switching, what Chrome on Android lets a page set), scanning on a press (the first code read, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+updated: 2026-10-20
 ---
 
 # Scanning
@@ -36,6 +36,45 @@ reads better).
   the stream is live.
 - Ask for the rear camera (`facingMode: "environment"`), turn on the torch when
   the track supports it, and stop the stream when the view is hidden.
+
+## Camera quality
+
+Researched on 2026-10-20, after the owner found the picture soft. Brief 21
+acts on it.
+
+- **What we ask for.** [camera.ts](../../web/src/scanner/camera.ts) asks
+  for 1280×720 and nothing about focus or zoom. In portrait, the 720 px side
+  is stretched across the screen's width, about 1.6× on a 1170 px-wide iPhone
+  screen. 720p is the usual default for barcode readers: STRICH's docs call it
+  enough for good-quality codes and suggest more only for small or worn ones,
+  because each extra pixel costs decode time.
+- **The stream is not the Camera app.** `getUserMedia` gives the camera's raw
+  video, with none of the app's HDR, night mode or photo processing. A picture
+  worse than the Camera app's is normal.
+- **iPhone.** Since iOS 16.4, `facingMode: "environment"` opens a multi-lens
+  virtual camera ahead of the plain wide lens: Back Triple Camera, then Back
+  Dual Wide ([WebKit 253186](https://bugs.webkit.org/show_bug.cgi?id=253186)).
+  Since iOS 17 that camera switches by itself to the ultra-wide lens near a
+  close object, cropped to keep the framing
+  ([WebKit 262416](https://bugs.webkit.org/show_bug.cgi?id=262416), still
+  open). That switch is how a Pro iPhone focuses up close, since its main lens
+  can't focus nearer than about 15 cm
+  ([WebKit 247737](https://bugs.webkit.org/show_bug.cgi?id=247737)). But the
+  cropped ultra-wide picture holds less detail. Safari has no focus control.
+  WebKit added the `zoom` capability in March 2023
+  ([WebKit 253646](https://bugs.webkit.org/show_bug.cgi?id=253646)); whether
+  an iPhone lists it shows in `getCapabilities()`.
+- **Chrome on Android.** `getCapabilities()` lists focus modes, focus
+  distance, zoom and torch when the camera supports them. `enumerateDevices`
+  lists each back lens, but with labels like `camera2 0, facing back`, so a
+  lens can't be chosen by name. `facingMode` usually opens the main lens.
+- **What helps.** More pixels on the barcode: a larger stream, or zoom, so
+  the book can sit beyond the main lens's close-focus limit. On Android, zoom
+  crops the sensor before scaling to the stream size, so 2× adds real detail.
+  A lens picker doesn't help: the labels say nothing, and an iPhone switches
+  lenses itself.
+- **Not known yet:** which of these applies to the owner's phone. Brief 21's
+  `?camera` readout on the Add page shows its numbers.
 
 ## Scanning on a press
 

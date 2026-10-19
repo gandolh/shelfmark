@@ -271,3 +271,18 @@ wrong, they press again. A press now takes the first code it reads, and the
 ISBN still wins over a sticker. The decision "The camera reads only on a
 press" is updated to match. 618 tests. Outcome in
 [brief 20](briefs/done/20-first-read-wins.md).
+
+## [2026-10-20] todo | Brief 21: read until the ISBN, and a sharper camera
+
+The owner reported that a press often reads nothing, while the old
+continuous scanner read well. The likely cause is brief 19's 3 s window: on
+a real phone the tap moves the camera, and it refocuses. They asked for a
+press that reads until it finds the ISBN, then stops. They also asked
+whether the soft picture is Shelfmark's or the browser's. The research is in
+[scanning.md](wiki/scanning.md), "Camera quality": we ask for only 1280×720,
+with no focus or zoom; iPhones switch lenses by themselves near a book;
+Chrome on Android lets a page set focus and zoom. Brief 21 drops the 3 s
+deadline, adds *Stop reading* and a 60 s limit, asks for 1080p, adds focus
+and a 2× zoom where the camera offers them, and adds a `?camera` readout so
+the owner's phone can settle the question. Spec in
+[brief 21](briefs/todo/21-read-until-found.md).
