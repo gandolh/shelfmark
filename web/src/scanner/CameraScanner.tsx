@@ -1,6 +1,26 @@
-import { useEffect, useEffectEvent, useImperativeHandle, useMemo, useRef, useState, useSyncExternalStore, type Ref } from "react";
-import { cameraFailure, hasTorch, openCamera, setTorch, stopStream } from "./camera";
-import { getEngine, readCode, type EngineChoice, type Reading, type ScannedCode } from "./detector";
+import {
+  useEffect,
+  useEffectEvent,
+  useImperativeHandle,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type Ref,
+} from "react";
+import {
+  cameraFailure,
+  capabilitiesOf,
+  hasTorch,
+  openCamera,
+  readoutLines,
+  stopStream,
+  tuneCamera,
+  zoomsTo2x,
+  type Zoom,
+} from "./camera";
+import { getEngine, readCode, type Engine, type EngineChoice, type Reading, type ScannedCode } from "./detector";
 import { armFeedback, signalScan } from "./feedback";
 import "./CameraScanner.css";
 
@@ -14,13 +34,21 @@ export type ScannerState = "asking" | "scanning" | "denied" | "no-camera" | "ins
 /** What the parent asks of a running scanner. */
 export interface ScannerHandle {
   /**
-   * Read the barcode in view: the first code read, or `null` when
-   * none is read within 3 s (detector.ts `readCode`). A second call while one
-   * runs gets the same answer. Rejects with an `AbortError` when the camera
-   * stops or the scanner is paused meanwhile, and at once when it isn't
-   * scanning.
+   * Read the barcode in view, for as long as it takes: the first code read,
+   * or `null` when nothing is read for a minute (detector.ts `readCode`). A
+   * second call while one runs gets the same answer. Rejects with an
+   * `AbortError` on `stop()`, when the camera stops or the scanner is paused
+   * meanwhile, and at once when it isn't scanning.
    */
   read(): Promise<ScannedCode | null>;
+  /** Stop the reading in progress, if any: its `read()` rejects with an `AbortError`. */
+  stop(): void;
+}
+
+/** The camera as the readout shows it: the engine and the live track. */
+export interface CameraInfo {
+  engine: Engine;
+  track: MediaStreamTrack;
 }
 
 export interface CameraScannerProps {
@@ -30,6 +58,8 @@ export interface CameraScannerProps {
   paused?: boolean;
   /** The torch the parent wants; ignored when the camera has none (see `onTorchAvailable`). */
   torch?: boolean;
+  /** The zoom the parent wants; ignored when the camera can't zoom to 2 (see `onZoomAvailable`). Default 2. */
+  zoom?: Zoom;
   /** Beep and vibrate on each code read. Default true. */
   feedback?: boolean;
   /** "Type the ISBN instead", offered in every state but scanning. */
@@ -37,6 +67,12 @@ export interface CameraScannerProps {
   onStateChange?: (state: ScannerState) => void;
   /** Whether a torch control would do anything; false until the camera runs. */
   onTorchAvailable?: (available: boolean) => void;
+  /** Whether a 1× / 2× zoom chip would do anything; false until the camera runs. */
+  onZoomAvailable?: (available: boolean) => void;
+  /** For the readout: the engine and the track while the camera runs, else `null`. */
+  onCamera?: (camera: CameraInfo | null) => void;
+  /** For the readout: each decode's time in ms, while a press reads. Not measured without it. */
+  onDecode?: (ms: number) => void;
   className?: string;
 }
 
@@ -86,10 +122,14 @@ export function CameraScanner({
   ref,
   paused = false,
   torch = false,
+  zoom = 2,
   feedback = true,
   onFallback,
   onStateChange,
   onTorchAvailable,
+  onZoomAvailable,
+  onCamera,
+  onDecode,
   className,
 }: CameraScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -180,10 +220,15 @@ export function CameraScanner({
         }
         if (current.current !== null) return current.current.result;
         const { detector } = engine;
-        const reading = readCode(() =>
+        const reading = readCode(async () => {
           // A video between streams has no frame to read.
-          video.readyState >= video.HAVE_CURRENT_DATA && video.videoWidth > 0 ? detector.detect(video) : Promise.resolve([]),
-        );
+          if (video.readyState < video.HAVE_CURRENT_DATA || video.videoWidth === 0) return [];
+          if (onDecode === undefined) return detector.detect(video);
+          const started = performance.now();
+          const detections = await detector.detect(video);
+          onDecode(performance.now() - started);
+          return detections;
+        });
         const result = reading.result
           .then((code) => {
             if (code !== null) {
@@ -198,16 +243,23 @@ export function CameraScanner({
         current.current = { reading, result };
         return result;
       },
+      stop() {
+        current.current?.reading.cancel();
+        current.current = null;
+      },
     }),
-    [canRead, engine, feedback],
+    [canRead, engine, feedback, onDecode],
   );
 
   const torchAvailable = useMemo(() => track !== null && hasTorch(track), [track]);
+  const zoomAvailable = useMemo(() => track !== null && zoomsTo2x(capabilitiesOf(track)), [track]);
+  // The torch, the zoom and continuous focus, where the camera offers each,
+  // applied as the stream opens and again on each change. A track stopped by
+  // a hidden page rejects; the next stream applies them again.
   useEffect(() => {
-    if (track === null || !torchAvailable) return;
-    // A track stopped by a hidden page rejects; the next stream reapplies it.
-    setTorch(track, torch).catch(() => {});
-  }, [track, torchAvailable, torch]);
+    if (track === null) return;
+    tuneCamera(track, { torch, zoom }).catch(() => {});
+  }, [track, torch, zoom]);
 
   const reportState = useEffectEvent((next: ScannerState) => onStateChange?.(next));
   useEffect(() => {
@@ -219,6 +271,21 @@ export function CameraScanner({
   useEffect(() => {
     reportTorch(torchUsable);
   }, [torchUsable]);
+
+  const reportZoom = useEffectEvent((available: boolean) => onZoomAvailable?.(available));
+  const zoomUsable = zoomAvailable && state === "scanning";
+  useEffect(() => {
+    reportZoom(zoomUsable);
+  }, [zoomUsable]);
+
+  const reportCamera = useEffectEvent((camera: CameraInfo | null) => onCamera?.(camera));
+  const camera = useMemo<CameraInfo | null>(
+    () => (state === "scanning" && engine !== null && track !== null ? { engine: engine.engine, track } : null),
+    [state, engine, track],
+  );
+  useEffect(() => {
+    reportCamera(camera);
+  }, [camera]);
 
   const retry = (): void => {
     setEngineFailed(false);
@@ -256,6 +323,47 @@ export function CameraScanner({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * `?camera` on the Add page: the camera's numbers (scanning.md, "Camera
+ * quality"). Only the owner's phone can say whether a soft picture is the
+ * stream's size or the lens, so it ships, behind an address nobody links to.
+ * The settings change once zoom and focus are applied, so they are read again
+ * every second.
+ */
+export function CameraReadout({
+  camera,
+  decodeMs,
+  className,
+}: {
+  camera: CameraInfo | null;
+  decodeMs: number | null;
+  className?: string;
+}) {
+  const [, refresh] = useReducer((n: number) => n + 1, 0);
+  useEffect(() => {
+    if (camera === null) return;
+    const timer = setInterval(refresh, 1000);
+    return () => clearInterval(timer);
+  }, [camera]);
+  if (camera === null) return null;
+  const { engine, track } = camera;
+  const lines = readoutLines({
+    engine,
+    label: track.label,
+    settings: track.getSettings(),
+    capabilities: capabilitiesOf(track),
+    decodeMs,
+  });
+  return (
+    <div className={className === undefined ? "scanner-readout" : `scanner-readout ${className}`}>
+      {/* Four lines, always in the same order. */}
+      {lines.map((line, index) => (
+        <span key={index}>{line}</span>
+      ))}
     </div>
   );
 }

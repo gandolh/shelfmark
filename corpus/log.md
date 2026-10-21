@@ -285,4 +285,22 @@ Chrome on Android lets a page set focus and zoom. Brief 21 drops the 3 s
 deadline, adds *Stop reading* and a 60 s limit, asks for 1080p, adds focus
 and a 2× zoom where the camera offers them, and adds a `?camera` readout so
 the owner's phone can settle the question. Spec in
-[brief 21](briefs/todo/21-read-until-found.md).
+[brief 21](briefs/done/21-read-until-found.md).
+
+## [2026-10-21] revisit + build | Brief 21: read until the ISBN, and a sharper camera
+
+A press of *Scan the barcode* now reads until it reads a code, with no 3 s
+deadline. While it reads, the button says *Stop reading*. A minute with
+nothing read stops it, for the battery, with "Nothing read for a minute". A
+sticker read first now waits 1 s for an ISBN, not 450 ms. The decision "The
+camera reads only on a press" is updated: its "for at most 3 s" is gone.
+
+The camera now asks for 1920×1080, sets continuous focus when the camera
+lists it, and shows a 1× / 2× zoom chip (starting at 2×) when the camera
+zooms to 2. `?camera` on the Add page shows the camera's numbers, for the
+owner's phone to settle whether the soft picture is the stream or the lens.
+
+Checked in headless Chrome with a fake camera: a press over a blank picture
+read the book at about 8 s and sent one lookup; *Stop reading* stopped the
+reads; a blank-only camera stopped at 60 s. 633 tests. Outcome in
+[brief 21](briefs/done/21-read-until-found.md).

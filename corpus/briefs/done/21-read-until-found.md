@@ -138,3 +138,66 @@ corpus/wiki/scanning.md  corpus/wiki/features.md  corpus/wiki/decisions.md
   at the end of the address. Send the readout's numbers: resolution, zoom
   range, focus modes, decode time. They show whether the soft picture is the
   stream's size or the lens.
+
+## Outcome
+
+_2026-10-21_. Built inline. 633 tests, 15 more than brief 20's 618.
+
+- **What changed.**
+  - `detector.ts`: `GIVE_UP_MS` (60 s) replaces `READ_FOR_MS`, and
+    `ISBN_GRACE_MS` is 1000. `readCode` takes `giveUpMs`. A sticker still
+    waiting at 60 s counts, as it did at 3 s.
+  - `camera.ts`: 1920×1080 as `ideal`. Also `capabilitiesOf`, `zoomsTo2x`
+    (the chip's rule), `focusesContinuously`, and `tuneCamera`. That one
+    `applyConstraints` set holds the torch, the zoom and continuous focus,
+    each only when the capabilities list it. It replaces `setTorch`.
+    `readoutLines` formats the readout.
+  - `CameraScanner`: the handle gains `stop()`. New props: `zoom`,
+    `onZoomAvailable`, and `onCamera` and `onDecode` for the readout. Decode
+    time is measured only when `onDecode` is given. `CameraReadout` is
+    exported from the same file and reads the settings again every second.
+  - `AddBookPage`: *Stop reading*, the minute's line, the zoom chip, and
+    the readout behind `?camera`.
+  - `ScannerDemo`: Read becomes Stop while it reads, and the readout shows
+    under the camera.
+- **Checked** in headless Chrome 150 (ZXing engine), with a fake camera
+  showing a blank picture for 8 s and then a book's EAN-13. The lookups were
+  answered in the browser, so no server ran and nothing reached Google:
+  - A press over the blank: 54 reads, 34 of them past 3 s. The book read at
+    7,983 ms and one lookup went out 24 ms later. The button said *Stop
+    reading* at 1, 3.5 and 6 s, with no message in between.
+  - *Stop reading* at 2 s: 14 reads before it, none in the 4 s after, no
+    lookup, no message, and the button was back.
+  - Without `?camera` there is no readout. With it, four lines show, and
+    the decode time updates while reading (5 to 10 ms at 640×360).
+  - With zoom, focus and torch faked into the track's capabilities, the
+    camera got one set, `{torch: false, zoom: 2, focusMode: "continuous"}`.
+    The chip showed "2×". A tap applied zoom 1 and showed "1×", and the
+    torch then applied `torch: true` with the same zoom and focus.
+  - A blank-only camera: 400 reads, the last at 59.9 s, then "Nothing read
+    for a minute", no lookup, and no reads after.
+- **Not checked here:** a real camera's focus, zoom and resolution, and
+  decode time at 1080p on a phone.
+- **Departures:**
+  - The zoom chip sits under the torch, in a column at top right, rather
+    than beside it. A long "Saved …" line can reach the right edge, and a
+    row of controls would sit in its way.
+  - The chip is one 44 px disc that shows the zoom in use and switches on a
+    tap. Like the torch, it goes back to 2× on a mode switch.
+  - The minute's line names the button in quotes: "Tap “Scan the barcode”
+    to try again."
+  - `server/src/routes/books.test.ts` ("3,000 books in under 100 ms") failed
+    once at 118.6 ms under the full suite's load and passed on two reruns
+    and alone. The server is untouched.
+
+**Owner check** (phone, after a deploy):
+- Tap *Scan the barcode*, then bring a book in. It reads once the barcode
+  is sharp, with no "nothing read" message in between, and stops there.
+- While it reads, *Stop reading* stops it.
+- On Android, a "2×" chip under the torch. Check whether 2× reads better
+  than 1× from about 20 cm. On an iPhone a chip may show too, if Safari
+  lists zoom. If 2× looks worse there, say so.
+- In the browser (not the installed app), open Add a book, then add
+  `?camera` to the end of the address. Send the readout's four lines:
+  resolution, zoom range, focus modes, decode time. A decode time over
+  150 ms is the cue for the crop brief.

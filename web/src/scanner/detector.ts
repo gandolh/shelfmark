@@ -131,27 +131,36 @@ export function codesFrom(detections: readonly Detection[]): ScannedCode[] {
 
 /** A press reads this often until a code is read. */
 export const READ_EVERY_MS = 150;
-/** How long a press keeps reading before it says nothing was read. */
-export const READ_FOR_MS = 3000;
-/** A sticker read first waits this long for an ISBN beside it: two more reads, with room for their decode time. */
-export const ISBN_GRACE_MS = 450;
+/**
+ * A press that reads nothing for this long stops: a phone put down with the
+ * camera on. It saves the battery; the owner can hold a book in view as long
+ * as the camera needs.
+ */
+export const GIVE_UP_MS = 60_000;
+/**
+ * A sticker read first waits this long for an ISBN beside it. The owner holds
+ * the book in view while the camera focuses, so the ISBN next to a shop
+ * sticker may come into focus a moment after it.
+ */
+export const ISBN_GRACE_MS = 1000;
 
-/** One press's reading. `result` is the code, or `null` when nothing was read in time. */
+/** One press's reading. `result` is the code, or `null` when nothing was read before `GIVE_UP_MS`. */
 export interface Reading {
   result: Promise<ScannedCode | null>;
-  /** Stop now: `result` rejects with an `AbortError` (the camera stopped, the page moved on). */
+  /** Stop now: `result` rejects with an `AbortError` (*Stop reading*, the camera stopped, the page moved on). */
   cancel(): void;
 }
 
 /**
- * Read until a code is read, for at most `forMs`. The first ISBN ends the
- * reading: the owner sees it, and presses again if it looks wrong. A barcode
- * that isn't one (a store sticker) waits `graceMs` for an ISBN beside it,
- * then counts.
+ * Read until a code is read, with no deadline but `giveUpMs`. The first ISBN
+ * ends the reading: the owner sees it, and presses again if it looks wrong. A
+ * barcode that isn't one (a store sticker) waits `graceMs` for an ISBN beside
+ * it, then counts. At `giveUpMs`, a sticker still waiting counts too; with
+ * nothing read, `result` is `null`.
  */
 export function readCode(
   detect: () => Promise<readonly Detection[]>,
-  { everyMs = READ_EVERY_MS, forMs = READ_FOR_MS, graceMs = ISBN_GRACE_MS } = {},
+  { everyMs = READ_EVERY_MS, giveUpMs = GIVE_UP_MS, graceMs = ISBN_GRACE_MS } = {},
 ): Reading {
   let settle: (code: ScannedCode | null) => void = () => {};
   let abort: (error: Error) => void = () => {};
@@ -184,7 +193,7 @@ export function readCode(
       }
     },
   });
-  timers.push(setTimeout(() => finish(other), forMs));
+  timers.push(setTimeout(() => finish(other), giveUpMs));
   return {
     result,
     cancel() {

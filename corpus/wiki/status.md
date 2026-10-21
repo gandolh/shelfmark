@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, not built. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-20
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+updated: 2026-10-21
 ---
 
 # Status
@@ -22,10 +22,11 @@ product calls are in [decisions.md](decisions.md), the look in
 1. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-2. Redeploy to ship briefs 15 to 20, then run the two checks in
+2. Redeploy to ship briefs 15 to 21, then run the two checks in
    owner-setup's "Romanian lookups after a deploy": the libraries over port
    9991, and the first CIP refresh in the logs. The phone checks of briefs 18
-   to 20 are in their outcomes.
+   to 21 are in their outcomes. Brief 21's `?camera` readout numbers, sent
+   from the owner's phone, decide whether the picture needs more work.
 3. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
    local Ward round trip (06, needs Docker Desktop's WSL integration), the
@@ -58,7 +59,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 18 | [One lookup per ISBN](../briefs/done/18-one-lookup-per-isbn.md) | 10 | done; the settle undone by 19 |
 | 19 | [Scan on a press](../briefs/done/19-scan-on-a-press.md) | 11 | done |
 | 20 | [The first read wins](../briefs/done/20-first-read-wins.md) | 12 | done |
-| 21 | [Read until the ISBN, and a sharper camera](../briefs/todo/21-read-until-found.md) | 13 | todo |
+| 21 | [Read until the ISBN, and a sharper camera](../briefs/done/21-read-until-found.md) | 13 | done |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for

@@ -1,6 +1,6 @@
 ---
 summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press. Research recommendations live on the concept pages until the owner confirms them.
-updated: 2026-10-18
+updated: 2026-10-21
 ---
 
 # Decisions
@@ -121,9 +121,13 @@ and its Z39.50 port did not answer). Measurements in
 ## The camera reads only on a press
 _2026-10-18_. Scan mode shows the live camera and a *Scan the barcode*
 button. The camera decodes nothing and sends no lookup until it is pressed.
-A press takes the first code it reads, for at most 3 s
-([scanning.md](scanning.md)). Until brief 20, the same day, it waited for
-two agreeing reads; now the owner presses again when an ISBN looks wrong.
+A press takes the first code it reads, and reads until it reads one
+([scanning.md](scanning.md)). *Stop reading* ends it, and so does a minute
+with nothing read, which is for the battery. Until brief 20, the same day, it
+waited for two agreeing reads; now the owner presses again when an ISBN
+looks wrong. Until brief 21 (2026-10-21) a press read for at most 3 s. On a
+real phone the tap moves the camera and it refocuses, so the window often
+ran out before the barcode was sharp.
 The owner asked for the press after briefs 17 and 18 had made continuous
 reading safer. They want nothing read or sent without a deliberate act,
 which also spares the libraries and the Google key the calls of a misread or

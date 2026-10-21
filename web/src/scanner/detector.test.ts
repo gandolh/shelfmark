@@ -6,9 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   codesFrom,
   FORMATS,
+  GIVE_UP_MS,
   ISBN_GRACE_MS,
   READ_EVERY_MS,
-  READ_FOR_MS,
   readCode,
   selectEngine,
   startDetectLoop,
@@ -138,8 +138,14 @@ describe("readCode", () => {
     return vi.fn(() => Promise.resolve(list.length > 1 ? list.shift()! : (list[0] ?? [])));
   }
 
+  /** A detector that sees nothing until `atMs` after it was made, then `frame`. */
+  function after(atMs: number, frame: Detection[]) {
+    const start = Date.now();
+    return vi.fn(() => Promise.resolve(Date.now() - start >= atMs ? frame : []));
+  }
+
   it("reads every 150 ms and ends on the first read with an ISBN", async () => {
-    expect([READ_EVERY_MS, READ_FOR_MS, ISBN_GRACE_MS]).toEqual([150, 3000, 450]);
+    expect([READ_EVERY_MS, GIVE_UP_MS, ISBN_GRACE_MS]).toEqual([150, 60_000, 1000]);
     const detect = frames([], [isbn]);
     const reading = readCode(detect);
     await vi.advanceTimersByTimeAsync(150);
@@ -147,6 +153,21 @@ describe("readCode", () => {
     expect(detect).toHaveBeenCalledTimes(2);
     await vi.advanceTimersByTimeAsync(3000);
     expect(detect).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps reading past 3 s: an ISBN read at 5 s ends the reading", async () => {
+    const detect = after(5000, [isbn]);
+    const reading = readCode(detect);
+    let result: unknown = "pending";
+    void reading.result.then((code) => (result = code));
+    await vi.advanceTimersByTimeAsync(4950);
+    expect(result).toBe("pending");
+    await vi.advanceTimersByTimeAsync(150);
+    expect(result).toEqual({ kind: "isbn", isbn13: "9786063205583" });
+    const reads = detect.mock.calls.length;
+    expect(reads).toBe(Math.ceil(5000 / 150) + 1);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(detect).toHaveBeenCalledTimes(reads);
   });
 
   it("takes a misread as read: the owner sees it and presses again", async () => {
@@ -162,32 +183,39 @@ describe("readCode", () => {
     await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205583" });
   });
 
-  it("gives a sticker read first two more reads for an ISBN beside it", async () => {
-    const reading = readCode(frames([sticker], [sticker], [sticker, isbn]));
-    await vi.advanceTimersByTimeAsync(300);
+  it("takes an ISBN read within 1 s of a sticker over the sticker", async () => {
+    // The sticker at once, the ISBN beside it coming into focus 900 ms later.
+    const start = Date.now();
+    const detect = vi.fn(() => Promise.resolve(Date.now() - start >= 900 ? [sticker, isbn] : [sticker]));
+    const reading = readCode(detect);
+    await vi.advanceTimersByTimeAsync(1000);
     await expect(reading.result).resolves.toEqual({ kind: "isbn", isbn13: "9786063205583" });
   });
 
-  it("takes the sticker when no ISBN comes in that time", async () => {
+  it("takes the sticker when no ISBN comes within 1 s", async () => {
     const detect = frames([sticker]);
     const reading = readCode(detect);
     await vi.advanceTimersByTimeAsync(0);
     let result: unknown = "pending";
     void reading.result.then((code) => (result = code));
-    await vi.advanceTimersByTimeAsync(449);
+    await vi.advanceTimersByTimeAsync(999);
     expect(result).toBe("pending");
     await vi.advanceTimersByTimeAsync(1);
     expect(result).toEqual({ kind: "other", code: "2000000000008" });
   });
 
-  it("says nothing was read after 3 s, and stops reading", async () => {
+  it("stops after 60 s with nothing read, and reads no more", async () => {
     const detect = frames([]);
     const reading = readCode(detect);
-    await vi.advanceTimersByTimeAsync(3000);
-    await expect(reading.result).resolves.toBeNull();
+    let result: unknown = "pending";
+    void reading.result.then((code) => (result = code));
+    await vi.advanceTimersByTimeAsync(59_999);
+    expect(result).toBe("pending");
+    await vi.advanceTimersByTimeAsync(1);
+    expect(result).toBeNull();
     const reads = detect.mock.calls.length;
-    expect(reads).toBe(20);
-    await vi.advanceTimersByTimeAsync(1000);
+    expect(reads).toBe(400);
+    await vi.advanceTimersByTimeAsync(5000);
     expect(detect).toHaveBeenCalledTimes(reads);
   });
 
@@ -199,6 +227,19 @@ describe("readCode", () => {
     await rejected;
     await vi.advanceTimersByTimeAsync(1000);
     expect(detect).not.toHaveBeenCalled();
+  });
+
+  it("stops mid-reading on cancel: no reads after it", async () => {
+    const detect = frames([]);
+    const reading = readCode(detect);
+    const rejected = expect(reading.result).rejects.toMatchObject({ name: "AbortError" });
+    await vi.advanceTimersByTimeAsync(10_000);
+    const reads = detect.mock.calls.length;
+    expect(reads).toBeGreaterThan(60);
+    reading.cancel();
+    await rejected;
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(detect).toHaveBeenCalledTimes(reads);
   });
 });
 

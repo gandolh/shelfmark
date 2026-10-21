@@ -1,6 +1,6 @@
 ---
-summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (our 720p stream, iPhone's lens switching, what Chrome on Android lets a page set), scanning on a press (the first code read, up to 3 s, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-updated: 2026-10-20
+summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (the stream's size, iPhone's lens switching, what Chrome on Android lets a page set) and what we ask for since brief 21 (1080p, continuous focus, a 1×/2× zoom chip, no lens picker), the `?camera` readout, scanning on a press (read until a code is read, *Stop reading*, a minute's limit, a sticker's 1 s wait, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+updated: 2026-10-21
 ---
 
 # Scanning
@@ -40,14 +40,14 @@ reads better).
 ## Camera quality
 
 Researched on 2026-10-20, after the owner found the picture soft. Brief 21
-acts on it.
+acted on it on 2026-10-21.
 
-- **What we ask for.** [camera.ts](../../web/src/scanner/camera.ts) asks
-  for 1280×720 and nothing about focus or zoom. In portrait, the 720 px side
-  is stretched across the screen's width, about 1.6× on a 1170 px-wide iPhone
-  screen. 720p is the usual default for barcode readers: STRICH's docs call it
-  enough for good-quality codes and suggest more only for small or worn ones,
-  because each extra pixel costs decode time.
+- **What we asked for until brief 21.** 1280×720 and nothing about focus or
+  zoom. In portrait, the 720 px side is stretched across the screen's width,
+  about 1.6× on a 1170 px-wide iPhone screen. 720p is the usual default for
+  barcode readers: STRICH's docs call it enough for good-quality codes and
+  suggest more only for small or worn ones, because each extra pixel costs
+  decode time.
 - **The stream is not the Camera app.** `getUserMedia` gives the camera's raw
   video, with none of the app's HDR, night mode or photo processing. A picture
   worse than the Camera app's is normal.
@@ -73,8 +73,30 @@ acts on it.
   crops the sensor before scaling to the stream size, so 2× adds real detail.
   A lens picker doesn't help: the labels say nothing, and an iPhone switches
   lenses itself.
-- **Not known yet:** which of these applies to the owner's phone. Brief 21's
-  `?camera` readout on the Add page shows its numbers.
+- **What we ask for since brief 21**
+  ([camera.ts](../../web/src/scanner/camera.ts)):
+  - 1920×1080 as `ideal`, so the browser gives what it can.
+  - Continuous focus, when `getCapabilities().focusMode` lists it.
+  - A 1× / 2× zoom chip when `getCapabilities().zoom` reaches 2. It starts
+    at 2× and lasts for the visit, like the torch.
+
+  The torch, the zoom and the focus go in one `applyConstraints` set
+  (`tuneCamera`), each only when the camera lists it. That way no setting
+  depends on an earlier call having kept another. If a phone then takes over
+  150 ms per decode, the fix is to decode only the viewfinder's crop, in a
+  later brief.
+- **No lens picker.** We keep `facingMode: "environment"`. Android names its
+  lenses `camera2 0, facing back` and so on, so choosing one by label is
+  guesswork, and an iPhone switches lenses by itself. Don't add a picker
+  without the owner's readout numbers showing it would help.
+- **The readout.** `?camera` at the end of the Add page's address shows, top
+  left over the camera, the engine and the track's label, what the browser
+  granted (`getSettings()`), what the camera can do (`getCapabilities()`),
+  and the last decode's time. It ships to production, unlinked, because
+  only the owner's phone can answer the question. An installed iOS app has
+  no address bar, so the owner opens it in the browser.
+- **Not known yet:** which of these applies to the owner's phone, until the
+  owner sends the readout's numbers.
 
 ## Scanning on a press
 
@@ -85,16 +107,26 @@ between presses. A beep or vibration and the frame's flash mark a read. A
 scanned ISBN already in the library shows "Already in your library" with
 "Add another copy" and "Open the book".
 
-- **A press reads every 150 ms until it reads a code, for at most 3 s**
-  ([detector.ts](../../web/src/scanner/detector.ts) `readCode`).
-  - The first ISBN read ends it, usually on the first read after the press.
-    The owner sees the ISBN and presses again if it looks wrong (brief 20).
-    Brief 17 required two agreeing reads because the check digit misses some
-    misreads (two wrong digits that cancel out, neighbouring digits that
-    differ by 5 swapped). That mattered while the camera read by itself.
-  - In one read, an ISBN wins over a sticker. A sticker read first waits
-    two more reads (450 ms, decode time included) for an ISBN beside it.
-  - Nothing in 3 s: "No barcode read", and no lookup.
+- **A press reads every 150 ms until it reads a code**
+  ([detector.ts](../../web/src/scanner/detector.ts) `readCode`). Since
+  brief 21 (2026-10-21) there is no deadline. On a real phone the tap moves
+  the camera and it refocuses, so brief 19's 3 s window often ran out before
+  the barcode was sharp.
+  - The first ISBN read ends it. The owner sees the ISBN and presses again
+    if it looks wrong (brief 20). Brief 17 required two agreeing reads
+    because the check digit misses some misreads (two wrong digits that
+    cancel out, neighbouring digits that differ by 5 swapped). That mattered
+    while the camera read by itself.
+  - In one read, an ISBN wins over a sticker. A sticker read first counts
+    only if no ISBN is read within 1 s (`ISBN_GRACE_MS`; 450 ms before
+    brief 21). The owner holds the book in view while the camera focuses,
+    so the ISBN beside a shop sticker needs time to come into focus.
+  - While it reads, the button says *Stop reading*, and a tap stops it with
+    no message. Hiding the page, switching mode and leaving the page stop it
+    the same way.
+  - Nothing read in 60 s (`GIVE_UP_MS`): the reading stops with "Nothing
+    read for a minute", and nothing is sent. The limit is for a phone put
+    down with the camera on. It saves the battery, not the owner's time.
 - **The button shows only while no result is open.** A result is the
   owner's until they act on it, and its own buttons bring the camera back. A
   misread is corrected with *Not this book* and another press.

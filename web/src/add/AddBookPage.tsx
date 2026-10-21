@@ -5,7 +5,8 @@ import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
 import { Button } from "../components/Button";
-import { CameraScanner, type ScannerHandle, type ScannerState } from "../scanner/CameraScanner";
+import type { Zoom } from "../scanner/camera";
+import { CameraReadout, CameraScanner, type CameraInfo, type ScannerHandle, type ScannerState } from "../scanner/CameraScanner";
 import type { ScannedCode } from "../scanner/detector";
 import { attachCover, lookupIsbn } from "./api";
 import type { CoverPhoto } from "./CoverCapture";
@@ -73,6 +74,13 @@ export function AddBookPage() {
   const saving = useRef(false);
   const [torch, setTorch] = useState(false);
   const [torchAvailable, setTorchAvailable] = useState(false);
+  // 2× first: the barcode fills the viewfinder from beyond the lens's close-focus limit.
+  const [zoom, setZoom] = useState<Zoom>(2);
+  const [zoomAvailable, setZoomAvailable] = useState(false);
+  // `?camera`: the camera's numbers over the stage. The owner types the address; nothing links to it.
+  const [readout] = useState(() => new URLSearchParams(window.location.search).has("camera"));
+  const [camera, setCamera] = useState<CameraInfo | null>(null);
+  const [decodeMs, setDecodeMs] = useState<number | null>(null);
   // A mode chosen by pointer puts the cursor in its field; one reached with
   // the tabs' arrow keys leaves focus on the tabs, as tabs should.
   const [focusOnEnter, setFocusOnEnter] = useState(true);
@@ -81,8 +89,8 @@ export function AddBookPage() {
   const scanner = useRef<ScannerHandle>(null);
   const pressButton = useRef<HTMLButtonElement>(null);
   const [scannerState, setScannerState] = useState<ScannerState>("asking");
-  // What the last press of "Scan the barcode" came to.
-  const [press, setPress] = useState<"idle" | "reading" | "missed">("idle");
+  // What the last press of "Scan the barcode" came to: `gave-up` is a minute with nothing read.
+  const [press, setPress] = useState<"idle" | "reading" | "gave-up">("idle");
 
   useEffect(() => {
     session.mode = mode;
@@ -110,20 +118,26 @@ export function AddBookPage() {
   }, [lookingId, lookingIsbn, memo]);
 
   // The camera reads only on a press, and only while nothing is on the sheet:
-  // a result is the owner's until they act on it.
+  // a result is the owner's until they act on it. A press reads until it reads
+  // a code, so the owner can bring the book in after the tap; *Stop reading*
+  // ends it, and a minute with nothing read ends it for the battery.
   const canPress = mode === "scan" && step.kind === "ready" && scannerState === "scanning";
   const scan = async () => {
-    if (press === "reading" || scanner.current === null) return;
+    if (scanner.current === null) return;
+    if (press === "reading") {
+      scanner.current.stop();
+      return;
+    }
     setPress("reading");
     let code: ScannedCode | null;
     try {
       code = await scanner.current.read();
     } catch {
-      // Stopped: the page was hidden, or the owner moved on.
+      // Stopped: by the owner, a hidden page, or a move to another mode.
       setPress("idle");
       return;
     }
-    setPress(code === null ? "missed" : "idle");
+    setPress(code === null ? "gave-up" : "idle");
     if (code !== null) dispatch({ type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined });
   };
   // A result's buttons bring the scan button back; focus, lost with the sheet, goes to it.
@@ -191,6 +205,8 @@ export function AddBookPage() {
   const changeMode = (next: Mode, viaKeyboard = false) => {
     setTorch(false);
     setTorchAvailable(false);
+    setZoom(2);
+    setZoomAvailable(false);
     setPress("idle");
     setFocusOnEnter(!viaKeyboard);
     dispatch({ type: "mode", mode: next });
@@ -236,36 +252,54 @@ export function AddBookPage() {
                 className="add-camera"
                 paused={scannerPaused(state)}
                 torch={torch}
+                zoom={zoom}
                 onFallback={() => changeMode("isbn")}
                 onStateChange={setScannerState}
                 onTorchAvailable={setTorchAvailable}
+                onZoomAvailable={setZoomAvailable}
+                onCamera={readout ? setCamera : undefined}
+                onDecode={readout ? setDecodeMs : undefined}
               />
-              {torchAvailable && (
-                <button
-                  type="button"
-                  className="add-torch"
-                  aria-pressed={torch}
-                  aria-label="Torch"
-                  onClick={() => setTorch((lit) => !lit)}
-                >
-                  <TorchIcon size={20} on={torch} />
-                </button>
+              {(torchAvailable || zoomAvailable) && (
+                <div className="add-controls">
+                  {torchAvailable && (
+                    <button
+                      type="button"
+                      className="add-control add-torch"
+                      aria-pressed={torch}
+                      aria-label="Torch"
+                      onClick={() => setTorch((lit) => !lit)}
+                    >
+                      <TorchIcon size={20} on={torch} />
+                    </button>
+                  )}
+                  {zoomAvailable && (
+                    <button
+                      type="button"
+                      className="add-control add-zoom"
+                      aria-label={`Zoom ${zoom}×`}
+                      onClick={() => setZoom((at) => (at === 2 ? 1 : 2))}
+                    >
+                      {zoom}×
+                    </button>
+                  )}
+                </div>
               )}
+              {readout && <CameraReadout className="add-readout" camera={camera} decodeMs={decodeMs} />}
               {canPress && (
                 <div className="add-press">
-                  <p className="add-press__note" role="status" data-shown={press === "missed" || undefined}>
-                    {press === "missed" ? "No barcode read. Hold it inside the frame and try again." : ""}
+                  <p className="add-press__note" role="status" data-shown={press === "gave-up" || undefined}>
+                    {press === "gave-up" ? "Nothing read for a minute. Tap “Scan the barcode” to try again." : ""}
                   </p>
                   <Button
                     ref={pressButton}
                     variant="primary"
                     size="large"
                     block
-                    icon={<BarcodeIcon size={20} />}
-                    aria-disabled={press === "reading" || undefined}
+                    icon={press === "reading" ? undefined : <BarcodeIcon size={20} />}
                     onClick={() => void scan()}
                   >
-                    {press === "reading" ? "Reading the barcode…" : "Scan the barcode"}
+                    {press === "reading" ? "Stop reading" : "Scan the barcode"}
                   </Button>
                 </div>
               )}

@@ -212,9 +212,18 @@ Two checks after the first deploy with briefs 15 and 16. Use the `ssh` and
 
 - **Scanner on Android and iPhone**: the steps are in the outcomes of
   [07-camera-scanner.md](../corpus/briefs/done/07-camera-scanner.md),
-  [09-add-a-book-page.md](../corpus/briefs/done/09-add-a-book-page.md) and
-  [19-scan-on-a-press.md](../corpus/briefs/done/19-scan-on-a-press.md). Once the
+  [09-add-a-book-page.md](../corpus/briefs/done/09-add-a-book-page.md),
+  [19-scan-on-a-press.md](../corpus/briefs/done/19-scan-on-a-press.md) and
+  [21-read-until-found.md](../corpus/briefs/done/21-read-until-found.md). Once the
   app is live, try them on the production site (HTTPS is already there).
+- **The camera readout**: in the phone's browser (not the installed app,
+  which has no address bar), sign in, open Add a book, then add `?camera`
+  to the end of the address. Four lines appear top left: the engine and the
+  camera's name, what the browser granted (size, frame rate, zoom, focus),
+  what the camera can do, and the last decode's time once you tap *Scan the
+  barcode*. Send those numbers; they show whether the soft picture is the
+  stream's size or the lens ([scanning.md](../corpus/wiki/scanning.md),
+  "Camera quality").
 - **Ward round trip, locally**: needs Docker Desktop's WSL integration. See
   [06-accounts-and-sign-in.md](../corpus/briefs/done/06-accounts-and-sign-in.md).
 - **PWA install**: step 8, details in

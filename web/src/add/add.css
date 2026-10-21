@@ -153,11 +153,18 @@
   padding-top: var(--add-top-room);
 }
 
-.add-torch {
+/* The camera's own controls, top right: the torch, then the 1× / 2× zoom chip under it. Each only when the camera has it. */
+.add-controls {
   position: absolute;
   top: calc(var(--add-top-room) - 32px);
   right: 12px;
   z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.add-control {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -176,6 +183,22 @@
 .add-torch[aria-pressed="true"] {
   background: var(--accent-tint);
   color: var(--accent-press);
+}
+
+/* The zoom in use, as a phone's camera app shows it: "2×", tap for "1×". */
+.add-zoom {
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+/* `?camera`: top left, under the mode switch and the session line, clear of the controls on the right. Under the sheet. */
+.add-readout {
+  position: absolute;
+  top: var(--add-top-room);
+  left: 12px;
+  z-index: 2;
+  max-width: min(22rem, calc(100% - 24px - var(--touch) - 12px));
 }
 
 /* The sheet leaves the mode switch and the counter uncovered, however long it grows. */
@@ -200,7 +223,8 @@
   border-radius: var(--radius-container);
 }
 
-.shell--desktop .add-torch {
+.shell--desktop .add-controls,
+.shell--desktop .add-readout {
   top: 12px;
 }
 
@@ -905,7 +929,7 @@ fieldset:disabled .add-chip {
   margin: 0 auto;
 }
 
-/* "No barcode read": like the session line over the camera. Empty, it takes no room. */
+/* "Nothing read for a minute": like the session line over the camera. Empty, it takes no room. */
 .add-press__note {
   margin: 0;
   font-size: var(--text-small);

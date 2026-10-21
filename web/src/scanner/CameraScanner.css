@@ -122,3 +122,23 @@
   background: transparent;
   color: var(--surface);
 }
+
+/*
+ * `?camera`: the camera's numbers for the owner's phone (scanning.md). Small
+ * type on the ground, like the session line over the camera; it never takes a
+ * touch. The page places it.
+ */
+.scanner-readout {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px 9px;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+  color: var(--ink-2);
+  font-size: var(--text-tab);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+}

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { CameraScanner, type ScannerHandle, type ScannerState } from "./CameraScanner";
+import { CameraReadout, CameraScanner, type CameraInfo, type ScannerHandle, type ScannerState } from "./CameraScanner";
 import { getEngine, type Engine, type ScannedCode } from "./detector";
 
 /**
- * Dev only (`/dev/scanner`): the scanner with every control, a Read button,
- * and a list of what each read came to. It also lists what the page fetched, so a phone without a
+ * Dev only (`/dev/scanner`): the scanner with every control, a Read button
+ * (Stop while it reads), the camera readout, and a list of what each read came to. It also lists what the page fetched, so a phone without a
  * network panel can still show the .wasm came from our own origin.
  */
 
@@ -41,6 +41,8 @@ export function ScannerDemo() {
   const [fallbacks, setFallbacks] = useState(0);
   const [engine, setEngine] = useState<Engine | "loading" | "failed">("loading");
   const [network, setNetwork] = useState<Fetched | null>(null);
+  const [camera, setCamera] = useState<CameraInfo | null>(null);
+  const [decodeMs, setDecodeMs] = useState<number | null>(null);
 
   useEffect(() => {
     // The same cached choice the scanner uses; this only reads it.
@@ -55,12 +57,16 @@ export function ScannerDemo() {
 
   const read = async (): Promise<void> => {
     if (scanner.current === null) return;
+    if (reading) {
+      scanner.current.stop();
+      return;
+    }
     setReading(true);
     try {
       const code = await scanner.current.read();
       setReads((list) => [{ id: Date.now() + Math.random(), at: new Date().toLocaleTimeString(), code }, ...list]);
     } catch {
-      // Stopped: paused or hidden.
+      // Stopped: Stop, paused or hidden.
     } finally {
       setReading(false);
     }
@@ -82,11 +88,14 @@ export function ScannerDemo() {
           onFallback={() => setFallbacks((n) => n + 1)}
           onStateChange={setState}
           onTorchAvailable={setTorchAvailable}
+          onCamera={setCamera}
+          onDecode={setDecodeMs}
         />
       </div>
+      <CameraReadout camera={camera} decodeMs={decodeMs} />
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-        <button type="button" onClick={() => void read()} disabled={reading || paused}>
-          {reading ? "Reading…" : "Read"}
+        <button type="button" onClick={() => void read()} disabled={paused}>
+          {reading ? "Stop" : "Read"}
         </button>
         <button type="button" onClick={() => setPaused((p) => !p)}>
           {paused ? "Resume" : "Pause"}
@@ -111,7 +120,7 @@ export function ScannerDemo() {
               <li key={id}>
                 {at} ·{" "}
                 {code === null ? (
-                  "nothing read in 3 s"
+                  "nothing read in a minute"
                 ) : (
                   <>
                     <strong>{code.kind}</strong> · {code.kind === "isbn" ? code.isbn13 : code.code}
