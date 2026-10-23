@@ -1,5 +1,5 @@
 ---
-summary: The SQLite schema as shipped by brief 02 on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs) and the planned lookup cache as their own tables; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
+summary: The SQLite schema as shipped by brief 02 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
 updated: 2026-10-23
 ---
 
@@ -59,6 +59,19 @@ but doubles the join and the edit UI for a case that hardly happens.
   `outcome` column lets expiry work without parsing each source's format, and
   its CHECK keeps an error from ever being stored. A found answer is reused
   forever, a not-found one for 7 days ([metadata-lookup.md](metadata-lookup.md)).
+- **`saved_views`** (migration 3, brief 27): `id`; `name` NOT NULL, not blank;
+  `name_key` NOT NULL UNIQUE; `state` TEXT, CHECKed to be a JSON object;
+  `position` INTEGER ≥ 0; `created_at`, `updated_at`. One row per named view
+  of the Library ([library-table.md](library-table.md)). `name_key` exists for
+  the same reason as tags': the name in NFC, trimmed and lower-cased in JS
+  (`viewNameKey` in [views.ts](../../server/src/store/views.ts)), because a
+  `UNIQUE ... COLLATE NOCASE` on `name` would fold ASCII only and let "Știință"
+  and "știință" be two views. A clash is a `409`. `state` is the shared
+  `SavedViewState` ([views.ts](../../shared/src/views.ts): tab, filters, sort,
+  shown columns), checked strictly on the way in and read leniently, so a
+  column a later version drops leaves the view rather than breaking it.
+  `position` is the view's place in the Views menu, kept dense (0, 1, 2…) by
+  the store, which is the only module that runs SQL on the table.
 - Auth tables come from the vendored `ward-auth` library, as in Satchel.
 
 ## Storage rules
@@ -86,6 +99,12 @@ but doubles the join and the edit UI for a case that hardly happens.
   no second row and the id keeps its cover and notes.
   The owned-check and "already in your library" only count owned rows. The
   server does not enforce the empty fields; the screens do.
+- A bulk change (brief 26, `POST /api/books/bulk`) is one transaction in
+  the books store: it checks every id first and changes nothing if one names
+  no book. Only the rows whose shelf, status or tags actually change are
+  written, so the rest keep their `updated_at`. A shelf change skips wishlist
+  rows (they have no shelf). Added tags go through `name_key` like any other,
+  and `book_tags`' primary key keeps a book from getting a tag twice.
 - Money in minor units (bani) to avoid float sums.
 - No FTS5 index: search runs in the browser over all rows
   ([library-table.md](library-table.md)). Add one only if the server ever needs

@@ -339,7 +339,7 @@ it" (the `collection` column and `wishlisted` lookups already exist);
 [24](briefs/done/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
 a scan with no signal; [25](briefs/done/25-offline-scan-queue.md) offline scans wait and
 are looked up one at a time when back online, through the server's queues;
-[26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
+[26](briefs/done/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
 transaction; [27](briefs/done/27-saved-views.md) named views stored on the server;
 [28](briefs/done/28-csv-import.md) CSV import with encoding detection, from the account
 menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
@@ -469,3 +469,21 @@ failed under the full run and passed alone). Owed to the review: real camera pho
 fixtures (the five are renders of real descriptions), a phone walk (iOS Safari: the photo
 input, the box drag, whether its service worker serves the Tesseract worker's requests
 offline), and the network panel during a read.
+
+## [2026-10-23] done | Brief 26: bulk edit from the table
+
+Select rows (a box per row and a header box over the rows on show; a long press in the
+covers), then move them to a shelf, set their status, add or remove tags, or delete them,
+from a bulk bar that stands in for the toolbar until Clear. Each change is one
+`POST /api/books/bulk` transaction; an unknown id is a `400` and nothing changes; a shelf
+change skips wishlist books and says how many. [Brief 26](briefs/done/26-bulk-edit.md) has
+the outcome. Built in a worktree on branch `brief-26` from `6ae6a2e`, code commit `fe7d22a`,
+cherry-picked onto `main` as `f6ed569`. Gates: typecheck, lint, build, 818 tests (the
+"3,000 books in under 100 ms" timing test flaked under load and passed alone).
+
+The wiki folds owed for brief 27 are in: `data-model.md` (`saved_views`, why `name_key`),
+`library-table.md` (layout memory, where Views sits, plus selection and the bulk bar),
+`features.md` (saved views and bulk edit shipped), `export.md` (the backup holds views;
+`backup.ts` copies the whole database). Root `DESIGN.md` has Views on both layouts, the
+Owned / Wishlist tabs (its "not built" line was stale) and the bulk bar. Still owed: the
+browser walk for 26 (both layouts, the long press on a real phone), with the review of 23–30.

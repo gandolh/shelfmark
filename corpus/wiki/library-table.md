@@ -1,5 +1,5 @@
 ---
-summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), remembered column layout, virtual scrolling, row selection, and why filtering does not need the server.
+summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (brief 26), and why filtering does not need the server.
 updated: 2026-10-23
 ---
 
@@ -69,13 +69,65 @@ after "a" and "Vol. 10" after "Vol. 2". Authors sort by the `author_sort` field
 
 ## Layout memory
 
-Column order, widths, visibility, sort and density are saved per device in
-`localStorage` (a convenience; losing it costs nothing). Saved views
-(v1.x, [features.md](features.md)) move this to the server under a name.
+The open tab, Table / Covers, column order, widths, visibility and sort are
+saved per layout (`shelfmark.library.desktop`, `shelfmark.library.phone`) in
+`localStorage` by [prefs.ts](../../web/src/library/prefs.ts): a convenience;
+losing it costs nothing. The filters live in page state for the session
+([state.ts](../../web/src/library/state.ts)).
+
+**Saved views** (brief 27, 2026-10-23) are stored on the server, so they
+follow the owner from the laptop to the phone: a name over the tab, the
+filters, the sort and the shown columns in order, behind `/api/views`
+(the `saved_views` table in [data-model.md](data-model.md)). The search
+text, the Table / Covers switch and the widths stay the device's, and
+`localStorage` still keeps the unsaved state. The **Views** menu lists them by
+position, with "Save current view…" and, for the view the page is on or was
+last on, "Update to current", "Rename…" and "Delete…". While the page matches
+a view the button shows its name. In the covers view a view's columns don't
+count towards matching it, and applying one there still sets the table's
+columns for when the owner switches back. On the
+desktop Views sits in the toolbar right after the Table / Covers control; on
+a phone it ends the Owned / Wishlist row, because the phone's toolbar row has
+no room for a fourth control.
 
 ## Rows
 
 The first column is the book: its cover, then title over author. Then the
-visible columns. Clicking a row opens the book page. A checkbox column enables
-bulk actions (v1.x). On a phone the Covers view leads, with the same search, sort and filters behind a sheet; a 12-column
+visible columns. Clicking a row opens the book page. On a phone the Covers view leads, with the same search, sort and filters behind a sheet; a 12-column
 table does not fit a phone, and pretending otherwise is worse.
+
+## Selection and the bulk bar
+
+Brief 26 (2026-10-23). A box before the columns selects a row; the header's
+box selects every row the search and filters let through (not every book),
+shows a dash when only some are, and unselects them once all are. The boxes
+are drawn by [BookTable.tsx](../../web/src/library/BookTable.tsx) outside
+TanStack's columns and are not in `LIBRARY_COLUMN_IDS`, so the column picker,
+layout memory and saved views never list or store them. In a row, Tab goes
+from the box to the title and the arrows move between rows from either.
+
+In the covers, a long press (half a second, a finger or a pen, or the mouse
+on the phone's layout) selects a cover. While anything is selected each cover
+is a toggle with a mark in its corner, and a tap ticks it instead of opening
+the book.
+
+The selection ([selection.ts](../../web/src/library/selection.ts), kept in
+`state.ts` for the session) survives sorting, filtering, searching and
+switching tab until Clear, so the bar counts the selected books out of sight
+("3 selected, 1 not shown"). It keeps each id with the book's `createdAt`,
+so a new book that takes a deleted one's id is not selected.
+
+While books are selected the **bulk bar** takes the toolbar's place: the
+count, then Move to shelf, Set status, Add tags, Remove tags, Delete and Clear
+on the desktop; the count, an Actions menu and Clear on a phone, where six
+buttons don't fit (Views stays at the end of the tabs row). Clear puts the
+toolbar back as it was. Each action is one `POST /api/books/bulk` with
+`{ ids, change }`, one SQLite transaction, answering the changed books, the
+deleted ids and the skipped ids ([data-model.md](data-model.md)). A shelf
+change applies to owned books only; the dialog and the line after it say how
+many wishlist books it left out. Tags match case-insensitively. Delete asks
+first, names the count and says there is no undo. The selection stays after a
+change, so another can follow; deleted books drop out of it. A line under the
+tabs says what the last change did. An id the server no longer has (deleted
+on another device) is a `400` with nothing changed; the page then fetches the
+list again and asks the owner to retry.

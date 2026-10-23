@@ -1,5 +1,5 @@
 ---
-summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out, the wishlist and the offline ownership check have shipped), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
+summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out; the wishlist, the offline ownership check, saved views and bulk edit have shipped), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
 updated: 2026-10-23
 ---
 
@@ -42,10 +42,8 @@ Shelfmark keeps all of it except loans.
 
 ## v1.x — right after
 
-| Feature | Why not v1 |
-|---|---|
-| Bulk edit (move shelf, add tag, delete) | Row selection in the table first. |
-| Saved views | Named filter + sort + columns, e.g. "Unread", "Unread, living room". |
+Bulk edit and saved views were the tier. Both shipped on 2026-10-23 (below);
+bulk edit had waited for row selection in the table.
 
 ## Shipped after v1
 
@@ -56,6 +54,8 @@ Shelfmark keeps all of it except loans.
 | Offline scan queue | Shipped 2026-10-23 (brief 25). Offline, a scan of a book not in the copy can be queued ("Look it up later", with a shelf); the queue survives a reload and shows as "Waiting to look up (N)" on Add a book. Back online the ISBNs are looked up one at a time and each opens as the usual sheet to confirm. Sign out clears it. See [scanning.md](scanning.md). |
 | Wishlist | Shipped 2026-10-23 (brief 23). Books wanted, not owned: a second collection inside Library (Owned / Wishlist tabs), "Add to wishlist" when a scanned book is not owned, and "I bought it" (on the scan sheet and the book's page) moving the row onto a shelf. Wanted by the owner (2026-10-14). |
 | CSV import | Shipped 2026-10-23 (brief 28). \"Import a CSV\" in the account menu: Goodreads, Libib, LibraryThing, a Shelfmark export or any spreadsheet, with the encoding detected, a preview with duplicates flagged, optional one-at-a-time lookups, and saving into Owned or Wishlist. See [import.md](import.md). |
+| Saved views | Shipped 2026-10-23 (brief 27). Named views of the Library ("Unread", "Unread, living room"): the tab, filters, sort and shown columns, stored on the server so they follow the owner across devices, from a Views menu. See [library-table.md](library-table.md). |
+| Bulk edit | Shipped 2026-10-23 (brief 26). Select rows (a box per row in the table, a long press in the covers), then move them to a shelf, set their status, add or remove tags, or delete them, each as one transaction. A shelf move leaves wishlist books out and says so. See [library-table.md](library-table.md). |
 | Stats | Shipped 2026-10-23 (brief 29). \"Stats\" in the account menu (not a third place): owned books by author, language, shelf (grouped by room), status and decade, money spent per year per currency, and a Wishlist count. Counted in the browser; each count opens Library filtered to those books. |
 
 ## Later

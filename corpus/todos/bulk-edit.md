@@ -5,7 +5,7 @@ status: promoted
 tags: [v1.x]
 ---
 
-Promoted 2026-10-23 into [brief 26](../briefs/todo/26-bulk-edit.md).
+Promoted 2026-10-23 into [brief 26](../briefs/done/26-bulk-edit.md).
 
 # Bulk edit from the table
 

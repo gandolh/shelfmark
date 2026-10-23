@@ -52,3 +52,28 @@ that runs SQL on `books`, `tags` and `book_tags`.
 - Delete 3 rows after the confirm: gone from the table and from `GET /api/books`.
 - A bulk request with one unknown id changes nothing.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built in `fe7d22a` in a worktree. `POST /api/books/bulk` takes `{ ids, change }`, `change`
+one of `{ kind: "shelf", shelf }` (`null` takes books off their shelf), `"status"`,
+`"addTags"`, `"removeTags"` (each with `tags`) or `"delete"` (`bookBulkSchema` in
+`shared/src/book.ts`, up to 10,000 distinct ids). `BookStore.bulk` runs it as one
+transaction: every id is checked first, and an unknown one answers `400 validation` naming
+it, with nothing changed. It answers `{ books, deleted, skipped }`: the books it applied to
+as they now stand, the deleted ids, and the wishlist ids a shelf change left alone. Only
+rows whose value changes are written, so the rest keep `updatedAt`; tags go through
+`name_key` and `book_tags`' primary key, so "signed" joins an existing "Signed" once.
+`books/store.ts` gains `bulk` / `bulkChangeBooks`, applied to the cached list in place.
+
+The table has a select box before the columns (drawn outside TanStack, not in
+`LIBRARY_COLUMN_IDS`) and a header box over the rows on show; on the covers a long press
+selects, and while anything is selected a tap toggles. The selection (`selection.ts`, held
+in `state.ts`) is keyed by id and `createdAt` and lasts through sort, filter, search and tab
+switches until Clear. The bulk bar (`BulkBar.tsx`, dialogs in `BulkDialogs.tsx` on
+ViewDialog's now-exported frame) replaces the toolbar: six buttons on the desktop, an
+Actions menu and Clear on a phone, where Views stays at the end of the tabs row. The
+selection stays after an edit; a delete drops the deleted books. A 400 makes the page
+refetch the list (a book deleted elsewhere). Also touched outside the brief's list:
+`web/src/api.ts` (`booksApi.bulk`), `ViewDialog.tsx` (exports). Not walked in a browser
+yet; 818 tests at the time.
