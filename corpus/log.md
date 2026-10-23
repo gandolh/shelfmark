@@ -304,3 +304,10 @@ Checked in headless Chrome with a fake camera: a press over a blank picture
 read the book at about 8 s and sent one lookup; *Stop reading* stopped the
 reads; a blank-only camera stopped at 60 s. 633 tests. Outcome in
 [brief 21](briefs/done/21-read-until-found.md).
+
+## [2026-10-23] todo | Brief 22 filed: Base UI for the widgets
+
+The owner asked for Base UI in the apps that still hand-build their widgets.
+[Brief 22](briefs/todo/22-base-ui-widgets.md) moves the menu, the Filter and
+Columns panels, Change password, the Add tabs, the segmented control and two
+disclosures to Base UI. TanStack Table and the native inputs stay.

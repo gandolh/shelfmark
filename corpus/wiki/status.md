@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-21
+updated: 2026-10-23
 ---
 
 # Status
@@ -60,6 +60,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 19 | [Scan on a press](../briefs/done/19-scan-on-a-press.md) | 11 | done |
 | 20 | [The first read wins](../briefs/done/20-first-read-wins.md) | 12 | done |
 | 21 | [Read until the ISBN, and a sharper camera](../briefs/done/21-read-until-found.md) | 13 | done |
+| 22 | [Base UI for the menus, panels, dialog and switches](../briefs/todo/22-base-ui-widgets.md) | 14 | todo, filed 2026-10-23 |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
