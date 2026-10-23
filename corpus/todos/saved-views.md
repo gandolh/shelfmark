@@ -1,9 +1,11 @@
 ---
 title: Saved views
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1.x]
 ---
+
+Promoted 2026-10-23 into [brief 27](../briefs/todo/27-saved-views.md).
 
 # Saved views
 

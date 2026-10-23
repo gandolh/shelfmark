@@ -330,3 +330,18 @@ Four things needed code:
 The re-lookup stays a plain button. Checked: 633 tests, typecheck, lint,
 build (+56 kB gzip), and before/after shots at 1440 and 390 px. The decision
 is in [decisions.md](wiki/decisions.md).
+
+## [2026-10-23] todo | Briefs 23–28: the v1.x todos
+
+All six v1.x todos are now briefs, one wave each, in this order:
+[23](briefs/todo/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
+it" (the `collection` column and `wishlisted` lookups already exist);
+[24](briefs/todo/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
+a scan with no signal; [25](briefs/todo/25-offline-scan-queue.md) offline scans wait and
+are looked up one at a time when back online, through the server's queues;
+[26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
+transaction; [27](briefs/todo/27-saved-views.md) named views stored on the server;
+[28](briefs/todo/28-csv-import.md) CSV import with encoding detection, from the account
+menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
+stats page needs a home that keeps "Two places only", the CIP photo needs OCR or Claude
+chosen, and the Atrium link needs a shape.

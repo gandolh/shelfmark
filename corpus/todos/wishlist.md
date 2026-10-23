@@ -1,9 +1,11 @@
 ---
 title: Wishlist
 created: 2026-10-14
-status: open
+status: promoted
 tags: [v1.x]
 ---
+
+Promoted 2026-10-23 into [brief 23](../briefs/todo/23-wishlist.md).
 
 # Wishlist
 
