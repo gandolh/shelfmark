@@ -62,3 +62,18 @@ What exists (checked 2026-10-23):
 - From the account menu, Stats opens the screen; Back returns where you were.
 - Pressing a shelf's count opens Library filtered to that shelf.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built as specified, in `web/src/stats/`: `count.ts` (pure `computeStats`, `top`), `links.ts`,
+`StatsPage.tsx`, `stats.css`, and `count.test.ts` (10 tests: multi-author, missing year, two
+currencies, wishlist excluded). Route `stats`, an account menu item after Import a CSV, and the
+one `PAGES` line.
+
+- Counts link to Library. No hook in `web/src/library/` was needed: `links.ts` clears the search
+  text and filters, sets one filter with the existing `setFilter`, sets the Owned tab with
+  `updatePrefs` for both layouts, then navigates. Author links use a text "contains" filter
+  (so a name that is part of another name also matches); a room links to all its shelves; a
+  decade links to a year range. "Unknown year" has no link (a number filter cannot select
+  books with none).
+- Not run in a browser; covered by typecheck, lint, build and the counting tests.

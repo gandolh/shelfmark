@@ -5,7 +5,7 @@ status: promoted
 tags: [later]
 ---
 
-Promoted 2026-10-23 into [brief 29](../briefs/todo/29-stats.md); the owner put it in the account menu.
+Promoted 2026-10-23 into [brief 29](../briefs/done/29-stats.md); the owner put it in the account menu.
 
 # Stats page
 

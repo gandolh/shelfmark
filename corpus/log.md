@@ -350,7 +350,7 @@ chosen, and the Atrium link needs a shape.
 
 Asked where stats should live under "Two places only", the owner chose an item in the
 account menu, over a button over the Library table or a third tab. The rule stands.
-[Brief 29](briefs/todo/29-stats.md) counts owned books in the browser, with no server
+[Brief 29](briefs/done/29-stats.md) counts owned books in the browser, with no server
 route, and links each count to Library with that filter.
 
 ## [2026-10-23] decision | The CIP photo is read by OCR in the browser; brief 30
@@ -404,3 +404,12 @@ repeated, with an invalid ISBN or needing a lookup, and rows can be unticked. Op
 run one at a time with a Stop button; ticked rows are saved one `POST /api/books` at a time into
 Owned or Wishlist, with saved / skipped / failed counts. No server change, no new dependency.
 [Brief 28](briefs/done/28-csv-import.md) has the outcome; features.md and import.md caught up.
+
+## [2026-10-23] done | Brief 29, Stats
+
+"Stats" in the account menu opens a stats screen (route `stats`, under Library; not a third
+place). Owned books only, counted in the browser: totals, ranked top-10 lists of authors,
+languages, shelves (by room), status and decades, and money spent per year per currency with a
+footnote for books missing a price or date. Each count sets one Library filter through the
+existing `setFilter` and opens Library on Owned; no change to `web/src/library/`. No server
+change. [Brief 29](briefs/done/29-stats.md) has the outcome; features.md caught up.
