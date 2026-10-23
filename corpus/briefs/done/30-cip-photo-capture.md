@@ -75,3 +75,30 @@ What exists (checked 2026-10-23):
 - With the network off after one use, the button still works.
 - No request leaves the app's origin during OCR (check the network panel).
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built as specified. Details in [cip-photo.md](../../wiki/cip-photo.md).
+
+- The parser move: `readDescription`, `romanian`, the `ISBN` pattern and the helpers the
+  monthly-list parser shares with it (`squash`, `tidy`, `AREA`, `readImprint`, `isImprint`)
+  live in `shared/src/cip.ts`, exported as one namespace, `cip`. Their tests moved with them;
+  the server's list tests pass unchanged.
+- `web/src/ocr/`: `block.ts` finds the description in OCR text and folds it for
+  `readDescription` (`block.test.ts`), `image.ts` crops and scales the photo, `engine.ts` runs
+  Tesseract.js 7.0.0 in a worker, `files.ts` picks the core (`wasm-feature-detect`),
+  `paths.ts` is shared with the service worker. `web/src/add/CipReader.tsx` is the button and
+  its states on the manual form; `add/cip.ts` fills only empty fields (`cip.test.ts`).
+- Served from the app: `ocrAssets()` in `web/vite.config.ts` copies the worker, the three
+  LSTM cores and `ron.traineddata.gz` (best_int) to `ocr/tesseract-<hash>/` and
+  `ocr/ron-<hash>/`, and serves them in dev. Not precached; `sw.ts` caches `ocr/` cache-first
+  on first use (4.8 MB a device). Tesseract's default jsDelivr URLs remain as dead strings
+  inside its own code; every path is passed explicitly.
+- Found while testing: Tesseract's default Otsu threshold lost the words under a shadow; the
+  reader sets Sauvola (`thresholding_method: "2"`).
+- Fixtures: five real CIP descriptions from the lists, rendered and degraded to look
+  photographed, not camera photos; all five give the right title, authors, publisher, year
+  and ISBN. Real photos are owed, and `fixtures/record.ts` re-reads them.
+- Checked in headless Chrome (not a walk): files only from the app's origin, the worker's
+  requests landing in the service worker's cache, and a second read with the server stopped.
+  No phone walk yet. No `THIRD-PARTY-NOTICES` or licences line exists, so none was added.

@@ -5,7 +5,7 @@ status: promoted
 tags: [later]
 ---
 
-Promoted 2026-10-23 into [brief 30](../briefs/todo/30-cip-photo-capture.md); the owner chose OCR in the browser.
+Promoted 2026-10-23 into [brief 30](../briefs/done/30-cip-photo-capture.md); the owner chose OCR in the browser.
 
 # Fill a book from a photo of its CIP block
 

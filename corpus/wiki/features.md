@@ -52,6 +52,7 @@ Shelfmark keeps all of it except loans.
 | Feature | Notes |
 |---|---|
 | Offline "do I own this?" | Shipped 2026-10-23 (brief 24). A scan with no signal is answered from a copy of the library kept in IndexedDB (ISBN, title, shelf, collection): on a shelf, on the wishlist, or not in the library, "as of" the copy's date. Needs one visit online first; sign out clears it. See [scanning.md](scanning.md). |
+| CIP photo | Shipped 2026-10-23 (brief 30). "Read the CIP block" on the by-hand form: a photo of a Romanian book's copyright page, read by Tesseract in the browser (no CDN, cached on first use, then offline), fills the empty fields (title, author, publisher, year, ISBN) and marks them to check. See [cip-photo.md](cip-photo.md). |
 | Offline scan queue | Shipped 2026-10-23 (brief 25). Offline, a scan of a book not in the copy can be queued ("Look it up later", with a shelf); the queue survives a reload and shows as "Waiting to look up (N)" on Add a book. Back online the ISBNs are looked up one at a time and each opens as the usual sheet to confirm. Sign out clears it. See [scanning.md](scanning.md). |
 | Wishlist | Shipped 2026-10-23 (brief 23). Books wanted, not owned: a second collection inside Library (Owned / Wishlist tabs), "Add to wishlist" when a scanned book is not owned, and "I bought it" (on the scan sheet and the book's page) moving the row onto a shelf. Wanted by the owner (2026-10-14). |
 | CSV import | Shipped 2026-10-23 (brief 28). \"Import a CSV\" in the account menu: Goodreads, Libib, LibraryThing, a Shelfmark export or any spreadsheet, with the encoding detected, a preview with duplicates flagged, optional one-at-a-time lookups, and saving into Owned or Wishlist. See [import.md](import.md). |
@@ -59,10 +60,7 @@ Shelfmark keeps all of it except loans.
 
 ## Later
 
-- **CIP photo capture**: Romanian books print a "Descrierea CIP a Bibliotecii
-  Naționale a României" block on the copyright page with title, author,
-  publisher, year and ISBN. A photo of it, read by OCR in the browser, fills
-  most Romanian books that the databases miss (owner, 2026-10-23; brief 30).
+None. The last one, CIP photo capture, shipped on 2026-10-23 (brief 30).
 
 ## Out
 

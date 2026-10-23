@@ -356,7 +356,7 @@ route, and links each count to Library with that filter.
 ## [2026-10-23] decision | The CIP photo is read by OCR in the browser; brief 30
 
 Asked what reads a photo of a book's CIP block, the owner chose Tesseract in the browser,
-over Claude on the server or dropping the feature: free, private and offline. [Brief 30](briefs/todo/30-cip-photo-capture.md)
+over Claude on the server or dropping the feature: free, private and offline. [Brief 30](briefs/done/30-cip-photo-capture.md)
 moves `readDescription` from the CIP list parser into `shared/` so the browser reads the
 OCR text with the same tested code, and serves Tesseract and its Romanian data from the
 app's own origin.
@@ -451,3 +451,21 @@ Known small items: the filter panel and column picker still list the wishlist-hi
 columns; a stale comment in `web/src/library/columns.ts`; `conflict: 409` belongs in
 `server/src/errors.ts`; the timing test in `server/src/routes/books.test.ts` flakes under
 load; status.md's "waves run one at a time" line is out of date (pairs ran in parallel).
+
+## [2026-10-23] done | Brief 30: reading the CIP block from a photo
+
+"Read the CIP block" on the by-hand form: a photo of the copyright page (a box around the
+block optional), Tesseract.js 7.0.0 with the `ron` data in a worker, the description found in
+the OCR text and read with the list parser, now in `shared/src/cip.ts`. It fills only empty
+fields and marks them to check; the OCR text stays under a disclosure to fix and fill again,
+or to copy when there is no "Descrierea CIP" heading. Every Tesseract file is served from the
+app under `ocr/<name>-<hash>/` (no CDN), not precached, and cached by the service worker on
+first use: 4.8 MB a device. Sauvola thresholds, since the default lost words under a shadow.
+[Brief 30](briefs/done/30-cip-photo-capture.md) has the outcome, [cip-photo.md](wiki/cip-photo.md)
+the detail; features.md, scanning.md, metadata-lookup.md and the glossary caught up.
+
+Gates: typecheck, lint, build, 800 tests (the "3,000 books in under 100 ms" timing test
+failed under the full run and passed alone). Owed to the review: real camera photos for the
+fixtures (the five are renders of real descriptions), a phone walk (iOS Safari: the photo
+input, the box drag, whether its service worker serves the Tesseract worker's requests
+offline), and the network panel during a read.

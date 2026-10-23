@@ -18,6 +18,7 @@ present. Formats to enable: `ean_13`, `ean_8`, `upc_a`, `upc_e`, `code_128`.
 By default it fetches its `.wasm` from jsDelivr; **self-host it** with
 `prepareZXingModule({ overrides: { locateFile } })` and precache it in the
 service worker, so scanning works offline and loads nothing from a third party.
+Reading the CIP block from a photo is OCR, not a barcode: [cip-photo.md](cip-photo.md).
 
 Rejected: `html5-qrcode` (last release 2023), `quagga2` (1D only, weaker on
 blurry phone images), `@zxing/browser` (the older JS port; the C++ WASM build

@@ -68,7 +68,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 27 | [Saved views](../briefs/done/27-saved-views.md) | 19 | done 2026-10-23 |
 | 28 | [CSV import](../briefs/done/28-csv-import.md) | 20 | done 2026-10-23 |
 | 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
-| 30 | [Fill a book from a photo of its CIP block](../briefs/todo/30-cip-photo-capture.md) | 22 | todo (filed 2026-10-23) |
+| 30 | [Fill a book from a photo of its CIP block](../briefs/done/30-cip-photo-capture.md) | 22 | done 2026-10-23; fixtures are renders, real photos and a phone walk owed |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for

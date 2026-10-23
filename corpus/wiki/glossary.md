@@ -1,6 +1,6 @@
 ---
-summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status, lookup and draft, CIP, library catalog and CIP index. Use these words in code, UI copy and briefs.
-updated: 2026-10-18
+summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status, lookup and draft, CIP and the CIP block, library catalog and CIP index. Use these words in code, UI copy and briefs.
+updated: 2026-10-23
 ---
 
 # Glossary
@@ -44,6 +44,11 @@ The cataloguing description the Romanian national library writes for a book
 before it is printed, printed on the copyright page and listed in its monthly
 CIP bibliography.
 _Avoid_: colophon, imprint page
+
+**CIP block**:
+The CIP as a book prints it on its copyright page, under "Descrierea CIP a
+Bibliotecii Naţionale a României"; what "Read the CIP block" reads from a photo.
+_Avoid_: CIP photo, CIP box, copyright block
 
 **Library catalog**:
 One of the three Romanian library catalogs a lookup asks over Z39.50: the
