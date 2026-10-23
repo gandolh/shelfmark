@@ -66,3 +66,28 @@ What exists (checked 2026-10-23):
 - A windows-1250 file with Romanian diacritics shows them correctly.
 - Re-importing a Shelfmark export of the library flags every row as a duplicate.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built in `web/src/import/` with no server change and no new dependency (the parser is
+`csv.ts`, mirroring `export/csv.ts`). Entry: "Import a CSV" in the account menu, route
+`import` (`/import`, under the Library place). Saving is one `POST /api/books` per row
+through `createBook`; lookups one `POST /api/lookup` at a time, only for ticked rows
+with no title.
+
+- Decoding: UTF-16 by byte order mark, else UTF-8 with `fatal: true`, else windows-1250
+  (cedilla ş ţ rewritten to comma-below ș ț), else windows-1252. windows-1250 reads
+  every byte, so the 1252 step is reached only where a runtime lacks that code page.
+- Delimiter is detected (`,` `;` tab), since Excel in a Romanian locale writes `;`.
+- Known headers: Goodreads (`Exclusive Shelf`), LibraryThing (`Primary Author`, "Last,
+  First" flipped), Libib (`ean_isbn13`), Shelfmark export (the Library's column
+  labels; the export's `'` formula guard is stripped). Recognised files go straight to
+  the preview; anything else gets the mapping step, prefilled by a generic guess.
+- Flags: Already in your library (an owned ISBN, or one in the target collection),
+  Repeated in this file, Invalid ISBN, Needs a lookup, Not found, Lookup failed.
+  Duplicates and invalid ISBNs start unticked. A ticked row still without a title is
+  left out at save time, and the page says so.
+- Not run in a browser (the page is untested beyond typecheck, lint and build); the
+  logic is covered by `csv.test.ts` and `rows.test.ts`.
+- `layout/AppShell.tsx` got its one `PAGES` line, which the typecheck requires for a
+  new route.

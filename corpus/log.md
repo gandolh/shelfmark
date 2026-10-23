@@ -341,7 +341,7 @@ a scan with no signal; [25](briefs/done/25-offline-scan-queue.md) offline scans 
 are looked up one at a time when back online, through the server's queues;
 [26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
 transaction; [27](briefs/todo/27-saved-views.md) named views stored on the server;
-[28](briefs/todo/28-csv-import.md) CSV import with encoding detection, from the account
+[28](briefs/done/28-csv-import.md) CSV import with encoding detection, from the account
 menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
 stats page needs a home that keeps "Two places only", the CIP photo needs OCR or Claude
 chosen, and the Atrium link needs a shape.
@@ -393,3 +393,14 @@ time through `POST /api/lookup`, and each opens as the usual sheet to confirm; n
 opens the by-hand form with the ISBN filled. Sign out clears it. The service worker, the
 server and `books/store.ts` are untouched. [Brief 25](briefs/done/25-offline-scan-queue.md)
 has the outcome; features.md and scanning.md caught up.
+
+## [2026-10-23] done | Brief 28, CSV import
+
+"Import a CSV" in the account menu opens an import screen (route `import`, under Library; not a
+third place). The file's encoding is detected (UTF-8, then windows-1250, then windows-1252,
+UTF-16 by its mark) and named; Goodreads, LibraryThing, Libib and Shelfmark-export headers map
+themselves, any other file gets a mapping step. The preview flags rows already in the library,
+repeated, with an invalid ISBN or needing a lookup, and rows can be unticked. Optional lookups
+run one at a time with a Stop button; ticked rows are saved one `POST /api/books` at a time into
+Owned or Wishlist, with saved / skipped / failed counts. No server change, no new dependency.
+[Brief 28](briefs/done/28-csv-import.md) has the outcome; features.md and import.md caught up.
