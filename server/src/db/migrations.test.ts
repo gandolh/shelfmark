@@ -51,7 +51,7 @@ describe("openDb", () => {
     expect(db.pragma("journal_mode", { simple: true })).toBe("wal");
     expect(db.pragma("foreign_keys", { simple: true })).toBe(1);
     expect(version(db)).toBe(migrations.length);
-    expect(tables(db)).toEqual(["book_tags", "books", "covers", "lookup_cache", "tags"]);
+    expect(tables(db)).toEqual(["book_tags", "books", "covers", "lookup_cache", "saved_views", "tags"]);
   });
 
   it("leaves a migrated database as it is on the next open", () => {
@@ -156,5 +156,26 @@ describe("migration 1", () => {
     const db = open();
     db.prepare("INSERT INTO tags (name, name_key) VALUES ('Știință', 'știință')").run();
     expect(() => db.prepare("INSERT INTO tags (name, name_key) VALUES ('știință', 'știință')").run()).toThrow(/UNIQUE/);
+  });
+});
+
+describe("migration 3", () => {
+  const insertView = (db: Db, name: string, key: string, state: string, position = 0) =>
+    db
+      .prepare("INSERT INTO saved_views (name, name_key, state, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)")
+      .run(name, key, state, position, NOW, NOW);
+
+  it("keeps a view's name unique on its folded key", () => {
+    const db = open();
+    insertView(db, "Unread", "unread", "{}");
+    expect(() => insertView(db, "unread", "unread", "{}", 1)).toThrow(/UNIQUE/);
+  });
+
+  it("refuses a state that is not a JSON object, a blank name and a negative position", () => {
+    const db = open();
+    expect(() => insertView(db, "A", "a", "not json")).toThrow(/CHECK/);
+    expect(() => insertView(db, "A", "a", "[]")).toThrow(/CHECK/);
+    expect(() => insertView(db, "", "", "{}")).toThrow(/CHECK/);
+    expect(() => insertView(db, "A", "a", "{}", -1)).toThrow(/CHECK/);
   });
 });

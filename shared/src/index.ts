@@ -3,3 +3,4 @@ export const APP_NAME = "Shelfmark";
 export * from "./isbn.js";
 export * from "./book.js";
 export * from "./lookup.js";
+export * from "./views.js";

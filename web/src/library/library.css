@@ -31,14 +31,58 @@
   line-height: 1;
 }
 
+/*
+ * Views (brief 27): the button shows the saved view's name while the page is
+ * on it. A long name is cut short; a hidden semibold copy in the same grid
+ * cell keeps the width from moving when the open button turns semibold.
+ */
+.library-views__label {
+  display: inline-grid;
+  grid-template-columns: minmax(0, auto);
+  max-width: 180px;
+}
+
+.library-views__text,
+.library-views__label::after {
+  grid-area: 1 / 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.library-views__label::after {
+  content: attr(data-label);
+  visibility: hidden;
+  font-weight: var(--weight-semibold);
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (max-width: 767px) {
+  .library-views__label {
+    max-width: 128px;
+  }
+}
+
 /* --- Collection tabs --------------------------------------------------------------- */
 
-/* Owned and Wishlist as text tabs under the title; the open one is ink with an accent underline. */
+/*
+ * Owned and Wishlist as text tabs under the title; the open one is ink with an
+ * accent underline. On a phone the row ends with Views (brief 27).
+ */
+/* On the tabs' baseline, so "Views" reads on the line of "Owned" and "Wishlist"; the tabs stay on the hairline. */
+.library-tabs-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
 .library-tabs {
   display: flex;
   gap: 20px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid var(--hairline);
 }
 
 .library-tab {
@@ -1107,4 +1151,117 @@
     width: 18px;
     height: 18px;
   }
+}
+
+/* --- Views dialogs ------------------------------------------------------------------ */
+
+/*
+ * Save, rename and delete a view (ViewDialog.tsx): the account's Change
+ * password dialog in this page's names. A white floating panel with the
+ * menus' shadow over a dimmed page: in the middle of the window on the
+ * desktop, the floating sheet over the bottom on a phone. Its field and
+ * error are the login page's (auth/auth.css).
+ */
+.library-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
+.library-dialog {
+  z-index: var(--z-float);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: var(--shadow-float);
+  color: var(--ink);
+  outline: none;
+}
+
+.library-dialog--centered {
+  position: fixed;
+  inset: 0;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  height: fit-content;
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  margin-top: max(24px, 16vh);
+  border-radius: var(--radius-sheet);
+  animation: library-dialog-in var(--duration) var(--ease-out);
+}
+
+.library-dialog--sheet {
+  position: fixed;
+  inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+  width: auto;
+  max-height: min(90dvh, 680px);
+  border-radius: var(--radius-sheet);
+  animation: library-sheet-in var(--duration-sheet) var(--ease-out);
+}
+
+@keyframes library-dialog-in {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes library-sheet-in {
+  from {
+    transform: translateY(calc(100% + 12px));
+  }
+}
+
+.library-dialog__frame {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 0;
+  padding: 22px 24px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.library-dialog--sheet .library-dialog__frame {
+  padding: 20px 16px 16px;
+}
+
+.library-dialog__title {
+  color: var(--ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-tight);
+  overflow-wrap: anywhere;
+}
+
+.library-dialog--sheet .library-dialog__title {
+  text-align: center;
+}
+
+.library-dialog__form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.library-dialog__text {
+  color: var(--ink-2);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
+}
+
+.library-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.library-dialog--sheet .library-dialog__actions {
+  flex-direction: column-reverse;
+  align-items: stretch;
+  gap: 4px;
 }

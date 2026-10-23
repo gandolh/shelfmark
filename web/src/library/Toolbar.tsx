@@ -6,6 +6,7 @@ import { ADD_BOOK } from "../router";
 import { activeFilters } from "./filters";
 import type { ViewMode } from "./prefs";
 import type { LibraryView } from "./view";
+import { ViewsMenu } from "./ViewsMenu";
 
 export interface ToolbarProps {
   /** The rows and columns on show: what brief 11's Export takes. */
@@ -23,9 +24,11 @@ export interface ToolbarProps {
 
 /**
  * The Library's controls (design.md). Desktop, right of the title: Table /
- * Covers, Filter, Columns (in the table), Export, and the accent "Add a
+ * Covers, Views, Filter, Columns (in the table), Export, and the accent "Add a
  * book" pill. Phone, under the search box: Covers / Table, then the quiet
- * "Filter and sort" and "Export" as accent text; Add a book is the tab bar's.
+ * "Filter and sort" and "Export" as accent text; Add a book is the tab bar's,
+ * and Views sits at the end of the collection tabs (LibraryPage), as a fourth
+ * control doesn't fit this row at 390 px.
  */
 export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
   const count = activeFilters(view.filters).length;
@@ -52,6 +55,7 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
           value={mode}
           onChange={onModeChange}
         />
+        <ViewsMenu layout="desktop" mode={mode} />
         <button
           ref={filterButton}
           type="button"

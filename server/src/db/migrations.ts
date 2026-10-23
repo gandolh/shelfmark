@@ -86,6 +86,24 @@ export const migrations: readonly string[] = [
     PRIMARY KEY (isbn13, source)
   ) WITHOUT ROWID;
   `,
+
+  // 3 (brief 27): saved views, the Library's filters, sort, columns and tab
+  // under a name. `state` is the shared SavedViewState as JSON, checked by
+  // the shared schema on the way in and read leniently on the way out
+  // (store/views.ts). `name_key` is the name folded to lower case in JS, as
+  // tags' is, so "Unread" and "unread" can't be two views. `position` is the
+  // view's place in the Views menu, 0 first, kept dense by the store.
+  `
+  CREATE TABLE saved_views (
+    id          INTEGER PRIMARY KEY,
+    name        TEXT NOT NULL CHECK (name <> ''),
+    name_key    TEXT NOT NULL UNIQUE,
+    state       TEXT NOT NULL CHECK (json_valid(state) AND json_type(state) = 'object'),
+    position    INTEGER NOT NULL CHECK (position >= 0),
+    created_at  TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
+  );
+  `,
 ];
 
 /** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */

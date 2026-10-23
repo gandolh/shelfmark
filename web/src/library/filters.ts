@@ -1,4 +1,4 @@
-import type { Book } from "@shelfmark/shared";
+import type { Book, SavedFilter } from "@shelfmark/shared";
 import { columnById, formatDay, isColumnId, type ColumnId, type LibraryColumn, type PickColumn } from "./columns";
 import { compactIsbn, compileSearch, fold } from "./search";
 import { collator } from "./sort";
@@ -14,17 +14,19 @@ import { collator } from "./sort";
  * Every active filter has to hold; within a pick-list, any chosen value does.
  */
 
-export type TextOp = "contains" | "empty" | "notEmpty";
+export type { TextOp } from "@shelfmark/shared";
 
-export type Filter =
-  | { kind: "text"; op: TextOp; text: string }
-  /** `NO_VALUE` stands for the books with none ("No shelf"). */
-  | { kind: "pick"; values: readonly string[] }
-  /** In the column's stored units (a price in bani). */
-  | { kind: "number"; min: number | null; max: number | null }
-  /** Calendar days, `YYYY-MM-DD`, both ends included. */
-  | { kind: "date"; from: string | null; to: string | null }
-  | { kind: "yesno"; value: boolean };
+/**
+ * One column's filter: the shared `SavedFilter` (shared/src/views.ts), so a
+ * saved view holds exactly what the panel sets.
+ *
+ * - `text`: `op` and the typed text
+ * - `pick`: the chosen values; `NO_VALUE` stands for the books with none ("No shelf")
+ * - `number`: `min` and `max`, in the column's stored units (a price in bani)
+ * - `date`: `from` and `to`, calendar days `YYYY-MM-DD`, both ends included
+ * - `yesno`: `value`
+ */
+export type Filter = SavedFilter;
 
 export type Filters = Readonly<Partial<Record<ColumnId, Filter>>>;
 

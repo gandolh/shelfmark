@@ -1,4 +1,12 @@
-import { CONDITIONS, FORMATS, METADATA_SOURCES, STATUSES, type Book } from "@shelfmark/shared";
+import {
+  CONDITIONS,
+  FORMATS,
+  LIBRARY_COLUMN_IDS,
+  METADATA_SOURCES,
+  STATUSES,
+  type Book,
+  type LibraryColumnId,
+} from "@shelfmark/shared";
 
 /**
  * The Library's columns: one per book field, each with the kind that decides
@@ -13,39 +21,10 @@ import { CONDITIONS, FORMATS, METADATA_SOURCES, STATUSES, type Book } from "@she
 
 export type ColumnKind = "text" | "pick" | "number" | "date" | "yesno";
 
-export const COLUMN_IDS = [
-  "book",
-  "authors",
-  "subtitle",
-  "publisher",
-  "year",
-  "shelf",
-  "status",
-  "added",
-  "isbn",
-  "barcode",
-  "pages",
-  "language",
-  "series",
-  "seriesNumber",
-  "description",
-  "subjects",
-  "format",
-  "condition",
-  "signed",
-  "rating",
-  "tags",
-  "notes",
-  "acquiredOn",
-  "acquiredFrom",
-  "price",
-  "currency",
-  "cover",
-  "source",
-  "changed",
-] as const;
+/** Every column's id, in the table's default order: the shared list, so a saved view (brief 27) names the same columns. */
+export const COLUMN_IDS = LIBRARY_COLUMN_IDS;
 
-export type ColumnId = (typeof COLUMN_IDS)[number];
+export type ColumnId = LibraryColumnId;
 
 interface ColumnBase {
   id: ColumnId;

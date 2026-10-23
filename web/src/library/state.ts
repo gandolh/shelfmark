@@ -95,6 +95,13 @@ export function clearFilters(): void {
   notify();
 }
 
+/** Replace every filter at once: a saved view being applied (brief 27, savedViews.ts). */
+export function setFilters(next: Filters): void {
+  if (next === filters) return;
+  filters = next;
+  notify();
+}
+
 /** The filters; re-renders when they change. */
 export function useLibraryFilters(): Filters {
   return useSyncExternalStore(subscribe, getFilters);

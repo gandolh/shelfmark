@@ -11,6 +11,7 @@ import { backupRoutes } from "./routes/backup.js";
 import { bookRoutes } from "./routes/books.js";
 import { coverRoutes } from "./routes/covers.js";
 import { lookupRoutes } from "./routes/lookup.js";
+import { viewRoutes } from "./routes/views.js";
 import { createBookStore, type BookStore } from "./store/books.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
@@ -104,6 +105,7 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(lookupRoutes, ctx),
   (app, ctx) => app.register(coverRoutes, ctx),
   (app, ctx) => app.register(backupRoutes, ctx),
+  (app, ctx) => app.register(viewRoutes, ctx),
 ];
 
 export interface BuildAppOptions {

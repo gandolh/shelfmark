@@ -21,6 +21,7 @@ import { describeSort, type Sorting } from "./sort";
 import { clearFilters, updatePrefs, useLibraryPrefs } from "./state";
 import { Toolbar } from "./Toolbar";
 import { columnApplies, useLibraryView, type LibraryView } from "./view";
+import { ViewsMenu } from "./ViewsMenu";
 import "./library.css";
 
 /**
@@ -118,7 +119,13 @@ export function LibraryPage() {
 
   return (
     <Page title="Library" caption={caption} toolbar={toolbar} search={{ placeholder: hasBooks ? `Search ${books(view.total)}` : "Search" }}>
-      {ready && view.counts.owned + view.counts.wishlist > 0 && <CollectionTabs view={view} onChange={setCollection} />}
+      {ready && view.counts.owned + view.counts.wishlist > 0 && (
+        <div className="library-tabs-row">
+          <CollectionTabs view={view} onChange={setCollection} />
+          {/* The phone's toolbar has no room for Views: it ends the tabs' row (desktop: Toolbar). */}
+          {!desktop && <ViewsMenu layout={layout} mode={mode} quiet />}
+        </div>
+      )}
       {hasBooks && (
         <FilterChips
           filters={view.filters}
