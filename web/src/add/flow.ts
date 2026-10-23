@@ -321,6 +321,7 @@ export function bodyFromForm(fields: FormFields, base: FormBase): BookCreate {
   return {
     ...base.details,
     title: fields.title,
+    subtitle: fields.subtitle,
     authors: fields.authors,
     publisher: fields.publisher,
     publishedYear: fields.publishedYear,
@@ -335,6 +336,7 @@ function initialFromDetails(details: Partial<Details>, extra: Partial<FormInitia
     ...EMPTY_FORM,
     shelf: undefined,
     title: details.title ?? "",
+    subtitle: details.subtitle ?? "",
     author: joinAuthors(details.authors ?? []),
     publisher: details.publisher ?? "",
     year: details.publishedYear ? String(details.publishedYear) : "",
@@ -345,7 +347,8 @@ function initialFromDetails(details: Partial<Details>, extra: Partial<FormInitia
 
 /** The details a form keeps but doesn't show: everything but its own fields. */
 function hiddenDetails(details: Partial<Details>): Partial<Details> {
-  const { title: _title, authors: _authors, publisher: _publisher, publishedYear: _year, isbn13: _isbn, ...rest } = details;
+  const { title: _title, subtitle: _subtitle, authors: _authors, publisher: _publisher, publishedYear: _year, isbn13: _isbn, ...rest } =
+    details;
   return rest;
 }
 

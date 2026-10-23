@@ -8,6 +8,7 @@ describe("readForm", () => {
       ok: true,
       fields: {
         title: "O vară cu Isidor",
+        subtitle: null,
         authors: [],
         publisher: null,
         publishedYear: null,
@@ -19,9 +20,10 @@ describe("readForm", () => {
     expect(readForm(EMPTY_FORM)).toEqual({ ok: false, errors: { title: "A book needs a title." } });
   });
 
-  it("reads authors, publisher, year, shelf and status", () => {
+  it("reads subtitle, authors, publisher, year, shelf and status", () => {
     const read = readForm({
       title: "Ochiul căprui al dragostei noastre",
+      subtitle: "  roman   ",
       author: "Mircea Eliade & Ioan Petru Culianu",
       publisher: " Humanitas ",
       year: "2021",
@@ -32,6 +34,7 @@ describe("readForm", () => {
     expect(read).toMatchObject({
       ok: true,
       fields: {
+        subtitle: "roman",
         authors: ["Mircea Eliade", "Ioan Petru Culianu"],
         publisher: "Humanitas",
         publishedYear: 2021,

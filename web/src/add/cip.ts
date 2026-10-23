@@ -14,6 +14,7 @@ export type CipValues = Partial<Record<FormField, string>>;
 export function cipValues(fields: CipFields): CipValues {
   const out: CipValues = {};
   if (fields.title) out.title = fields.title;
+  if (fields.subtitle) out.subtitle = fields.subtitle;
   if (fields.authors.length > 0) out.author = joinAuthors(fields.authors);
   if (fields.publisher) out.publisher = fields.publisher;
   if (fields.year !== null) out.year = String(fields.year);

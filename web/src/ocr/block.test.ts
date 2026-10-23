@@ -13,12 +13,12 @@ import { readCipBlock, tidyOcr, type CipFields } from "./block";
 const fixture = (name: string) => readFileSync(new URL(`./fixtures/${name}.txt`, import.meta.url), "utf8");
 
 const EXPECTED: Record<string, Omit<CipFields, "year"> & { year: number }> = {
-  "1-pastoureau": { title: "Roz", authors: ["Michel Pastoureau"], publisher: "For You", year: 2026, isbn13: "9786066398121" },
-  "2-popa": { title: "Ferestrele Clujului", authors: ["Mircea Popa"], publisher: "Editura Școala Ardeleană", year: 2026, isbn13: "9786303143477" },
+  "1-pastoureau": { title: "Roz", subtitle: "istoria unei culori diafane", authors: ["Michel Pastoureau"], publisher: "For You", year: 2026, isbn13: "9786066398121" },
+  "2-popa": { title: "Ferestrele Clujului", subtitle: "exerciții de memorie culturală", authors: ["Mircea Popa"], publisher: "Editura Școala Ardeleană", year: 2026, isbn13: "9786303143477" },
   // "coord.:" names editors, not authors.
-  "3-jurnalismul": { title: "Jurnalismul tradițional și noile media", authors: [], publisher: "Eikon", year: 2026, isbn13: "9786064916341" },
-  "4-odell": { title: "Anna - biografia", authors: ["Amy Odell"], publisher: "Paralela 45", year: 2026, isbn13: "9789734744312" },
-  "5-paleologu": { title: "Ce ne facem cu atîția proști?", authors: ["Theodor Paleologu"], publisher: "Editura Trei", year: 2026, isbn13: "9786064031365" },
+  "3-jurnalismul": { title: "Jurnalismul tradițional și noile media", subtitle: "delimitări, practici și controverse", authors: [], publisher: "Eikon", year: 2026, isbn13: "9786064916341" },
+  "4-odell": { title: "Anna - biografia", subtitle: null, authors: ["Amy Odell"], publisher: "Paralela 45", year: 2026, isbn13: "9789734744312" },
+  "5-paleologu": { title: "Ce ne facem cu atîția proști?", subtitle: null, authors: ["Theodor Paleologu"], publisher: "Editura Trei", year: 2026, isbn13: "9786064031365" },
 };
 
 describe("readCipBlock, on what Tesseract read from the fixture photos", () => {

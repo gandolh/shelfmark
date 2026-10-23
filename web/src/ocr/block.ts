@@ -77,11 +77,27 @@ function isbnOf(written: string): string | null {
 
 export interface CipFields {
   title: string | null;
+  /** After " : " in the title part; the form shows it under the title. */
+  subtitle: string | null;
   authors: string[];
   publisher: string | null;
   year: number | null;
   /** The block's ISBN, when it has exactly one that checks out. */
   isbn13: string | null;
+}
+
+/**
+ * A " / " the OCR lost runs the statement of responsibility into the title
+ * part: "exerciţii de memorie culturală Mircea Popa". When the description has
+ * no slash, an author's name at the end of the title part is taken off.
+ */
+function withoutAuthorTail(text: string | null, authors: readonly string[], description: string): string | null {
+  if (text === null || description.includes(" / ")) return text;
+  const lower = text.toLocaleLowerCase("ro");
+  for (const author of authors) {
+    if (lower.endsWith(` ${author.toLocaleLowerCase("ro")}`)) return text.slice(0, -(author.length + 1)).trim() || null;
+  }
+  return text;
 }
 
 export type CipRead =
@@ -131,7 +147,8 @@ export function readCipBlock(ocr: string): CipRead {
     description,
     isbns,
     fields: {
-      title: read.title,
+      title: read.subtitle === null ? (withoutAuthorTail(read.title, read.authors, description) ?? read.title) : read.title,
+      subtitle: withoutAuthorTail(read.subtitle, read.authors, description),
       authors: read.authors,
       publisher: read.publisher,
       year: read.year,

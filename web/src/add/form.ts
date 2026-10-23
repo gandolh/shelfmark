@@ -10,6 +10,8 @@ import { isbnProblem } from "./words";
 
 export interface FormValues {
   title: string;
+  /** Optional, under the title: "exerciţii de memorie culturală". */
+  subtitle: string;
   /** Several authors are written with "&" between them: "Mircea Eliade & Ioan Petru Culianu". */
   author: string;
   publisher: string;
@@ -19,12 +21,13 @@ export interface FormValues {
   status: Status;
 }
 
-export type FormField = "title" | "author" | "publisher" | "year" | "isbn";
+export type FormField = "title" | "subtitle" | "author" | "publisher" | "year" | "isbn";
 export type FormErrors = Partial<Record<FormField, string>>;
 
 /** The form's values as book fields, checked. */
 export interface FormFields {
   title: string;
+  subtitle: string | null;
   authors: string[];
   publisher: string | null;
   publishedYear: number | null;
@@ -35,6 +38,7 @@ export interface FormFields {
 
 export const EMPTY_FORM: FormValues = {
   title: "",
+  subtitle: "",
   author: "",
   publisher: "",
   year: "",
@@ -80,11 +84,13 @@ export function readForm(values: FormValues): { ok: true; fields: FormFields } |
   }
 
   if (Object.keys(errors).length > 0) return { ok: false, errors };
+  const subtitle = values.subtitle.trim().replace(/\s+/g, " ");
   const publisher = values.publisher.trim().replace(/\s+/g, " ");
   return {
     ok: true,
     fields: {
       title,
+      subtitle: subtitle === "" ? null : subtitle,
       authors: splitAuthors(values.author),
       publisher: publisher === "" ? null : publisher,
       publishedYear,
@@ -97,6 +103,6 @@ export function readForm(values: FormValues): { ok: true; fields: FormFields } |
 
 /** The first field with a problem, in the order the form shows them, to move focus to. */
 export function firstInvalid(errors: FormErrors): FormField | null {
-  const order: FormField[] = ["title", "author", "publisher", "year", "isbn"];
+  const order: FormField[] = ["title", "subtitle", "author", "publisher", "year", "isbn"];
   return order.find((field) => errors[field] !== undefined) ?? null;
 }

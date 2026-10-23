@@ -99,7 +99,7 @@ export interface ManualFormProps {
 }
 
 /**
- * Add by hand: title (required), author, publisher, year, ISBN, shelf and
+ * Add by hand: title (required), subtitle, author, publisher, year, ISBN, shelf and
  * status, and a photo of the front when no cover is coming. Errors are
  * checked on submit, said under each field, and the first one takes focus.
  * The same form serves a miss, Edit details on a found book, and By hand.
@@ -181,6 +181,7 @@ export function ManualForm({
           autoCapitalize="sentences"
           autoComplete="off"
         />
+        <TextField label="Subtitle" optional {...text("subtitle")} autoCapitalize="sentences" autoComplete="off" />
         <TextField label="Author" optional {...text("author")} autoCapitalize="words" autoComplete="off" />
         <div className="add-form__pair">
           <TextField label="Publisher" optional {...text("publisher")} autoCapitalize="words" autoComplete="off" />

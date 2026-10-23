@@ -30,7 +30,7 @@ type Phase =
   /** The photo is kept, so "Try again" reads it again once the reader can load. */
   | { kind: "failed"; message: string; file: File; box: Box | null };
 
-const FIELD_NAMES: Record<FormField, string> = { title: "title", author: "author", publisher: "publisher", year: "year", isbn: "ISBN" };
+const FIELD_NAMES: Record<FormField, string> = { title: "title", subtitle: "subtitle", author: "author", publisher: "publisher", year: "year", isbn: "ISBN" };
 
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1)} MB`;
 

@@ -501,6 +501,25 @@ describe("Edit details", () => {
     state = flowReducer(state, { type: "save" });
     expect(expectStep(state, "form").save.saving).toBe(true);
   });
+
+  it("shows the draft's subtitle in its field, and saves what the field says", () => {
+    const state = flowReducer(scanAndAnswer(lookup({ draft: draft({ subtitle: "There and Back Again" }) })), {
+      type: "edit",
+      shelf: null,
+      status: "unread",
+    });
+    const form = expectStep(state, "form");
+    expect(form.initial.subtitle).toBe("There and Back Again");
+    expect(form.base.details).not.toHaveProperty("subtitle");
+
+    const body = (subtitle: string) => {
+      const read = readForm({ ...form.initial, subtitle, shelf: null });
+      if (!read.ok) throw new Error("form should read");
+      return bodyFromForm(read.fields, form.base);
+    };
+    expect(body("There and Back Again, 75th edition").subtitle).toBe("There and Back Again, 75th edition");
+    expect(body("  ").subtitle).toBeNull();
+  });
 });
 
 describe("modes", () => {
