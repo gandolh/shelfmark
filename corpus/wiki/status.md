@@ -79,7 +79,6 @@ test then moves to a signed-in session in one place.
 
 | Tier | Todo |
 |---|---|
-| later | [atrium-link](../todos/atrium-link.md) |
 
 Every v1 and v1.x todo is promoted (the v1.x ones on 2026-10-23, as briefs
 23–28). Waves 15–20 run one at a time: each touches the Library page.

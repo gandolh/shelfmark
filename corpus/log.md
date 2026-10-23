@@ -360,3 +360,10 @@ over Claude on the server or dropping the feature: free, private and offline. [B
 moves `readDescription` from the CIP list parser into `shared/` so the browser reads the
 OCR text with the same tested code, and serves Tesseract and its Romanian data from the
 app's own origin.
+
+## [2026-10-23] decision | Revisit: no Atrium link; the apps stay independent
+
+The owner dropped the Atrium link todo: Shelfmark and Atrium are independent products for
+now, and may be merged once both are mature, when the owner says so. "Physical books only"
+in [decisions.md](wiki/decisions.md) no longer allows a link to an Atrium copy, and
+features.md lists it under Out. No todos are left.

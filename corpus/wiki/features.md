@@ -59,11 +59,11 @@ Shelfmark keeps all of it except loans.
   Naționale a României" block on the copyright page with title, author,
   publisher, year and ISBN. A photo of it, read by OCR in the browser, fills
   most Romanian books that the databases miss (owner, 2026-10-23; brief 30).
-- **Atrium link**: mark that an ebook copy exists in Atrium.
 
 ## Out
 
-Loans (the owner dropped them, 2026-10-14). Social features, reviews, reading
+Loans (the owner dropped them, 2026-10-14). A link to a book's Atrium copy (dropped
+2026-10-23: the two apps stay independent until the owner decides to merge them). Social features, reviews, reading
 challenges, ebook files, price tracking, and
 shelf-photo spine recognition (impressive, unreliable, not worth the work at
 one person's scale).

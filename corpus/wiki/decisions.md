@@ -17,8 +17,10 @@ stores or reads a book file. The owner asked for "what physical books do I
 own". Rejected: adding a physical-books section to Atrium (`../atrium`), which
 is built around uploaded files, readers and per-profile reading progress; a
 catalog of objects shares almost none of that, and would bend Atrium's single
-media grid around items with no file. A later link from a book to its Atrium
-copy is allowed ([features.md](features.md)).
+media grid around items with no file. **Revisited 2026-10-23:** there is no link
+from a book to its Atrium copy either. The owner keeps the two apps independent
+for now and may merge them once both are mature; that is the owner's call, and
+they will say when. Until then, no feature reaches from one app into the other.
 
 ## A web app with a PWA, on React + Fastify + SQLite
 _2026-10-14_. The owner chose the stack: a React PWA for the phone and laptop,
