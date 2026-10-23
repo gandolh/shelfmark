@@ -5,25 +5,22 @@
  * Its fields and errors are the login page's (auth/auth.css).
  */
 
+.password-dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
+}
+
 .password-dialog {
+  z-index: var(--z-float);
+  display: flex;
   flex-direction: column;
-  max-width: none;
-  max-height: none;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
-  border: 0;
   background: var(--surface);
   box-shadow: var(--shadow-float);
   color: var(--ink);
-}
-
-.password-dialog[open] {
-  display: flex;
-}
-
-.password-dialog::backdrop {
-  background: color-mix(in srgb, var(--ink) 32%, transparent);
+  outline: none;
 }
 
 /* Desktop: in the middle, a little above the centre, rising a few pixels as it opens. */

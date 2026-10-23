@@ -1,15 +1,5 @@
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type FormEvent,
-  type MouseEvent,
-  type ReactNode,
-  type SyntheticEvent,
-} from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
 import {
   useChangePassword,
   useSession,
@@ -28,8 +18,8 @@ import "../auth/auth.css";
 import "./account.css";
 
 /**
- * The account menu's "Change password" (brief 06): a modal dialog, so focus
- * stays in the form until it is done or cancelled. On the desktop a white
+ * The account menu's "Change password" (brief 06): a modal Base UI `Dialog`,
+ * so focus stays in the form until it is done or cancelled. On the desktop a white
  * panel in the middle of the window; on a phone the floating sheet over the
  * bottom of the screen, as the Library's Filter panel.
  *
@@ -108,41 +98,19 @@ export function ChangePasswordDialog() {
       onClose={() => {
         setOpen(false);
         if (confirmed) clear();
-        if (returnFocus?.isConnected) returnFocus.focus();
-        returnFocus = null;
       }}
     />
   );
 }
 
 function PasswordDialog({ onClose }: { onClose: () => void }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const titleId = useId();
+  const popupRef = useRef<HTMLDivElement>(null);
   const desktop = useIsDesktop();
   const session = useSession();
   const user = session.status === "signed_in" ? session.user : null;
   const hasPassword = user?.hasPassword ?? true;
   const change = useChangePassword();
   const local = useSetLocalPassword();
-
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (!dialog.open) dialog.showModal();
-    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-    return () => {
-      if (dialog.open) dialog.close();
-    };
-  }, []);
-
-  // A press on the backdrop (which the dialog itself receives) closes it, as the panels do.
-  const onClick = (event: MouseEvent<HTMLDialogElement>) => {
-    if (event.target === event.currentTarget) onClose();
-  };
-  const onCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
-    event.preventDefault();
-    onClose();
-  };
 
   let title = "Change password";
   let body;
@@ -193,21 +161,34 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
     );
   }
 
+  // Esc, and a press on the backdrop as the panels do, close it; an Esc a field already used doesn't.
   return (
-    <dialog
-      ref={dialogRef}
-      aria-labelledby={titleId}
-      className={desktop ? "password-dialog password-dialog--centered" : "password-dialog password-dialog--sheet"}
-      onClick={onClick}
-      onCancel={onCancel}
+    <Dialog.Root
+      open
+      onOpenChange={(next, details) => {
+        if (!next && !(details.reason === "escape-key" && details.event.defaultPrevented)) onClose();
+      }}
     >
-      <div className="password-dialog__frame">
-        <h2 id={titleId} className="password-dialog__title">
-          {title}
-        </h2>
-        {body}
-      </div>
-    </dialog>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="password-dialog-backdrop" />
+        <Dialog.Popup
+          ref={popupRef}
+          className={desktop ? "password-dialog password-dialog--centered" : "password-dialog password-dialog--sheet"}
+          initialFocus={() => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true}
+          // Back to what had focus when it opened: the account button.
+          finalFocus={() => {
+            const target = returnFocus;
+            returnFocus = null;
+            return target?.isConnected ? target : true;
+          }}
+        >
+          <div className="password-dialog__frame">
+            <Dialog.Title className="password-dialog__title">{title}</Dialog.Title>
+            {body}
+          </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 

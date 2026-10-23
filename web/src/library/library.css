@@ -113,48 +113,44 @@
 /* --- Panels: Filter and Columns ---------------------------------------------------------- */
 
 .library-panel {
+  display: flex;
   flex-direction: column;
-  max-width: none;
-  max-height: none;
-  margin: 0;
-  padding: 0;
   overflow: hidden;
-  border: 0;
   background: var(--surface);
   box-shadow: var(--shadow-float);
   color: var(--ink);
+  outline: none;
 }
 
-.library-panel[open] {
-  display: flex;
+/* Desktop: hangs under its button, shortened to the room below it; nothing behind it dims. */
+.library-panel-positioner {
+  z-index: var(--z-float);
 }
 
-/* Desktop: hangs under its button; nothing behind it dims. */
 .library-panel--anchored {
-  position: fixed;
-  inset: auto;
   width: 324px;
   max-width: calc(100vw - 16px);
+  max-height: var(--available-height);
   border-radius: var(--radius-menu);
   animation: library-panel-in var(--duration) var(--ease-out);
 }
 
-.library-panel--anchored::backdrop {
-  background: transparent;
+/* Phone: the floating sheet, over the bottom of the screen, over a dimmed page. */
+.library-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-float);
+  background: color-mix(in srgb, var(--ink) 32%, transparent);
 }
 
-/* Phone: the floating sheet, over the bottom of the screen. */
 .library-panel--sheet {
   position: fixed;
   inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+  z-index: var(--z-float);
   width: auto;
   max-height: min(86dvh, 680px);
   border-radius: var(--radius-sheet);
   animation: library-sheet-in var(--duration-sheet) var(--ease-out);
-}
-
-.library-panel--sheet::backdrop {
-  background: color-mix(in srgb, var(--ink) 32%, transparent);
 }
 
 @keyframes library-panel-in {

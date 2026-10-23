@@ -230,9 +230,12 @@
   pointer-events: none;
 }
 
-.menu {
-  position: fixed;
+/* Base UI places the positioner; the menu inside it is the white list. */
+.menu-positioner {
   z-index: var(--z-float);
+}
+
+.menu {
   display: flex;
   flex-direction: column;
   min-width: 224px;
@@ -242,11 +245,7 @@
   background: var(--surface);
   box-shadow: var(--shadow-float);
   color: var(--ink);
-  visibility: hidden; /* until it is placed by its button */
-}
-
-.menu[data-placed] {
-  visibility: visible;
+  outline: none;
   animation: menu-in var(--duration) var(--ease-out);
 }
 
@@ -291,10 +290,11 @@
   color: var(--ink);
   font-size: var(--text-meta);
   text-align: left;
+  cursor: default;
+  user-select: none;
 }
 
-.menu__item:hover,
-.menu__item:focus {
+.menu__item[data-highlighted] {
   background: var(--accent-tint-soft);
 }
 
@@ -302,7 +302,7 @@
   outline-offset: -2px;
 }
 
-.menu__item:disabled {
+.menu__item[data-disabled] {
   color: var(--muted);
   background: none;
 }

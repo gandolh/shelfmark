@@ -1,4 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, type MouseEvent, type ReactNode, type RefObject, type SyntheticEvent } from "react";
+import { Dialog } from "@base-ui/react/dialog";
+import { Popover } from "@base-ui/react/popover";
+import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
 import { BackIcon } from "../components/icons";
 
 export interface PanelProps {
@@ -20,76 +22,92 @@ const GAP = 8;
 const MARGIN = 8;
 
 /**
- * The Filter and Columns panels: a modal `<dialog>`, so focus stays inside,
- * Escape closes it and nothing behind it clips it. On the desktop it is a
- * white panel under its button with no dimming (a click outside closes it);
- * on a phone it is a sheet over the bottom of the screen, as design.md's
- * floating sheet, over a dimmed page. Content changes apply as they are made;
- * Done only closes. Built here for the Library; a candidate for
- * components/ when another page needs one.
+ * The desktop panel's close part. Base UI traps focus in a modal popover only
+ * when it has one, so `PanelHeader`'s Done is it.
+ */
+const PanelClose = createContext(false);
+
+/** Whether a closing Esc was already used by a control inside (a step going back), so isn't the panel's. */
+function keptOpen(details: { reason: string; event: Event }): boolean {
+  return details.reason === "escape-key" && details.event.defaultPrevented;
+}
+
+/**
+ * The Filter and Columns panels, modal so focus stays inside and Escape
+ * closes them. On the desktop a Base UI `Popover`: a white panel under its
+ * button with no dimming, where a click outside closes it and lands nowhere
+ * else. On a phone a Base UI `Dialog`: a sheet over the bottom of the screen,
+ * as design.md's floating sheet, over a dimmed page. Content changes apply as
+ * they are made; Done only closes. Mounted means open. Built here for the
+ * Library; a candidate for components/ when another page needs one.
  */
 export function Panel({ label, anchor, fallback, desktop, align = "start", onClose, children }: PanelProps) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
 
-  // Open as soon as it mounts, focus what asked for it, and hand focus back
-  // on the way out.
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (!dialog.open) dialog.showModal();
-    dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
-    return () => {
-      if (dialog.open) dialog.close();
-      (anchor.isConnected ? anchor : fallback?.())?.focus();
-    };
-  }, [anchor, fallback]);
+  // A chip that opened the panel goes when its filter does; the panel stays where it is.
+  const lastPlace = useRef<DOMRect | null>(null);
+  const placedBy = useMemo(
+    () => ({
+      contextElement: anchor,
+      getBoundingClientRect: () => {
+        if (anchor.isConnected || lastPlace.current === null) lastPlace.current = anchor.getBoundingClientRect();
+        return lastPlace.current;
+      },
+    }),
+    [anchor],
+  );
 
-  // The desktop panel follows its button while the page scrolls or resizes.
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog || !desktop) return;
-    const place = () => {
-      // A chip that opened the panel goes when its filter does; the panel stays where it is.
-      if (!anchor.isConnected) return;
-      const box = anchor.getBoundingClientRect();
-      const width = dialog.offsetWidth;
-      const preferred = align === "end" ? box.right - width : box.left;
-      const left = Math.min(Math.max(preferred, MARGIN), window.innerWidth - width - MARGIN);
-      const top = Math.min(box.bottom + GAP, window.innerHeight - 160);
-      dialog.style.left = `${Math.round(left)}px`;
-      dialog.style.top = `${Math.round(Math.max(MARGIN, top))}px`;
-      dialog.style.maxHeight = `${Math.round(window.innerHeight - Math.max(MARGIN, top) - MARGIN)}px`;
-    };
-    place();
-    window.addEventListener("resize", place);
-    window.addEventListener("scroll", place, true);
-    return () => {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
-    };
-  }, [anchor, desktop, align]);
-
-  // A press outside the panel (on the backdrop, which the dialog itself
-  // receives) closes it, as a menu does.
-  const onClick = (event: MouseEvent<HTMLDialogElement>) => {
-    if (event.target === event.currentTarget) onClose();
+  const onOpenChange = (open: boolean, details: { reason: string; event: Event }) => {
+    if (!open && !keptOpen(details)) onClose();
   };
+  const initialFocus = () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true;
+  // Back to what asked for it, or the fallback when that is gone.
+  const finalFocus = () => (anchor.isConnected ? anchor : fallback?.()) ?? true;
+  const frame = <div className="library-panel__frame">{children}</div>;
 
-  const onCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
-    event.preventDefault();
-    onClose();
-  };
-
+  if (desktop) {
+    return (
+      <Popover.Root open modal onOpenChange={onOpenChange}>
+        <Popover.Portal>
+          <Popover.Positioner
+            className="library-panel-positioner"
+            anchor={placedBy}
+            side="bottom"
+            align={align}
+            sideOffset={GAP}
+            collisionPadding={MARGIN}
+            // Always under the button, shortened to the room below it, as before.
+            collisionAvoidance={{ side: "none" }}
+          >
+            <Popover.Popup
+              ref={popupRef}
+              aria-label={label}
+              className="library-panel library-panel--anchored"
+              initialFocus={initialFocus}
+              finalFocus={finalFocus}
+            >
+              <PanelClose.Provider value>{frame}</PanelClose.Provider>
+            </Popover.Popup>
+          </Popover.Positioner>
+        </Popover.Portal>
+      </Popover.Root>
+    );
+  }
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label={label}
-      className={desktop ? "library-panel library-panel--anchored" : "library-panel library-panel--sheet"}
-      onClick={onClick}
-      onCancel={onCancel}
-    >
-      <div className="library-panel__frame">{children}</div>
-    </dialog>
+    <Dialog.Root open onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="library-panel-backdrop" />
+        <Dialog.Popup
+          ref={popupRef}
+          aria-label={label}
+          className="library-panel library-panel--sheet"
+          initialFocus={initialFocus}
+          finalFocus={finalFocus}
+        >
+          {frame}
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
@@ -102,6 +120,12 @@ export interface PanelHeaderProps {
 
 /** The panel's top row: a way back (when there is one), the title, and Done. */
 export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
+  const closePart = useContext(PanelClose);
+  const done = (
+    <button type="button" className="button button--quiet button--compact library-panel__done" onClick={onDone}>
+      Done
+    </button>
+  );
   return (
     <div className="library-panel__head">
       <div className="library-panel__start">
@@ -113,11 +137,7 @@ export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
         )}
       </div>
       <h2 className="library-panel__title">{title}</h2>
-      <div className="library-panel__end">
-        <button type="button" className="button button--quiet button--compact library-panel__done" onClick={onDone}>
-          Done
-        </button>
-      </div>
+      <div className="library-panel__end">{closePart ? <Popover.Close render={done} /> : done}</div>
     </div>
   );
 }

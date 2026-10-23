@@ -1,5 +1,6 @@
+import { Tabs } from "@base-ui/react/tabs";
 import type { Book, BookCreate } from "@shelfmark/shared";
-import { useEffect, useId, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { createBook, useBooks } from "../books/store";
 import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
@@ -26,7 +27,7 @@ import {
 import { BarcodeIcon, TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
 import { createLookupMemo } from "./memo";
-import { ModeSwitch, modeTabId } from "./ModeSwitch";
+import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
 import { announcement, lookupFailure, saveFailure, sessionCount } from "./words";
@@ -68,7 +69,6 @@ export function AddBookPage() {
   const shelves = useMemo(() => shelvesInUse(books), [books]);
   // The shelf used last this session, else the one the library added to last.
   const defaultShelf = state.lastShelf !== undefined ? state.lastShelf : (shelves[0] ?? null);
-  const panelId = useId();
   const isbnField = useRef<IsbnFieldHandle>(null);
   const result = useRef<HTMLDivElement>(null);
   const saving = useRef(false);
@@ -212,7 +212,7 @@ export function AddBookPage() {
     dispatch({ type: "mode", mode: next });
   };
 
-  const switcher = <ModeSwitch value={mode} onChange={changeMode} panelId={panelId} overCamera={!desktop && mode === "scan"} disabled={isSaving(step)} />;
+  const switcher = <ModeSwitch overCamera={!desktop && mode === "scan"} disabled={isSaving(step)} />;
   const status = added > 0 || notice !== null ? <SessionStatus added={added} notice={notice} /> : null;
   const sheet = (floating: boolean, takeFocus: boolean) =>
     step.kind === "ready" ? null : (
@@ -230,7 +230,12 @@ export function AddBookPage() {
 
   return (
     <Page title="Add a book" bleed caption={desktop ? status : undefined}>
-      <div className={`add add--${mode}`}>
+      <Tabs.Root
+        value={mode}
+        // The arrow keys switch as they move focus, which stays on the tabs; a click (or Enter) moves it into the new form.
+        onValueChange={(next: Mode, details) => changeMode(next, !(details.event instanceof MouseEvent))}
+        render={<div className={`add add--${mode}`} />}
+      >
         {/* Scan moves focus into each result; Type ISBN keeps it in the field, so results are read out from here. */}
         <p className="visually-hidden" role="status">
           {announcement(state, mode !== "scan")}
@@ -244,7 +249,7 @@ export function AddBookPage() {
             {status}
           </div>
         )}
-        <div role="tabpanel" id={panelId} aria-labelledby={modeTabId(panelId, mode)} className="add__panel">
+        <Tabs.Panel value={mode} className="add__panel">
           {mode === "scan" && (
             <div className="add-stage">
               <CameraScanner
@@ -321,8 +326,8 @@ export function AddBookPage() {
             </div>
           )}
           {mode === "manual" && <div className="add-column">{sheet(false, focusOnEnter)}</div>}
-        </div>
-      </div>
+        </Tabs.Panel>
+      </Tabs.Root>
     </Page>
   );
 }
