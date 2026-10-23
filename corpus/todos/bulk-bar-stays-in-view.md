@@ -1,9 +1,13 @@
 ---
 title: The bulk bar stays in view while rows are selected
 created: 2026-10-23
-status: open
+status: dropped
 tags: [v1.x]
 ---
+
+Dropped 2026-10-23: the owner chose to leave the bar where it is, over pinning it under
+the top bar or putting it in place of the phone's bottom nav. Scrolling back up is the
+accepted price.
 
 # The bulk bar stays in view while rows are selected
 

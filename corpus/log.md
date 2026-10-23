@@ -515,3 +515,14 @@ Still owed, needing a real phone or the owner: the long press with iOS and Andro
 own menus, the photo picker and box drag, real camera photos for the CIP fixtures,
 whether iOS Safari's service worker answers the Tesseract worker's requests offline,
 and the timing test that fails under a parallel load.
+
+## [2026-10-23] decision | The bulk bar stays put; the subtitle gets a field
+
+Asked about the review's two todos. The bulk bar keeps scrolling with the page:
+the owner chose that over pinning it under the top bar, or in place of the phone's
+bottom nav, and the todo [bulk-bar-stays-in-view](todos/bulk-bar-stays-in-view.md) is
+dropped. The subtitle gets an optional field under Title on the by-hand form, filled
+from the CIP block and marked to check, over saving it unseen or leaving it to Edit:
+[brief 31](briefs/todo/31-subtitle-on-the-by-hand-form.md). Writing it found that a
+lookup draft's subtitle is today saved as a hidden detail from "Edit details", so 31
+moves it into the field as well.

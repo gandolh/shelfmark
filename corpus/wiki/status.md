@@ -69,6 +69,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 28 | [CSV import](../briefs/done/28-csv-import.md) | 20 | done 2026-10-23 |
 | 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
 | 30 | [Fill a book from a photo of its CIP block](../briefs/done/30-cip-photo-capture.md) | 22 | done 2026-10-23; fixtures are renders, real photos and a phone walk owed |
+| 31 | [A subtitle field on the by-hand form](../briefs/todo/31-subtitle-on-the-by-hand-form.md) | 23 | todo |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
@@ -79,6 +80,8 @@ test then moves to a signed-in session in one place.
 
 None. On 2026-10-23 the v1.x todos became briefs 23–28, stats and the CIP photo
 became 29 and 30, and the Atrium link was dropped (the apps stay independent).
+The review's two todos went the same day: the subtitle field became 31, and the pinned
+bulk bar was dropped.
 Waves 15–22 were planned one at a time, since each touches the Library page or the add flow. On
 2026-10-23 they ran two at a time where the files did not overlap; 26 and 27 were built in a
 worktree and cherry-picked onto `main`.
