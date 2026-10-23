@@ -345,3 +345,10 @@ transaction; [27](briefs/todo/27-saved-views.md) named views stored on the serve
 menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
 stats page needs a home that keeps "Two places only", the CIP photo needs OCR or Claude
 chosen, and the Atrium link needs a shape.
+
+## [2026-10-23] decision | Stats open from the account menu; brief 29
+
+Asked where stats should live under "Two places only", the owner chose an item in the
+account menu, over a button over the Library table or a third tab. The rule stands.
+[Brief 29](briefs/todo/29-stats.md) counts owned books in the browser, with no server
+route, and links each count to Library with that filter.

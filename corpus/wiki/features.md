@@ -1,6 +1,6 @@
 ---
 summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out, the wishlist is v1.x), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
-updated: 2026-10-21
+updated: 2026-10-23
 ---
 
 # Features
@@ -53,7 +53,8 @@ Shelfmark keeps all of it except loans.
 
 ## Later
 
-- **Stats page**: counts by author, language, shelf, decade; total spent.
+- **Stats**: counts by author, language, shelf, decade; total spent. From the
+  account menu, not a third place (owner, 2026-10-23; brief 29).
 - **CIP photo capture**: Romanian books print a "Descrierea CIP a Bibliotecii
   Naționale a României" block on the copyright page with title, author,
   publisher, year and ISBN. A photo of it, read by OCR or Claude, would fill
