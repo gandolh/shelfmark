@@ -6,7 +6,7 @@ import { CheckIcon } from "../components/icons";
 import { Sheet } from "../components/Sheet";
 import { bookRoute } from "../router";
 import { CoverCapture, type CoverPhoto } from "./CoverCapture";
-import { newestCopy, type FormBase, type FormReason, type Mode, type Proposal, type Step } from "./flow";
+import { newestCopy, wishlistedCopy, type FormBase, type FormReason, type Mode, type Proposal, type Step } from "./flow";
 import type { FormFields, FormValues } from "./form";
 import { AlertIcon, BarcodeIcon } from "./icons";
 import { IsbnField } from "./IsbnField";
@@ -18,6 +18,10 @@ import { bylineLine, draftSources, metaLine, notFoundWording, ownedLine, sourceL
 /** What the sheet's buttons ask the page to do. */
 export interface SheetActions {
   saveProposal: (proposal: Proposal, shelf: string | null, status: Status, photo: CoverPhoto | null) => void;
+  /** "Add to wishlist": saves the proposal with `collection: "wishlist"`, no shelf. */
+  saveToWishlist: (proposal: Proposal, photo: CoverPhoto | null) => void;
+  /** "I bought it": moves the wishlisted book (`bookId`) to Owned on `shelf`, acquired today. */
+  buy: (bookId: number, shelf: string | null) => void;
   saveForm: (fields: FormFields, base: FormBase, photo: CoverPhoto | null) => void;
   discard: () => void;
   edit: (shelf: string | null, status: Status) => void;
@@ -72,6 +76,9 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       break;
     case "owned":
       content = <Owned key={step.id} step={step} books={books} {...shared} />;
+      break;
+    case "wishlisted":
+      content = <Wishlisted key={step.id} step={step} books={books} shelves={shelves} defaultShelf={defaultShelf} {...shared} />;
       break;
     case "other":
       content = <Other key={step.id} code={step.code} {...shared} />;
@@ -220,6 +227,19 @@ function Found({
       >
         {save.saving ? "Saving…" : words.save}
       </Button>
+      {proposal.origin !== "copy" && (
+        <Button
+          variant="secondary"
+          pill
+          block
+          aria-disabled={save.saving || undefined}
+          onClick={() => {
+            if (!save.saving) on.saveToWishlist(proposal, photo);
+          }}
+        >
+          Add to wishlist
+        </Button>
+      )}
       <div className="add-actions add-actions--split">
         <Leave onClick={on.discard} disabled={save.saving}>
           {proposal.origin === "copy" ? words.discard : "Not this book"}
@@ -275,6 +295,67 @@ function Owned({
           Add another copy
         </Button>
         <ButtonLink to={bookRoute(newest.id)} variant="secondary" pill block>
+          Open the book
+        </ButtonLink>
+      </div>
+    </>
+  );
+}
+
+// --- On the wishlist -------------------------------------------------------------
+
+function Wishlisted({
+  step,
+  books,
+  shelves,
+  defaultShelf,
+  headingId,
+  takeFocus,
+  words,
+  on,
+}: Shared & { step: Extract<Step, { kind: "wishlisted" }>; books: readonly Book[]; shelves: readonly string[]; defaultShelf: string | null }) {
+  const heading = useHeadingFocus(takeFocus);
+  const [shelf, setShelf] = useState(defaultShelf);
+  const { lookup, save } = step;
+  const { draft, isbn13 } = lookup;
+  // The wishlisted step always has a copy; the fallback only satisfies the type.
+  const wanted = wishlistedCopy(lookup) ?? { id: 0 };
+  const saved = books.find((book) => book.id === wanted.id);
+  const title = saved?.title ?? draft?.title ?? `ISBN ${isbn13}`;
+  const byline = bylineLine(saved ?? draft ?? {});
+  const coverBook: CoverBook = saved ?? { title, authors: draft?.authors ?? [], language: draft?.language ?? null };
+  const src = saved?.hasCover ? undefined : draft?.coverCandidates[0]?.url;
+
+  return (
+    <>
+      <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
+        <p className="add-status">
+          <CheckIcon size={15} />
+          On your wishlist
+        </p>
+        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+          {title}
+        </h2>
+        {byline && <p className="add-byline">{byline}</p>}
+      </Head>
+      <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
+      {save.failure && <FailureLine>{save.failure.message}</FailureLine>}
+      <Button
+        variant="primary"
+        size="large"
+        block
+        aria-disabled={save.saving || undefined}
+        onClick={() => {
+          if (!save.saving) on.buy(wanted.id, shelf);
+        }}
+      >
+        {save.saving ? "Saving…" : "I bought it"}
+      </Button>
+      <div className="add-pair">
+        <Button variant="secondary" pill block onClick={on.discard} disabled={save.saving}>
+          {words.next}
+        </Button>
+        <ButtonLink to={bookRoute(wanted.id)} variant="secondary" pill block>
           Open the book
         </ButtonLink>
       </div>

@@ -21,7 +21,7 @@ const books = [
 
 describe("buildXlsx", () => {
   it("parses back with typed cells", async () => {
-    const view = { owned: books } as unknown as LibraryView;
+    const view = { books, collection: "owned" } as unknown as LibraryView;
     const table = everythingTable(view, COLUMNS, true);
     const blob = await buildXlsx(table);
     const rows = await readSheet(Buffer.from(await blob.arrayBuffer()));
@@ -43,7 +43,7 @@ describe("buildXlsx", () => {
   });
 
   it("sizes columns from the content", () => {
-    const view = { owned: books } as unknown as LibraryView;
+    const view = { books, collection: "owned" } as unknown as LibraryView;
     const widths = columnWidths(everythingTable(view, COLUMNS, true));
     expect(widths).toHaveLength(COLUMNS.length);
     expect(Math.max(...widths)).toBeLessThanOrEqual(60);

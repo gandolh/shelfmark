@@ -5,10 +5,11 @@ import { defaultPrefs } from "./prefs";
 import { searchBooks } from "./search";
 import { DEFAULT_SORTING, sortBooks } from "./sort";
 import { book, syntheticLibrary } from "./test-books";
-import { deriveView, exportColumns, visibleColumns, type ViewState } from "./view";
+import { columnsIn, deriveView, exportColumns, visibleColumns, type ViewState } from "./view";
 
 const defaults = defaultPrefs("desktop");
 const state = (overrides: Partial<ViewState> = {}): ViewState => ({
+  collection: "owned",
   query: "",
   filters: {},
   sorting: DEFAULT_SORTING,
@@ -51,6 +52,35 @@ describe("deriveView", () => {
       }),
     );
     expect(view.columns.map((column) => column.id)).toEqual(["book", "shelf", "publisher", "status", "added", "notes"]);
+  });
+});
+
+describe("the wishlist collection", () => {
+  const books = [
+    book({ title: "Solenoid", shelf: "Bedroom" }),
+    book({ title: "Dune", collection: "wishlist" }),
+    book({ title: "Orbitor", collection: "wishlist" }),
+  ];
+
+  it("holds the wishlist books only, and counts both collections", () => {
+    const view = deriveView(books, state({ collection: "wishlist", sorting: [{ id: "book", desc: false }] }));
+    expect(view.collection).toBe("wishlist");
+    expect(view.total).toBe(2);
+    expect(view.counts).toEqual({ owned: 1, wishlist: 2 });
+    expect(view.rows.map((b) => b.title)).toEqual(["Dune", "Orbitor"]);
+    expect(view.books.map((b) => b.title)).toEqual(["Dune", "Orbitor"]);
+  });
+
+  it("leaves out the columns a wishlist book never fills, even when shown", () => {
+    const all = Object.fromEntries(defaults.columnOrder.map((id) => [id, true])) as ViewState["columnVisibility"];
+    const owned = deriveView(books, state({ columnVisibility: all })).columns.map((c) => c.id);
+    const wishlist = deriveView(books, state({ collection: "wishlist", columnVisibility: all })).columns.map((c) => c.id);
+    for (const id of ["shelf", "condition", "acquiredOn", "acquiredFrom"] as const) {
+      expect(owned).toContain(id);
+      expect(wishlist).not.toContain(id);
+    }
+    expect(wishlist).toContain("publisher");
+    expect(columnsIn("wishlist", visibleColumns(defaults.columnOrder, all)).map((c) => c.id)).toEqual(wishlist);
   });
 });
 

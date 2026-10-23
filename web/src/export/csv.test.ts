@@ -54,6 +54,7 @@ describe("fields", () => {
 
   it("writes every field for every book, and the view's columns with Author after the title", () => {
     const state: ViewState = {
+      collection: "owned",
       query: "",
       filters: {},
       sorting: DEFAULT_SORTING,
@@ -68,5 +69,25 @@ describe("fields", () => {
     expect(seen.header.slice(0, 2)).toEqual(["Title", "Author"]);
     const csv = toCsv(seen.header, seen.rows);
     expect(csv).toContain("'=SUM(1)");
+  });
+
+  it("exports the wishlist's own books, without the columns it never fills", () => {
+    const wanted = book({ title: "Wanted", collection: "wishlist" });
+    const state: ViewState = {
+      collection: "wishlist",
+      query: "",
+      filters: {},
+      sorting: DEFAULT_SORTING,
+      columnOrder: defaultPrefs("desktop").columnOrder,
+      columnVisibility: defaultPrefs("desktop").columnVisibility,
+    };
+    const view = deriveView([b, wanted], state);
+    const all = everythingTable(view, COLUMNS, false);
+    expect(all.rows).toHaveLength(1);
+    expect(all.header).not.toContain("Shelf");
+    expect(all.header).toContain("Title");
+    const seen = viewTable(view, false);
+    expect(seen.rows).toHaveLength(1);
+    expect(seen.header).not.toContain("Shelf");
   });
 });

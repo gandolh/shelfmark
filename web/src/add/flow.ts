@@ -2,6 +2,7 @@ import {
   draftMetadataSource,
   type Book,
   type BookCreate,
+  type Collection,
   type Draft,
   type LookupSource,
   type LookupResponse,
@@ -74,6 +75,8 @@ export interface SaveState {
  * - `other`: a barcode that isn't an ISBN.
  * - `failed`: the lookup didn't answer.
  * - `owned`: the ISBN is already in the library.
+ * - `wishlisted`: no copy is owned, but one is on the wishlist: "I bought it"
+ *   asks for a shelf and moves that row to Owned (`save` is that call's state).
  * - `found`: a draft (or another copy) to confirm with a shelf and a status.
  * - `form`: the by-hand form.
  */
@@ -84,6 +87,7 @@ export type Step =
   | { kind: "other"; id: number; code: string }
   | { kind: "failed"; id: number; isbn13: string; failure: Failure }
   | { kind: "owned"; id: number; lookup: LookupResponse }
+  | { kind: "wishlisted"; id: number; lookup: LookupResponse; save: SaveState }
   | { kind: "found"; id: number; lookup: LookupResponse | null; proposal: Proposal; save: SaveState }
   | {
       kind: "form";
@@ -99,8 +103,12 @@ export type StepKind = Step["kind"];
 
 /** What the top of the page says for a moment after a save. */
 export type Notice =
-  | { id: number; kind: "saved"; bookId: number; title: string }
+  /** `outcome`: `wishlist` (added to the wishlist), `bought` (moved from the wishlist to a shelf); left out for a new owned book. */
+  | { id: number; kind: "saved"; bookId: number; title: string; outcome?: SavedOutcome }
   | { id: number; kind: "cover-failed"; bookId: number; title: string };
+
+/** How a save differs from a new owned book. */
+export type SavedOutcome = "wishlist" | "bought";
 
 export interface FlowState {
   mode: Mode;
@@ -128,7 +136,8 @@ export type FlowEvent =
   | { type: "another-copy"; proposal: Proposal | null }
   | { type: "discard" }
   | { type: "save" }
-  | { type: "saved"; book: { id: number; title: string; shelf: string | null } }
+  /** `outcome`: `wishlist` leaves the default shelf alone; `bought` (from "I bought it") sets it to the shelf chosen. */
+  | { type: "saved"; book: { id: number; title: string; shelf: string | null }; outcome?: SavedOutcome }
   | { type: "save-failed"; failure: Failure }
   | { type: "cover-failed"; book: { id: number; title: string } }
   | { type: "dismiss-notice"; id: number };
@@ -164,7 +173,7 @@ export function scannerPaused(state: FlowState): boolean {
 
 /** True while a save is in flight: the sheet's buttons wait. */
 export function isSaving(step: Step): boolean {
-  return (step.kind === "found" || step.kind === "form") && step.save.saving;
+  return (step.kind === "found" || step.kind === "form" || step.kind === "wishlisted") && step.save.saving;
 }
 
 /** The ISBN the sheet is about, if any: Enter on the same ISBN again does nothing. */
@@ -173,6 +182,7 @@ export function currentIsbn(step: Step): string | null {
     case "looking":
       return step.isbn13;
     case "owned":
+    case "wishlisted":
       return step.lookup.isbn13;
     case "found":
     case "form":
@@ -256,9 +266,23 @@ export function copyProposal(lookup: LookupResponse, books: readonly Book[]): Pr
   return null;
 }
 
-/** The create body for a confirmed proposal. */
-export function bodyFromProposal(proposal: Proposal, shelf: string | null, status: Status): BookCreate {
-  return { ...proposal.details, shelf, status };
+/**
+ * The create body for a confirmed proposal. On the wishlist there is no
+ * shelf: the caller passes `null`, and `collection: "wishlist"` is sent.
+ */
+export function bodyFromProposal(proposal: Proposal, shelf: string | null, status: Status, collection: Collection = "owned"): BookCreate {
+  return { ...proposal.details, shelf, status, ...(collection === "wishlist" ? { collection } : {}) };
+}
+
+/** The wishlisted copy "I bought it" moves: the first one a lookup found. */
+export function wishlistedCopy(lookup: LookupResponse): LookupResponse["wishlisted"][number] | null {
+  return lookup.wishlisted[0] ?? null;
+}
+
+/** Today as `YYYY-MM-DD` in the owner's own day: the `acquiredOn` of a book just bought. */
+export function todayIso(now: Date = new Date()): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
 /** The create body for the form: its fields over the details it doesn't show. */
@@ -296,9 +320,10 @@ function hiddenDetails(details: Partial<Details>): Partial<Details> {
 
 // --- The machine ----------------------------------------------------------------
 
-/** The step a lookup's answer leads to. Already owned wins over found. */
+/** The step a lookup's answer leads to. Already owned wins over wishlisted, and both win over found. */
 function answered(lookup: LookupResponse, id: number): Step {
   if (lookup.owned.length > 0) return { kind: "owned", id, lookup };
+  if (lookup.wishlisted.length > 0) return { kind: "wishlisted", id, lookup, save: IDLE };
   const { draft } = lookup;
   if (draft !== null && draft.title) {
     return { kind: "found", id, lookup, proposal: proposalFromDraft({ ...draft, title: draft.title }), save: IDLE };
@@ -428,29 +453,31 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       return go(restingStep(state.mode, id));
 
     case "save":
-      if ((step.kind !== "found" && step.kind !== "form") || saving) return state;
+      if ((step.kind !== "found" && step.kind !== "form" && step.kind !== "wishlisted") || saving) return state;
       return { ...state, step: { ...step, save: { saving: true, failure: null } } };
 
     case "saved": {
       // Counted even when the owner has moved on: the book is in the library.
+      const { outcome } = event;
       const counted: Partial<FlowState> = {
         added: state.added + 1,
-        lastShelf: event.book.shelf,
-        notice: { id, kind: "saved", bookId: event.book.id, title: event.book.title },
+        // A wishlist book has no shelf: the next book keeps defaulting to the last real one.
+        lastShelf: outcome === "wishlist" ? state.lastShelf : event.book.shelf,
+        notice: { id, kind: "saved", bookId: event.book.id, title: event.book.title, outcome },
       };
       if (!saving) return { ...state, ...counted, next: id + 1 };
       // The resting step and the notice each take an id, the notice's the newer.
       return {
         ...state,
         ...counted,
-        notice: { id: id + 1, kind: "saved", bookId: event.book.id, title: event.book.title },
+        notice: { id: id + 1, kind: "saved", bookId: event.book.id, title: event.book.title, outcome },
         step: restingStep(state.mode, id),
         next: id + 2,
       };
     }
 
     case "save-failed":
-      if (!saving || (step.kind !== "found" && step.kind !== "form")) return state;
+      if (!saving || (step.kind !== "found" && step.kind !== "form" && step.kind !== "wishlisted")) return state;
       return { ...state, step: { ...step, save: { saving: false, failure: event.failure } } };
 
     case "cover-failed":

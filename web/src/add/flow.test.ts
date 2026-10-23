@@ -10,7 +10,9 @@ import {
   newestCopy,
   proposalFromBook,
   proposalFromDraft,
+  isSaving,
   scannerPaused,
+  todayIso,
   type FlowEvent,
   type FlowState,
   type Mode,
@@ -58,6 +60,8 @@ const NOT_FOUND = lookup({
     { source: "googlebooks", outcome: "skipped_no_key" },
   ],
 });
+
+const WISHLISTED = lookup({ wishlisted: [{ id: 21 }] });
 
 const OWNED = lookup({ owned: [{ id: 7, shelf: "Living room · A3", createdAt: "2026-03-03T10:00:00.000Z" }] });
 
@@ -182,6 +186,43 @@ describe("the scan flow", () => {
     expect(form.initial.publisher).toBe("Polirom");
     expect(form.base.cover.kind).toBe("candidates");
     expect(form.base.details).toMatchObject({ pages: 300, language: "en", metadataSource: "openlibrary" });
+  });
+
+  it("a wishlisted book (no owned copy) gets its own step, with “I bought it” saving through it", () => {
+    let state = scanAndAnswer(WISHLISTED);
+    expect(expectStep(state, "wishlisted").lookup.wishlisted).toEqual([{ id: 21 }]);
+    expect(currentIsbn(state.step)).toBe(HOBBIT);
+
+    state = flowReducer(state, { type: "save" });
+    expect(isSaving(state.step)).toBe(true);
+    state = flowReducer(state, { type: "save-failed", failure: { message: "no", network: false } });
+    expect(expectStep(state, "wishlisted").save).toEqual({ saving: false, failure: { message: "no", network: false } });
+
+    state = flowReducer(state, { type: "save" });
+    state = flowReducer(state, { type: "saved", book: { id: 21, title: "The Hobbit", shelf: "Bedroom" }, outcome: "bought" });
+    expect(state.step.kind).toBe("ready");
+    expect(state.lastShelf).toBe("Bedroom");
+    expect(state.notice).toMatchObject({ kind: "saved", bookId: 21, outcome: "bought" });
+  });
+
+  it("an owned copy leads over a wishlisted one", () => {
+    const both = lookup({ owned: OWNED.owned, wishlisted: [{ id: 21 }] });
+    expectStep(scanAndAnswer(both), "owned");
+  });
+
+  it("a wishlist save keeps the default shelf, and its body has the wishlist and no shelf", () => {
+    let state = scanAndAnswer(lookup());
+    state = flowReducer(state, { type: "save" });
+    state = flowReducer(state, { type: "saved", book: { id: 30, title: "The Hobbit", shelf: null }, outcome: "wishlist" });
+    expect(state.lastShelf).toBeUndefined();
+    expect(state.added).toBe(1);
+    const proposal = proposalFromDraft({ ...draft(), title: "The Hobbit" });
+    expect(bodyFromProposal(proposal, null, "unread", "wishlist")).toMatchObject({ collection: "wishlist", shelf: null, status: "unread" });
+    expect(bodyFromProposal(proposal, "A", "unread")).not.toHaveProperty("collection");
+  });
+
+  it("todayIso is the local calendar day", () => {
+    expect(todayIso(new Date(2026, 9, 3, 23, 59))).toBe("2026-10-03");
   });
 
   it("already owned wins over found, then offers another copy", () => {

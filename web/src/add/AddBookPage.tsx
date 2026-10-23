@@ -1,7 +1,7 @@
 import { Tabs } from "@base-ui/react/tabs";
 import type { Book, BookCreate } from "@shelfmark/shared";
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
-import { createBook, useBooks } from "../books/store";
+import { createBook, patchBook, useBooks } from "../books/store";
 import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
@@ -19,10 +19,12 @@ import {
   initialFlow,
   isSaving,
   scannerPaused,
+  todayIso,
   type CoverPlan,
   type FlowState,
   type Mode,
   type Notice,
+  type SavedOutcome,
 } from "./flow";
 import { BarcodeIcon, TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
@@ -174,7 +176,7 @@ export function AddBookPage() {
     }
     // Its ISBN is in the library now: the next lookup of it says so.
     if (book.isbn13 !== null) memo.forget(book.isbn13);
-    dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf } });
+    dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf }, outcome: body.collection === "wishlist" ? "wishlist" : undefined });
     // Type ISBN: the cursor is back in the empty field, so a USB scanner goes
     // straight on to the next book. By hand: the fresh form takes it.
     isbnField.current?.reset();
@@ -185,8 +187,30 @@ export function AddBookPage() {
     }
   };
 
+  // "I bought it": the same row moves to Owned with the shelf chosen and today's date; no second row.
+  const buy = async (bookId: number, shelf: string | null) => {
+    if (saving.current) return;
+    saving.current = true;
+    dispatch({ type: "save" });
+    let book: Book;
+    try {
+      book = await patchBook(bookId, { collection: "owned", shelf, acquiredOn: todayIso() });
+    } catch (error) {
+      dispatch({ type: "save-failed", failure: saveFailure(error) });
+      return;
+    } finally {
+      saving.current = false;
+    }
+    if (book.isbn13 !== null) memo.forget(book.isbn13);
+    dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf }, outcome: "bought" });
+    isbnField.current?.reset();
+    setFocusOnEnter(true);
+  };
+
   const on: SheetActions = {
     saveProposal: (proposal, shelf, status, photo) => void save(bodyFromProposal(proposal, shelf, status), proposal.cover, photo),
+    saveToWishlist: (proposal, photo) => void save(bodyFromProposal(proposal, null, "unread", "wishlist"), proposal.cover, photo),
+    buy: (bookId, shelf) => void buy(bookId, shelf),
     saveForm: (fields, base, photo) => void save(bodyFromForm(fields, base), base.cover, photo),
     discard: () => {
       dispatch({ type: "discard" });
@@ -332,6 +356,12 @@ export function AddBookPage() {
   );
 }
 
+function savedLine(title: string, outcome: SavedOutcome | undefined): string {
+  if (outcome === "wishlist") return `Added “${title}” to your wishlist`;
+  if (outcome === "bought") return `Moved “${title}” to your shelf`;
+  return `Saved “${title}”`;
+}
+
 /**
  * The session counter, and for a few seconds after a save what was saved.
  * Screen readers hear the same from the page's live region.
@@ -343,7 +373,7 @@ function SessionStatus({ added, notice }: { added: number; notice: Notice | null
     text = (
       <>
         <CheckIcon size={14} />
-        <span className="add-session__title">Saved “{notice.title}”</span>
+        <span className="add-session__title">{savedLine(notice.title, notice.outcome)}</span>
         <span className="add-session__count">· {count}</span>
       </>
     );

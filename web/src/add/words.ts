@@ -205,6 +205,8 @@ export function saveFailure(error: unknown): Failure {
 export function announcement(state: Pick<FlowState, "step" | "notice" | "added">, stepsToo: boolean): string {
   const { step, notice, added } = state;
   if (notice !== null && notice.id > step.id) {
+    if (notice.kind === "saved" && notice.outcome === "wishlist") return `Added ${notice.title} to your wishlist.`;
+    if (notice.kind === "saved" && notice.outcome === "bought") return `Moved ${notice.title} to your shelf.`;
     return notice.kind === "saved"
       ? `Saved ${notice.title}. ${sessionCount(added)}.`
       : `${notice.title} is saved, but its cover didn't download.`;
@@ -217,6 +219,8 @@ export function announcement(state: Pick<FlowState, "step" | "notice" | "added">
       return `${sourceLine(step.proposal.origin)}: ${step.proposal.details.title}.`;
     case "owned":
       return step.lookup.draft?.title ? `Already in your library: ${step.lookup.draft.title}.` : "Already in your library.";
+    case "wishlisted":
+      return step.lookup.draft?.title ? `On your wishlist: ${step.lookup.draft.title}.` : "On your wishlist.";
     case "form":
       return step.reason === "not-found" && step.lookup ? notFoundText(step.lookup.isbn13, step.lookup.tried) : "";
     case "failed":

@@ -88,6 +88,21 @@ describe("readPrefs", () => {
   });
 });
 
+describe("the collection tab", () => {
+  it("opens on Owned, and remembers Wishlist per layout", () => {
+    const storage = memoryStorage();
+    expect(readPrefs(storage, "desktop").collection).toBe("owned");
+    writePrefs(storage, "phone", { ...defaultPrefs("phone"), collection: "wishlist" });
+    expect(readPrefs(storage, "phone").collection).toBe("wishlist");
+    expect(readPrefs(storage, "desktop").collection).toBe("owned");
+  });
+
+  it("falls back to Owned on anything else", () => {
+    const storage = memoryStorage({ [prefsKey("desktop")]: JSON.stringify({ collection: "loans" }) });
+    expect(readPrefs(storage, "desktop").collection).toBe("owned");
+  });
+});
+
 describe("writePrefs", () => {
   it("round-trips, one entry per layout", () => {
     const storage = memoryStorage();

@@ -1,9 +1,10 @@
+import type { Collection } from "@shelfmark/shared";
 import { BOOK_COLUMN_ID, COLUMNS, columnById, isColumnId, type ColumnId } from "./columns";
 import { DEFAULT_SORTING, type SortKey, type Sorting } from "./sort";
 
 /**
- * The Library's layout memory (corpus/wiki/library-table.md): which view,
- * the sort, and the table's column order, visibility and widths, kept in
+ * The Library's layout memory (corpus/wiki/library-table.md): which
+ * collection tab (Owned or Wishlist), which view, the sort, and the table's column order, visibility and widths, kept in
  * this browser's `localStorage`, one entry per layout, since a phone and a
  * desktop window want different things. A convenience: when storage is
  * blocked, full, or holds something this version can't read, the defaults
@@ -14,6 +15,8 @@ export type Layout = "desktop" | "phone";
 export type ViewMode = "table" | "covers";
 
 export interface LibraryPrefs {
+  /** The tab last open: Owned or Wishlist. */
+  collection: Collection;
   view: ViewMode;
   sorting: Sorting;
   /** Every column, in the table's order; the book column first. */
@@ -47,6 +50,7 @@ export const DEFAULT_VISIBILITY: Readonly<Record<ColumnId, boolean>> = Object.fr
 
 export function defaultPrefs(layout: Layout): LibraryPrefs {
   return {
+    collection: "owned",
     view: defaultView(layout),
     sorting: DEFAULT_SORTING,
     columnOrder: DEFAULT_ORDER,
@@ -106,6 +110,7 @@ export function normalizeSizing(value: unknown): Readonly<Partial<Record<ColumnI
 export function parsePrefs(value: unknown, layout: Layout): LibraryPrefs {
   const saved = isRecord(value) ? value : {};
   return {
+    collection: saved.collection === "wishlist" ? "wishlist" : "owned",
     view: saved.view === "table" || saved.view === "covers" ? saved.view : defaultView(layout),
     sorting: normalizeSorting(saved.sorting),
     columnOrder: normalizeOrder(saved.columnOrder),

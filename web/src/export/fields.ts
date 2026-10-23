@@ -1,6 +1,6 @@
 import type { Book } from "@shelfmark/shared";
 import { exportValue, type LibraryColumn } from "../library/columns";
-import { exportColumns, type LibraryView } from "../library/view";
+import { columnsIn, exportColumns, type LibraryView } from "../library/view";
 
 /**
  * How the Library's books become a table of cells for a spreadsheet. Built on
@@ -74,7 +74,7 @@ export function viewTable(view: LibraryView, typedDates: boolean): ExportTable {
   return table(view.rows, exportColumns(view.columns), typedDates);
 }
 
-/** "Every book, every field": all owned books, all columns, in the table's default order. */
+/** "Every book, every field": all the open collection's books, all the columns it fills, in the table's default order. */
 export function everythingTable(view: LibraryView, columns: readonly LibraryColumn[], typedDates: boolean): ExportTable {
-  return table(view.owned, columns, typedDates);
+  return table(view.books, columnsIn(view.collection, columns), typedDates);
 }
