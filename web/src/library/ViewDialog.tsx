@@ -12,13 +12,15 @@ import "../auth/auth.css";
  * confirm a delete. A modal Base UI `Dialog`, as Change password is: a white
  * panel in the middle of the window on the desktop, the floating sheet over
  * the bottom of a phone. A name another view has is said under the field
- * (the server's `409`); any other failure under the form.
+ * (the server's `409`); any other failure under the form. The bulk bar's
+ * dialogs (BulkDialogs.tsx) are built from the same `DialogFrame`,
+ * `DialogActions` and `DialogFailure`.
  */
 
 /** As the server allows (shared/src/views.ts). */
 const NAME_MAX = 80;
 
-interface FrameProps {
+export interface FrameProps {
   title: string;
   desktop: boolean;
   /** Where focus goes back to on close: the Views button. */
@@ -27,7 +29,7 @@ interface FrameProps {
   children: ReactNode;
 }
 
-function Frame({ title, desktop, returnFocus, onClose, children }: FrameProps) {
+export function DialogFrame({ title, desktop, returnFocus, onClose, children }: FrameProps) {
   const popupRef = useRef<HTMLDivElement>(null);
   return (
     <Dialog.Root
@@ -56,7 +58,7 @@ function Frame({ title, desktop, returnFocus, onClose, children }: FrameProps) {
 }
 
 /** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-function Actions({ desktop, cancel, onCancel, children }: { desktop: boolean; cancel: string; onCancel: () => void; children: ReactNode }) {
+export function DialogActions({ desktop, cancel, onCancel, children }: { desktop: boolean; cancel: string; onCancel: () => void; children: ReactNode }) {
   return (
     <div className="library-dialog__actions">
       <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
@@ -67,7 +69,7 @@ function Actions({ desktop, cancel, onCancel, children }: { desktop: boolean; ca
   );
 }
 
-function Failure({ children }: { children: string }) {
+export function DialogFailure({ children }: { children: string }) {
   return (
     <p className="auth-error" role="alert">
       <AlertIcon />
@@ -76,7 +78,7 @@ function Failure({ children }: { children: string }) {
   );
 }
 
-function messageOf(error: unknown, fallback: string): string {
+export function messageOf(error: unknown, fallback: string): string {
   return isApiError(error) ? error.message : fallback;
 }
 
@@ -132,7 +134,7 @@ export function NameDialog({ title, intro, submitLabel, initialName = "", deskto
   };
 
   return (
-    <Frame title={title} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <DialogFrame title={title} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         {intro && <p className="library-dialog__text">{intro}</p>}
         <AuthField
@@ -150,14 +152,14 @@ export function NameDialog({ title, intro, submitLabel, initialName = "", deskto
             setFieldError(undefined);
           }}
         />
-        {failure !== null && <Failure>{failure}</Failure>}
-        <Actions desktop={desktop} cancel="Cancel" onCancel={onClose}>
+        {failure !== null && <DialogFailure>{failure}</DialogFailure>}
+        <DialogActions desktop={desktop} cancel="Cancel" onCancel={onClose}>
           <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
             {pending ? "Saving…" : submitLabel}
           </Button>
-        </Actions>
+        </DialogActions>
       </form>
-    </Frame>
+    </DialogFrame>
   );
 }
 
@@ -189,18 +191,18 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
   };
 
   return (
-    <Frame title={`Delete “${name}”?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <DialogFrame title={`Delete “${name}”?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
       <div className="library-dialog__form">
         <p className="library-dialog__text">
           Only the saved view goes, on every device. Your books, and what the Library shows now, stay as they are.
         </p>
-        {failure !== null && <Failure>{failure}</Failure>}
-        <Actions desktop={desktop} cancel="Keep it" onCancel={onClose}>
+        {failure !== null && <DialogFailure>{failure}</DialogFailure>}
+        <DialogActions desktop={desktop} cancel="Keep it" onCancel={onClose}>
           <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} data-autofocus onClick={confirm}>
             {pending ? "Deleting…" : "Delete view"}
           </Button>
-        </Actions>
+        </DialogActions>
       </div>
-    </Frame>
+    </DialogFrame>
   );
 }

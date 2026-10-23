@@ -1,4 +1,4 @@
-import type { Book, BookCreate, BookPatch } from "@shelfmark/shared";
+import type { Book, BookBulk, BookBulkResult, BookCreate, BookPatch } from "@shelfmark/shared";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { ApiError, booksApi, isApiError } from "../api";
 import { authClient } from "../auth/session";
@@ -32,6 +32,7 @@ export interface BooksSource {
   create(body: BookCreate): Promise<Book>;
   patch(id: number, patch: BookPatch): Promise<Book>;
   remove(id: number): Promise<void>;
+  bulk(body: BookBulk): Promise<BookBulkResult>;
 }
 
 type Update = (books: readonly Book[]) => readonly Book[];
@@ -138,6 +139,18 @@ export function createBooksStore(source: BooksSource, hooks: BooksHooks = {}) {
     },
 
     /**
+     * One change to many books (`POST /api/books/bulk`, brief 26): the books
+     * it answers replace theirs in place, the ids it deleted leave the list.
+     * The server changes all of them or none, so a failure leaves the list
+     * alone.
+     */
+    async bulk(body: BookBulk): Promise<BookBulkResult> {
+      const result = await source.bulk(body);
+      if (result.books.length > 0 || result.deleted.length > 0) apply((books) => applyBulk(books, result));
+      return result;
+    },
+
+    /**
      * A cover was stored (`updatedAt`, its `CoverInfo`'s) or removed (`null`)
      * outside these calls (brief 05's cover routes): the book's `hasCover` and
      * `coverUpdatedAt` follow, as the next fetch would say.
@@ -193,6 +206,13 @@ function replace(books: readonly Book[], book: Book): readonly Book[] {
   return books.map((b) => (b.id === book.id ? book : b));
 }
 
+/** A bulk change's answer applied to the list: its books in their places, its deleted ids gone, the rest untouched. */
+function applyBulk(books: readonly Book[], result: BookBulkResult): readonly Book[] {
+  const changed = new Map(result.books.map((book) => [book.id, book]));
+  const deleted = new Set(result.deleted);
+  return books.flatMap((book) => (deleted.has(book.id) ? [] : [changed.get(book.id) ?? book]));
+}
+
 function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
   return new ApiError(0, "bad_response", "The books couldn't be loaded.", { cause: error });
@@ -240,6 +260,11 @@ export function patchBook(id: number, patch: BookPatch): Promise<Book> {
 /** Delete a book and take it out of the list. */
 export function deleteBook(id: number): Promise<void> {
   return store.remove(id);
+}
+
+/** One change to many books (`POST /api/books/bulk`), applied to the list. Rejects with an `ApiError`; then nothing changed. */
+export function bulkChangeBooks(body: BookBulk): Promise<BookBulkResult> {
+  return store.bulk(body);
 }
 
 /** Fetch the list again, outside a component. */

@@ -118,6 +118,15 @@ describe("the books routes", () => {
     expect(calls[0]?.init.method).toBe("DELETE");
   });
 
+  it("posts a bulk change and reads what it did", async () => {
+    serve(() => json(200, { books: [{ ...book, shelf: "Bedroom · B1" }], deleted: [], skipped: [2] }));
+    const result = await booksApi.bulk({ ids: [1, 2], change: { kind: "shelf", shelf: "Bedroom · B1" } });
+    expect(result).toEqual({ books: [{ ...book, shelf: "Bedroom · B1" }], deleted: [], skipped: [2] });
+    expect(calls[0]?.url).toBe("/shelfmark-api/api/books/bulk");
+    expect(calls[0]?.init.method).toBe("POST");
+    expect(calls[0]?.init.body).toBe('{"ids":[1,2],"change":{"kind":"shelf","shelf":"Bedroom · B1"}}');
+  });
+
   it("refuses an answer that isn't a book", async () => {
     serve(() => json(200, { books: [{ ...book, authors: "Mircea Cărtărescu" }] }));
     const error = await failure(booksApi.list());

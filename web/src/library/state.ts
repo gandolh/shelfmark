@@ -2,12 +2,13 @@ import { useSyncExternalStore } from "react";
 import type { ColumnId } from "./columns";
 import type { Filter, Filters } from "./filters";
 import { browserStorage, readPrefs, writePrefs, type Layout, type LibraryPrefs } from "./prefs";
+import { NO_SELECTION, type Selection } from "./selection";
 
 /**
  * The Library's state that outlives the page: the prefs (saved per layout,
- * read once per session) and the filters (this session only). Opening a
- * book unmounts the page; coming Back finds both as they were left, as the
- * search text is in layout/search.ts.
+ * read once per session), the filters and the row selection (this session
+ * only). Opening a book unmounts the page; coming Back finds them as they
+ * were left, as the search text is in layout/search.ts.
  */
 
 const listeners = new Set<() => void>();
@@ -105,4 +106,29 @@ export function setFilters(next: Filters): void {
 /** The filters; re-renders when they change. */
 export function useLibraryFilters(): Filters {
   return useSyncExternalStore(subscribe, getFilters);
+}
+
+// --- Selection (brief 26) ------------------------------------------------------------
+
+let selection: Selection = NO_SELECTION;
+
+export function getSelection(): Selection {
+  return selection;
+}
+
+/** Replace the selection (selection.ts makes the next one). Sorting and filtering never call this. */
+export function setSelection(next: Selection): void {
+  if (next === selection) return;
+  selection = next;
+  notify();
+}
+
+/** The bulk bar's Clear. */
+export function clearSelection(): void {
+  setSelection(NO_SELECTION);
+}
+
+/** The selection; re-renders when it changes. */
+export function useLibrarySelection(): Selection {
+  return useSyncExternalStore(subscribe, getSelection);
 }

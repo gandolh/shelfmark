@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { bookCreateSchema, bookPatchSchema, bookSchema, deriveAuthorSort, type Book } from "./book.js";
+import { BULK_MAX_BOOKS, bookBulkSchema, bookCreateSchema, bookPatchSchema, bookSchema, deriveAuthorSort, type Book } from "./book.js";
 
 const book: Book = {
   id: 1,
@@ -138,6 +138,47 @@ describe("bookPatchSchema", () => {
     expect(issue(bookCreateSchema.safeParse({ title: "t", coverUpdatedAt: "2026-10-14T09:00:00.000Z" }))).toMatch(
       /Unrecognized key/,
     );
+  });
+});
+
+describe("bookBulkSchema", () => {
+  it("takes each kind of change", () => {
+    expect(bookBulkSchema.parse({ ids: [1, 2], change: { kind: "shelf", shelf: " Bedroom · B1 " } })).toEqual({
+      ids: [1, 2],
+      change: { kind: "shelf", shelf: "Bedroom · B1" },
+    });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "shelf", shelf: "  " } }).change).toEqual({ kind: "shelf", shelf: null });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "status", status: "read" } }).change).toEqual({ kind: "status", status: "read" });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "addTags", tags: [" signed ", ""] } }).change).toEqual({
+      kind: "addTags",
+      tags: ["signed"],
+    });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "removeTags", tags: ["x"] } }).change).toEqual({ kind: "removeTags", tags: ["x"] });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "delete" } }).change).toEqual({ kind: "delete" });
+  });
+
+  it("counts each id once", () => {
+    expect(bookBulkSchema.parse({ ids: [3, 1, 3], change: { kind: "delete" } }).ids).toEqual([3, 1]);
+  });
+
+  it("refuses no ids, bad ids, too many ids and a change it doesn't know", () => {
+    expect(issue(bookBulkSchema.safeParse({ ids: [], change: { kind: "delete" } }))).toBe("ids: name at least one book");
+    expect(issue(bookBulkSchema.safeParse({ ids: [0], change: { kind: "delete" } }))).toMatch(/^ids\.0:/);
+    expect(issue(bookBulkSchema.safeParse({ ids: ["1"], change: { kind: "delete" } }))).toMatch(/^ids\.0:/);
+    const many = Array.from({ length: BULK_MAX_BOOKS + 1 }, (_, i) => i + 1);
+    expect(issue(bookBulkSchema.safeParse({ ids: many, change: { kind: "delete" } }))).toMatch(/^ids:/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "rename" } }))).toMatch(/^change/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1] }))).toMatch(/^change/);
+  });
+
+  it("checks the change's own fields", () => {
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "status", status: "lost" } }))).toMatch(/^change\.status:/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "shelf" } }))).toMatch(/^change\.shelf:/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "addTags", tags: [" "] } }))).toBe(
+      "change.tags: name at least one tag",
+    );
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete", shelf: "x" } }))).toMatch(/Unrecognized key/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete" }, extra: 1 }))).toMatch(/Unrecognized key/);
   });
 });
 

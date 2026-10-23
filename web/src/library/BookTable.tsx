@@ -31,8 +31,9 @@ import { SortIcon } from "./icons";
 import { TAB_BAR_HEIGHT } from "../layout/viewport";
 import { normalizeOrder, normalizeSizing, normalizeVisibility, type Layout, type LibraryPrefs } from "./prefs";
 import { rememberScroll } from "./scroll";
+import { isSelected, selectAllState, toggleAll, toggleBook, type Selection } from "./selection";
 import { directionLabel, toggleSort, type Sorting } from "./sort";
-import { updatePrefs } from "./state";
+import { getSelection, setSelection, updatePrefs, useLibrarySelection } from "./state";
 
 /**
  * The Table view (design.md, the `Covers-Desktop` mock-up): one white
@@ -46,6 +47,13 @@ import { updatePrefs } from "./state";
  * Keyboard: Tab reaches one row (the last one used); ↑ ↓ Page Up/Down Home
  * End move between rows; Enter opens the book. Header buttons sort (Shift
  * with Enter adds a key); the handle between headers resizes with ← →.
+ *
+ * Before the columns, a box per row selects the book for the bulk bar
+ * (brief 26), and the header's box selects every row on show (what the
+ * search and filters let through), or none of them once they all are. The
+ * boxes are not a TanStack column: column order, visibility, widths and
+ * saved views never see them. In the row, Tab goes from the box to the
+ * title; the arrows move between rows in either.
  */
 
 const features = tableFeatures({
@@ -59,6 +67,8 @@ const helper = createColumnHelper<typeof features, Book>();
 
 /** 12 + the 69 px cover + 12, and the divider over it. */
 export const ROW_HEIGHT = 94;
+/** The select boxes' track: the table's edge padding and the box (library.css, `.library-select`). */
+const SELECT_WIDTH = { desktop: 48, phone: 44 } as const;
 const MAX_WIDTH = 1200;
 const EMPTY: Book[] = [];
 
@@ -82,11 +92,14 @@ function resolve<T>(updater: Updater<T>, current: T): T {
 
 // --- Rows and their keyboard ----------------------------------------------------------
 
+/** What in a row has focus: its select box or its title link. */
+type RowPart = "select" | "title";
+
 interface RowNav {
-  /** The row whose title link is in the Tab order. */
+  /** The row whose box and title link are in the Tab order. */
   tabbable: number;
   onFocus: (index: number) => void;
-  onKeyDown: (event: KeyboardEvent<HTMLAnchorElement>, index: number) => void;
+  onKeyDown: (event: KeyboardEvent<HTMLElement>, index: number, part: RowPart) => void;
 }
 
 const RowNavContext = createContext<RowNav>({ tabbable: 0, onFocus: () => {}, onKeyDown: () => {} });
@@ -111,7 +124,7 @@ function BookCell({ book, index }: { book: Book; index: number }) {
           className="library-book__title"
           tabIndex={nav.tabbable === index ? 0 : -1}
           onFocus={() => nav.onFocus(index)}
-          onKeyDown={(event) => nav.onKeyDown(event, index)}
+          onKeyDown={(event) => nav.onKeyDown(event, index, "title")}
           onClick={rememberScroll}
         >
           {book.title}
@@ -122,10 +135,53 @@ function BookCell({ book, index }: { book: Book; index: number }) {
   );
 }
 
+/** The row's select box, filling its cell so the whole cell ticks it. */
+function SelectCell({ book, index, selected }: { book: Book; index: number; selected: boolean }) {
+  const nav = useContext(RowNavContext);
+  return (
+    <div role="cell" className="library-table__cell library-table__cell--select">
+      <label className="library-select">
+        <input
+          type="checkbox"
+          checked={selected}
+          aria-label={`Select “${book.title}”`}
+          tabIndex={nav.tabbable === index ? 0 : -1}
+          onChange={() => setSelection(toggleBook(getSelection(), book))}
+          onFocus={() => nav.onFocus(index)}
+          onKeyDown={(event) => nav.onKeyDown(event, index, "select")}
+        />
+      </label>
+    </div>
+  );
+}
+
+/** The header's box: all, some (a dash) or none of the rows on show. */
+function SelectAllCell({ rows, selection }: { rows: readonly Book[]; selection: Selection }) {
+  const state = selectAllState(selection, rows);
+  const box = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    if (box.current) box.current.indeterminate = state === "some";
+  }, [state]);
+  const shown = rows.length === 1 ? "the 1 book shown" : `all ${rows.length.toLocaleString("en-GB")} books shown`;
+  return (
+    <div role="columnheader" className="library-table__cell library-table__cell--select">
+      <label className="library-select">
+        <input
+          ref={box}
+          type="checkbox"
+          checked={state === "all"}
+          aria-label={state === "all" ? `Unselect ${shown}` : `Select ${shown}`}
+          onChange={() => setSelection(toggleAll(getSelection(), rows))}
+        />
+      </label>
+    </div>
+  );
+}
+
 /** A plain click anywhere on a row opens its book, as the title link does. */
 function onRowClick(event: MouseEvent<HTMLDivElement>, book: Book): void {
   if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-  if ((event.target as HTMLElement).closest("a, button, input")) return;
+  if ((event.target as HTMLElement).closest("a, button, input, label")) return;
   if (window.getSelection()?.type === "Range") return; // selecting text, not opening
   rememberScroll();
   navigate(bookRoute(book.id));
@@ -142,6 +198,8 @@ export interface BookTableProps {
 
 export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   const desktop = layout === "desktop";
+  const selection = useLibrarySelection();
+  const selectWidth = SELECT_WIDTH[layout];
 
   const table = useTable({
     features,
@@ -171,11 +229,12 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
 
   const headers = table.getHeaderGroups()[0]?.headers ?? [];
   const tableRows = table.getRowModel().rows;
-  const totalWidth = headers.reduce((sum, header) => sum + header.getSize(), 0);
-  // The book column takes what the others leave; the rest keep their widths.
-  const template = headers
-    .map((header) => (header.column.id === BOOK_COLUMN_ID ? `minmax(${header.getSize()}px, 1fr)` : `${header.getSize()}px`))
-    .join(" ");
+  const totalWidth = selectWidth + headers.reduce((sum, header) => sum + header.getSize(), 0);
+  // The select boxes first; the book column takes what the others leave; the rest keep their widths.
+  const template = [
+    `${selectWidth}px`,
+    ...headers.map((header) => (header.column.id === BOOK_COLUMN_ID ? `minmax(${header.getSize()}px, 1fr)` : `${header.getSize()}px`)),
+  ].join(" ");
 
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
@@ -226,26 +285,27 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   // --- Keyboard: one row in the Tab order, arrows between rows ---------------------
 
   const [active, setActive] = useState(0);
-  const pendingFocus = useRef<number | null>(null);
+  const pendingFocus = useRef<{ index: number; part: RowPart } | null>(null);
   const firstShown = items[0]?.index ?? 0;
   const lastShown = items.at(-1)?.index ?? 0;
   // The row last used, while it is rendered; otherwise the first one on screen.
   const tabbable = active >= firstShown && active <= lastShown && active < tableRows.length ? active : firstShown;
 
   useLayoutEffect(() => {
-    const index = pendingFocus.current;
-    if (index === null) return;
-    const link = body.current?.querySelector<HTMLElement>(`[data-index="${index}"] .library-book__title`);
-    if (link) {
+    const pending = pendingFocus.current;
+    if (pending === null) return;
+    const selector = pending.part === "select" ? ".library-select input" : ".library-book__title";
+    const target = body.current?.querySelector<HTMLElement>(`[data-index="${pending.index}"] ${selector}`);
+    if (target) {
       pendingFocus.current = null;
-      link.focus({ preventScroll: true });
+      target.focus({ preventScroll: true });
     }
   });
 
-  const moveTo = (index: number) => {
+  const moveTo = (index: number, part: RowPart) => {
     const next = Math.max(0, Math.min(tableRows.length - 1, index));
     setActive(next);
-    pendingFocus.current = next;
+    pendingFocus.current = { index: next, part };
     virtualizer.scrollToIndex(next, { align: "auto" });
   };
 
@@ -253,7 +313,7 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   const nav: RowNav = {
     tabbable,
     onFocus: setActive,
-    onKeyDown: (event, index) => {
+    onKeyDown: (event, index, part) => {
       const steps: Record<string, () => number> = {
         ArrowDown: () => index + 1,
         ArrowUp: () => index - 1,
@@ -265,7 +325,7 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
       const step = steps[event.key];
       if (!step || event.altKey || event.ctrlKey || event.metaKey) return;
       event.preventDefault();
-      moveTo(step());
+      moveTo(step(), part);
     },
   };
 
@@ -312,12 +372,13 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
         role="table"
         aria-label="Books"
         aria-rowcount={tableRows.length + 1}
-        aria-colcount={headers.length}
+        aria-colcount={headers.length + 1}
         style={style}
       >
         <div ref={head} className="library-table__head">
           <div role="rowgroup">
             <div role="row" aria-rowindex={1} className="library-table__row library-table__row--head">
+              <SelectAllCell rows={rows} selection={selection} />
               {headers.map((header) => (
                 <HeaderCell key={header.id} header={header} sorting={sorting} onSort={onSort} onResize={onResize} />
               ))}
@@ -329,16 +390,19 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
             {items.map((item) => {
               const row = tableRows[item.index];
               if (!row) return null;
+              const selected = isSelected(selection, row.original);
               return (
                 <div
                   key={row.id}
                   role="row"
                   aria-rowindex={item.index + 2}
                   data-index={item.index}
+                  data-selected={selected ? "" : undefined}
                   className="library-table__row"
                   style={{ transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)` }}
                   onClick={(event) => onRowClick(event, row.original)}
                 >
+                  <SelectCell book={row.original} index={item.index} selected={selected} />
                   {row.getVisibleCells().map((cell) => (
                     <div
                       key={cell.id}

@@ -1,4 +1,4 @@
-import { bookListSchema, bookSchema, type Book } from "@shelfmark/shared";
+import { bookBulkResultSchema, bookListSchema, bookSchema, type Book, type BookBulkResult } from "@shelfmark/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { databasePath, openDb } from "../db/open.js";
 import { createBookStore } from "../store/books.js";
@@ -207,6 +207,105 @@ describe("DELETE /api/books/:id", () => {
   it("is a 404 for an unknown book", async () => {
     const res = await t.inject({ method: "DELETE", url: "/api/books/999" });
     expectError(res, 404, "not_found");
+  });
+});
+
+describe("POST /api/books/bulk", () => {
+  async function bulk(payload: object): Promise<BookBulkResult> {
+    const res = await t.inject({ method: "POST", url: "/api/books/bulk", payload });
+    expect(res.statusCode).toBe(200);
+    return bookBulkResultSchema.parse(res.json());
+  }
+
+  async function list(): Promise<Book[]> {
+    return bookListSchema.parse((await t.inject({ method: "GET", url: "/api/books" })).json()).books;
+  }
+
+  it("moves the books named to a shelf and no others", async () => {
+    // What the Library sends after "filter to one shelf, select all".
+    const shown = [
+      await create({ title: "Solenoid", shelf: "Living room · A1" }),
+      await create({ title: "Orbitor", shelf: "Living room · A1" }),
+    ];
+    const hidden = await create({ title: "Nostalgia", shelf: "Study · C2" });
+
+    const result = await bulk({ ids: shown.map((b) => b.id), change: { kind: "shelf", shelf: "Bedroom · B1" } });
+    expect(result.books.map((b) => [b.id, b.shelf])).toEqual(shown.map((b) => [b.id, "Bedroom · B1"]));
+    expect(result).toMatchObject({ deleted: [], skipped: [] });
+
+    const after = await list();
+    expect(after.map((b) => b.shelf)).toEqual(["Bedroom · B1", "Bedroom · B1", "Study · C2"]);
+    expect(after[2]).toEqual(hidden);
+  });
+
+  it("skips wishlist books on a shelf change and says which", async () => {
+    const owned = await create({ title: "Solenoid" });
+    const wished = await create({ title: "Orbitor", collection: "wishlist" });
+    const result = await bulk({ ids: [wished.id, owned.id], change: { kind: "shelf", shelf: "Bedroom · B1" } });
+    expect(result.books.map((b) => b.id)).toEqual([owned.id]);
+    expect(result.skipped).toEqual([wished.id]);
+    expect((await list())[1]).toEqual(wished);
+  });
+
+  it("adds a tag to each book once, matched with the library's spelling", async () => {
+    const books = [
+      await create({ title: "A", tags: ["Signed"] }),
+      await create({ title: "B" }),
+      await create({ title: "C", tags: ["Poetry"] }),
+      await create({ title: "D" }),
+      await create({ title: "E" }),
+    ];
+    const result = await bulk({ ids: books.map((b) => b.id), change: { kind: "addTags", tags: ["signed"] } });
+    expect(result.books.map((b) => b.tags)).toEqual([["Signed"], ["Signed"], ["Poetry", "Signed"], ["Signed"], ["Signed"]]);
+    expect((await list()).map((b) => b.tags)).toEqual(result.books.map((b) => b.tags));
+  });
+
+  it("sets the status and removes tags", async () => {
+    const a = await create({ title: "A", tags: ["Signed", "Poetry"] });
+    const b = await create({ title: "B", tags: ["signed"] });
+    expect((await bulk({ ids: [a.id, b.id], change: { kind: "status", status: "reading" } })).books.map((x) => x.status)).toEqual([
+      "reading",
+      "reading",
+    ]);
+    expect((await bulk({ ids: [a.id, b.id], change: { kind: "removeTags", tags: ["SIGNED"] } })).books.map((x) => x.tags)).toEqual([
+      ["Poetry"],
+      [],
+    ]);
+  });
+
+  it("deletes books and answers their ids; they are gone from the list", async () => {
+    const books = [await create({ title: "A" }), await create({ title: "B" }), await create({ title: "C" }), await create({ title: "D" })];
+    const doomed = books.slice(0, 3).map((b) => b.id);
+    expect(await bulk({ ids: doomed, change: { kind: "delete" } })).toEqual({ books: [], deleted: doomed, skipped: [] });
+    expect((await list()).map((b) => b.title)).toEqual(["D"]);
+  });
+
+  it("is a 400 naming the unknown ids, and changes nothing", async () => {
+    const a = await create({ title: "A", shelf: "Living room · A1", tags: ["Poetry"] });
+    const before = await list();
+    for (const change of [{ kind: "shelf", shelf: "Bedroom" }, { kind: "addTags", tags: ["Signed"] }, { kind: "delete" }]) {
+      const res = await t.inject({ method: "POST", url: "/api/books/bulk", payload: { ids: [a.id, 999], change } });
+      expect(expectError(res, 400, "validation")).toBe("ids: There is no book 999, so nothing was changed.");
+    }
+    const two = await t.inject({ method: "POST", url: "/api/books/bulk", payload: { ids: [998, a.id, 999], change: { kind: "delete" } } });
+    expect(expectError(two, 400, "validation")).toBe("ids: There are no books 998, 999, so nothing was changed.");
+    expect(await list()).toEqual(before);
+  });
+
+  it("is a 400 for a bad body", async () => {
+    const a = await create({ title: "A" });
+    for (const payload of [
+      {},
+      { ids: [], change: { kind: "delete" } },
+      { ids: [a.id] },
+      { ids: [a.id], change: { kind: "status", status: "lost" } },
+      { ids: [a.id], change: { kind: "addTags", tags: [] } },
+      { ids: [a.id], change: { kind: "delete" }, also: true },
+    ]) {
+      const res = await t.inject({ method: "POST", url: "/api/books/bulk", payload });
+      expectError(res, 400, "validation");
+    }
+    expect((await list()).map((b) => b.id)).toEqual([a.id]);
   });
 });
 

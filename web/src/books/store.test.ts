@@ -1,4 +1,4 @@
-import type { Book, BookCreate, BookPatch } from "@shelfmark/shared";
+import type { Book, BookBulk, BookCreate, BookPatch } from "@shelfmark/shared";
 import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api";
 import { createBooksStore, resetWhenSignedOut, type BooksSource } from "./store";
@@ -79,6 +79,22 @@ function fakeSource(initial: Book[] = []) {
     remove: vi.fn(async (id: number) => {
       if (!rows.some((b) => b.id === id)) throw new ApiError(404, "not_found", "There is no such book.");
       rows = rows.filter((b) => b.id !== id);
+    }),
+    // As the server: all or nothing, wishlist books skipped by a shelf change.
+    bulk: vi.fn(async ({ ids, change }: BookBulk) => {
+      const named = ids.map((id) => rows.find((b) => b.id === id));
+      if (named.some((b) => b === undefined)) throw new ApiError(400, "validation", "ids: There is no book 9, so nothing was changed.");
+      const found = named as Book[];
+      if (change.kind === "delete") {
+        rows = rows.filter((b) => !ids.includes(b.id));
+        return { books: [], deleted: [...ids], skipped: [] };
+      }
+      const skipped = change.kind === "shelf" ? found.filter((b) => b.collection !== "owned").map((b) => b.id) : [];
+      const books = found
+        .filter((b) => !skipped.includes(b.id))
+        .map((b) => (change.kind === "shelf" ? { ...b, shelf: change.shelf } : change.kind === "status" ? { ...b, status: change.status } : b));
+      rows = rows.map((b) => books.find((x) => x.id === b.id) ?? b);
+      return { books, deleted: [], skipped };
     }),
   } satisfies BooksSource;
   return {
@@ -275,6 +291,50 @@ describe("changes", () => {
       ["Solenoid", "read"],
       ["Orbitor", "unread"],
     ]);
+  });
+
+  it("applies a bulk change in place: changed books replaced, the rest untouched", async () => {
+    const { store } = await loadedStore([
+      makeBook(1, "Solenoid", { shelf: "Living room · A1" }),
+      makeBook(2, "Orbitor", { collection: "wishlist" }),
+      makeBook(3, "Nostalgia", { shelf: "Living room · A1" }),
+    ]);
+    const before = store.getState().books;
+    const result = await store.bulk({ ids: [1, 2], change: { kind: "shelf", shelf: "Bedroom · B1" } });
+    expect(result.skipped).toEqual([2]);
+    const after = store.getState().books;
+    expect(after.map((b) => [b.id, b.shelf])).toEqual([
+      [1, "Bedroom · B1"],
+      [2, null],
+      [3, "Living room · A1"],
+    ]);
+    expect(after[1]).toBe(before[1]);
+    expect(after[2]).toBe(before[2]);
+  });
+
+  it("takes the books a bulk delete answers out of the list", async () => {
+    const { server, store } = await loadedStore([makeBook(1, "Solenoid"), makeBook(2, "Orbitor"), makeBook(3, "Nostalgia")]);
+    await store.bulk({ ids: [3, 1], change: { kind: "delete" } });
+    expect(titles(store.getState().books)).toEqual(["Orbitor"]);
+    expect(server.source.list).toHaveBeenCalledTimes(1);
+  });
+
+  it("leaves the list alone when a bulk change fails", async () => {
+    const { store } = await loadedStore([makeBook(1, "Solenoid"), makeBook(2, "Orbitor")]);
+    const before = store.getState().books;
+    await expect(store.bulk({ ids: [1, 9], change: { kind: "delete" } })).rejects.toMatchObject({ code: "validation" });
+    expect(store.getState().books).toBe(before);
+  });
+
+  it("replays a bulk change saved while the list was loading onto the answer", async () => {
+    const server = fakeSource([makeBook(1, "Solenoid"), makeBook(2, "Orbitor")]);
+    const store = createBooksStore(server.source);
+    store.ensureLoaded();
+    const stale = [makeBook(1, "Solenoid"), makeBook(2, "Orbitor")];
+    await store.bulk({ ids: [1, 2], change: { kind: "status", status: "read" } });
+    await store.bulk({ ids: [2], change: { kind: "delete" } });
+    await server.answerList(stale);
+    expect(store.getState().books.map((b) => [b.title, b.status])).toEqual([["Solenoid", "read"]]);
   });
 
   it("doesn't add a book twice when the answer already has it", async () => {

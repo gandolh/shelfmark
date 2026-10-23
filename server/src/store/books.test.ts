@@ -1,4 +1,4 @@
-import { bookSchema } from "@shelfmark/shared";
+import { bookSchema, type BulkChange } from "@shelfmark/shared";
 import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrations.js";
@@ -308,5 +308,108 @@ describe("findByIsbn", () => {
     ]);
     expect(found[0]).toEqual(owned);
     expect(store.findByIsbn("9780000000000")).toEqual([]);
+  });
+});
+
+describe("bulk", () => {
+  const ids = (...books: { id: number }[]) => books.map((book) => book.id);
+  const done = (outcome: ReturnType<BookStore["bulk"]>) => {
+    if (!("done" in outcome)) throw new Error(`unknown ids ${outcome.unknown.join(", ")}`);
+    return outcome.done;
+  };
+
+  it("moves owned books to a shelf, skips wishlist books, and writes only the books that change", () => {
+    const a = store.create({ title: "A", shelf: "Living room · A1" });
+    const b = store.create({ title: "B", shelf: "Bedroom · B1" });
+    const w = store.create({ title: "W", collection: "wishlist" });
+    const other = store.create({ title: "Other", shelf: "Living room · A1" });
+
+    const result = done(store.bulk(ids(w, b, a), { kind: "shelf", shelf: "Bedroom · B1" }));
+    expect(result.books.map((book) => [book.id, book.shelf])).toEqual([
+      [a.id, "Bedroom · B1"],
+      [b.id, "Bedroom · B1"],
+    ]);
+    expect(result.skipped).toEqual([w.id]);
+    expect(result.deleted).toEqual([]);
+    expect(result.books[0]?.updatedAt).not.toBe(a.updatedAt);
+    expect(result.books[1]).toEqual(b); // already there: untouched
+    expect(store.get(w.id)).toEqual(w);
+    expect(store.get(other.id)).toEqual(other);
+  });
+
+  it("takes books off their shelf with null", () => {
+    const a = store.create({ title: "A", shelf: "Bedroom · B1" });
+    expect(done(store.bulk(ids(a), { kind: "shelf", shelf: null })).books[0]?.shelf).toBeNull();
+  });
+
+  it("sets the status of owned and wishlist books alike", () => {
+    const a = store.create({ title: "A" });
+    const w = store.create({ title: "W", collection: "wishlist" });
+    const read = store.create({ title: "R", status: "read" });
+    const result = done(store.bulk(ids(a, w, read), { kind: "status", status: "read" }));
+    expect(result.books.map((book) => book.status)).toEqual(["read", "read", "read"]);
+    expect(result.skipped).toEqual([]);
+    expect(result.books[2]).toEqual(read);
+  });
+
+  it("adds a tag once to each book, matching an existing tag case-insensitively", () => {
+    const tagged = store.create({ title: "A", tags: ["Signed"] });
+    const others = [1, 2, 3, 4].map((n) => store.create({ title: `B${n}`, tags: n === 1 ? ["Poetry"] : [] }));
+
+    const result = done(store.bulk(ids(tagged, ...others), { kind: "addTags", tags: ["signed", "SIGNED"] }));
+    expect(result.books.map((book) => book.tags)).toEqual([["Signed"], ["Poetry", "Signed"], ["Signed"], ["Signed"], ["Signed"]]);
+    expect(tagNames()).toEqual(["Signed", "Poetry"]);
+    expect(result.books[0]).toEqual(tagged); // had it already: untouched
+    expect(result.books[1]?.updatedAt).not.toBe(others[0]?.updatedAt);
+  });
+
+  it("removes tags case-insensitively and forgets a tag no book uses", () => {
+    const a = store.create({ title: "A", tags: ["Signed", "Poetry"] });
+    const b = store.create({ title: "B", tags: ["Poetry"] });
+    const c = store.create({ title: "C", tags: ["Signed"] });
+
+    const result = done(store.bulk(ids(a, b, c), { kind: "removeTags", tags: ["SIGNED"] }));
+    expect(result.books.map((book) => book.tags)).toEqual([["Poetry"], ["Poetry"], []]);
+    expect(result.books[1]).toEqual(b); // had no such tag: untouched
+    expect(tagNames()).toEqual(["Poetry"]);
+  });
+
+  it("deletes books with their covers and tag links, and answers their ids", () => {
+    const a = store.create({ title: "A", tags: ["Signed"] });
+    const b = store.create({ title: "B", tags: ["Poetry"] });
+    const keep = store.create({ title: "Keep", tags: ["Poetry"] });
+    addCover(a.id);
+
+    expect(done(store.bulk(ids(b, a), { kind: "delete" }))).toEqual({ books: [], deleted: [a.id, b.id], skipped: [] });
+    expect(store.list()).toEqual([keep]);
+    expect(db.prepare("SELECT count(*) AS n FROM covers").get()).toEqual({ n: 0 });
+    expect(tagNames()).toEqual(["Poetry"]);
+  });
+
+  it("changes nothing when an id names no book, and names those ids", () => {
+    const a = store.create({ title: "A", tags: ["Poetry"] });
+    const before = store.list();
+    const changes: BulkChange[] = [
+      { kind: "status", status: "read" },
+      { kind: "shelf", shelf: "Bedroom" },
+      { kind: "addTags", tags: ["Signed"] },
+      { kind: "removeTags", tags: ["Poetry"] },
+      { kind: "delete" },
+    ];
+    for (const change of changes) {
+      expect(store.bulk([998, a.id, 997], change)).toEqual({ unknown: [997, 998] });
+    }
+    expect(store.list()).toEqual(before);
+    expect(tagNames()).toEqual(["Poetry"]);
+  });
+
+  it("runs as one transaction: a failure part-way leaves every book as it was", () => {
+    const a = store.create({ title: "A" });
+    const b = store.create({ title: "B" });
+    db.exec(`CREATE TRIGGER refuse BEFORE UPDATE ON books WHEN NEW.id = ${b.id} BEGIN SELECT RAISE(ABORT, 'refused'); END`);
+
+    expect(() => store.bulk(ids(a, b), { kind: "addTags", tags: ["Signed"] })).toThrow("refused");
+    expect(store.get(a.id)).toEqual(a);
+    expect(tagNames()).toEqual([]);
   });
 });

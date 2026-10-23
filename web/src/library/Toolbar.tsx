@@ -29,6 +29,9 @@ export interface ToolbarProps {
  * "Filter and sort" and "Export" as accent text; Add a book is the tab bar's,
  * and Views sits at the end of the collection tabs (LibraryPage), as a fourth
  * control doesn't fit this row at 390 px.
+ *
+ * While books are selected the bulk bar (BulkBar.tsx) stands in this place;
+ * on a phone Views stays at the end of the tabs, as it is no part of this row.
  */
 export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
   const count = activeFilters(view.filters).length;

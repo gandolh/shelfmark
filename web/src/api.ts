@@ -1,4 +1,13 @@
-import { bookListSchema, bookSchema, type Book, type BookCreate, type BookPatch } from "@shelfmark/shared";
+import {
+  bookBulkResultSchema,
+  bookListSchema,
+  bookSchema,
+  type Book,
+  type BookBulk,
+  type BookBulkResult,
+  type BookCreate,
+  type BookPatch,
+} from "@shelfmark/shared";
 import { API_BASE } from "./base";
 
 export { API_BASE } from "./base";
@@ -195,6 +204,10 @@ export const booksApi = {
 
   remove: (id: number, options?: CallOptions): Promise<void> =>
     apiRequest(`/api/books/${id}`, { ...options, method: "DELETE" }),
+
+  /** One change to many books (brief 26); an id that names no book is a 400 and nothing changes. */
+  bulk: (body: BookBulk, options?: CallOptions): Promise<BookBulkResult> =>
+    apiRequest("/api/books/bulk", { ...options, method: "POST", body, schema: bookBulkResultSchema }),
 };
 
 /**

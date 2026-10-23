@@ -1,7 +1,7 @@
 /*
  * The Library page (web/src/library): the table, the covers grid, the
- * filter chips, the Filter and Columns panels, and the empty and loading
- * states. Every colour, size of type, radius and shadow comes from
+ * filter chips, the Filter and Columns panels, the bulk bar and its dialogs,
+ * and the empty and loading states. Every colour, size of type, radius and shadow comes from
  * styles/tokens.css (design.md); a mix of two tokens is the most this file
  * invents. Below 768 px is the phone, where every target is 44 px.
  */
@@ -61,6 +61,38 @@
 @media (max-width: 767px) {
   .library-views__label {
     max-width: 128px;
+  }
+}
+
+/*
+ * The bulk bar (brief 26, BulkBar.tsx): in the toolbar's place while books
+ * are selected. "3 selected" in ink, then the actions as the toolbar's own
+ * buttons; on a phone the count leads the row and Actions and Clear end it.
+ */
+.library-bulk__count {
+  margin-right: 4px;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.library-bulk__hidden {
+  color: var(--muted);
+  font-weight: var(--weight-regular);
+}
+
+/* What the last change did, under the tabs while the selection stays. */
+.library-notice {
+  margin: -4px 0 14px;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+}
+
+@media (max-width: 767px) {
+  .library-bulk__count {
+    font-size: var(--text-body);
   }
 }
 
@@ -687,6 +719,11 @@
   background: var(--library-row-hover);
 }
 
+/* A selected row (brief 26) wears the selected menu row's wash, hovered or not. */
+.library-table__rows > .library-table__row[data-selected] {
+  background: var(--accent-tint-soft);
+}
+
 /* The row carries the keyboard ring of its title link. */
 .library-table__rows > .library-table__row:has(.library-book__title:focus-visible) {
   background: var(--library-row-hover);
@@ -727,6 +764,33 @@
 
 .library-table__cell--book {
   padding-block: 12px;
+}
+
+/*
+ * The select boxes' track (BookTable's SELECT_WIDTH: 48 px, 44 on a phone):
+ * the table's edge padding, then the box. The label fills the cell, so the
+ * whole cell ticks the box and never opens the row's book.
+ */
+.library-table__cell--select {
+  position: relative;
+}
+
+.library-select {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  padding-left: 24px;
+  cursor: pointer;
+}
+
+.library-select input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
 .library-table__cell--shelf {
@@ -912,12 +976,56 @@
 }
 
 .library-cover {
+  position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
   min-width: 0;
+  padding: 0;
+  border: 0;
   border-radius: var(--radius-cover);
+  background: none;
   color: var(--ink);
+  font: inherit;
+  text-align: start;
   text-decoration: none;
+  /* A long press selects (brief 26): no link callout, no text selection. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button.library-cover {
+  cursor: pointer;
+}
+
+/*
+ * While books are selected, each cover carries a mark in its top corner: an
+ * open ring, or the accent disc with a white check once ticked. A ticked
+ * cover is ringed in the accent too.
+ */
+.library-cover__check {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--ink-2);
+  color: var(--on-accent);
+}
+
+.library-cover[data-selected] .library-cover__check {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.library-cover[data-selected] > .cover {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .library-cover:hover {
@@ -1106,6 +1214,15 @@
     padding-right: 16px;
   }
 
+  .library-select {
+    padding-left: 16px;
+  }
+
+  .library-select input {
+    width: 18px;
+    height: 18px;
+  }
+
   .library-message {
     padding: 48px 20px 56px;
   }
@@ -1153,14 +1270,15 @@
   }
 }
 
-/* --- Views dialogs ------------------------------------------------------------------ */
+/* --- Views and bulk dialogs ------------------------------------------------------------ */
 
 /*
- * Save, rename and delete a view (ViewDialog.tsx): the account's Change
- * password dialog in this page's names. A white floating panel with the
- * menus' shadow over a dimmed page: in the middle of the window on the
- * desktop, the floating sheet over the bottom on a phone. Its field and
- * error are the login page's (auth/auth.css).
+ * Save, rename and delete a view (ViewDialog.tsx), and the bulk bar's move,
+ * tag and delete dialogs (BulkDialogs.tsx, whose shelf and tag lists are the
+ * filter panel's rows): the account's Change password dialog in this page's
+ * names. A white floating panel with the menus' shadow over a dimmed page:
+ * in the middle of the window on the desktop, the floating sheet over the
+ * bottom on a phone. Its field and error are the login page's (auth/auth.css).
  */
 .library-dialog-backdrop {
   position: fixed;

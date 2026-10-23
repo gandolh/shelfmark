@@ -1,4 +1,13 @@
-import { DEFAULT_CURRENCY, deriveAuthorSort, type Book, type BookCreate, type BookPatch } from "@shelfmark/shared";
+import {
+  DEFAULT_CURRENCY,
+  deriveAuthorSort,
+  type Book,
+  type BookBulkResult,
+  type BookCreate,
+  type BookPatch,
+  type BulkChange,
+  type Collection,
+} from "@shelfmark/shared";
 import type { Db } from "../db/open.js";
 
 /**
@@ -21,6 +30,12 @@ export interface BookStore {
   remove(id: number): boolean;
   /** Every copy with this ISBN-13, owned and wishlist alike, by id. */
   findByIsbn(isbn13: string): Book[];
+  /**
+   * One change to many books, in one transaction (brief 26). `ids` are
+   * distinct. When any of them names no book, nothing changes and the answer
+   * is `{ unknown }`, those ids in order.
+   */
+  bulk(ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] };
 }
 
 /** The stored fields: everything in `Book` but the id, the tags, the cover's facts and the times. */
@@ -190,6 +205,27 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     "DELETE FROM tags WHERE NOT EXISTS (SELECT 1 FROM book_tags WHERE tag_id = tags.id)",
   );
 
+  // A bulk change names its books as one JSON array parameter, read with json_each.
+  const IDS = "SELECT value FROM json_each(@ids)";
+  const knownBooks = db.prepare<[{ ids: string }], { id: number; collection: Collection }>(
+    `SELECT id, collection FROM books WHERE id IN (${IDS})`,
+  );
+  const rowsOf = db.prepare<[{ ids: string }], BookRow>(`${SELECT_BOOKS} WHERE b.id IN (${IDS}) ORDER BY b.id`);
+  const tagsOf = db.prepare<[{ ids: string }], TagRow>(`${SELECT_TAGS} WHERE bt.book_id IN (${IDS}) ORDER BY bt.rowid`);
+  // Only the books whose value changes are written, so the others keep their updatedAt.
+  const setShelves = db.prepare<[{ ids: string; shelf: string | null; at: string }]>(
+    `UPDATE books SET shelf = @shelf, updated_at = @at WHERE id IN (${IDS}) AND shelf IS NOT @shelf`,
+  );
+  const setStatuses = db.prepare<[{ ids: string; status: string; at: string }]>(
+    `UPDATE books SET status = @status, updated_at = @at WHERE id IN (${IDS}) AND status <> @status`,
+  );
+  const touch = db.prepare<[string, number]>("UPDATE books SET updated_at = ? WHERE id = ?");
+  const linkTagOnce = db.prepare<[number, number]>("INSERT OR IGNORE INTO book_tags (book_id, tag_id) VALUES (?, ?)");
+  const unlinkNamedTags = db.prepare<[{ book: number; keys: string }]>(
+    "DELETE FROM book_tags WHERE book_id = @book AND tag_id IN (SELECT id FROM tags WHERE name_key IN (SELECT value FROM json_each(@keys)))",
+  );
+  const deleteBooks = db.prepare<[{ ids: string }]>(`DELETE FROM books WHERE id IN (${IDS})`);
+
   function withTags(rows: BookRow[], tagRows: TagRow[]): Book[] {
     const byBook = new Map<number, string[]>();
     for (const { bookId, name } of tagRows) {
@@ -205,13 +241,15 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     return row && toBook(row, getTags.all(id).map((tag) => tag.name));
   }
 
+  /** The tag's id, made if no tag has its key yet. */
+  function tagId({ name, key }: { name: string; key: string }): number {
+    return findTag.get(key)?.id ?? Number(insertTag.run(name, key).lastInsertRowid);
+  }
+
   /** Replaces a book's tags. An existing tag is matched case-insensitively and keeps its spelling. */
   function setTags(bookId: number, tags: readonly string[]): void {
     unlinkTags.run(bookId);
-    for (const { name, key } of normalizeTags(tags)) {
-      const tagId = findTag.get(key)?.id ?? Number(insertTag.run(name, key).lastInsertRowid);
-      linkTag.run(bookId, tagId);
-    }
+    for (const tag of normalizeTags(tags)) linkTag.run(bookId, tagId(tag));
     dropUnusedTags.run();
   }
 
@@ -256,6 +294,60 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     return removed;
   });
 
+  /** The books with these ids, by id: two statements, however many there are. */
+  function listOf(ids: readonly number[]): Book[] {
+    const param = { ids: JSON.stringify(ids) };
+    return withTags(rowsOf.all(param), tagsOf.all(param));
+  }
+
+  const bulk = db.transaction((ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] } => {
+    const known = knownBooks.all({ ids: JSON.stringify(ids) });
+    if (known.length !== ids.length) {
+      const found = new Set(known.map((book) => book.id));
+      return { unknown: ids.filter((id) => !found.has(id)).sort((a, b) => a - b) };
+    }
+    const at = now().toISOString();
+
+    if (change.kind === "delete") {
+      deleteBooks.run({ ids: JSON.stringify(ids) });
+      dropUnusedTags.run();
+      return { done: { books: [], deleted: [...ids].sort((a, b) => a - b), skipped: [] } };
+    }
+
+    // A shelf is where an owned copy sits: a wishlist book has none to change.
+    const skipped = new Set(change.kind === "shelf" ? known.filter((book) => book.collection !== "owned").map((book) => book.id) : []);
+    const applied = skipped.size > 0 ? ids.filter((id) => !skipped.has(id)) : ids;
+    const param = JSON.stringify(applied);
+
+    switch (change.kind) {
+      case "shelf":
+        setShelves.run({ ids: param, shelf: change.shelf, at });
+        break;
+      case "status":
+        setStatuses.run({ ids: param, status: change.status, at });
+        break;
+      case "addTags": {
+        const tagIds = normalizeTags(change.tags).map(tagId);
+        for (const id of applied) {
+          let added = false;
+          for (const tag of tagIds) added = linkTagOnce.run(id, tag).changes > 0 || added;
+          if (added) touch.run(at, id);
+        }
+        break;
+      }
+      case "removeTags": {
+        const keys = JSON.stringify(normalizeTags(change.tags).map((tag) => tag.key));
+        for (const id of applied) {
+          if (unlinkNamedTags.run({ book: id, keys }).changes > 0) touch.run(at, id);
+        }
+        dropUnusedTags.run();
+        break;
+      }
+    }
+
+    return { done: { books: listOf(applied), deleted: [], skipped: [...skipped].sort((a, b) => a - b) } };
+  });
+
   return {
     list: () => withTags(listRows.all(), listTags.all()),
     get,
@@ -263,5 +355,6 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     patch: (id, changes) => patch(id, changes),
     remove: (id) => remove(id),
     findByIsbn: (isbn13) => withTags(isbnRows.all(isbn13), isbnTags.all(isbn13)),
+    bulk: (ids, change) => bulk(ids, change),
   };
 }

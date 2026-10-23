@@ -1,5 +1,5 @@
 import type { Collection } from "@shelfmark/shared";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBooks } from "../books/store";
 import { Button, ButtonLink } from "../components/Button";
 import { setSearchQuery } from "../layout/search";
@@ -7,6 +7,7 @@ import { Page } from "../layout/Page";
 import { useIsDesktop } from "../layout/viewport";
 import { ADD_BOOK } from "../router";
 import { BookTable } from "./BookTable";
+import { BulkBar, type BulkNotice } from "./BulkBar";
 import type { ColumnId } from "./columns";
 import { ColumnPicker } from "./ColumnPicker";
 import { CoversGrid } from "./CoversGrid";
@@ -18,7 +19,8 @@ import { Panel } from "./Panel";
 import type { Layout, LibraryPrefs, ViewMode } from "./prefs";
 import { useScrollMemory } from "./scroll";
 import { describeSort, type Sorting } from "./sort";
-import { clearFilters, updatePrefs, useLibraryPrefs } from "./state";
+import { selectedBooks, type Selection } from "./selection";
+import { clearFilters, getSelection, updatePrefs, useLibraryPrefs, useLibrarySelection } from "./state";
 import { Toolbar } from "./Toolbar";
 import { columnApplies, useLibraryView, type LibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
@@ -42,11 +44,13 @@ const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist
  * The Library (design.md; corpus/wiki/library-table.md): the open collection
  * (Owned or Wishlist), as a table or as covers, searched from the box in the shell, filtered by
  * any column, sorted by any. "14 books, newest first" under the title.
+ * While books are selected (brief 26) the bulk bar stands in for the
+ * toolbar; Clear puts the toolbar back as it was.
  */
 export function LibraryPage() {
   const desktop = useIsDesktop();
   const layout: Layout = desktop ? "desktop" : "phone";
-  const { status, error, refresh } = useBooks();
+  const { status, error, refresh, books: allBooks } = useBooks();
   const prefs = useLibraryPrefs(layout);
   const view = useLibraryView(layout);
   const [panel, setPanel] = useState<PanelState | null>(null);
@@ -58,6 +62,24 @@ export function LibraryPage() {
   const ready = status === "ready";
   const hasBooks = ready && view.total > 0;
   useScrollMemory(ready);
+
+  // The selection can hold books of either tab, and books out of sight; one deleted elsewhere drops out here.
+  const selection = useLibrarySelection();
+  const selected = useMemo(() => selectedBooks(selection, allBooks), [selection, allBooks]);
+  const selecting = ready && selected.length > 0;
+  // What the last bulk change did, for as long as the selection it was made on stays.
+  const [notice, setNotice] = useState<(BulkNotice & { selection: Selection }) | null>(null);
+  const shownNotice = notice?.selection === selection ? notice : null;
+  // The bar takes the toolbar's place, and with it the buttons a panel hangs from.
+  if (selecting && panel) setPanel(null);
+  // Clear (or a delete) took away the focused button with the bar: focus goes on to the toolbar's Filter.
+  const wasSelecting = useRef(selecting);
+  useEffect(() => {
+    if (wasSelecting.current && !selecting && (document.activeElement === null || document.activeElement === document.body)) {
+      filterButton.current?.focus();
+    }
+    wasSelecting.current = selecting;
+  }, [selecting]);
 
   const collection = view.collection;
   // The wishlist leaves out the columns a wishlist book never fills; the saved choice is untouched.
@@ -99,7 +121,15 @@ export function LibraryPage() {
   const count = view.narrowed ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}` : books(view.total);
   const caption = hasBooks ? `${count}, ${describeSort(view.sorting)}` : undefined;
 
-  const toolbar = hasBooks ? (
+  const toolbar = selecting ? (
+    <BulkBar
+      selected={selected}
+      rows={view.rows}
+      books={allBooks}
+      desktop={desktop}
+      onNotice={(next) => setNotice({ ...next, selection: getSelection() })}
+    />
+  ) : hasBooks ? (
     <Toolbar
       view={view}
       desktop={desktop}
@@ -125,6 +155,15 @@ export function LibraryPage() {
           {/* The phone's toolbar has no room for Views: it ends the tabs' row (desktop: Toolbar). */}
           {!desktop && <ViewsMenu layout={layout} mode={mode} quiet />}
         </div>
+      )}
+      {/* Said for every change; shown under the bar for the ones that leave it up. */}
+      <span className="visually-hidden" role="status">
+        {shownNotice?.text ?? ""}
+      </span>
+      {selecting && shownNotice?.visible && (
+        <p className="library-notice" aria-hidden="true">
+          {shownNotice.text}
+        </p>
       )}
       {hasBooks && (
         <FilterChips
@@ -175,7 +214,7 @@ export function LibraryPage() {
       ) : mode === "table" ? (
         <BookTable rows={view.rows} sorting={view.sorting} prefs={tablePrefs} layout={layout} />
       ) : (
-        <CoversGrid rows={view.rows} layout={layout} />
+        <CoversGrid rows={view.rows} layout={layout} selecting={selecting} />
       )}
 
       {panel && (

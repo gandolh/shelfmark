@@ -191,6 +191,60 @@ export type BookCreate = z.infer<typeof bookCreateSchema>;
 export const bookPatchSchema = z.strictObject({ title: titleSchema.optional(), ...bookFields });
 export type BookPatch = z.infer<typeof bookPatchSchema>;
 
+/** How many books one bulk change can name: more than a home library holds. */
+export const BULK_MAX_BOOKS = 10_000;
+
+/** At least one tag, blanks dropped. */
+const someTags = names.pipe(z.array(z.string()).min(1, { message: "name at least one tag" }));
+
+/**
+ * One change to many books (`BookBulk.change`): put them on a shelf (`null`
+ * takes them off any shelf; a blank counts as `null`), set their status, add
+ * or remove tags, or delete them. A shelf is an owned book's only: a shelf
+ * change leaves wishlist books as they are and answers them as skipped.
+ * Tags match case-insensitively, as everywhere: adding "signed" to a book
+ * tagged "Signed" leaves it with one tag, spelt as the library spells it.
+ */
+export const bulkChangeSchema = z.discriminatedUnion("kind", [
+  z.strictObject({
+    kind: z.literal("shelf"),
+    shelf: z.preprocess((value) => (typeof value === "string" && value.trim() === "" ? null : value), shortText.nullable()),
+  }),
+  z.strictObject({ kind: z.literal("status"), status: statusSchema }),
+  z.strictObject({ kind: z.literal("addTags"), tags: someTags }),
+  z.strictObject({ kind: z.literal("removeTags"), tags: someTags }),
+  z.strictObject({ kind: z.literal("delete") }),
+]);
+export type BulkChange = z.infer<typeof bulkChangeSchema>;
+
+/**
+ * `POST /api/books/bulk` (brief 26): one change to the books named by `ids`,
+ * in one transaction. Each id counts once. An id that names no book is a 400
+ * and nothing changes.
+ */
+export const bookBulkSchema = z.strictObject({
+  ids: z
+    .array(z.number().int().positive())
+    .min(1, { message: "name at least one book" })
+    .max(BULK_MAX_BOOKS)
+    .transform((ids) => [...new Set(ids)]),
+  change: bulkChangeSchema,
+});
+export type BookBulk = z.infer<typeof bookBulkSchema>;
+
+/**
+ * What a bulk change did. `books`: every named book it applied to, as it now
+ * stands, by id (one that already had the shelf, status or tag comes back
+ * unchanged). `deleted`: the ids a delete took out. `skipped`: the ids it
+ * left alone (wishlist books on a shelf change).
+ */
+export const bookBulkResultSchema = z.object({
+  books: z.array(bookSchema),
+  deleted: z.array(z.number().int().positive()),
+  skipped: z.array(z.number().int().positive()),
+});
+export type BookBulkResult = z.infer<typeof bookBulkResultSchema>;
+
 /**
  * The sort key for a list of authors, from the first: "Mircea Cărtărescu" →
  * "Cărtărescu, Mircea". A one-word name, or one already written with a comma,
