@@ -277,7 +277,7 @@ export function AddBookPage() {
   const waiting =
     queue.length > 0 && step.kind === "ready" ? (
       <button type="button" className="add-waiting" onClick={() => dispatch({ type: "show-queue" })}>
-        {waitingLine(queue.length)}
+        {waitingLine(queue)}
       </button>
     ) : null;
   const status =

@@ -13,6 +13,8 @@ export const ERROR_STATUS = {
   /** A browser sent a change from a page on another origin (`auth/guard.ts`). */
   forbidden: 403,
   not_found: 404,
+  /** The change clashes with what is stored: a saved view's name another view has (`routes/views.ts`). */
+  conflict: 409,
   internal: 500,
   /** A host the server called (a cover download) failed or timed out. */
   upstream: 502,

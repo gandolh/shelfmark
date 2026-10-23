@@ -1,4 +1,4 @@
-import type { Book } from "@shelfmark/shared";
+import type { Book, Collection } from "@shelfmark/shared";
 import { useId, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { columnById, type ColumnId, type LibraryColumn } from "./columns";
@@ -17,6 +17,7 @@ import { ChevronDownIcon, ChevronIcon } from "./icons";
 import { PanelHeader, useFocusOnChange } from "./Panel";
 import { collator, directionLabel, firstSortDesc, type Sorting } from "./sort";
 import { setFilter } from "./state";
+import { columnsIn } from "./view";
 
 /**
  * The Filter panel (corpus/wiki/library-table.md): first the list of
@@ -65,6 +66,8 @@ const SORTABLE: readonly LibraryColumn[] = [...LIST].sort((a, b) => collator.com
 export interface FilterPanelProps {
   /** Every owned book: the pick-lists offer what they have. */
   books: readonly Book[];
+  /** The tab on show: the wishlist lists only the columns its books can fill. */
+  collection: Collection;
   filters: Filters;
   query: string;
   /** Show the sort first (Covers, and the phone). */
@@ -82,6 +85,7 @@ export interface FilterPanelProps {
 
 export function FilterPanel({
   books,
+  collection,
   filters,
   query,
   withSort,
@@ -103,6 +107,8 @@ export function FilterPanel({
     if (focusColumns) columnsRow.current?.focus();
   }, [focusColumns]);
 
+  const list = useMemo(() => columnsIn(collection, LIST), [collection]);
+  const sortable = useMemo(() => columnsIn(collection, SORTABLE), [collection]);
   const title = withSort ? "Filter and sort" : "Filter";
   // Back from the column picker, and not since moved on to a column's filter.
   const columnsFirst = focusColumns && returnTo === null;
@@ -156,7 +162,7 @@ export function FilterPanel({
     <div ref={body} className="library-panel__content">
       <PanelHeader title={title} onDone={onClose} />
       <div className="library-panel__scroll">
-        {withSort && <SortSection sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />}
+        {withSort && <SortSection columns={sortable} sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />}
         {onColumns && (
           <section className="library-panel__section" aria-label="Table">
             <h3 className="library-panel__label" aria-hidden="true">
@@ -181,7 +187,7 @@ export function FilterPanel({
         <section className="library-panel__section" aria-label="Filter by">
           {withSort && <h3 className="library-panel__label">Filter by</h3>}
           <ul className="library-columns" role="list">
-            {LIST.map((column, index) => {
+            {list.map((column, index) => {
               const filter = filters[column.id];
               const summary = isActive(filter) ? filterSummary(column, filter) : null;
               const focusHere = returnTo === null ? index === 0 && !withSort : returnTo === column.id;
@@ -209,10 +215,20 @@ export function FilterPanel({
 
 // --- Sort --------------------------------------------------------------------------
 
-function SortSection({ sorting, onChange, takeFocus }: { sorting: Sorting; onChange: (sorting: Sorting) => void; takeFocus: boolean }) {
+interface SortSectionProps {
+  /** The columns this tab can sort by. */
+  columns: readonly LibraryColumn[];
+  sorting: Sorting;
+  onChange: (sorting: Sorting) => void;
+  takeFocus: boolean;
+}
+
+function SortSection({ columns, sorting, onChange, takeFocus }: SortSectionProps) {
   const id = useId();
   const lead = sorting[0] ?? { id: "added" as const, desc: true };
   const column = columnById(lead.id);
+  // A sort carried over from Owned (by shelf, say) stays listed, so the select shows what is in force.
+  const options = columns.some((option) => option.id === lead.id) ? columns : [...columns, column];
   const rest = sorting.slice(1).map((key) => columnById(key.id).label.toLowerCase());
 
   return (
@@ -232,7 +248,7 @@ function SortSection({ sorting, onChange, takeFocus }: { sorting: Sorting; onCha
               onChange([{ id: next.id, desc: firstSortDesc(next) }]);
             }}
           >
-            {SORTABLE.map((option) => (
+            {options.map((option) => (
               <option key={option.id} value={option.id}>
                 {option.label}
               </option>

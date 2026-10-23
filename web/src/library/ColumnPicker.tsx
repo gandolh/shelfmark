@@ -1,3 +1,4 @@
+import type { Collection } from "@shelfmark/shared";
 import { useLayoutEffect, useRef } from "react";
 import { BOOK_COLUMN_ID, columnById, type ColumnId } from "./columns";
 import { MoveDownIcon, MoveUpIcon } from "./icons";
@@ -5,24 +6,29 @@ import { PanelHeader } from "./Panel";
 import { DEFAULT_ORDER, DEFAULT_VISIBILITY, type Layout } from "./prefs";
 import { collator } from "./sort";
 import { updatePrefs, useLibraryPrefs } from "./state";
+import { columnApplies } from "./view";
 
 /**
  * Which columns the table shows, and in what order. The shown ones are
  * listed in the table's order with Move up / Move down; the hidden ones
  * follow A to Z. Showing a column puts it at the table's end. The book
- * column always leads. Everything applies at once.
+ * column always leads. Everything applies at once. The wishlist lists only
+ * the columns its books can fill; the others keep their place for Owned.
  */
 export interface ColumnPickerProps {
   layout: Layout;
+  /** The tab on show. */
+  collection: Collection;
   /** A step back to the sheet it was opened from: the phone's "Filter and sort". */
   back?: { label: string; onClick: () => void };
   onClose: () => void;
 }
 
-export function ColumnPicker({ layout, back, onClose }: ColumnPickerProps) {
+export function ColumnPicker({ layout, collection, back, onClose }: ColumnPickerProps) {
   const { columnOrder, columnVisibility } = useLibraryPrefs(layout);
-  const shown = columnOrder.filter((id) => id === BOOK_COLUMN_ID || columnVisibility[id]);
-  const hidden = columnOrder
+  const listed = columnOrder.filter((id) => columnApplies(id, collection));
+  const shown = listed.filter((id) => id === BOOK_COLUMN_ID || columnVisibility[id]);
+  const hidden = listed
     .filter((id) => !shown.includes(id))
     .map(columnById)
     .sort((a, b) => collator.compare(a.label, b.label));

@@ -229,6 +229,7 @@ export function LibraryPage() {
           {panel.kind === "filter" ? (
             <FilterPanel
               books={view.books}
+              collection={collection}
               filters={view.filters}
               query={view.query}
               withSort={!desktop || mode === "covers"}
@@ -242,6 +243,7 @@ export function LibraryPage() {
           ) : (
             <ColumnPicker
               layout={layout}
+              collection={collection}
               back={phoneColumns ? { label: "Filter and sort", onClick: () => step("filter") } : undefined}
               onClose={() => setPanel(null)}
             />

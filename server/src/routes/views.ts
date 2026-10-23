@@ -1,5 +1,5 @@
 import { savedViewCreateSchema, savedViewPatchSchema, type SavedViewList } from "@shelfmark/shared";
-import type { FastifyPluginAsync, FastifyReply } from "fastify";
+import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { ApiError } from "../errors.js";
 import { createViewStore, ViewNameTaken } from "../store/views.js";
@@ -17,14 +17,8 @@ function viewId(raw: string): number {
   return id;
 }
 
-/**
- * A name another view has: `409 { error: { code: "conflict", message } }`,
- * the API's error shape, sent here because `ERROR_STATUS` (errors.ts) has no
- * 409 yet.
- */
-function nameTaken(reply: FastifyReply, error: ViewNameTaken): FastifyReply {
-  return reply.code(409).send({ error: { code: "conflict", message: error.message } });
-}
+/** A name another view has: `409 conflict`, with the store's message. */
+const nameTaken = (error: ViewNameTaken) => new ApiError("conflict", error.message);
 
 /**
  * The saved views (brief 27). A list answers `{ views }` by position; one
@@ -43,7 +37,7 @@ export const viewRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db }
       const view = views.create(input);
       return reply.code(201).send(view);
     } catch (error) {
-      if (error instanceof ViewNameTaken) return nameTaken(reply, error);
+      if (error instanceof ViewNameTaken) throw nameTaken(error);
       throw error;
     }
   });
@@ -56,7 +50,7 @@ export const viewRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db }
       if (!view) throw noSuchView();
       return reply.send(view);
     } catch (error) {
-      if (error instanceof ViewNameTaken) return nameTaken(reply, error);
+      if (error instanceof ViewNameTaken) throw nameTaken(error);
       throw error;
     }
   });

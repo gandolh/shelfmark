@@ -564,14 +564,14 @@ function Failed({
 
 // --- The queued scans ---------------------------------------------------------------
 
-/** The list behind "Waiting to look up (N)". An answered scan opens as the usual sheet; nothing is saved until it is confirmed there. */
+/** The list behind "Waiting to look up (N)" (or "Ready to confirm (N)"). An answered scan opens as the usual sheet; nothing is saved until it is confirmed there. */
 function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly QueueItem[] }) {
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
       <div className="add-head__text">
         <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title add-title--small">
-          {waitingLine(queue.length)}
+          {waitingLine(queue)}
         </h2>
         <p className="add-meta">Looked up one at a time while you're online. Each answer is yours to confirm.</p>
       </div>

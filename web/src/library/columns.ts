@@ -14,9 +14,10 @@ import {
  * (BookTable), the filters, the sort, the column picker and the export all
  * read these definitions; none of them knows a field by name.
  *
- * Not here: `id` (an internal number), `collection` (v1 shows the owned
- * books only; the wishlist brief adds the switch above the table) and
- * `createdAt`/`updatedAt` under their own names ("Added", "Changed").
+ * Not here: `id` (an internal number), `collection` (the Owned and Wishlist
+ * tabs above the table choose it; `columnApplies` in view.ts drops the columns
+ * a wishlist book never fills) and `createdAt`/`updatedAt` under their own
+ * names ("Added", "Changed").
  */
 
 export type ColumnKind = "text" | "pick" | "number" | "date" | "yesno";

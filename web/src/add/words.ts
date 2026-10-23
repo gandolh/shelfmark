@@ -203,9 +203,10 @@ export function noOfflineCopy(): Failure {
 
 // --- The scan queue ---------------------------------------------------------------
 
-/** The line on Add a book that opens the list. */
-export function waitingLine(count: number): string {
-  return `Waiting to look up (${count})`;
+/** The line on Add a book that opens the list, and the list's heading. Once every scan is answered, none is waiting. */
+export function waitingLine(queue: readonly Pick<QueueItem, "state">[]): string {
+  const answered = queue.length > 0 && queue.every((item) => item.state === "answered");
+  return answered ? `Ready to confirm (${queue.length})` : `Waiting to look up (${queue.length})`;
 }
 
 /** What a queued scan is doing, for its row in the list. */

@@ -108,7 +108,12 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
                 data-autofocus={index === 0 ? "" : undefined}
               />
               <span className="library-option__label">{shelf.name}</span>
-              <span className="library-option__count tabular">{shelf.count}</span>
+              {/* Heard as "Bedroom · B1, 5 books", not "Bedroom · B1 5". */}
+              <span className="library-option__count tabular">
+                <span className="visually-hidden">, </span>
+                {shelf.count}
+                <span className="visually-hidden"> {shelf.count === 1 ? "book" : "books"}</span>
+              </span>
             </label>
           ))}
           <label className="library-option">
@@ -273,6 +278,7 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
               />
               <span className="library-option__label">{tag.name}</span>
               <span className="library-option__count tabular">
+                <span className="visually-hidden">, on </span>
                 {tag.count === count ? "all" : `${tag.count} of ${count}`}
               </span>
             </label>

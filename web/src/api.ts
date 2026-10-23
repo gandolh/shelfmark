@@ -27,6 +27,7 @@ export { API_BASE } from "./base";
 export type ApiErrorCode =
   | "validation"
   | "not_found"
+  | "conflict"
   | "internal"
   | "signed_out"
   | "network"

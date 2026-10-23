@@ -213,8 +213,9 @@ describe("the offline answer's words", () => {
 describe("the scan queue's words", () => {
   const found = { owned: [], wishlisted: [], draft: { title: "The Hobbit" } } as unknown as LookupResponse;
 
-  it("counts what is waiting", () => {
-    expect(waitingLine(3)).toBe("Waiting to look up (3)");
+  it("counts what is waiting, and says when all of it is answered", () => {
+    expect(waitingLine([{ state: "waiting" }, { state: "answered" }, { state: "failed" }])).toBe("Waiting to look up (3)");
+    expect(waitingLine([{ state: "answered" }, { state: "answered" }])).toBe("Ready to confirm (2)");
   });
 
   it("says what became of each scan", () => {
