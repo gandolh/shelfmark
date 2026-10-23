@@ -487,3 +487,31 @@ The wiki folds owed for brief 27 are in: `data-model.md` (`saved_views`, why `na
 `backup.ts` copies the whole database). Root `DESIGN.md` has Views on both layouts, the
 Owned / Wishlist tabs (its "not built" line was stale) and the bulk bar. Still owed: the
 browser walk for 26 (both layouts, the long press on a real phone), with the review of 23–30.
+
+## [2026-10-23] review | Briefs 23–30, in the browser
+
+Walked on the dev server with a scratch database and a throwaway account (desktop
+1280 px and phone 390 px, headless Chrome): CSV import (a 40-row Goodreads file, all
+saved), stats (counts and the "no price or date" footnote), bulk edit (tags matched
+case-insensitively and added once; a search-scoped select-all moved only the 7 rows on
+show; delete named the count and said there is no undo; a simulated long press on a
+cover selected it on the phone and the bar turned into Actions and Clear), the CIP
+reader on a fixture photo (all five fields filled and marked), the offline answer
+("Already on Hall · A1" from IndexedDB with the network off), the scan queue (queued
+offline, looked up by itself on reconnect), and "I bought it" on a wishlist book.
+Merged `main` passed typecheck, lint, build and 838 of 839 tests; the timing test
+failed under load and passed alone (852 ms of test time).
+
+Fixed in the review: the Filter panel, its sort list and the column picker no longer
+list the four columns a wishlist book never fills; `conflict: 409` is in
+`server/src/errors.ts` and the views route throws it; the Move and Remove tags dialogs'
+counts are heard as "Bedroom · B1, 5 books" and "signed, on all"; the queue's line
+says "Ready to confirm (N)" once every scan is answered; a stale comment in
+`columns.ts`; status.md's waves line. Two todos filed:
+[bulk-bar-stays-in-view](todos/bulk-bar-stays-in-view.md) (the bar scrolls off when
+ticking rows further down) and [subtitle-on-the-by-hand-form](todos/subtitle-on-the-by-hand-form.md).
+
+Still owed, needing a real phone or the owner: the long press with iOS and Android's
+own menus, the photo picker and box drag, real camera photos for the CIP fixtures,
+whether iOS Safari's service worker answers the Tesseract worker's requests offline,
+and the timing test that fails under a parallel load.

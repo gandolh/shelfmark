@@ -79,4 +79,6 @@ test then moves to a signed-in session in one place.
 
 None. On 2026-10-23 the v1.x todos became briefs 23–28, stats and the CIP photo
 became 29 and 30, and the Atrium link was dropped (the apps stay independent).
-Waves 15–22 run one at a time: each touches the Library page or the add flow.
+Waves 15–22 were planned one at a time, since each touches the Library page or the add flow. On
+2026-10-23 they ran two at a time where the files did not overlap; 26 and 27 were built in a
+worktree and cherry-picked onto `main`.

@@ -34,9 +34,10 @@ each. Everything is derived for the open collection (`LibraryView.collection`,
 (shelf, condition, acquired on, acquired from) even if the column picker has them
 on, and the saved choice is untouched. Switching tab clears the filters (they are
 session-only), so a shelf filter can't hide the other tab's books. Export on the
-Wishlist tab writes the wishlist's rows and the columns it fills. The Filter panel
-and column picker still list the four columns on the wishlist; they just find
-nothing there.
+Wishlist tab writes the wishlist's rows and the columns it fills. The Filter panel,
+its sort list and the column picker leave the four out on the wishlist too
+(`columnsIn` / `columnApplies` in [view.ts](../../web/src/library/view.ts), since the
+2026-10-23 review); a sort carried over from Owned stays listed until changed.
 
 ## Filters per column
 
