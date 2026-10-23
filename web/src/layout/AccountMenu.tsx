@@ -3,12 +3,13 @@ import { changePassword, downloadBackup, linkWard, signOut, unlinkWard, useWardL
 import { AlertIcon } from "../auth/icons";
 import { AccountIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/Menu";
+import { IMPORT_CSV, navigate } from "../router";
 
 const NOTICE_MS = 6000;
 
 /**
  * The account button and its menu, in place of a Settings page (design.md):
- * Change password, Sign in with Ward, Download a backup, then Sign out.
+ * Change password, Sign in with Ward, Import a CSV, Download a backup, then Sign out.
  * `bar` is the 34 px button in the desktop top bar; `header` is the 44 px
  * target beside a phone page's title.
  */
@@ -52,6 +53,7 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
               },
             ]
           : []),
+        { label: "Import a CSV", detail: "Goodreads, Libib, spreadsheet", onSelect: () => navigate(IMPORT_CSV) },
         { label: "Download a backup", detail: "Database file", onSelect: run(downloadBackup) },
       ],
     },

@@ -9,6 +9,7 @@ import { appBase } from "./base";
  *   /shelfmark/            library   the Library
  *   /shelfmark/add         add       Add a book
  *   /shelfmark/books/:id   book      one book
+ *   /shelfmark/import      import    Import a CSV (account menu; sits under Library)
  *   /shelfmark/login       login     signing in (brief 06)
  *
  * Anything else is the Library, and the shell rewrites the address to `/shelfmark/`.
@@ -19,6 +20,7 @@ const APP_ROUTES = {
   library: "/",
   add: "/add",
   book: "/books/:id",
+  import: "/import",
   login: "/login",
 } as const;
 
@@ -52,6 +54,7 @@ export type RouteOf<N extends RouteName> = Extract<Route, { name: N }>;
 
 export const LIBRARY: RouteOf<"library"> = { name: "library", params: {} };
 export const ADD_BOOK: RouteOf<"add"> = { name: "add", params: {} };
+export const IMPORT_CSV: RouteOf<"import"> = { name: "import", params: {} };
 export const LOGIN: RouteOf<"login"> = { name: "login", params: {} };
 
 export function bookRoute(id: number | string): RouteOf<"book"> {
@@ -133,6 +136,7 @@ export function placeOf(to: Route): Place | null {
   switch (to.name) {
     case "library":
     case "book":
+    case "import":
       return "library";
     case "add":
       return "add";

@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, type ComponentType } from "react";
 import { AddBookPage } from "../add/AddBookPage";
 import { BookPage } from "../book/BookPage";
+import { ImportPage } from "../import/ImportPage";
 import { LibraryPage } from "../library/LibraryPage";
 import {
   LIBRARY,
@@ -30,6 +31,7 @@ const PAGES: { [N in RouteName]: PageComponent<N> | null } = {
   library: LibraryPage,
   add: AddBookPage,
   book: BookPage,
+  import: ImportPage,
   login: null,
   devScanner: import.meta.env.DEV ? lazy(() => import("../scanner/ScannerDemo")) : null,
 };

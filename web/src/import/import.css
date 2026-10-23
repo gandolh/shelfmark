@@ -1,0 +1,196 @@
+/*
+ * Import a CSV (web/src/import): one card per step. Colours, radii and type
+ * come from tokens.css.
+ */
+
+.import {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: var(--page-width);
+}
+
+.import__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border-radius: var(--radius-container);
+}
+
+.import__heading {
+  margin: 0;
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+}
+
+.import__text {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-body);
+}
+
+.import__muted {
+  color: var(--muted);
+}
+
+.import__error {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
+}
+
+.import__link {
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.import__link:hover:not(:disabled) {
+  color: var(--accent-press);
+  text-decoration: underline;
+}
+
+.import__link:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+
+.import__actions,
+.import__bar,
+.import__lookup {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.import__counts {
+  padding-left: 20px;
+}
+
+.import__failures {
+  margin: 0;
+  padding-left: 20px;
+  font-size: var(--text-meta);
+}
+
+.import-map {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.import-map__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--divider);
+}
+
+.import-map__column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.import-map__name {
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+}
+
+.import-map__sample {
+  overflow: hidden;
+  max-width: 420px;
+  color: var(--muted);
+  font-size: var(--text-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-select {
+  min-height: var(--control-height);
+  padding: 0 10px;
+  background: var(--field);
+  border: 0;
+  border-radius: var(--radius-control);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-meta);
+}
+
+.shell--phone .import-select {
+  min-height: var(--touch);
+  font-size: var(--text-input-phone);
+}
+
+.import__scroll {
+  align-self: stretch;
+  overflow-x: auto;
+}
+
+.import-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-meta);
+  text-align: left;
+}
+
+.import-table th {
+  padding: 6px 10px;
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.import-table td {
+  padding: 8px 10px;
+  border-top: 1px solid var(--divider);
+  vertical-align: top;
+}
+
+.import-table tbody tr:not([data-ticked]) td:not(:first-child):not(:last-child) {
+  color: var(--muted);
+}
+
+.import-table__isbn {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.import-check {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+}
+
+.import-flag {
+  display: inline-block;
+  margin: 0 6px 4px 0;
+  padding: 2px 8px;
+  background: var(--control);
+  border-radius: var(--radius-pill);
+  color: var(--ink-2);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  white-space: nowrap;
+}
+
+.import-flag--needs-lookup {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+}
