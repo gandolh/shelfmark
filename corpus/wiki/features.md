@@ -57,8 +57,8 @@ Shelfmark keeps all of it except loans.
   account menu, not a third place (owner, 2026-10-23; brief 29).
 - **CIP photo capture**: Romanian books print a "Descrierea CIP a Bibliotecii
   Naționale a României" block on the copyright page with title, author,
-  publisher, year and ISBN. A photo of it, read by OCR or Claude, would fill
-  most Romanian books that the databases miss.
+  publisher, year and ISBN. A photo of it, read by OCR in the browser, fills
+  most Romanian books that the databases miss (owner, 2026-10-23; brief 30).
 - **Atrium link**: mark that an ebook copy exists in Atrium.
 
 ## Out

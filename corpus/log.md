@@ -352,3 +352,11 @@ Asked where stats should live under "Two places only", the owner chose an item i
 account menu, over a button over the Library table or a third tab. The rule stands.
 [Brief 29](briefs/todo/29-stats.md) counts owned books in the browser, with no server
 route, and links each count to Library with that filter.
+
+## [2026-10-23] decision | The CIP photo is read by OCR in the browser; brief 30
+
+Asked what reads a photo of a book's CIP block, the owner chose Tesseract in the browser,
+over Claude on the server or dropping the feature: free, private and offline. [Brief 30](briefs/todo/30-cip-photo-capture.md)
+moves `readDescription` from the CIP list parser into `shared/` so the browser reads the
+OCR text with the same tested code, and serves Tesseract and its Romanian data from the
+app's own origin.

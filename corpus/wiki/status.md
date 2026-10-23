@@ -68,6 +68,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 27 | [Saved views](../briefs/todo/27-saved-views.md) | 19 | todo (filed 2026-10-23) |
 | 28 | [CSV import](../briefs/todo/28-csv-import.md) | 20 | todo (filed 2026-10-23) |
 | 29 | [Stats, from the account menu](../briefs/todo/29-stats.md) | 21 | todo (filed 2026-10-23) |
+| 30 | [Fill a book from a photo of its CIP block](../briefs/todo/30-cip-photo-capture.md) | 22 | todo (filed 2026-10-23) |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
@@ -78,7 +79,6 @@ test then moves to a signed-in session in one place.
 
 | Tier | Todo |
 |---|---|
-| later | [cip-photo-capture](../todos/cip-photo-capture.md) |
 | later | [atrium-link](../todos/atrium-link.md) |
 
 Every v1 and v1.x todo is promoted (the v1.x ones on 2026-10-23, as briefs
