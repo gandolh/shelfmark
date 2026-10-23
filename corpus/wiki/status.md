@@ -77,8 +77,6 @@ test then moves to a signed-in session in one place.
 
 ## Todos left, by tier
 
-| Tier | Todo |
-|---|---|
-
-Every v1 and v1.x todo is promoted (the v1.x ones on 2026-10-23, as briefs
-23–28). Waves 15–20 run one at a time: each touches the Library page.
+None. On 2026-10-23 the v1.x todos became briefs 23–28, stats and the CIP photo
+became 29 and 30, and the Atrium link was dropped (the apps stay independent).
+Waves 15–22 run one at a time: each touches the Library page or the add flow.
