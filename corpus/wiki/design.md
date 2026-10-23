@@ -1,6 +1,6 @@
 ---
 summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-10-15
+updated: 2026-10-23
 ---
 
 # Design
@@ -126,7 +126,7 @@ What the mock-ups left open, as the v1 briefs drew it (DESIGN.md has the detail)
   typographic cover (title and author on one of eight tints picked from the
   title), not a grey box.
 - The book page, the filter chip row, empty and loading states, and the
-  account menu. The Owned / Wishlist tabs wait for the v1.x wishlist brief.
+  account menu. The Owned / Wishlist tabs shipped with brief 23 (2026-10-23).
 - `DESIGN.md`, written from the built UI by brief 13 (below).
 
 ## Finish review (2026-10-15, brief 13)

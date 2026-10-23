@@ -63,3 +63,19 @@ navigation ([decisions.md](../../wiki/decisions.md), "Two places only").
   under Owned with that shelf and today's date, and the Wishlist count dropped by one.
 - Export from the Wishlist tab exports the wishlist rows only.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built as specified, no migration. Library has Owned / Wishlist tabs with counts
+(`LibraryPrefs.collection`, saved per layout); the wishlist hides shelf, condition
+and both acquired columns; export follows the open tab. The scan sheet offers
+"Add to wishlist" on a found book (`collection: "wishlist"`, no shelf) and a new
+`wishlisted` step ("On your wishlist", shelf picker, "I bought it"); an owned copy
+still leads when both exist. "I bought it" is one `PATCH` with
+`{ collection: "owned", shelf, acquiredOn: today }`, also on a wishlist book's page
+(`web/src/book/BuyIt.tsx`). Switching tab clears the filters.
+
+Deviation from the file list: `web/src/add/AddBookPage.tsx` (the sheet actions are
+wired there) and `web/src/add/words.ts` (the live-region wording) also changed;
+no other brief owns either. `columns.ts`'s header comment still says the
+wishlist is future work. Not checked in a browser; gates and unit tests only.

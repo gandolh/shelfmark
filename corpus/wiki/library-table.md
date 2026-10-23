@@ -1,6 +1,6 @@
 ---
 summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), remembered column layout, virtual scrolling, row selection, and why filtering does not need the server.
-updated: 2026-10-14
+updated: 2026-10-23
 ---
 
 # Library table
@@ -25,6 +25,18 @@ of the page; everything below applies to whichever is open. Two views of the
 same rows, switched by a Table / Covers control ([design.md](design.md)): **Table**, the default on a laptop, and **Covers**,
 a cover grid that is the default on a phone. Search, filters and sort apply to
 both; export takes the rows either view holds.
+
+The open collection is `LibraryPrefs.collection` (`"owned"` or `"wishlist"`, in
+[prefs.ts](../../web/src/library/prefs.ts)), saved per layout beside the view and
+the column layout; it opens on Owned. The tabs sit under the title with a count
+each. Everything is derived for the open collection (`LibraryView.collection`,
+`counts`, `books`). The wishlist leaves out the columns its books never fill
+(shelf, condition, acquired on, acquired from) even if the column picker has them
+on, and the saved choice is untouched. Switching tab clears the filters (they are
+session-only), so a shelf filter can't hide the other tab's books. Export on the
+Wishlist tab writes the wishlist's rows and the columns it fills. The Filter panel
+and column picker still list the four columns on the wishlist; they just find
+nothing there.
 
 ## Filters per column
 

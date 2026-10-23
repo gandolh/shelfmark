@@ -1,5 +1,5 @@
 ---
-summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out, the wishlist is v1.x), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
+summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out, the wishlist has shipped), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
 updated: 2026-10-23
 ---
 
@@ -48,8 +48,13 @@ Shelfmark keeps all of it except loans.
 | Offline "do I own this?" | Scan in a bookshop with no signal; checks an IndexedDB copy of the ISBN list. The most-cited use of these apps away from home. |
 | Offline scan queue | Scanned ISBNs wait in IndexedDB and are looked up when back online. |
 | CSV import | Goodreads/Libib/spreadsheet. Moves to v1 if the owner already has a list ([open-questions.md](open-questions.md)). |
-| Wishlist | Books wanted, not owned: a second collection inside Library (Owned / Wishlist), and "Add to wishlist" when a scanned book is not owned. "I bought it" moves one onto a shelf. Wanted by the owner (2026-10-14). |
 | Saved views | Named filter + sort + columns, e.g. "Unread", "Unread, living room". |
+
+## Shipped after v1
+
+| Feature | Notes |
+|---|---|
+| Wishlist | Shipped 2026-10-23 (brief 23). Books wanted, not owned: a second collection inside Library (Owned / Wishlist tabs), "Add to wishlist" when a scanned book is not owned, and "I bought it" (on the scan sheet and the book's page) moving the row onto a shelf. Wanted by the owner (2026-10-14). |
 
 ## Later
 

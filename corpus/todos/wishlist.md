@@ -5,7 +5,7 @@ status: promoted
 tags: [v1.x]
 ---
 
-Promoted 2026-10-23 into [brief 23](../briefs/todo/23-wishlist.md).
+Promoted 2026-10-23 into [brief 23](../briefs/done/23-wishlist.md).
 
 # Wishlist
 

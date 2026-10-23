@@ -32,7 +32,7 @@ product calls are in [decisions.md](decisions.md), the look in
    local Ward round trip (06, needs Docker Desktop's WSL integration), the
    exports opened in Excel (11). The container build (14) was checked locally
    on 2026-10-17, poppler-utils included.
-4. After v1 ships, promote the v1.x todos below; the wishlist is first in
+4. After v1 ships, promote the v1.x todos below; the wishlist (done) was first in
    line, since the Library already leaves room for its Owned / Wishlist tabs.
 
 ## Briefs
@@ -61,7 +61,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 20 | [The first read wins](../briefs/done/20-first-read-wins.md) | 12 | done |
 | 21 | [Read until the ISBN, and a sharper camera](../briefs/done/21-read-until-found.md) | 13 | done |
 | 22 | [Base UI for the menus, panels, dialog and switches](../briefs/done/22-base-ui-widgets.md) | 14 | done 2026-10-23 |
-| 23 | [Wishlist](../briefs/todo/23-wishlist.md) | 15 | todo (filed 2026-10-23) |
+| 23 | [Wishlist](../briefs/done/23-wishlist.md) | 15 | done 2026-10-23 |
 | 24 | [Offline "do I own this?"](../briefs/todo/24-offline-owned-check.md) | 16 | todo (filed 2026-10-23) |
 | 25 | [Offline scan queue](../briefs/todo/25-offline-scan-queue.md) | 17 | todo (filed 2026-10-23) |
 | 26 | [Bulk edit from the table](../briefs/todo/26-bulk-edit.md) | 18 | todo (filed 2026-10-23) |

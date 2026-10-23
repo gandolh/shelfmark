@@ -1,6 +1,6 @@
 ---
 summary: The SQLite schema as shipped by brief 02 on 2026-10-14. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs) and the planned lookup cache as their own tables; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
-updated: 2026-10-15
+updated: 2026-10-23
 ---
 
 # Data model
@@ -81,6 +81,9 @@ but doubles the join and the edit UI for a case that hardly happens.
   bulk (then it becomes a table).
 - A wishlist row has `collection = 'wishlist'` and no shelf, condition or
   acquisition; "I bought it" sets `collection = 'owned'` and asks for a shelf.
+  Shipped (brief 23, 2026-10-23) as one `PATCH /api/books/:id` with
+  `{ collection: "owned", shelf, acquiredOn: <today> }`: the same row moves, so
+  no second row and the id keeps its cover and notes.
   The owned-check and "already in your library" only count owned rows. The
   server does not enforce the empty fields; the screens do.
 - Money in minor units (bani) to avoid float sums.

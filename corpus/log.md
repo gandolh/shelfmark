@@ -334,7 +334,7 @@ is in [decisions.md](wiki/decisions.md).
 ## [2026-10-23] todo | Briefs 23–28: the v1.x todos
 
 All six v1.x todos are now briefs, one wave each, in this order:
-[23](briefs/todo/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
+[23](briefs/done/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
 it" (the `collection` column and `wishlisted` lookups already exist);
 [24](briefs/todo/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
 a scan with no signal; [25](briefs/todo/25-offline-scan-queue.md) offline scans wait and
@@ -367,3 +367,10 @@ The owner dropped the Atrium link todo: Shelfmark and Atrium are independent pro
 now, and may be merged once both are mature, when the owner says so. "Physical books only"
 in [decisions.md](wiki/decisions.md) no longer allows a link to an Atrium copy, and
 features.md lists it under Out. No todos are left.
+
+## [2026-10-23] done | Brief 23, the wishlist
+
+Library got Owned / Wishlist tabs, the scan sheet "Add to wishlist" and "I bought it" (scan
+sheet and book page, one PATCH to owned with a shelf and today's `acquiredOn`). No migration.
+[Brief 23](briefs/done/23-wishlist.md) has the outcome; features.md, library-table.md,
+data-model.md and design.md caught up.
