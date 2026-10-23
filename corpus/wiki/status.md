@@ -69,7 +69,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 28 | [CSV import](../briefs/done/28-csv-import.md) | 20 | done 2026-10-23 |
 | 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
 | 30 | [Fill a book from a photo of its CIP block](../briefs/done/30-cip-photo-capture.md) | 22 | done 2026-10-23; fixtures are renders, real photos and a phone walk owed |
-| 31 | [A subtitle field on the by-hand form](../briefs/todo/31-subtitle-on-the-by-hand-form.md) | 23 | todo |
+| 31 | [A subtitle field on the by-hand form](../briefs/done/31-subtitle-on-the-by-hand-form.md) | 23 | done 2026-10-23 |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for

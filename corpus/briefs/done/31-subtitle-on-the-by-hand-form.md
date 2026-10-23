@@ -61,3 +61,22 @@ Facts (checked 2026-10-23):
   field saves the book with no subtitle, and editing it saves the edit.
 - A by-hand book with the field left empty saves `subtitle: null`.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built as specified, inline (no agent), with these choices:
+
+- Subtitle sits between Title and Author, optional, `autoCapitalize="sentences"`.
+  `readForm` trims and collapses spaces; empty is `null`. It joins `FormField`, so the
+  CIP reader's fill rule, its marks and its "Filled the …" line cover it.
+  `CipReader.tsx`'s field names gained it (one word, outside the OWN list).
+- `initialFromDetails` fills it from a draft, `hiddenDetails` no longer keeps it, and
+  `bodyFromForm` saves it from the field, so "Edit details" can change or clear it.
+- **One addition:** on fixture `2-popa` the OCR lost the " / " before "Mircea Popa",
+  which ran the author's name onto the subtitle. `readCipBlock` now takes an author's
+  name off the end of the title part when the description has no " / "
+  (`withoutAuthorTail`). The five fixtures' expected fields now include the subtitle
+  (three have one).
+- Checked: typecheck, lint, build, 840 tests; and in the browser at 390 px, reading
+  `2-popa.jpg` filled and marked Subtitle "exerciții de memorie culturală", and the
+  saved book had it.

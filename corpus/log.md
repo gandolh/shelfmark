@@ -523,6 +523,18 @@ the owner chose that over pinning it under the top bar, or in place of the phone
 bottom nav, and the todo [bulk-bar-stays-in-view](todos/bulk-bar-stays-in-view.md) is
 dropped. The subtitle gets an optional field under Title on the by-hand form, filled
 from the CIP block and marked to check, over saving it unseen or leaving it to Edit:
-[brief 31](briefs/todo/31-subtitle-on-the-by-hand-form.md). Writing it found that a
+[brief 31](briefs/done/31-subtitle-on-the-by-hand-form.md). Writing it found that a
 lookup draft's subtitle is today saved as a hidden detail from "Edit details", so 31
 moves it into the field as well.
+
+## [2026-10-23] done | Brief 31: a subtitle field on the by-hand form
+
+An optional Subtitle field under Title on the by-hand form. "Read the CIP block" fills and
+marks it like the others, and "Edit details" on a found book shows the draft's subtitle in it
+instead of saving it unseen. On the way, the reader takes an author's name off the end of the
+title part when the OCR lost the " / " before it (fixture `2-popa`). Checked with typecheck,
+lint, build, 840 tests and a browser read of `2-popa.jpg` at 390 px; the saved book had the
+subtitle. [Brief 31](briefs/done/31-subtitle-on-the-by-hand-form.md). Built inline.
+
+The timing test passed in the full run on an idle machine (load 0.64): its earlier failures
+came from the trips agent building alongside, so it stays as it is.

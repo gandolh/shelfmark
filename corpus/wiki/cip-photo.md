@@ -22,8 +22,11 @@ cut to the box and scaled to at most 2400 px on the long side
 The fields the read found go into the form's empty fields only, or into ones still holding what
 an earlier read put there ([`web/src/add/cip.ts`](../../web/src/add/cip.ts)); a field the owner typed is
 never touched, and a hidden ISBN (from a scan) stays. Filled fields are tinted and ringed in the
-accent with "From the CIP block: check it." until they are edited. Title only, no subtitle: the
-form has no subtitle field. The text Tesseract read stays under a disclosure, editable, with
+accent with "From the CIP block: check it." until they are edited. The subtitle (after " : " in
+the title part) has its own optional field under Title since brief 31; when the OCR lost the
+" / " before the statement of responsibility, an author's name run onto the end of the title part
+is taken off (`withoutAuthorTail` in [`web/src/ocr/block.ts`](../../web/src/ocr/block.ts)). The
+text Tesseract read stays under a disclosure, editable, with
 "Fill from this text" to read it again after a fix. With no "Descrierea CIP" heading the form
 says so and opens the text to copy.
 

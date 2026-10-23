@@ -5,7 +5,7 @@ status: promoted
 tags: [v1.x]
 ---
 
-Promoted 2026-10-23 into [brief 31](../briefs/todo/31-subtitle-on-the-by-hand-form.md).
+Promoted 2026-10-23 into [brief 31](../briefs/done/31-subtitle-on-the-by-hand-form.md).
 
 # A subtitle field on the by-hand form
 
