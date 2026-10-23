@@ -56,14 +56,18 @@ export class ImageReadError extends Error {
   }
 }
 
-type Drawable = ImageBitmap | HTMLImageElement;
+export type Drawable = ImageBitmap | HTMLImageElement;
 
-/** Decode an image file, upright: `createImageBitmap` applies the photo's EXIF rotation; `<img>` is the fallback (older Safari, HEIC). */
-async function decode(file: Blob): Promise<{ image: Drawable; release: () => void }> {
+/**
+ * Decode an image file, upright: `createImageBitmap` applies the photo's EXIF
+ * rotation; `<img>` is the fallback (older Safari, HEIC). Also read by
+ * ocr/image.ts for a photo of a CIP block.
+ */
+export async function decode(file: Blob): Promise<{ image: Drawable; width: number; height: number; release: () => void }> {
   if (typeof createImageBitmap === "function") {
     try {
       const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-      return { image: bitmap, release: () => bitmap.close() };
+      return { image: bitmap, width: bitmap.width, height: bitmap.height, release: () => bitmap.close() };
     } catch {
       // Fall through to <img>, which decodes more formats on Safari.
     }
@@ -78,7 +82,7 @@ async function decode(file: Blob): Promise<{ image: Drawable; release: () => voi
     URL.revokeObjectURL(url);
     throw new ImageReadError("This file isn't a picture the browser can read.", { cause: error });
   }
-  return { image, release: () => URL.revokeObjectURL(url) };
+  return { image, width: image.naturalWidth, height: image.naturalHeight, release: () => URL.revokeObjectURL(url) };
 }
 
 function canvasOf(size: Size): HTMLCanvasElement {
@@ -101,10 +105,8 @@ export async function resizeImage(
   file: Blob,
   { maxSide = COVER_MAX_SIDE, maxBytes = COVER_MAX_BYTES }: { maxSide?: number; maxBytes?: number } = {},
 ): Promise<ResizedImage> {
-  const { image, release } = await decode(file);
+  const { image, width, height, release } = await decode(file);
   try {
-    const width = image instanceof HTMLImageElement ? image.naturalWidth : image.width;
-    const height = image instanceof HTMLImageElement ? image.naturalHeight : image.height;
     if (width === 0 || height === 0) throw new ImageReadError("This picture is empty.");
 
     let source: CanvasImageSource = image;

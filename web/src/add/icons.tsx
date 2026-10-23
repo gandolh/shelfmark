@@ -75,3 +75,13 @@ export function BarcodeIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** A page with lines of text in a frame's corners: "Read the CIP block". */
+export function TextScanIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2" />
+      <path d="M8 9h8M8 12h8M8 15h5" />
+    </Icon>
+  );
+}

@@ -470,6 +470,14 @@
   }
 }
 
+/* How far along, when it is known: `--value` from 0 to 1, no running bar. */
+.add-progress--value::after {
+  width: calc(var(--value, 0) * 100%);
+  animation: none;
+  opacity: 1;
+  transition: width 0.2s var(--ease-out);
+}
+
 /* --- Actions -------------------------------------------------------------------------- */
 
 /* The way out, under the primary action: centred alone, at the two ends with "Edit details". */
@@ -736,6 +744,12 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Filled from the CIP block (brief 30): tinted and ringed until the owner changes it. */
+.add-input[data-filled] {
+  background: var(--accent-tint-soft);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
 .shell--desktop .add-field--isbn {
   max-width: 280px;
 }
@@ -930,6 +944,130 @@ fieldset:disabled .add-chip {
 .add-cover__pick:has(input:focus-visible) {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+/* --- Read the CIP block (brief 30): the cover row's look, opening into the photo and the read --- */
+
+.add-cip {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 10px 12px;
+  border-radius: var(--radius-menu);
+  outline: 1.5px dashed color-mix(in srgb, var(--muted) 55%, transparent);
+  outline-offset: -1.5px;
+}
+
+.add-cip--open {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  padding: 12px;
+  outline-style: solid;
+  outline-color: var(--divider);
+}
+
+.add-cip__icon {
+  display: flex;
+  flex: none;
+  color: var(--muted);
+}
+
+.add-cip__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  line-height: var(--leading-tight);
+}
+
+.add-cip__text.add-error {
+  flex-direction: row;
+  color: var(--ink);
+}
+
+.add-cip__actions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+.add-cip__pick {
+  cursor: pointer;
+}
+
+.add-cip__pick:has(input:focus-visible) {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* The photo at its own shape, as wide as the row allows; the drag draws the box over it. */
+.add-cip__photo {
+  position: relative;
+  align-self: center;
+  max-width: 100%;
+  touch-action: none; /* a drag draws the box rather than scrolling the sheet */
+  user-select: none;
+  cursor: crosshair;
+}
+
+.add-cip__photo img {
+  display: block;
+  max-width: 100%;
+  max-height: 46vh;
+  border-radius: var(--radius-field);
+}
+
+.add-cip__box {
+  position: absolute;
+  border: 2px solid var(--accent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  box-shadow: 0 0 0 9999px color-mix(in srgb, var(--ink) 35%, transparent);
+  pointer-events: none;
+}
+
+.add-cip__photo:has(.add-cip__box) {
+  overflow: hidden;
+  border-radius: var(--radius-field);
+}
+
+.add-cip__raw {
+  font-size: var(--text-meta);
+}
+
+.add-cip__raw > summary {
+  color: var(--accent);
+  font-weight: var(--weight-semibold);
+  cursor: pointer;
+}
+
+.add-cip__raw[open] > summary {
+  margin-bottom: 8px;
+}
+
+.add-cip__raw > .button {
+  margin-top: 8px;
+}
+
+.add-cip__ocr {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: var(--radius-field);
+  background: var(--field);
+  color: var(--ink);
+  font: inherit;
+  font-size: var(--text-input-phone); /* 16 px: iOS doesn't zoom into it */
+  line-height: 1.4;
+  resize: vertical;
 }
 
 /* --- Phone: 44 px targets and the phone's type sizes ------------------------------------- */

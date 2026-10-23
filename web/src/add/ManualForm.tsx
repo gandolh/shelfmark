@@ -1,5 +1,8 @@
 import { useId, useState, type FormEvent, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
 import { Button } from "../components/Button";
+import type { CipFields } from "../ocr/block";
+import { cipValues, fillFromCip, type CipValues } from "./cip";
+import { CipReader } from "./CipReader";
 import { CoverCapture, type CoverPhoto } from "./CoverCapture";
 import { firstInvalid, readForm, type FormErrors, type FormField, type FormFields, type FormValues } from "./form";
 import { AlertIcon } from "./icons";
@@ -117,6 +120,8 @@ export function ManualForm({
   const [values, setValues] = useState(initial);
   const [errors, setErrors] = useState<FormErrors>({});
   const [photo, setPhoto] = useState<CoverPhoto | null>(null);
+  /** What "Read the CIP block" put in each field; a field stands out while it still holds that. */
+  const [filled, setFilled] = useState<CipValues>({});
 
   const set = <K extends keyof FormValues>(key: K, value: FormValues[K]) => {
     setValues((current) => ({ ...current, [key]: value }));
@@ -137,17 +142,37 @@ export function ManualForm({
     onSubmit(read.fields, photo);
   };
 
-  const text = (key: FormField) => ({
-    name: key,
-    value: values[key],
-    onChange: (event: { target: { value: string } }) => set(key, event.target.value),
-    error: errors[key],
-  });
+  const text = (key: FormField) => {
+    const fromCip = filled[key] !== undefined && filled[key] === values[key];
+    return {
+      name: key,
+      value: values[key],
+      onChange: (event: { target: { value: string } }) => set(key, event.target.value),
+      error: errors[key],
+      ...(fromCip ? { "data-filled": "", hint: "From the CIP block: check it." } : {}),
+    };
+  };
+
+  // The read fills only empty fields (cip.ts); a hidden ISBN came from the scan and stays.
+  const fillFromBlock = (fields: CipFields): FormField[] => {
+    const { isbn, ...rest } = cipValues(fields);
+    const read = showIsbn && isbn !== undefined ? { ...rest, isbn } : rest;
+    const out = fillFromCip(values, read, filled);
+    setValues(out.values);
+    setFilled(out.filled);
+    setErrors((current) => {
+      const kept = { ...current };
+      for (const field of out.changed) delete kept[field];
+      return kept;
+    });
+    return out.changed;
+  };
 
   return (
     <form className="add-form" onSubmit={submit} noValidate aria-busy={saving || undefined}>
       {intro}
       <fieldset className="add-form__fields" disabled={saving}>
+        <CipReader onRead={fillFromBlock} disabled={saving} />
         <TextField
           label="Title"
           {...text("title")}

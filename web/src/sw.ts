@@ -4,6 +4,7 @@ import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute, type 
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { CacheFirst } from "workbox-strategies";
 import { appBase } from "./base";
+import { OCR_CACHE, isOcrPath } from "./ocr/paths";
 import { COVER_CACHE, isApiPath, isCoverPath } from "./pwa/routes";
 
 /*
@@ -50,3 +51,16 @@ registerRoute(
   }),
 );
 // No other route is registered for `/shelfmark-api/`, so the browser goes to the network for it.
+
+// Reading a CIP block (brief 30): Tesseract's worker, core and Romanian data,
+// 4.8 MB a device only needs if it reads one, so not precached. Cache-first
+// from the first read on, so the next works offline; the directories carry a
+// hash of their contents, so a cached file is never stale. The page's own
+// download (ocr/engine.ts) and the Tesseract worker's requests both land here.
+registerRoute(
+  ({ url, request }) => request.method === "GET" && url.origin === self.location.origin && isOcrPath(url.pathname, BASE),
+  new CacheFirst({
+    cacheName: OCR_CACHE.name,
+    plugins: [new ExpirationPlugin({ maxEntries: OCR_CACHE.maxEntries, purgeOnQuotaError: true })],
+  }),
+);

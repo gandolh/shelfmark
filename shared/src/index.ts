@@ -4,3 +4,4 @@ export * from "./isbn.js";
 export * from "./book.js";
 export * from "./lookup.js";
 export * from "./views.js";
+export * as cip from "./cip.js";

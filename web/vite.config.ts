@@ -1,11 +1,102 @@
-import { dirname, resolve } from "node:path";
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { basename, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
-import { defineConfig, loadEnv, type ProxyOptions } from "vite";
+import { defineConfig, loadEnv, type Plugin, type ProxyOptions } from "vite";
 import { VitePWA } from "vite-plugin-pwa";
 
 const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+
+/** The Tesseract builds shipped: LSTM only (the `ron` data below has no legacy model), best first. */
+const OCR_CORES = ["relaxedsimd-lstm", "simd-lstm", "lstm"] as const;
+
+/**
+ * Reading the CIP block (brief 30) runs Tesseract.js in a worker, and all of
+ * it comes from the app's own origin, never jsDelivr (tesseract.js's default):
+ * the worker script, the core's glue and .wasm (one build per device, chosen
+ * by ocr/files.ts), and the Romanian `ron` data (best_int, 1.7 MB gzipped).
+ *
+ * Copied under the base path with their own names, since the core finds its
+ * .wasm beside the worker script and Tesseract asks for `<langPath>/ron.traineddata.gz`.
+ * Each set sits in a directory named by a hash of its contents
+ * (`ocr/tesseract-<hash>/`, `ocr/ron-<hash>/`), so the service worker's
+ * cache-first copy is never stale after an upgrade. Not precached (globIgnores
+ * below): they are fetched on the first press of "Read the CIP block", and
+ * sw.ts keeps them from then on. The app reads the paths and sizes from
+ * `__SHELFMARK_OCR__`.
+ */
+function ocrAssets(): Plugin {
+  const require = createRequire(import.meta.url);
+  const tesseract = require.resolve("tesseract.js/package.json");
+  const core = dirname(createRequire(tesseract).resolve("tesseract.js-core/package.json"));
+  const read = (path: string) => readFileSync(path);
+  const hashOf = (buffers: Buffer[]) => {
+    const hash = createHash("sha256");
+    for (const buffer of buffers) hash.update(buffer);
+    return hash.digest("hex").slice(0, 10);
+  };
+
+  // The worker without its source-map comment (the map isn't shipped), and its licence file beside it.
+  const workerJs = Buffer.from(
+    read(resolve(dirname(tesseract), "dist/worker.min.js")).toString("utf8").replace(/\n\/\/# sourceMappingURL=\S+\s*$/, "\n"),
+  );
+  const engine: [string, Buffer][] = [
+    ["worker.min.js", workerJs],
+    ["worker.min.js.LICENSE.txt", read(resolve(dirname(tesseract), "dist/worker.min.js.LICENSE.txt"))],
+    ...OCR_CORES.flatMap((name) => [
+      [`tesseract-core-${name}.js`, read(resolve(core, `tesseract-core-${name}.js`))] as [string, Buffer],
+      [`tesseract-core-${name}.wasm`, read(resolve(core, `tesseract-core-${name}.wasm`))] as [string, Buffer],
+    ]),
+  ];
+  const ronPath = require.resolve("@tesseract.js-data/ron/4.0.0_best_int/ron.traineddata.gz");
+  const lang: [string, Buffer][] = [[basename(ronPath), read(ronPath)]];
+
+  const engineDir = `ocr/tesseract-${hashOf(engine.map(([, buffer]) => buffer))}/`;
+  const langDir = `ocr/ron-${hashOf(lang.map(([, buffer]) => buffer))}/`;
+  const files = new Map<string, Buffer>([
+    ...engine.map(([name, buffer]) => [engineDir + name, buffer] as const),
+    ...lang.map(([name, buffer]) => [langDir + name, buffer] as const),
+  ]);
+  const size = (dir: string, name: string) => files.get(dir + name)!.length;
+  const manifest = {
+    engine: engineDir,
+    lang: langDir,
+    bytes: {
+      worker: size(engineDir, "worker.min.js"),
+      cores: Object.fromEntries(
+        OCR_CORES.map((name) => [name, { js: size(engineDir, `tesseract-core-${name}.js`), wasm: size(engineDir, `tesseract-core-${name}.wasm`) }]),
+      ),
+      ron: size(langDir, "ron.traineddata.gz"),
+    },
+  };
+  const TYPES: Record<string, string> = { js: "text/javascript", wasm: "application/wasm", gz: "application/gzip", txt: "text/plain" };
+
+  let base = "/";
+  return {
+    name: "shelfmark-ocr-assets",
+    config: () => ({ define: { __SHELFMARK_OCR__: JSON.stringify(manifest) } }),
+    configResolved(config) {
+      base = config.base;
+    },
+    // Dev: answer for them at the same paths the build emits.
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const path = (req.url ?? "").split("?")[0]!;
+        const file = path.startsWith(base) ? files.get(path.slice(base.length)) : undefined;
+        if (!file) return next();
+        res.setHeader("Content-Type", TYPES[path.split(".").at(-1)!] ?? "application/octet-stream");
+        res.setHeader("Content-Length", file.length);
+        res.end(file);
+      });
+    },
+    generateBundle() {
+      for (const [fileName, source] of files) this.emitFile({ type: "asset", fileName, source });
+    },
+  };
+}
 
 /**
  * Local dev on one origin, the way Caddy serves the deploy: `/shelfmark-api` is
@@ -59,6 +150,7 @@ export default defineConfig(({ mode }) => {
     base,
     plugins: [
       react(),
+      ocrAssets(),
       ...(https ? [basicSsl()] : []),
       VitePWA({
         // Our own worker, src/sw.ts: precache plus a covers cache. workbox only
@@ -97,6 +189,10 @@ export default defineConfig(({ mode }) => {
           // workbox's 2 MiB limit) so scanning starts offline. Nothing of the
           // API is cached here.
           globPatterns: ["**/*.{js,css,html,png,svg,ico,wasm}"],
+          // Tesseract's worker, cores and language data (ocrAssets above): about
+          // 4.8 MB a device needs only if it reads a CIP block, so sw.ts caches
+          // them on that first use instead.
+          globIgnores: ["ocr/**"],
         },
       }),
     ],
