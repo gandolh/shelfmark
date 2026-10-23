@@ -5,7 +5,7 @@ status: promoted
 tags: [v1.x]
 ---
 
-Promoted 2026-10-23 into [brief 24](../briefs/todo/24-offline-owned-check.md).
+Promoted 2026-10-23 into [brief 24](../briefs/done/24-offline-owned-check.md).
 
 # Offline "do I own this?"
 

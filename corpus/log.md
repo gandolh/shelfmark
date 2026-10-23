@@ -336,7 +336,7 @@ is in [decisions.md](wiki/decisions.md).
 All six v1.x todos are now briefs, one wave each, in this order:
 [23](briefs/done/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
 it" (the `collection` column and `wishlisted` lookups already exist);
-[24](briefs/todo/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
+[24](briefs/done/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
 a scan with no signal; [25](briefs/todo/25-offline-scan-queue.md) offline scans wait and
 are looked up one at a time when back online, through the server's queues;
 [26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
@@ -374,3 +374,12 @@ Library got Owned / Wishlist tabs, the scan sheet "Add to wishlist" and "I bough
 sheet and book page, one PATCH to owned with a shelf and today's `acquiredOn`). No migration.
 [Brief 23](briefs/done/23-wishlist.md) has the outcome; features.md, library-table.md,
 data-model.md and design.md caught up.
+
+## [2026-10-23] done | Brief 24, offline "do I own this?"
+
+The page keeps `{ isbn13, title, shelf, collection }` for every book in IndexedDB, rewritten
+whole whenever the library list loads or changes, and a scan whose lookup gets no answer
+(a `network` error) is answered from it: already on a shelf, on the wishlist, or not in the
+library, as of the copy's date, said plainly to be the offline answer. Sign out clears it.
+The service worker and the server are untouched. [Brief 24](briefs/done/24-offline-owned-check.md)
+has the outcome; features.md and scanning.md caught up.

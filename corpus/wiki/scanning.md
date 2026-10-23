@@ -1,6 +1,6 @@
 ---
 summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (the stream's size, iPhone's lens switching, what Chrome on Android lets a page set) and what we ask for since brief 21 (1080p, continuous focus, a 1×/2× zoom chip, no lens picker), the `?camera` readout, scanning on a press (read until a code is read, *Stop reading*, a minute's limit, a sticker's 1 s wait, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-updated: 2026-10-21
+updated: 2026-10-23
 ---
 
 # Scanning
@@ -140,6 +140,23 @@ scanned ISBN already in the library shows "Already in your library" with
   before a camera lookup. The owner then chose the press: no read or call
   happens without one. Of those briefs, the memo and one lookup per ISBN remain; brief 20
   dropped the two agreeing reads.
+
+## Offline
+
+The app shell and the scanner work offline, but the answer to a scan is the server's
+(`POST /api/lookup`), and the service worker keeps every API call network-only. So the page
+keeps its own copy of the library in IndexedDB ([`web/src/offline/`](../../web/src/offline/library.ts)):
+`{ isbn13, title, shelf, collection }` per book with an ISBN, one record rewritten whole
+(with `savedAt`) each time the book list loads or changes, and cleared on sign out.
+
+When a lookup fails with a `network` error (no answer at all; a 4xx or 5xx is the server
+answering and stays a failure), `AddBookPage` reads the copy and the flow enters the
+`offline` step: "Already on Living room · A2", "On your wishlist" or "Not in your library",
+with "This is the offline answer ... as of <date>". It offers no save, only the next scan
+and "Try again online". With no copy (a device that never loaded the library, or after sign
+out) the step is the ordinary failed one, saying the offline check needs one visit online
+first. Only books with an ISBN are in the copy, and a book added on another device appears
+once this one loads the library again.
 
 ## What a code means
 

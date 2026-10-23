@@ -49,3 +49,24 @@ network"). There is no IndexedDB use in `web/src` yet.
 - Offline, scan a book you don't own: "Not in your library" with the copy's date.
 - After sign out, the copy is gone.
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built as specified, with these choices:
+
+- `web/src/offline/db.ts` is the one IndexedDB database (`shelfmark-offline`, version 1,
+  store `library`); `library.ts` holds the copy as one record (key `copy`, `{ savedAt,
+  books }`) rewritten whole. Books without an ISBN are left out (a scan can't match them).
+- `books/store.ts` takes optional hooks: `persist` after every successful fetch and every
+  change once a fetch has succeeded, `forget` on `reset`. Sign out also awaits
+  `clearLibraryCopy` in `account/actions.ts`, and a session ending any other way clears it
+  through `reset`.
+- The offline answer is a new flow step, `offline`, entered by `answered-offline` from
+  `looking`. It says "Already on <shelf>", "On your wishlist" or "Not in your library", and
+  "This is the offline answer ... as of <date>". It offers no save: only "next" and "Try
+  again online". With no copy the step is the ordinary `failed` one, worded for it.
+- "Offline" is an `ApiError` with code `network` from the lookup, not `navigator.onLine`:
+  a 4xx or 5xx is the server answering and stays a failure. `AddBookPage.tsx` and
+  `words.ts` were edited outside the OWN list, as cleared by the caller.
+- No `fake-indexeddb`: the pure parts (`copyOf`, `answerFor`, the words, the reducer, the
+  store hooks) are unit-tested; the IndexedDB calls are thin and were not run in a browser.
