@@ -1,3 +1,4 @@
+import type { LookupResponse } from "@shelfmark/shared";
 import { describe, expect, it } from "vitest";
 import { ApiError } from "../api";
 import { flowReducer, initialFlow } from "./flow";
@@ -9,6 +10,8 @@ import {
   lookupFailure,
   metaLine,
   notFoundText,
+  queueItemLine,
+  waitingLine,
   noOfflineCopy,
   notFoundWording,
   offlineNote,
@@ -204,5 +207,21 @@ describe("the offline answer's words", () => {
     const step = { kind: "offline" as const, id: 2, isbn13: "9780547928227", answer: { kind: "absent" as const, savedAt } };
     expect(announcement({ step, notice: null, added: 0 }, true)).toBe(`Not in your library. ${offlineNote(step.answer)}`);
     expect(noOfflineCopy().message).toContain("needs one visit online first");
+  });
+});
+
+describe("the scan queue's words", () => {
+  const found = { owned: [], wishlisted: [], draft: { title: "The Hobbit" } } as unknown as LookupResponse;
+
+  it("counts what is waiting", () => {
+    expect(waitingLine(3)).toBe("Waiting to look up (3)");
+  });
+
+  it("says what became of each scan", () => {
+    expect(queueItemLine({ state: "waiting", lookup: null })).toBe("Waiting for the network");
+    expect(queueItemLine({ state: "answered", lookup: found })).toBe("The Hobbit");
+    expect(queueItemLine({ state: "answered", lookup: { ...found, draft: null } })).toBe("Nothing found");
+    expect(queueItemLine({ state: "answered", lookup: { ...found, wishlisted: [{}] } as unknown as LookupResponse })).toBe("On your wishlist");
+    expect(queueItemLine({ state: "failed", lookup: null })).toBe("The lookup didn't work");
   });
 });

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from
 import { createBook, patchBook, useBooks } from "../books/store";
 import { isApiError } from "../api";
 import { answerFor, loadLibraryCopy } from "../offline/library";
+import { queueScan, startScanQueue, takeScan, useScanQueue } from "../offline/queueStore";
 import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
@@ -34,7 +35,7 @@ import { createLookupMemo } from "./memo";
 import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
-import { announcement, lookupFailure, noOfflineCopy, saveFailure, sessionCount } from "./words";
+import { announcement, lookupFailure, noOfflineCopy, queuedLine, saveFailure, sessionCount, waitingLine } from "./words";
 import "./add.css";
 
 /**
@@ -70,6 +71,7 @@ export function AddBookPage() {
   const [state, dispatch] = useReducer(flowReducer, undefined, startFlow);
   const { mode, step, notice, added } = state;
   const { books } = useBooks();
+  const { items: queue } = useScanQueue();
   const shelves = useMemo(() => shelvesInUse(books), [books]);
   // The shelf used last this session, else the one the library added to last.
   const defaultShelf = state.lastShelf !== undefined ? state.lastShelf : (shelves[0] ?? null);
@@ -95,6 +97,9 @@ export function AddBookPage() {
   const [scannerState, setScannerState] = useState<ScannerState>("asking");
   // What the last press of "Scan the barcode" came to: `gave-up` is a minute with nothing read.
   const [press, setPress] = useState<"idle" | "reading" | "gave-up">("idle");
+
+  // Scans queued offline are looked up (one at a time) whenever the app is online.
+  useEffect(() => startScanQueue(lookupIsbn), []);
 
   useEffect(() => {
     session.mode = mode;
@@ -175,10 +180,14 @@ export function AddBookPage() {
     if (answerId !== null && !desktop) result.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [answerId, desktop]);
 
+  // The sheet is a queued scan's: saving or discarding it takes the scan out of the queue.
+  const fromQueue = state.queued;
+
   const save = async (body: BookCreate, cover: CoverPlan, photo: CoverPhoto | null) => {
     // The button waits from the next render; a double tap before then stops here.
     if (saving.current) return;
     saving.current = true;
+    const scan = fromQueue;
     dispatch({ type: "save" });
     let book: Book;
     try {
@@ -189,6 +198,7 @@ export function AddBookPage() {
     } finally {
       saving.current = false;
     }
+    if (scan !== null) takeScan(scan);
     // Its ISBN is in the library now: the next lookup of it says so.
     if (book.isbn13 !== null) memo.forget(book.isbn13);
     dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf }, outcome: body.collection === "wishlist" ? "wishlist" : undefined });
@@ -206,6 +216,7 @@ export function AddBookPage() {
   const buy = async (bookId: number, shelf: string | null) => {
     if (saving.current) return;
     saving.current = true;
+    const scan = fromQueue;
     dispatch({ type: "save" });
     let book: Book;
     try {
@@ -216,6 +227,7 @@ export function AddBookPage() {
     } finally {
       saving.current = false;
     }
+    if (scan !== null) takeScan(scan);
     if (book.isbn13 !== null) memo.forget(book.isbn13);
     dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf }, outcome: "bought" });
     isbnField.current?.reset();
@@ -228,6 +240,7 @@ export function AddBookPage() {
     buy: (bookId, shelf) => void buy(bookId, shelf),
     saveForm: (fields, base, photo) => void save(bodyFromForm(fields, base), base.cover, photo),
     discard: () => {
+      if (fromQueue !== null && !isSaving(step)) takeScan(fromQueue);
       dispatch({ type: "discard" });
       isbnField.current?.reset();
     },
@@ -238,6 +251,14 @@ export function AddBookPage() {
     typeIsbn: () => dispatch({ type: "type-isbn" }),
     byHand: () => dispatch({ type: "by-hand" }),
     retry: () => dispatch({ type: "retry" }),
+    lookLater: (isbn13, shelf) => void queueScan(isbn13, shelf).then((outcome) => dispatch({ type: "queued", isbn13, outcome })),
+    openQueued: (id) => {
+      const item = queue.find((queued) => queued.id === id);
+      if (item === undefined) return;
+      // It stays queued until the sheet saves it or the owner discards it.
+      dispatch({ type: "open-queued", id, isbn13: item.isbn13, lookup: item.lookup, shelf: item.shelf });
+    },
+    removeQueued: takeScan,
     submitIsbn: (isbn13) => dispatch({ type: "submit-isbn", isbn13, known: memo.get(isbn13) }),
   };
 
@@ -252,7 +273,20 @@ export function AddBookPage() {
   };
 
   const switcher = <ModeSwitch overCamera={!desktop && mode === "scan"} disabled={isSaving(step)} />;
-  const status = added > 0 || notice !== null ? <SessionStatus added={added} notice={notice} /> : null;
+  const sessionLine = added > 0 || notice !== null ? <SessionStatus added={added} notice={notice} /> : null;
+  const waiting =
+    queue.length > 0 && step.kind === "ready" ? (
+      <button type="button" className="add-waiting" onClick={() => dispatch({ type: "show-queue" })}>
+        {waitingLine(queue.length)}
+      </button>
+    ) : null;
+  const status =
+    sessionLine === null && waiting === null ? null : (
+      <>
+        {sessionLine}
+        {waiting}
+      </>
+    );
   const sheet = (floating: boolean, takeFocus: boolean) =>
     step.kind === "ready" ? null : (
       <ResultSheet
@@ -263,6 +297,7 @@ export function AddBookPage() {
         shelves={shelves}
         defaultShelf={defaultShelf}
         books={books}
+        queue={queue}
         on={on}
       />
     );
@@ -388,12 +423,14 @@ function SessionStatus({ added, notice }: { added: number; notice: Notice | null
     text = (
       <>
         <CheckIcon size={14} />
-        <span className="add-session__title">{savedLine(notice.title, notice.outcome)}</span>
-        <span className="add-session__count">· {count}</span>
+        <span className="add-sessionLine_title">{savedLine(notice.title, notice.outcome)}</span>
+        <span className="add-sessionLine_count">· {count}</span>
       </>
     );
+  } else if (notice?.kind === "queued") {
+    text = <span className="add-sessionLine_title">{queuedLine(notice)}</span>;
   } else if (notice?.kind === "cover-failed") {
-    text = <span className="add-session__title">“{notice.title}” is saved; its cover didn't download.</span>;
+    text = <span className="add-sessionLine_title">“{notice.title}” is saved; its cover didn't download.</span>;
   }
   return (
     <span className="add-session" data-shown={text !== "" || undefined}>

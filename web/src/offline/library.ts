@@ -1,5 +1,5 @@
 import type { Book, Collection } from "@shelfmark/shared";
-import { inStore, STORES } from "./db";
+import { inOrder, inStore, STORES } from "./db";
 
 /**
  * The device's copy of the library, for "do I own this?" with no signal:
@@ -51,15 +51,6 @@ export function answerFor(copy: LibraryCopy, isbn13: string): OfflineAnswer {
 }
 
 const KEY = "copy";
-
-// Writes and clears run one after another, so a clear (sign out) is never
-// overtaken by a write that was started before it.
-let queue: Promise<unknown> = Promise.resolve();
-function inOrder<T>(task: () => Promise<T>): Promise<T> {
-  const run = queue.then(task, task);
-  queue = run.catch(() => undefined);
-  return run;
-}
 
 /** Replace the copy with `books`. Resolves `false` when the device wouldn't store it; never rejects. */
 export function saveLibraryCopy(books: readonly Book[]): Promise<boolean> {

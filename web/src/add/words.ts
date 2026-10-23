@@ -2,7 +2,8 @@ import { clean, type LookupResponse, type LookupSource, type ParseIsbnResult } f
 import { isApiError } from "../api";
 import { authorLine } from "../components/cover";
 import type { OfflineAnswer } from "../offline/library";
-import type { FlowState } from "./flow";
+import type { QueueItem } from "../offline/queueStore";
+import type { FlowState, Notice } from "./flow";
 
 /**
  * Everything Add a book says that depends on data: what is wrong with an
@@ -200,6 +201,44 @@ export function noOfflineCopy(): Failure {
   };
 }
 
+// --- The scan queue ---------------------------------------------------------------
+
+/** The line on Add a book that opens the list. */
+export function waitingLine(count: number): string {
+  return `Waiting to look up (${count})`;
+}
+
+/** What a queued scan is doing, for its row in the list. */
+export function queueItemLine(item: Pick<QueueItem, "state" | "lookup">): string {
+  switch (item.state) {
+    case "waiting":
+      return "Waiting for the network";
+    case "looking":
+      return "Looking it up…";
+    case "failed":
+      return "The lookup didn't work";
+    case "answered": {
+      const { lookup } = item;
+      if (lookup === null) return "Looked up";
+      if (lookup.owned.length > 0) return "Already in your library";
+      if (lookup.wishlisted.length > 0) return "On your wishlist";
+      return lookup.draft?.title ? lookup.draft.title : "Nothing found";
+    }
+  }
+}
+
+/** What the top of the page says after "Look it up later". */
+export function queuedLine(notice: Extract<Notice, { kind: "queued" }>): string {
+  switch (notice.outcome) {
+    case "queued":
+      return `${notice.isbn13} will be looked up when you're online`;
+    case "already":
+      return `${notice.isbn13} is already waiting to be looked up`;
+    case "failed":
+      return `Couldn't keep ${notice.isbn13} on this device`;
+  }
+}
+
 /** "23 Oct 2026", in the device's time zone. */
 export function asOf(iso: string): string {
   return DAY.format(new Date(iso));
@@ -248,6 +287,7 @@ export function announcement(state: Pick<FlowState, "step" | "notice" | "added">
   if (notice !== null && notice.id > step.id) {
     if (notice.kind === "saved" && notice.outcome === "wishlist") return `Added ${notice.title} to your wishlist.`;
     if (notice.kind === "saved" && notice.outcome === "bought") return `Moved ${notice.title} to your shelf.`;
+    if (notice.kind === "queued") return `${queuedLine(notice)}.`;
     return notice.kind === "saved"
       ? `Saved ${notice.title}. ${sessionCount(added)}.`
       : `${notice.title} is saved, but its cover didn't download.`;
@@ -266,6 +306,8 @@ export function announcement(state: Pick<FlowState, "step" | "notice" | "added">
       return step.reason === "not-found" && step.lookup ? notFoundText(step.lookup.isbn13, step.lookup.tried) : "";
     case "failed":
       return step.failure.message;
+    case "queue":
+      return "Waiting to look up.";
     case "offline":
       return `${offlineStatus(step.answer)}${step.answer.kind === "absent" ? "" : `: ${step.answer.copies[0]?.title ?? step.isbn13}`}. ${offlineNote(step.answer)}`;
     default:

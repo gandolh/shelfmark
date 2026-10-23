@@ -107,6 +107,51 @@
   font-size: inherit;
 }
 
+/* "Waiting to look up (N)": opens the list of scans queued offline. */
+.add-waiting {
+  padding: 5px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--text-small);
+  line-height: var(--leading-tight);
+  cursor: pointer;
+}
+
+.add-top .add-waiting {
+  background: color-mix(in srgb, var(--ground) 92%, transparent);
+}
+
+.page__caption .add-waiting {
+  margin-left: 8px;
+}
+
+/* The queued scans: one row each, the ISBN and what became of it, then its buttons. */
+.add-queue {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.add-queue__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.add-queue__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
 /* --- The camera stage ---------------------------------------------------------------- */
 
 .add-stage {

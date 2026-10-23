@@ -3,6 +3,7 @@ import { apiUrl } from "../api";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
 import { clearLibraryCopy } from "../offline/library";
+import { clearScanQueue } from "../offline/queueStore";
 import { COVER_CACHE } from "../pwa/routes";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
@@ -114,6 +115,8 @@ export async function signOut(): Promise<void> {
   }
   // The device's offline copy of the library goes too (it never rejects).
   await clearLibraryCopy();
+  // So do the scans waiting to be looked up (it never rejects).
+  await clearScanQueue();
   window.location.replace(pathFor(LOGIN));
 }
 

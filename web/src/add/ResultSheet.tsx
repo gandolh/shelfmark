@@ -4,6 +4,7 @@ import { Button, ButtonLink } from "../components/Button";
 import { CoverImage, type CoverBook } from "../components/CoverImage";
 import { CheckIcon } from "../components/icons";
 import { Sheet } from "../components/Sheet";
+import type { QueueItem } from "../offline/queueStore";
 import { bookRoute } from "../router";
 import { CoverCapture, type CoverPhoto } from "./CoverCapture";
 import { newestCopy, wishlistedCopy, type FormBase, type FormReason, type Mode, type Proposal, type Step } from "./flow";
@@ -13,7 +14,7 @@ import { IsbnField } from "./IsbnField";
 import { FailureLine, ManualForm } from "./ManualForm";
 import { ShelfPicker } from "./ShelfPicker";
 import { StatusPicker } from "./StatusPicker";
-import { bylineLine, draftSources, metaLine, notFoundWording, offlineNote, offlineStatus, ownedLine, sourceLine } from "./words";
+import { bylineLine, draftSources, metaLine, notFoundWording, offlineNote, offlineStatus, ownedLine, queueItemLine, sourceLine, waitingLine } from "./words";
 
 /** What the sheet's buttons ask the page to do. */
 export interface SheetActions {
@@ -29,6 +30,12 @@ export interface SheetActions {
   typeIsbn: () => void;
   byHand: () => void;
   retry: () => void;
+  /** "Look it up later": queue an offline scan's ISBN with the shelf picked, if any. */
+  lookLater: (isbn13: string, shelf: string | null) => void;
+  /** A queued scan's answer as the ordinary sheet (or the by-hand form when the lookup was refused). */
+  openQueued: (id: number) => void;
+  /** Drop a queued scan. */
+  removeQueued: (id: number) => void;
   submitIsbn: (isbn13: string) => void;
 }
 
@@ -44,6 +51,8 @@ export interface ResultSheetProps {
   defaultShelf: string | null;
   /** The library, for an already-owned book's details and cover. */
   books: readonly Book[];
+  /** The scans waiting to be looked up (offline/queueStore.ts). */
+  queue: readonly QueueItem[];
   on: SheetActions;
 }
 
@@ -61,7 +70,7 @@ const WORDS: Record<Mode, { save: string; next: string; discard: string }> = {
  * way out ("Not this book", "Discard this scan") sits apart, under it, in
  * plain ink.
  */
-export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultShelf, books, on }: ResultSheetProps) {
+export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultShelf, books, queue, on }: ResultSheetProps) {
   const headingId = useId();
   const words = WORDS[mode];
   const shared = { headingId, takeFocus, words, on };
@@ -87,10 +96,31 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       content = <Typing key={step.id} code={step.code} {...shared} />;
       break;
     case "offline":
-      content = <Offline key={step.id} step={step} {...shared} />;
+      content = (
+        <Offline
+          key={step.id}
+          step={step}
+          later={{ shelves, defaultShelf, waiting: queue.some((item) => item.isbn13 === step.isbn13) }}
+          {...shared}
+        />
+      );
       break;
     case "failed":
-      content = <Failed key={step.id} message={step.failure.message} {...shared} />;
+      content = (
+        <Failed
+          key={step.id}
+          message={step.failure.message}
+          later={
+            step.failure.network
+              ? { isbn13: step.isbn13, shelves, defaultShelf, waiting: queue.some((item) => item.isbn13 === step.isbn13) }
+              : null
+          }
+          {...shared}
+        />
+      );
+      break;
+    case "queue":
+      content = <Queue key={step.id} queue={queue} {...shared} />;
       break;
     case "form":
       content = <FormStep key={step.id} step={step} shelves={shelves} defaultShelf={defaultShelf} mode={mode} {...shared} />;
@@ -193,7 +223,8 @@ function Found({
   on,
 }: Shared & { step: Extract<Step, { kind: "found" }>; shelves: readonly string[]; defaultShelf: string | null }) {
   const heading = useHeadingFocus(takeFocus);
-  const [shelf, setShelf] = useState(defaultShelf);
+  // A queued scan keeps the shelf chosen when it was scanned.
+  const [shelf, setShelf] = useState(step.shelf === undefined ? defaultShelf : step.shelf);
   const [status, setStatus] = useState<Status>("unread");
   const [photo, setPhoto] = useState<CoverPhoto | null>(null);
   const { proposal, save } = step;
@@ -373,7 +404,14 @@ function Wishlisted({
  * reached. It only says where the book is: saving needs the network, so no
  * save action is offered, and "Try again" asks the server once it is back.
  */
-function Offline({ step, headingId, takeFocus, words, on }: Shared & { step: Extract<Step, { kind: "offline" }> }) {
+function Offline({
+  step,
+  later,
+  headingId,
+  takeFocus,
+  words,
+  on,
+}: Shared & { step: Extract<Step, { kind: "offline" }>; later: Omit<LookLaterProps, "isbn13" | "on"> }) {
   const heading = useHeadingFocus(takeFocus);
   const { answer, isbn13 } = step;
   const title = answer.kind === "absent" ? `ISBN ${isbn13}` : (answer.copies[0]?.title ?? `ISBN ${isbn13}`);
@@ -391,6 +429,7 @@ function Offline({ step, headingId, takeFocus, words, on }: Shared & { step: Ext
         <p className="add-meta">{offlineNote(answer)}</p>
         {answer.kind === "absent" && <p className="add-meta">Adding it needs the network.</p>}
       </Head>
+      {answer.kind === "absent" && <LookLater isbn13={isbn13} {...later} on={on} />}
       <Button variant="primary" size="large" block onClick={on.discard}>
         {words.next}
       </Button>
@@ -399,6 +438,29 @@ function Offline({ step, headingId, takeFocus, words, on }: Shared & { step: Ext
           Try again online
         </Button>
       </div>
+    </>
+  );
+}
+
+interface LookLaterProps {
+  isbn13: string;
+  shelves: readonly string[];
+  defaultShelf: string | null;
+  /** The ISBN is already in the queue. */
+  waiting: boolean;
+  on: SheetActions;
+}
+
+/** Offline, a book to add: queue its ISBN (and a shelf) to be looked up once the network is back. */
+function LookLater({ isbn13, shelves, defaultShelf, waiting, on }: LookLaterProps) {
+  const [shelf, setShelf] = useState(defaultShelf);
+  if (waiting) return <p className="add-meta">Already waiting to be looked up.</p>;
+  return (
+    <>
+      <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} />
+      <Button variant="secondary" pill block onClick={() => on.lookLater(isbn13, shelf)}>
+        Look it up later
+      </Button>
     </>
   );
 }
@@ -464,7 +526,14 @@ function Typing({ code, headingId, takeFocus, on }: Shared & { code: string }) {
 
 // --- A failed lookup ----------------------------------------------------------------
 
-function Failed({ message, headingId, takeFocus, words, on }: Shared & { message: string }) {
+function Failed({
+  message,
+  later,
+  headingId,
+  takeFocus,
+  words,
+  on,
+}: Shared & { message: string; later: Omit<LookLaterProps, "on"> | null }) {
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
@@ -479,6 +548,7 @@ function Failed({ message, headingId, takeFocus, words, on }: Shared & { message
           <p className="add-meta">{message}</p>
         </div>
       </div>
+      {later !== null && <LookLater {...later} on={on} />}
       <Button variant="primary" size="large" block onClick={on.retry}>
         Try again
       </Button>
@@ -487,6 +557,56 @@ function Failed({ message, headingId, takeFocus, words, on }: Shared & { message
         <Button variant="quiet" onClick={on.byHand}>
           Add by hand
         </Button>
+      </div>
+    </>
+  );
+}
+
+// --- The queued scans ---------------------------------------------------------------
+
+/** The list behind "Waiting to look up (N)". An answered scan opens as the usual sheet; nothing is saved until it is confirmed there. */
+function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly QueueItem[] }) {
+  const heading = useHeadingFocus(takeFocus);
+  return (
+    <>
+      <div className="add-head__text">
+        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title add-title--small">
+          {waitingLine(queue.length)}
+        </h2>
+        <p className="add-meta">Looked up one at a time while you're online. Each answer is yours to confirm.</p>
+      </div>
+      {queue.length > 0 && (
+        <ul className="add-queue">
+          {queue.map((item) => (
+            <li key={item.id} className="add-queue__item">
+              <div className="add-queue__text">
+                <span className="add-queue__isbn tabular">{item.isbn13}</span>
+                <span className="add-meta">
+                  {queueItemLine(item)}
+                  {item.shelf !== null && ` · ${item.shelf}`}
+                </span>
+              </div>
+              {item.state === "answered" && (
+                <Button variant="secondary" pill onClick={() => on.openQueued(item.id)}>
+                  Review
+                </Button>
+              )}
+              {item.state === "failed" && (
+                <Button variant="secondary" pill onClick={() => on.openQueued(item.id)}>
+                  Add by hand
+                </Button>
+              )}
+              {(item.state === "waiting" || item.state === "failed") && (
+                <Button variant="quiet" onClick={() => on.removeQueued(item.id)}>
+                  Remove
+                </Button>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="add-actions">
+        <Leave onClick={on.discard}>Close</Leave>
       </div>
     </>
   );

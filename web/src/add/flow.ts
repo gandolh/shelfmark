@@ -81,6 +81,8 @@ export interface SaveState {
  * - `wishlisted`: no copy is owned, but one is on the wishlist: "I bought it"
  *   asks for a shelf and moves that row to Owned (`save` is that call's state).
  * - `found`: a draft (or another copy) to confirm with a shelf and a status.
+ * - `queue`: the scans waiting to be looked up (queued offline); opening one
+ *   leaves this step for the ordinary sheet of its answer.
  * - `form`: the by-hand form.
  */
 export type Step =
@@ -92,7 +94,9 @@ export type Step =
   | { kind: "offline"; id: number; isbn13: string; answer: OfflineAnswer }
   | { kind: "owned"; id: number; lookup: LookupResponse }
   | { kind: "wishlisted"; id: number; lookup: LookupResponse; save: SaveState }
-  | { kind: "found"; id: number; lookup: LookupResponse | null; proposal: Proposal; save: SaveState }
+  /** `shelf`: the shelf chosen when the scan was queued (offline/queue.ts); left out, the page's default. */
+  | { kind: "found"; id: number; lookup: LookupResponse | null; proposal: Proposal; save: SaveState; shelf?: string | null }
+  | { kind: "queue"; id: number }
   | {
       kind: "form";
       id: number;
@@ -109,7 +113,12 @@ export type StepKind = Step["kind"];
 export type Notice =
   /** `outcome`: `wishlist` (added to the wishlist), `bought` (moved from the wishlist to a shelf); left out for a new owned book. */
   | { id: number; kind: "saved"; bookId: number; title: string; outcome?: SavedOutcome }
-  | { id: number; kind: "cover-failed"; bookId: number; title: string };
+  | { id: number; kind: "cover-failed"; bookId: number; title: string }
+  /** An offline scan went (or didn't) onto the queue. */
+  | { id: number; kind: "queued"; isbn13: string; outcome: QueueOutcome };
+
+/** `already`: the ISBN was waiting; `failed`: the device wouldn't keep it. */
+export type QueueOutcome = "queued" | "already" | "failed";
 
 /** How a save differs from a new owned book. */
 export type SavedOutcome = "wishlist" | "bought";
@@ -124,6 +133,13 @@ export interface FlowState {
   /** The shelf of the last book saved here; `undefined` until one is. The next book defaults to it. */
   lastShelf: string | null | undefined;
   notice: Notice | null;
+  /**
+   * The queued scan (offline/queue.ts) the sheet came from, while the sheet is
+   * still that scan's: its answer, "Edit details" or "Add another copy" on it.
+   * Saving or discarding there takes the scan out of the queue; leaving the
+   * sheet any other way keeps it queued.
+   */
+  queued: number | null;
 }
 
 export type FlowEvent =
@@ -136,6 +152,12 @@ export type FlowEvent =
   /** The server couldn't be reached and the device's copy of the library has an answer. */
   | { type: "answered-offline"; id: number; answer: OfflineAnswer }
   | { type: "retry" }
+  /** The page asked the queue to keep an offline scan ("Look it up later"), and this is what came of it. */
+  | { type: "queued"; isbn13: string; outcome: QueueOutcome }
+  /** "Waiting to look up (N)": the list of queued scans. */
+  | { type: "show-queue" }
+  /** A queued scan's answer (`null`: the lookup was refused, so the form opens) as the ordinary sheet, on the shelf it was queued with. */
+  | { type: "open-queued"; id: number; isbn13: string; lookup: LookupResponse | null; shelf: string | null }
   | { type: "type-isbn" }
   | { type: "by-hand" }
   | { type: "edit"; shelf: string | null; status: Status }
@@ -158,6 +180,7 @@ export function initialFlow(mode: Mode, carried?: Pick<FlowState, "added" | "las
     added: carried?.added ?? 0,
     lastShelf: carried?.lastShelf,
     notice: null,
+    queued: null,
   };
 }
 
@@ -329,12 +352,14 @@ function hiddenDetails(details: Partial<Details>): Partial<Details> {
 // --- The machine ----------------------------------------------------------------
 
 /** The step a lookup's answer leads to. Already owned wins over wishlisted, and both win over found. */
-function answered(lookup: LookupResponse, id: number): Step {
+function answered(lookup: LookupResponse, id: number, shelf?: string | null): Step {
+  const chosen: Partial<FormInitial> = shelf === undefined ? {} : { shelf };
   if (lookup.owned.length > 0) return { kind: "owned", id, lookup };
   if (lookup.wishlisted.length > 0) return { kind: "wishlisted", id, lookup, save: IDLE };
   const { draft } = lookup;
   if (draft !== null && draft.title) {
-    return { kind: "found", id, lookup, proposal: proposalFromDraft({ ...draft, title: draft.title }), save: IDLE };
+    const found: Step = { kind: "found", id, lookup, proposal: proposalFromDraft({ ...draft, title: draft.title }), save: IDLE };
+    return shelf === undefined ? found : { ...found, shelf };
   }
   if (draft !== null) {
     const { details, cover } = proposalFromDraft({ ...draft, title: "" });
@@ -343,7 +368,7 @@ function answered(lookup: LookupResponse, id: number): Step {
       id,
       reason: "untitled",
       lookup,
-      initial: initialFromDetails(details),
+      initial: initialFromDetails(details, chosen),
       base: { details: hiddenDetails(details), cover },
       save: IDLE,
     };
@@ -353,13 +378,22 @@ function answered(lookup: LookupResponse, id: number): Step {
     id,
     reason: "not-found",
     lookup,
-    initial: initialFromDetails({ isbn13: lookup.isbn13 }),
+    initial: initialFromDetails({ isbn13: lookup.isbn13 }, chosen),
     base: NO_BASE,
     save: IDLE,
   };
 }
 
 export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
+  const next = reduce(state, event);
+  if (next === state) return state;
+  if (event.type === "open-queued") return { ...next, queued: next.step === state.step ? state.queued : event.id };
+  // Still the same sheet (a save in flight, a failure), or one it leads to on the same scan.
+  const same = next.step.id === state.step.id || event.type === "edit" || event.type === "another-copy";
+  return same || next.queued === null ? next : { ...next, queued: null };
+}
+
+function reduce(state: FlowState, event: FlowEvent): FlowState {
   const { step } = state;
   const id = state.next;
   const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({ ...state, ...extra, step: next, next: id + 1 });
@@ -403,6 +437,32 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
         return go({ kind: "looking", id, isbn13: step.lookup.isbn13 });
       }
       return state;
+
+    case "queued": {
+      const notice: Notice = { id: id + 1, kind: "queued", isbn13: event.isbn13, outcome: event.outcome };
+      const waiting = (step.kind === "offline" || step.kind === "failed") && step.isbn13 === event.isbn13;
+      // Kept (or already kept): the sheet is done and the scanner reads the next book. Not kept: the sheet stays.
+      if (event.outcome === "failed" || !waiting) return { ...state, notice: { ...notice, id }, next: id + 1 };
+      return { ...state, step: restingStep(state.mode, id), notice, next: id + 2 };
+    }
+
+    case "show-queue":
+      if (step.kind !== "ready") return state;
+      return go({ kind: "queue", id });
+
+    case "open-queued": {
+      if (step.kind !== "queue" && step.kind !== "ready") return state;
+      if (event.lookup !== null) return go(answered(event.lookup, id, event.shelf));
+      return go({
+        kind: "form",
+        id,
+        reason: "failed",
+        lookup: null,
+        initial: initialFromDetails({ isbn13: event.isbn13 }, { shelf: event.shelf }),
+        base: NO_BASE,
+        save: IDLE,
+      });
+    }
 
     case "type-isbn":
       if (step.kind !== "other") return state;

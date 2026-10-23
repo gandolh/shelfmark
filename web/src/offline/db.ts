@@ -9,14 +9,15 @@
  */
 
 export const DB_NAME = "shelfmark-offline";
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 
-/** Version 1: the library copy. Add a store per version below. */
-export const STORES = { library: "library" } as const;
+/** Version 1: the library copy. Version 2: the scan queue. Add a store per version below. */
+export const STORES = { library: "library", queue: "queue" } as const;
 
 function upgrade(db: IDBDatabase, oldVersion: number): void {
   if (oldVersion < 1) db.createObjectStore(STORES.library);
-  // if (oldVersion < 2) db.createObjectStore("queue", { keyPath: "id", autoIncrement: true });
+  if (oldVersion < 2) db.createObjectStore(STORES.queue, { keyPath: "id", autoIncrement: true });
+  // if (oldVersion < 3) db.createObjectStore("...");
 }
 
 export function openOfflineDb(factory: IDBFactory | undefined = globalThis.indexedDB): Promise<IDBDatabase> {
@@ -53,4 +54,15 @@ export async function inStore<T>(
   } finally {
     db.close();
   }
+}
+
+// Writes and clears of every store run one after another, so a clear (sign
+// out) is never overtaken by a write that was started before it.
+let chain: Promise<unknown> = Promise.resolve();
+
+/** Run `task` after every task given here before it has settled. Never leaves the chain rejected. */
+export function inOrder<T>(task: () => Promise<T>): Promise<T> {
+  const run = chain.then(task, task);
+  chain = run.catch(() => undefined);
+  return run;
 }

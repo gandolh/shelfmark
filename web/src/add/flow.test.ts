@@ -603,3 +603,126 @@ describe("proposals", () => {
     expect(copyProposal(lookup({ ...two, draft: null }), [])).toBeNull();
   });
 });
+
+describe("the scan queue", () => {
+  const absent: OfflineAnswer = { kind: "absent", savedAt: "2026-10-22T10:00:00.000Z" };
+
+  function offlineAbsent(): FlowState {
+    const looking = run("scan", scanIsbn(HOBBIT));
+    return flowReducer(looking, { type: "answered-offline", id: expectStep(looking, "looking").id, answer: absent });
+  }
+
+  it("queues from the offline answer: the scanner is back and a notice says so, newer than the step", () => {
+    const state = flowReducer(offlineAbsent(), { type: "queued", isbn13: HOBBIT, outcome: "queued" });
+    expect(state.step.kind).toBe("ready");
+    expect(state.notice).toMatchObject({ kind: "queued", isbn13: HOBBIT, outcome: "queued" });
+    expect(state.notice!.id).toBeGreaterThan(state.step.id);
+  });
+
+  it("queues from a network failure too, but not from one the server gave", () => {
+    const looking = run("scan", scanIsbn(HOBBIT));
+    const id = expectStep(looking, "looking").id;
+    const offline = flowReducer(looking, { type: "lookup-failed", id, failure: { message: "x", network: true } });
+    expect(flowReducer(offline, { type: "queued", isbn13: HOBBIT, outcome: "queued" }).step.kind).toBe("ready");
+    // Another ISBN's answer leaves the sheet alone.
+    expect(flowReducer(offline, { type: "queued", isbn13: ISIDOR, outcome: "queued" }).step.kind).toBe("failed");
+  });
+
+  it("says a second scan is already waiting, and keeps the sheet when the device wouldn't store it", () => {
+    const already = flowReducer(offlineAbsent(), { type: "queued", isbn13: HOBBIT, outcome: "already" });
+    expect(already.notice).toMatchObject({ outcome: "already" });
+    const failed = flowReducer(offlineAbsent(), { type: "queued", isbn13: HOBBIT, outcome: "failed" });
+    expect(failed.step.kind).toBe("offline");
+    expect(failed.notice).toMatchObject({ outcome: "failed" });
+  });
+
+  it("opens only from the ready scanner, and closes with discard", () => {
+    const ready = run("scan");
+    const queue = flowReducer(ready, { type: "show-queue" });
+    expect(queue.step.kind).toBe("queue");
+    expect(scannerPaused(queue)).toBe(true);
+    expect(flowReducer(queue, { type: "discard" }).step.kind).toBe("ready");
+    expect(flowReducer(offlineAbsent(), { type: "show-queue" }).step.kind).toBe("offline");
+  });
+
+  it("opens a found answer as the usual sheet, on the shelf it was queued with", () => {
+    const queue = flowReducer(run("scan"), { type: "show-queue" });
+    const state = flowReducer(queue, { type: "open-queued", id: 7, isbn13: HOBBIT, lookup: lookup(), shelf: "Study" });
+    const found = expectStep(state, "found");
+    expect(found.shelf).toBe("Study");
+    expect(found.proposal.details.title).toBe("The Hobbit");
+    expect(found.save.saving).toBe(false);
+    // Nothing is saved until the owner confirms: opening alone moves no count.
+    expect(state.added).toBe(0);
+  });
+
+  it("opens a book no source knew as the by-hand form with the ISBN filled", () => {
+    const queue = flowReducer(run("scan"), { type: "show-queue" });
+    const state = flowReducer(queue, { type: "open-queued", id: 7, isbn13: ISIDOR, lookup: NOT_FOUND, shelf: null });
+    const form = expectStep(state, "form");
+    expect(form.reason).toBe("not-found");
+    expect(form.initial).toMatchObject({ isbn: ISIDOR, shelf: null });
+  });
+
+  it("opens a refused lookup as the by-hand form with the ISBN filled", () => {
+    const queue = flowReducer(run("scan"), { type: "show-queue" });
+    const form = expectStep(flowReducer(queue, { type: "open-queued", id: 7, isbn13: ISIDOR, lookup: null, shelf: "Study" }), "form");
+    expect(form.reason).toBe("failed");
+    expect(form.initial).toMatchObject({ isbn: ISIDOR, shelf: "Study" });
+  });
+
+  it("opens an ISBN that is owned by now as the owned sheet", () => {
+    const owned = lookup({ owned: [{ id: 1, shelf: null, createdAt: "2026-10-01T00:00:00.000Z" } as LookupResponse["owned"][number]] });
+    const queue = flowReducer(run("scan"), { type: "show-queue" });
+    expect(flowReducer(queue, { type: "open-queued", id: 7, isbn13: HOBBIT, lookup: owned, shelf: null }).step.kind).toBe("owned");
+  });
+});
+
+describe("a sheet that came from the queue", () => {
+  function opened(): FlowState {
+    const queue = flowReducer(run("scan"), { type: "show-queue" });
+    return flowReducer(queue, { type: "open-queued", id: 7, isbn13: HOBBIT, lookup: lookup(), shelf: null });
+  }
+
+  it("remembers the scan through a save in flight and through Edit details", () => {
+    const state = opened();
+    expect(state.queued).toBe(7);
+    expect(flowReducer(state, { type: "save" }).queued).toBe(7);
+    expect(flowReducer(flowReducer(state, { type: "edit", shelf: null, status: "unread" }), { type: "save" }).queued).toBe(7);
+  });
+
+  it("lets the page see the scan at the save, which then clears it", () => {
+    const saving = flowReducer(opened(), { type: "save" });
+    expect(saving.queued).toBe(7);
+    const saved = flowReducer(saving, { type: "saved", book: { id: 1, title: "The Hobbit", shelf: null } });
+    expect(saved.queued).toBeNull();
+  });
+
+  it("is still there when the owner discards, for the page to take the scan out", () => {
+    const state = opened();
+    expect(state.queued).toBe(7);
+    expect(flowReducer(state, { type: "discard" }).queued).toBeNull();
+  });
+
+  it("is forgotten by every other way out, so the scan stays queued", () => {
+    expect(flowReducer(opened(), { type: "mode", mode: "isbn" }).queued).toBeNull();
+    const typed = flowReducer(flowReducer(run("isbn"), { type: "show-queue" }), {
+      type: "open-queued",
+      id: 7,
+      isbn13: HOBBIT,
+      lookup: lookup(),
+      shelf: null,
+    });
+    expect(typed.queued).toBe(7);
+    expect(flowReducer(typed, { type: "submit-isbn", isbn13: ISIDOR }).queued).toBeNull();
+    const missed = flowReducer(flowReducer(run("scan"), { type: "show-queue" }), {
+      type: "open-queued",
+      id: 8,
+      isbn13: ISIDOR,
+      lookup: NOT_FOUND,
+      shelf: null,
+    });
+    expect(missed.queued).toBe(8);
+    expect(flowReducer(missed, { type: "retry" }).queued).toBeNull();
+  });
+});

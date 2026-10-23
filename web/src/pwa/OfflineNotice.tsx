@@ -1,4 +1,6 @@
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import { lookupIsbn } from "../add/api";
+import { startScanQueue } from "../offline/queueStore";
 import "./pwa.css";
 
 function subscribe(notify: () => void): () => void {
@@ -12,6 +14,8 @@ function subscribe(notify: () => void): () => void {
 
 /** A quiet line under the top bar while the network is gone. The shell and covers still work. */
 export function OfflineNotice() {
+  // App start: scans queued offline last time are looked up now (and on every `online`), whichever page is open.
+  useEffect(() => startScanQueue(lookupIsbn), []);
   const online = useSyncExternalStore(subscribe, () => navigator.onLine, () => true);
   if (online) return null;
   return (
