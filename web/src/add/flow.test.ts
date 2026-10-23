@@ -18,6 +18,7 @@ import {
   type Mode,
   type Step,
 } from "./flow";
+import type { OfflineAnswer } from "../offline/library";
 import { readForm } from "./form";
 
 const HOBBIT = "9780547928227";
@@ -375,6 +376,37 @@ describe("lookup failures", () => {
   it("looks a miss up again when a source errored", () => {
     const state = flowReducer(scanAndAnswer(NOT_FOUND), { type: "retry" });
     expect(expectStep(state, "looking").isbn13).toBe(ISIDOR);
+  });
+});
+
+describe("the offline answer", () => {
+  const answer: OfflineAnswer = {
+    kind: "owned",
+    copies: [{ isbn13: HOBBIT, title: "The Hobbit", shelf: "Living room · A2", collection: "owned" }],
+    savedAt: "2026-10-22T10:00:00.000Z",
+  };
+
+  it("replaces a lookup that couldn't reach the server, and a late one is dropped", () => {
+    const looking = run("scan", scanIsbn(HOBBIT));
+    const id = expectStep(looking, "looking").id;
+    const done = flowReducer(looking, { type: "answered-offline", id, answer });
+    expect(expectStep(done, "offline")).toMatchObject({ isbn13: HOBBIT, answer });
+    expect(currentIsbn(done.step)).toBe(HOBBIT);
+    expect(flowReducer(done, { type: "answered-offline", id, answer })).toBe(done);
+    expect(flowReducer(looking, { type: "answered-offline", id: id + 9, answer })).toBe(looking);
+  });
+
+  it("looks again on retry, and lets the same ISBN be submitted again", () => {
+    const looking = run("isbn", { type: "submit-isbn", isbn13: HOBBIT });
+    const done = flowReducer(looking, { type: "answered-offline", id: expectStep(looking, "looking").id, answer });
+    expect(expectStep(flowReducer(done, { type: "retry" }), "looking").isbn13).toBe(HOBBIT);
+    expect(expectStep(flowReducer(done, { type: "submit-isbn", isbn13: HOBBIT }), "looking").isbn13).toBe(HOBBIT);
+  });
+
+  it("is left by discard like any result", () => {
+    const looking = run("scan", scanIsbn(HOBBIT));
+    const done = flowReducer(looking, { type: "answered-offline", id: expectStep(looking, "looking").id, answer });
+    expect(flowReducer(done, { type: "discard" }).step.kind).toBe("ready");
   });
 });
 

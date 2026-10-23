@@ -2,6 +2,7 @@ import type { Book, BookCreate, BookPatch } from "@shelfmark/shared";
 import { useEffect, useMemo, useSyncExternalStore } from "react";
 import { ApiError, booksApi, isApiError } from "../api";
 import { authClient } from "../auth/session";
+import { clearLibraryCopy, saveLibraryCopy } from "../offline/library";
 
 /**
  * The books client: `GET /api/books` once per session, the whole list kept in
@@ -37,7 +38,15 @@ type Update = (books: readonly Book[]) => readonly Book[];
 
 const INITIAL: BooksState = { books: [], status: "loading", error: null };
 
-export function createBooksStore(source: BooksSource) {
+/** Hooks for what lives beside the list: the device's offline copy of it. */
+export interface BooksHooks {
+  /** The list as it now stands, once a fetch has succeeded: after the fetch and after every change. */
+  persist?: (books: readonly Book[]) => void;
+  /** The store was reset (signed out). */
+  forget?: () => void;
+}
+
+export function createBooksStore(source: BooksSource, hooks: BooksHooks = {}) {
   let state = INITIAL;
   let loaded = false; // a fetch has succeeded since the last reset
   let started = false;
@@ -57,6 +66,7 @@ export function createBooksStore(source: BooksSource) {
   function apply(update: Update): void {
     if (inFlight) pending.push(update);
     set({ books: update(state.books) });
+    if (loaded) hooks.persist?.(state.books);
   }
 
   function load(): Promise<void> {
@@ -71,6 +81,7 @@ export function createBooksStore(source: BooksSource) {
         const replayed = pending.reduce<readonly Book[]>((list, update) => update(list), books);
         loaded = true;
         set({ books: replayed, status: "ready", error: null });
+        hooks.persist?.(replayed);
       },
       (error: unknown) => {
         if (run !== generation) return;
@@ -148,6 +159,7 @@ export function createBooksStore(source: BooksSource) {
       inFlight = null;
       pending = [];
       set(INITIAL);
+      hooks.forget?.();
     },
   };
 }
@@ -188,7 +200,11 @@ function toApiError(error: unknown): ApiError {
 
 // --- The app's store ------------------------------------------------------------
 
-const store = createBooksStore(booksApi);
+// The device keeps a copy of the list for the offline "do I own this?" (offline/library.ts).
+const store = createBooksStore(booksApi, {
+  persist: (books) => void saveLibraryCopy(books),
+  forget: () => void clearLibraryCopy(),
+});
 
 resetWhenSignedOut(store, authClient());
 

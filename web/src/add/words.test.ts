@@ -9,7 +9,11 @@ import {
   lookupFailure,
   metaLine,
   notFoundText,
+  noOfflineCopy,
   notFoundWording,
+  offlineNote,
+  offlineShelves,
+  offlineStatus,
   ownedLine,
   saveFailure,
   sessionCount,
@@ -172,5 +176,33 @@ describe("announcement", () => {
     expect(announcement(state, false)).toBe("Saved O vară cu Isidor. 1 added this session.");
     state = flowReducer(state, { type: "submit-isbn", isbn13: "9780547928227" });
     expect(announcement(state, true)).toBe("Looking up 9780547928227.");
+  });
+});
+
+describe("the offline answer's words", () => {
+  const savedAt = "2026-10-22T10:00:00.000Z";
+  const copy = (shelf: string | null) => ({ isbn13: "9780547928227", title: "The Hobbit", shelf, collection: "owned" as const });
+
+  it("says where it is, that it is the offline answer, and as of when", () => {
+    const answer = { kind: "owned" as const, copies: [copy("Living room · A2")], savedAt };
+    expect(offlineStatus(answer)).toBe("Already on Living room · A2");
+    expect(offlineNote(answer)).toContain("This is the offline answer");
+    expect(offlineNote(answer)).toContain("22 Oct 2026");
+  });
+
+  it("names every shelf, and the missing one plainly", () => {
+    expect(offlineShelves([copy("Living room · A2"), copy(null)])).toBe("Living room · A2 and no shelf");
+    expect(offlineShelves([copy(null)])).toBe("No shelf");
+  });
+
+  it("says wishlisted and absent", () => {
+    expect(offlineStatus({ kind: "wishlisted", copies: [copy(null)], savedAt })).toBe("On your wishlist");
+    expect(offlineStatus({ kind: "absent", savedAt })).toBe("Not in your library");
+  });
+
+  it("announces the offline step and the no-copy failure asks for one visit online", () => {
+    const step = { kind: "offline" as const, id: 2, isbn13: "9780547928227", answer: { kind: "absent" as const, savedAt } };
+    expect(announcement({ step, notice: null, added: 0 }, true)).toBe(`Not in your library. ${offlineNote(step.answer)}`);
+    expect(noOfflineCopy().message).toContain("needs one visit online first");
   });
 });

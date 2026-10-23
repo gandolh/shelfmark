@@ -370,3 +370,25 @@ describe("resetWhenSignedOut", () => {
     expect(heard).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("the offline copy hooks", () => {
+  it("persists the list after a fetch and after each change, never before the first fetch, and forgets on reset", async () => {
+    const server = fakeSource([makeBook(1, "Solenoid")]);
+    const persist = vi.fn();
+    const forget = vi.fn();
+    const store = createBooksStore(server.source, { persist, forget });
+
+    store.ensureLoaded();
+    expect(persist).not.toHaveBeenCalled();
+    await server.answerList();
+    expect(persist).toHaveBeenCalledTimes(1);
+    expect(titles(persist.mock.calls[0]![0])).toEqual(["Solenoid"]);
+
+    await store.create({ title: "Orbitor", shelf: null, status: "unread" } as BookCreate);
+    expect(persist).toHaveBeenCalledTimes(2);
+    expect(titles(persist.mock.calls[1]![0])).toEqual(["Solenoid", "Orbitor"]);
+
+    store.reset();
+    expect(forget).toHaveBeenCalledTimes(1);
+  });
+});

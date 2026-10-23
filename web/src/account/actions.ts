@@ -2,6 +2,7 @@ import { useSession, useWardResult, type SessionState } from "../../vendor/ward/
 import { apiUrl } from "../api";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
+import { clearLibraryCopy } from "../offline/library";
 import { COVER_CACHE } from "../pwa/routes";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
@@ -111,6 +112,8 @@ export async function signOut(): Promise<void> {
   } catch {
     // Nothing to do: the reload below still ends the session's page.
   }
+  // The device's offline copy of the library goes too (it never rejects).
+  await clearLibraryCopy();
   window.location.replace(pathFor(LOGIN));
 }
 

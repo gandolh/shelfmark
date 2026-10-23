@@ -13,7 +13,7 @@ import { IsbnField } from "./IsbnField";
 import { FailureLine, ManualForm } from "./ManualForm";
 import { ShelfPicker } from "./ShelfPicker";
 import { StatusPicker } from "./StatusPicker";
-import { bylineLine, draftSources, metaLine, notFoundWording, ownedLine, sourceLine } from "./words";
+import { bylineLine, draftSources, metaLine, notFoundWording, offlineNote, offlineStatus, ownedLine, sourceLine } from "./words";
 
 /** What the sheet's buttons ask the page to do. */
 export interface SheetActions {
@@ -85,6 +85,9 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       break;
     case "typing":
       content = <Typing key={step.id} code={step.code} {...shared} />;
+      break;
+    case "offline":
+      content = <Offline key={step.id} step={step} {...shared} />;
       break;
     case "failed":
       content = <Failed key={step.id} message={step.failure.message} {...shared} />;
@@ -358,6 +361,43 @@ function Wishlisted({
         <ButtonLink to={bookRoute(wanted.id)} variant="secondary" pill block>
           Open the book
         </ButtonLink>
+      </div>
+    </>
+  );
+}
+
+// --- The offline answer -----------------------------------------------------------
+
+/**
+ * The device's copy of the library answering when the server can't be
+ * reached. It only says where the book is: saving needs the network, so no
+ * save action is offered, and "Try again" asks the server once it is back.
+ */
+function Offline({ step, headingId, takeFocus, words, on }: Shared & { step: Extract<Step, { kind: "offline" }> }) {
+  const heading = useHeadingFocus(takeFocus);
+  const { answer, isbn13 } = step;
+  const title = answer.kind === "absent" ? `ISBN ${isbn13}` : (answer.copies[0]?.title ?? `ISBN ${isbn13}`);
+  const coverBook: CoverBook = { title, authors: [], language: null };
+  return (
+    <>
+      <Head cover={<CoverImage book={coverBook} width={60} loading="eager" />}>
+        <p className="add-status">
+          {answer.kind === "absent" ? <AlertIcon size={15} /> : <CheckIcon size={15} />}
+          {offlineStatus(answer)}
+        </p>
+        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+          {title}
+        </h2>
+        <p className="add-meta">{offlineNote(answer)}</p>
+        {answer.kind === "absent" && <p className="add-meta">Adding it needs the network.</p>}
+      </Head>
+      <Button variant="primary" size="large" block onClick={on.discard}>
+        {words.next}
+      </Button>
+      <div className="add-actions">
+        <Button variant="quiet" onClick={on.retry}>
+          Try again online
+        </Button>
       </div>
     </>
   );

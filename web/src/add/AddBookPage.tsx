@@ -2,6 +2,8 @@ import { Tabs } from "@base-ui/react/tabs";
 import type { Book, BookCreate } from "@shelfmark/shared";
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { createBook, patchBook, useBooks } from "../books/store";
+import { isApiError } from "../api";
+import { answerFor, loadLibraryCopy } from "../offline/library";
 import { CheckIcon } from "../components/icons";
 import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
@@ -32,7 +34,7 @@ import { createLookupMemo } from "./memo";
 import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
-import { announcement, lookupFailure, saveFailure, sessionCount } from "./words";
+import { announcement, lookupFailure, noOfflineCopy, saveFailure, sessionCount } from "./words";
 import "./add.css";
 
 /**
@@ -112,8 +114,21 @@ export function AddBookPage() {
         memo.keep(lookup);
         dispatch({ type: "looked-up", id: lookingId, lookup });
       },
-      (error: unknown) => {
-        if (!controller.signal.aborted) dispatch({ type: "lookup-failed", id: lookingId, failure: lookupFailure(error) });
+      async (error: unknown) => {
+        if (controller.signal.aborted) return;
+        // No answer from the server (offline): the device's copy of the library answers, if it has one.
+        // A 4xx or a 5xx is the server answering, so it stays a failure.
+        if (isApiError(error, "network")) {
+          const copy = await loadLibraryCopy();
+          if (controller.signal.aborted) return;
+          dispatch(
+            copy === null
+              ? { type: "lookup-failed", id: lookingId, failure: noOfflineCopy() }
+              : { type: "answered-offline", id: lookingId, answer: answerFor(copy, lookingIsbn) },
+          );
+          return;
+        }
+        dispatch({ type: "lookup-failed", id: lookingId, failure: lookupFailure(error) });
       },
     );
     return () => controller.abort();

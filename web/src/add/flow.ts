@@ -8,6 +8,7 @@ import {
   type LookupResponse,
   type Status,
 } from "@shelfmark/shared";
+import type { OfflineAnswer } from "../offline/library";
 import type { ScannedCode } from "../scanner/detector";
 import { EMPTY_FORM, joinAuthors, type FormFields, type FormValues } from "./form";
 import type { Failure } from "./words";
@@ -74,6 +75,8 @@ export interface SaveState {
  * - `looking`: a lookup in flight.
  * - `other`: a barcode that isn't an ISBN.
  * - `failed`: the lookup didn't answer.
+ * - `offline`: the lookup couldn't reach the server, so the device's copy of
+ *   the library answered (offline/library.ts). Nothing on it can be saved.
  * - `owned`: the ISBN is already in the library.
  * - `wishlisted`: no copy is owned, but one is on the wishlist: "I bought it"
  *   asks for a shelf and moves that row to Owned (`save` is that call's state).
@@ -86,6 +89,7 @@ export type Step =
   | { kind: "looking"; id: number; isbn13: string }
   | { kind: "other"; id: number; code: string }
   | { kind: "failed"; id: number; isbn13: string; failure: Failure }
+  | { kind: "offline"; id: number; isbn13: string; answer: OfflineAnswer }
   | { kind: "owned"; id: number; lookup: LookupResponse }
   | { kind: "wishlisted"; id: number; lookup: LookupResponse; save: SaveState }
   | { kind: "found"; id: number; lookup: LookupResponse | null; proposal: Proposal; save: SaveState }
@@ -129,6 +133,8 @@ export type FlowEvent =
   | { type: "submit-isbn"; isbn13: string; known?: LookupResponse }
   | { type: "looked-up"; id: number; lookup: LookupResponse }
   | { type: "lookup-failed"; id: number; failure: Failure }
+  /** The server couldn't be reached and the device's copy of the library has an answer. */
+  | { type: "answered-offline"; id: number; answer: OfflineAnswer }
   | { type: "retry" }
   | { type: "type-isbn" }
   | { type: "by-hand" }
@@ -184,6 +190,8 @@ export function currentIsbn(step: Step): string | null {
     case "owned":
     case "wishlisted":
       return step.lookup.isbn13;
+    case "offline":
+      return step.isbn13;
     case "found":
     case "form":
       return step.lookup?.isbn13 ?? null;
@@ -374,7 +382,7 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       if (saving || state.mode === "manual") return state;
       if (state.mode === "scan" && step.kind !== "typing") return state;
       // A double read from a USB scanner, or Enter pressed again: the answer is already here.
-      if (currentIsbn(step) === event.isbn13 && step.kind !== "failed") return state;
+      if (currentIsbn(step) === event.isbn13 && step.kind !== "failed" && step.kind !== "offline") return state;
       return go(event.known ? answered(event.known, id) : { kind: "looking", id, isbn13: event.isbn13 });
 
     case "looked-up":
@@ -385,8 +393,12 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
       if (step.kind !== "looking" || step.id !== event.id) return state;
       return go({ kind: "failed", id, isbn13: step.isbn13, failure: event.failure });
 
+    case "answered-offline":
+      if (step.kind !== "looking" || step.id !== event.id) return state;
+      return go({ kind: "offline", id, isbn13: step.isbn13, answer: event.answer });
+
     case "retry":
-      if (step.kind === "failed") return go({ kind: "looking", id, isbn13: step.isbn13 });
+      if (step.kind === "failed" || step.kind === "offline") return go({ kind: "looking", id, isbn13: step.isbn13 });
       if (step.kind === "form" && step.reason === "not-found" && step.lookup && !saving) {
         return go({ kind: "looking", id, isbn13: step.lookup.isbn13 });
       }

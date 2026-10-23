@@ -1,6 +1,7 @@
 import { clean, type LookupResponse, type LookupSource, type ParseIsbnResult } from "@shelfmark/shared";
 import { isApiError } from "../api";
 import { authorLine } from "../components/cover";
+import type { OfflineAnswer } from "../offline/library";
 import type { FlowState } from "./flow";
 
 /**
@@ -188,6 +189,46 @@ export function lookupFailure(error: unknown): Failure {
   return { message: "The lookup didn't work. Try again.", network: false };
 }
 
+/**
+ * A lookup that couldn't reach the server, when the device has no copy of the
+ * library to answer from (it was never loaded here, or the owner signed out).
+ */
+export function noOfflineCopy(): Failure {
+  return {
+    message: "Shelfmark can't be reached, and this device has no copy of your library yet. The offline check needs one visit online first.",
+    network: true,
+  };
+}
+
+/** "23 Oct 2026", in the device's time zone. */
+export function asOf(iso: string): string {
+  return DAY.format(new Date(iso));
+}
+
+/** Where the owned copies are: "Living room · A2", "Living room · A2 and No shelf". */
+export function offlineShelves(copies: readonly { shelf: string | null }[]): string {
+  const shelves = [...new Set(copies.map((copy) => copy.shelf ?? "no shelf"))];
+  const line = shelves.length === 1 ? (shelves[0] ?? "") : `${shelves.slice(0, -1).join(", ")} and ${shelves.at(-1)}`;
+  return line.charAt(0).toUpperCase() + line.slice(1);
+}
+
+/** The offline sheet's headline: "Already on Living room · A2", "On your wishlist", "Not in your library". */
+export function offlineStatus(answer: OfflineAnswer): string {
+  switch (answer.kind) {
+    case "owned":
+      return `Already on ${offlineShelves(answer.copies)}`;
+    case "wishlisted":
+      return "On your wishlist";
+    case "absent":
+      return "Not in your library";
+  }
+}
+
+/** The line that says plainly this is not a live answer. */
+export function offlineNote(answer: OfflineAnswer): string {
+  return `This is the offline answer: Shelfmark can't be reached, so it comes from the copy of your library on this device, as of ${asOf(answer.savedAt)}.`;
+}
+
 /** Why a book wasn't saved. Nothing was saved when this shows. */
 export function saveFailure(error: unknown): Failure {
   if (isApiError(error, "network")) {
@@ -225,6 +266,8 @@ export function announcement(state: Pick<FlowState, "step" | "notice" | "added">
       return step.reason === "not-found" && step.lookup ? notFoundText(step.lookup.isbn13, step.lookup.tried) : "";
     case "failed":
       return step.failure.message;
+    case "offline":
+      return `${offlineStatus(step.answer)}${step.answer.kind === "absent" ? "" : `: ${step.answer.copies[0]?.title ?? step.isbn13}`}. ${offlineNote(step.answer)}`;
     default:
       return "";
   }
