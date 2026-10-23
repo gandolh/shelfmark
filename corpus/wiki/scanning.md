@@ -158,6 +158,23 @@ out) the step is the ordinary failed one, saying the offline check needs one vis
 first. Only books with an ISBN are in the copy, and a book added on another device appears
 once this one loads the library again.
 
+### The scan queue
+
+On the offline answer for a book not in the copy (and on the no-copy failed step), "Look it
+up later" keeps `{ isbn13, scannedAt, shelf }` in a second IndexedDB store (`queue`, database
+version 2; [`web/src/offline/queue.ts`](../../web/src/offline/queue.ts)). A second scan of a
+queued ISBN says it is already waiting. Add a book shows "Waiting to look up (N)", which opens
+the list. When the browser is online (app start and the `online` event, via
+[`queueStore.ts`](../../web/src/offline/queueStore.ts)) the scans are looked up one after
+another through the ordinary `POST /api/lookup`, so the server's per-source queues keep the
+pacing; there is no batch call and no background sync. An answer waits in the list, in memory
+only, until the owner opens it: it becomes the usual found / owned / wishlisted sheet on the
+shelf it was queued with, and nothing is saved without a confirm. Nothing found, or a lookup
+the server refused, opens the by-hand form with the ISBN filled. Opening a scan keeps it
+queued: it leaves the queue only when its book is saved or the owner discards it (the
+sheet's discard or "Remove" in the list), so abandoning the sheet any other way loses
+nothing. Sign out clears it.
+
 ## What a code means
 
 - **ISBN-13**: EAN-13 starting `978` or `979`. Validate the check digit.

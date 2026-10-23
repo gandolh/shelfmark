@@ -68,7 +68,11 @@ Built as specified, with these choices:
   `show-queue` opens the new `queue` step (the list), `open-queued` turns an answer into the
   usual `found` / `owned` / `wishlisted` / not-found form step, on the queued shelf. A refused
   lookup opens the by-hand form with the ISBN filled.
-- Opening a scan takes it out of the queue (it is the sheet's now); after saving or
+- Opening a scan does not remove it. `FlowState.queued` holds the scan's id while the sheet
+  is still that scan's (its answer, "Edit details", "Add another copy"). The page takes the scan
+  out of the queue only when its book is saved (shelf, wishlist, "I bought it", or the form) or
+  the owner discards (the sheet's discard/next, or "Remove" in the list). Leaving any other way
+  (mode switch, another ISBN, retry, reload) keeps it queued and listed. After saving or
   discarding, the scanner is back and "Waiting to look up (N)" shows the rest. Not run in a browser.
 - Sign out awaits `clearScanQueue()` in `account/actions.ts`. `web/src/sw.ts`, the server and
   `books/store.ts` are untouched. No `fake-indexeddb`: the IndexedDB calls are thin and untested.

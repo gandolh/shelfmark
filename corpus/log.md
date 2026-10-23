@@ -337,7 +337,7 @@ All six v1.x todos are now briefs, one wave each, in this order:
 [23](briefs/done/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
 it" (the `collection` column and `wishlisted` lookups already exist);
 [24](briefs/done/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
-a scan with no signal; [25](briefs/todo/25-offline-scan-queue.md) offline scans wait and
+a scan with no signal; [25](briefs/done/25-offline-scan-queue.md) offline scans wait and
 are looked up one at a time when back online, through the server's queues;
 [26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
 transaction; [27](briefs/todo/27-saved-views.md) named views stored on the server;
@@ -382,4 +382,14 @@ whole whenever the library list loads or changes, and a scan whose lookup gets n
 (a `network` error) is answered from it: already on a shelf, on the wishlist, or not in the
 library, as of the copy's date, said plainly to be the offline answer. Sign out clears it.
 The service worker and the server are untouched. [Brief 24](briefs/done/24-offline-owned-check.md)
+has the outcome; features.md and scanning.md caught up.
+
+## [2026-10-23] done | Brief 25, offline scan queue
+
+An offline scan of a book not in the copy can be queued ("Look it up later", with a shelf) in
+a second IndexedDB store; the queue survives a reload and shows as "Waiting to look up (N)"
+on Add a book. Online (app start and the `online` event) the ISBNs are looked up one at a
+time through `POST /api/lookup`, and each opens as the usual sheet to confirm; nothing found
+opens the by-hand form with the ISBN filled. Sign out clears it. The service worker, the
+server and `books/store.ts` are untouched. [Brief 25](briefs/done/25-offline-scan-queue.md)
 has the outcome; features.md and scanning.md caught up.

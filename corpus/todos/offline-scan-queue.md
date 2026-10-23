@@ -5,7 +5,7 @@ status: promoted
 tags: [v1.x]
 ---
 
-Promoted 2026-10-23 into [brief 25](../briefs/todo/25-offline-scan-queue.md).
+Promoted 2026-10-23 into [brief 25](../briefs/done/25-offline-scan-queue.md).
 
 # Offline scan queue
 

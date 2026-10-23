@@ -63,7 +63,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 22 | [Base UI for the menus, panels, dialog and switches](../briefs/done/22-base-ui-widgets.md) | 14 | done 2026-10-23 |
 | 23 | [Wishlist](../briefs/done/23-wishlist.md) | 15 | done 2026-10-23 |
 | 24 | [Offline "do I own this?"](../briefs/done/24-offline-owned-check.md) | 16 | done 2026-10-23 |
-| 25 | [Offline scan queue](../briefs/todo/25-offline-scan-queue.md) | 17 | todo (filed 2026-10-23) |
+| 25 | [Offline scan queue](../briefs/done/25-offline-scan-queue.md) | 17 | done 2026-10-23 |
 | 26 | [Bulk edit from the table](../briefs/todo/26-bulk-edit.md) | 18 | todo (filed 2026-10-23) |
 | 27 | [Saved views](../briefs/todo/27-saved-views.md) | 19 | todo (filed 2026-10-23) |
 | 28 | [CSV import](../briefs/todo/28-csv-import.md) | 20 | todo (filed 2026-10-23) |
