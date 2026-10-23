@@ -308,6 +308,25 @@ reads; a blank-only camera stopped at 60 s. 633 tests. Outcome in
 ## [2026-10-23] todo | Brief 22 filed: Base UI for the widgets
 
 The owner asked for Base UI in the apps that still hand-build their widgets.
-[Brief 22](briefs/todo/22-base-ui-widgets.md) moves the menu, the Filter and
+[Brief 22](briefs/done/22-base-ui-widgets.md) moves the menu, the Filter and
 Columns panels, Change password, the Add tabs, the segmented control and two
 disclosures to Base UI. TanStack Table and the native inputs stay.
+
+## [2026-10-23] done | Brief 22: Base UI for the widgets
+
+[Brief 22](briefs/done/22-base-ui-widgets.md) is built. The menus, the
+Filter/Columns panels (a modal Popover on the desktop, a Dialog sheet on a
+phone), Change password, the mode tabs, the segmented controls and Change
+cover are on Base UI.
+
+Four things needed code:
+
+- Done is the popover's close part, which Base UI requires before it traps
+  focus;
+- menu items run from `finalFocus`;
+- mode tabs don't take focus on a mouse press;
+- an Esc a control already used is left alone.
+
+The re-lookup stays a plain button. Checked: 633 tests, typecheck, lint,
+build (+56 kB gzip), and before/after shots at 1440 and 390 px. The decision
+is in [decisions.md](wiki/decisions.md).

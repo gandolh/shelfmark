@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press. Research recommendations live on the concept pages until the owner confirms them.
-updated: 2026-10-21
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them.
+updated: 2026-10-23
 ---
 
 # Decisions
@@ -136,3 +136,14 @@ Rejected: continuous reading (briefs 07-18: no tap per book, but every book
 in view is read and looked up), with or without brief 17's replaceable
 result and brief 18's 600 ms wait before a lookup. The cost is one tap per
 book.
+
+## Base UI under the menus, panels, dialog and switches
+_2026-10-23_, the owner's call, to match their other apps (atrium,
+imbatranimOS, sports-app, trips and others). The menus, the Filter and
+Columns panels, Change password, the Add page's mode tabs, the segmented
+controls and Change cover sit on `@base-ui/react` (pinned 1.9.0), styled by
+Shelfmark's own CSS and DESIGN.md's tokens ([brief 22](../briefs/done/22-base-ui-widgets.md)).
+Base UI owns focus, keys, placement and ARIA. It costs about 56 kB gzip on the
+main chunk. TanStack Table stays, since Base UI has no table, and native
+checkboxes, radios and selects stay native. Rejected: keeping the hand-built
+widgets, and shadcn, which brings Tailwind.
