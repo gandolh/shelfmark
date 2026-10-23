@@ -1,0 +1,116 @@
+/* Stats (web/src/stats): plain lists in the table's style. Colours and type from tokens.css. */
+
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: var(--page-width);
+}
+
+.stats__totals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0;
+}
+
+.stats__total {
+  flex: 1 1 140px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border-radius: var(--radius-container);
+}
+
+.stats__total dt {
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+}
+
+.stats__total dd {
+  margin: 4px 0 0;
+  font-size: var(--text-title-phone);
+  font-weight: var(--weight-bold);
+  font-variant-numeric: tabular-nums;
+}
+
+.stats__note,
+.stats__foot {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.stats__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats__heading {
+  margin: 0;
+  font-size: var(--text-row-title);
+  font-weight: var(--weight-semibold);
+}
+
+.stats__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface);
+  border-radius: var(--radius-container);
+  font-size: var(--text-body);
+}
+
+.stats__caption {
+  padding: 10px 16px 0;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  text-align: left;
+}
+
+.stats__table th,
+.stats__table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--divider);
+  text-align: left;
+  font-weight: var(--weight-regular);
+}
+
+.stats__table tr:last-child > * {
+  border-bottom: 0;
+}
+
+.stats__table td:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.stats__detail {
+  color: var(--muted);
+  font-size: var(--text-meta);
+}
+
+.stats__sub th {
+  padding-left: 32px;
+  color: var(--ink-2);
+}
+
+.stats__count {
+  min-width: 44px;
+  min-height: 44px;
+  margin: -12px 0;
+  padding: 0 4px;
+  background: none;
+  border: 0;
+  color: var(--accent);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.stats__count:hover {
+  color: var(--accent-press);
+  text-decoration: underline;
+}
