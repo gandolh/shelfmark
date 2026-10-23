@@ -340,7 +340,7 @@ it" (the `collection` column and `wishlisted` lookups already exist);
 a scan with no signal; [25](briefs/done/25-offline-scan-queue.md) offline scans wait and
 are looked up one at a time when back online, through the server's queues;
 [26](briefs/todo/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
-transaction; [27](briefs/todo/27-saved-views.md) named views stored on the server;
+transaction; [27](briefs/done/27-saved-views.md) named views stored on the server;
 [28](briefs/done/28-csv-import.md) CSV import with encoding detection, from the account
 menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
 stats page needs a home that keeps "Two places only", the CIP photo needs OCR or Claude
@@ -413,3 +413,41 @@ languages, shelves (by room), status and decades, and money spent per year per c
 footnote for books missing a price or date. Each count sets one Library filter through the
 existing `setFilter` and opens Library on Owned; no change to `web/src/library/`. No server
 change. [Brief 29](briefs/done/29-stats.md) has the outcome; features.md caught up.
+
+## [2026-10-23] done | Brief 27: saved views
+
+Named views of the Library (tab, filters, sort, columns) stored on the server in
+`saved_views` (migration 3) behind `/api/views`, applied from a Views menu.
+[Brief 27](briefs/done/27-saved-views.md) has the outcome. Built in a worktree and
+cherry-picked as `2b422c7`. Gates on its base: typecheck, lint, build, 778 tests (the
+"3,000 books in under 100 ms" timing test flakes under load and passed alone).
+
+## [2026-10-23] resume | Paused for quota: briefs 26 and 30 left
+
+Done today: 23 wishlist, 24 offline owned check, 25 offline scan queue, 27 saved views,
+28 CSV import, 29 stats (all committed on `main`, not deployed).
+
+**In the working tree, uncommitted: brief 30 (CIP photo), stopped mid-way.** The parser
+move is done and green: `readDescription`, `romanian` and the ISBN pattern now live in
+`shared/src/cip.ts` (exported as `cip` from `shared/src/index.ts`), the server imports
+them back, `shared/src/cip.test.ts` is new. `web/package.json` and `package-lock.json`
+were being changed for Tesseract.js when it stopped: check them before going on. Left:
+the OCR worker in `web/src/ocr/`, serving Tesseract and the `ron` data from the app, the
+service worker's runtime cache, the button on the manual form, fixtures, closeout.
+
+**Not started: brief 26 (bulk edit).** Its agent was stopped before writing anything.
+Run it on top of brief 27; its prompt should carry 27's Toolbar / LibraryPage layout
+(Views after the Table/Covers control on the desktop; on a phone at the end of the tabs
+row) and say not to add the checkbox column to `LIBRARY_COLUMN_IDS`.
+
+**Wiki folds owed for 27:** `data-model.md` (the `saved_views` table, why `name_key`),
+`library-table.md` ("Layout memory": views are on the server now; where the menu sits),
+`features.md` (saved views shipped), and one line in `export.md` (the backup includes
+views). Root `DESIGN.md`'s toolbar lines need the phone placement.
+
+**Review owed** for 23–30 once 26 and 30 land: no browser walk yet for the wishlist sheet,
+the offline answers and queue (IndexedDB never ran in a browser), CSV import or stats.
+Known small items: the filter panel and column picker still list the wishlist-hidden
+columns; a stale comment in `web/src/library/columns.ts`; `conflict: 409` belongs in
+`server/src/errors.ts`; the timing test in `server/src/routes/books.test.ts` flakes under
+load; status.md's "waves run one at a time" line is out of date (pairs ran in parallel).

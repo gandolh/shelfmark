@@ -48,3 +48,20 @@ column layout and sort are remembered per layout in `localStorage`
 - Change a filter: the name no longer shows as current; "Update to current" saves it.
 - Two views can't share a name (a `409`, said in the dialog).
 - `npm run build`, `npm run typecheck`, `npm run lint`, `npm test` pass.
+
+## Outcome (2026-10-23)
+
+Built in `2b422c7` as migration 3, `saved_views` (id, name, `name_key` UNIQUE folded in
+JS like tags, `state` JSON checked as an object, dense positions, timestamps), with
+`server/src/store/views.ts` and `GET/POST /api/views`, `PATCH/DELETE /api/views/:id`.
+A name another view holds, in any case, is a `409 conflict` (sent by the route, since
+`ERROR_STATUS` in `errors.ts` has no 409 yet). `shared/src/views.ts` holds
+`SavedViewState` and is now the home of the Library column ids and the filter type. A
+state is checked strictly on the way in and read leniently, so a column that no longer
+exists drops out. A view holds the tab, filters, sort and shown columns, not the search
+text. Applying sets tab, sort and columns, then filters. Update, Rename and Delete act
+on the view the page is on or was last on (the menu is flat). Desktop has Views in the
+toolbar; on a phone it sits at the end of the Owned / Wishlist row, because the toolbar
+row has no room (root `DESIGN.md` still describes the old toolbar). The backup needed no
+change: it copies the whole database file. Checked in a browser at 1280 and 390; 727
+tests at the time.

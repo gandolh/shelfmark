@@ -65,7 +65,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 24 | [Offline "do I own this?"](../briefs/done/24-offline-owned-check.md) | 16 | done 2026-10-23 |
 | 25 | [Offline scan queue](../briefs/done/25-offline-scan-queue.md) | 17 | done 2026-10-23 |
 | 26 | [Bulk edit from the table](../briefs/todo/26-bulk-edit.md) | 18 | todo (filed 2026-10-23) |
-| 27 | [Saved views](../briefs/todo/27-saved-views.md) | 19 | todo (filed 2026-10-23) |
+| 27 | [Saved views](../briefs/done/27-saved-views.md) | 19 | done 2026-10-23 |
 | 28 | [CSV import](../briefs/done/28-csv-import.md) | 20 | done 2026-10-23 |
 | 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
 | 30 | [Fill a book from a photo of its CIP block](../briefs/todo/30-cip-photo-capture.md) | 22 | todo (filed 2026-10-23) |
