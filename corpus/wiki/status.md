@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. Brief 22 (Base UI under the widgets) built 2026-10-23, not deployed. Briefs 23-31 (the v1.x set) built 2026-10-23, and brief 32 (change the username, on ward-auth 0.4.0) built 2026-10-24, none deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. Brief 22 (Base UI under the widgets) built 2026-10-23, not deployed. Briefs 23-31 (the v1.x set) built 2026-10-23, and brief 32 (change the username, on ward-auth 0.4.0) built 2026-10-24. Briefs 15-32 deployed 2026-10-24 and checked read-only (CIP refresh, port 9991). What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
 updated: 2026-10-24
 ---
 
@@ -22,11 +22,15 @@ product calls are in [decisions.md](decisions.md), the look in
 1. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-2. Redeploy to ship briefs 15 to 32, then run the two checks in
-   owner-setup's "Romanian lookups after a deploy": the libraries over port
-   9991, and the first CIP refresh in the logs. The phone checks of briefs 18
-   to 21 are in their outcomes. Brief 21's `?camera` readout numbers, sent
-   from the owner's phone, decide whether the picture needs more work.
+2. **Deployed 2026-10-24** with briefs 15 to 32 (the owner ran it; the deploy
+   mirrors the local tree, so the unpushed commits went too). Checked read-only
+   the same day: the container runs ward-auth 0.4.0 and the web release has
+   Change username. The first CIP refresh found 82 issues and 0 to import.
+   The container reaches all three libraries on port 9991, but BCU
+   Timișoara took 5.2 s to connect, against a 10 s budget per library.
+   Left for the owner: look up `9786068044873` in the app (it should say the
+   Romanian Academy Library), the phone checks of briefs 18 to 21 in their
+   outcomes, and brief 21's `?camera` readout numbers from the phone.
 3. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
    local Ward round trip (06, needs Docker Desktop's WSL integration), the

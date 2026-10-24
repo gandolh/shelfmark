@@ -564,3 +564,15 @@ passed alone. `npm test` now runs 715 tests in about 3 s. Rejected: dropping onl
 the timing and seed tests, and an opt-in `test:heavy` script. The routes, the
 guard, sign-in and the seed are now checked by hand.
 [decisions.md](wiki/decisions.md) has the entry.
+
+## [2026-10-24] deploy | Briefs 15–32 live
+
+The owner deployed. The deploy mirrors the local tree, so the commits not yet
+pushed went too. Checked read-only over SSH: the API container restarted
+healthy with ward-auth 0.4.0, and the current web release has Change username.
+The new container's first CIP refresh found 82 issues on the site and 0 to
+import, so the index on the data volume is complete. From inside the container,
+all three libraries accepted a connection on port 9991: the Academy in 168 ms,
+BCU Cluj in 134 ms, and BCU Timișoara in 5.2 s, against the lookup's 10 s per
+library. The in-app lookup of `9786068044873` and the phone checks stay with the
+owner.
