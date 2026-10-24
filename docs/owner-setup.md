@@ -145,6 +145,10 @@ docker compose -f infrastructure/docker-compose.yml exec -it shelfmark-api node 
 If you would rather pass them, add `-e SEED_USERNAME=<name> -e SEED_PASSWORD=<password>`
 after `exec`, and keep the command out of any file. An existing user is left as it is.
 
+The seed finds that user by name. Once you change your username (account menu,
+Change username), give the seed the new name or don't run it again: under the
+old name it makes a second account.
+
 After your first sign-in, check that the login lockout sees each visitor's own
 address. Under rootless Docker, Caddy may reach the container from an address
 outside `172.16.0.0/12`, the range vps-deploy trusts:

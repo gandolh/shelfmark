@@ -1,4 +1,4 @@
-// ward-auth 0.3.1 — built from https://github.com/gandolh/ward-auth (shared-library/).
+// ward-auth 0.4.0 — built from https://github.com/gandolh/ward-auth (shared-library/).
 // MIT licensed; see LICENSE beside this file. Do not edit a vendored copy: copy a newer build in.
 import { randomBytes as randomBytes$1, createHash, scrypt as scrypt$1, timingSafeEqual, webcrypto, randomUUID } from 'node:crypto';
 import { promisify } from 'node:util';
@@ -492,6 +492,14 @@ function createAccounts(options) {
                 throw new TypeError("setRole: role must be a non-empty string");
             await store.setRole(userId, role, now());
         },
+        async renameUser(userId, username) {
+            const name = normaliseUsername(username);
+            const user = await store.findUserById(userId);
+            if (user === undefined)
+                return undefined;
+            await store.setUsername(userId, name, foldUsername(name), now());
+            return toAuthUser({ ...user, username: name });
+        },
         verifyCredentials,
         changePassword,
         setPassword,
@@ -700,10 +708,10 @@ function secureCookiesFor(publicOrigin) {
  *
  * ## Per-surface budgets
  *
- * Login, registration and password change hold **independent** budgets.
- * Spending the password-change budget (which needs a session first) must never
- * lock the same address out of login, which is how the person would recover,
- * and a registration flood must not stop existing users signing in.
+ * Login, registration, password change and rename hold **independent**
+ * budgets. Spending the password-change budget (which needs a session first)
+ * must never lock the same address out of login, which is how the person would
+ * recover, and a registration flood must not stop existing users signing in.
  *
  * ## No artificial delay
  *
@@ -1390,6 +1398,7 @@ function createSqliteStore(db, options = {}) {
        VALUES (?, ?, ?, ?, ?, ?, ?)`),
         setPasswordHash: db.prepare("UPDATE auth_users SET password_hash = ?, updated_at = ? WHERE id = ?"),
         setRole: db.prepare("UPDATE auth_users SET role = ?, updated_at = ? WHERE id = ?"),
+        setUsername: db.prepare("UPDATE auth_users SET username = ?, username_folded = ?, updated_at = ? WHERE id = ?"),
         insertSession: db.prepare(`INSERT INTO auth_sessions (id_hash, user_id, origin, ward_sid, created_at, renewed_at, expires_at)
        VALUES (?, ?, ?, ?, ?, ?, ?)`),
         sessionById: db.prepare("SELECT * FROM auth_sessions WHERE id_hash = ?"),
@@ -1444,6 +1453,15 @@ function createSqliteStore(db, options = {}) {
         },
         setRole(userId, role, now) {
             s.setRole.run(role, now, userId);
+        },
+        setUsername(userId, username, usernameFolded, now) {
+            inSavepoint(db, () => {
+                // Checked rather than caught, for the reason `insertUser` gives.
+                const holder = s.userByFolded.get(usernameFolded);
+                if (holder !== undefined && holder.id !== userId)
+                    throw new UsernameTakenError();
+                s.setUsername.run(username, usernameFolded, now, userId);
+            });
         },
         createSession(session) {
             s.insertSession.run(session.idHash, session.userId, session.origin, session.wardSid, session.createdAt, session.renewedAt, session.expiresAt);
@@ -4315,6 +4333,15 @@ function passwordChangeBody(body) {
         return undefined;
     return { currentPassword, newPassword };
 }
+/** A rename's body. The name's rules are the policy's, answered with its code. */
+function usernameBody(body) {
+    if (typeof body !== "object" || body === null)
+        return undefined;
+    const { username } = body;
+    if (typeof username !== "string")
+        return undefined;
+    return { username };
+}
 /**
  * Whether the request is same-origin enough to act on the session cookie.
  *
@@ -5052,6 +5079,46 @@ const wardAuthPlugin = async (app, options) => {
             lockout.clearFailures(target);
             return reply.code(204).send();
         });
+        if (options.allowRename !== false) {
+            /**
+             * Rename oneself. Guarded, so `request.auth` is set. The id and every
+             * session stay. A taken name is the one answer that says something
+             * about other accounts, so each `409` counts against the address's
+             * rename budget; a policy failure or a success does not.
+             */
+            routes.post("/username", async (request, reply) => {
+                if (!sameOrigin(request, publicOrigin))
+                    return crossSite(reply);
+                const auth = request.auth;
+                if (auth === null)
+                    return reply.code(401).send({ error: "unauthorized" });
+                const address = lockoutKey(request);
+                const gate = lockout.check({ surface: "rename", address });
+                if (!gate.allowed)
+                    return tooManyAttempts(reply, gate.retryAfterSeconds ?? 1);
+                const body = usernameBody(request.body);
+                if (body === undefined)
+                    return reply.code(400).send({ error: "invalid_request" });
+                let user;
+                try {
+                    user = await accounts.renameUser(auth.user.id, body.username);
+                }
+                catch (error) {
+                    if (error instanceof UsernamePolicyError) {
+                        return reply.code(400).send({ error: error.code });
+                    }
+                    if (error instanceof UsernameTakenError) {
+                        lockout.recordFailure({ surface: "rename", address });
+                        return reply.code(409).send({ error: "username_taken" });
+                    }
+                    throw error;
+                }
+                // The guard found the user a moment ago; gone now means signed out.
+                if (user === undefined)
+                    return reply.code(401).send({ error: "unauthorized" });
+                return reply.code(200).send(await sessionBody(user, auth.session));
+            });
+        }
         if (options.registration !== undefined) {
             const { role } = options.registration;
             /**

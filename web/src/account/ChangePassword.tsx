@@ -1,5 +1,4 @@
-import { Dialog } from "@base-ui/react/dialog";
-import { useEffect, useRef, useState, useSyncExternalStore, type FormEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useChangePassword,
   useSession,
@@ -14,14 +13,11 @@ import { accountMessage } from "../auth/messages";
 import "../auth/session";
 import { Button } from "../components/Button";
 import { useIsDesktop } from "../layout/viewport";
-import "../auth/auth.css";
-import "./account.css";
+import { AccountDialog, Actions, dialogSwitch } from "./AccountDialog";
 
 /**
- * The account menu's "Change password" (brief 06): a modal Base UI `Dialog`,
- * so focus stays in the form until it is done or cancelled. On the desktop a white
- * panel in the middle of the window; on a phone the floating sheet over the
- * bottom of the screen, as the Library's Filter panel.
+ * The account menu's "Change password" (brief 06), in the account dialog shell
+ * (`AccountDialog.tsx`).
  *
  * - With a password: the current one, the new one twice. Every other session
  *   ends; this one stays.
@@ -31,30 +27,11 @@ import "./account.css";
  *   `?ward=reauthenticated`, and the dialog opens itself again on that.
  */
 
-// --- Open and closed, from outside React -------------------------------------------
-
-let open = false;
-let returnFocus: HTMLElement | null = null;
-const listeners = new Set<() => void>();
-
-function setOpen(next: boolean): void {
-  if (next === open) return;
-  open = next;
-  for (const listener of listeners) listener();
-}
-
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => {
-    listeners.delete(listener);
-  };
-}
+const passwordDialog = dialogSwitch();
 
 /** Show the dialog (the account menu's action). Focus goes back to what had it, the account button, on close. */
 export function openChangePassword(): void {
-  if (open) return;
-  returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  setOpen(true);
+  passwordDialog.show();
 }
 
 // --- Checking the new password before it is sent ----------------------------------
@@ -83,20 +60,20 @@ export function checkPasswords(entry: PasswordEntry, needsCurrent: boolean): Pas
 
 /** Mount once inside the auth gate (`App.tsx`). Renders nothing while closed. */
 export function ChangePasswordDialog() {
-  const isOpen = useSyncExternalStore(subscribe, () => open, () => false);
+  const isOpen = passwordDialog.useOpen();
   const { result, clear } = useWardResult();
   const confirmed = result === "reauthenticated";
 
   // Back from confirming with Ward: carry on where the dialog left off.
   useEffect(() => {
-    if (confirmed) setOpen(true);
+    if (confirmed) passwordDialog.set(true);
   }, [confirmed]);
 
   if (!isOpen) return null;
   return (
     <PasswordDialog
       onClose={() => {
-        setOpen(false);
+        passwordDialog.set(false);
         if (confirmed) clear();
       }}
     />
@@ -104,7 +81,6 @@ export function ChangePasswordDialog() {
 }
 
 function PasswordDialog({ onClose }: { onClose: () => void }) {
-  const popupRef = useRef<HTMLDivElement>(null);
   const desktop = useIsDesktop();
   const session = useSession();
   const user = session.status === "signed_in" ? session.user : null;
@@ -161,34 +137,10 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
     );
   }
 
-  // Esc, and a press on the backdrop as the panels do, close it; an Esc a field already used doesn't.
   return (
-    <Dialog.Root
-      open
-      onOpenChange={(next, details) => {
-        if (!next && !(details.reason === "escape-key" && details.event.defaultPrevented)) onClose();
-      }}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="password-dialog-backdrop" />
-        <Dialog.Popup
-          ref={popupRef}
-          className={desktop ? "password-dialog password-dialog--centered" : "password-dialog password-dialog--sheet"}
-          initialFocus={() => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true}
-          // Back to what had focus when it opened: the account button.
-          finalFocus={() => {
-            const target = returnFocus;
-            returnFocus = null;
-            return target?.isConnected ? target : true;
-          }}
-        >
-          <div className="password-dialog__frame">
-            <Dialog.Title className="password-dialog__title">{title}</Dialog.Title>
-            {body}
-          </div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
+    <AccountDialog title={title} onClose={onClose} returnFocus={passwordDialog.takeReturnFocus}>
+      {body}
+    </AccountDialog>
   );
 }
 
@@ -248,8 +200,8 @@ function PasswordForm(props: PasswordFormProps) {
   const blockFailure = failure !== null && !wrongCurrent ? accountMessage(failure) : null;
 
   return (
-    <form className="password-dialog__form" onSubmit={submit} noValidate>
-      {intro && <p className="password-dialog__text">{intro}</p>}
+    <form className="account-dialog__form" onSubmit={submit} noValidate>
+      {intro && <p className="account-dialog__text">{intro}</p>}
       <input className="visually-hidden" type="text" name="username" autoComplete="username" value={username} readOnly tabIndex={-1} aria-hidden="true" />
       {needsCurrent && (
         <AuthField
@@ -301,8 +253,8 @@ function PasswordForm(props: PasswordFormProps) {
 function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; desktop: boolean; onConfirm: () => void; onCancel: () => void }) {
   const { pending, failure, desktop, onConfirm, onCancel } = props;
   return (
-    <div className="password-dialog__form">
-      <p className="password-dialog__text">
+    <div className="account-dialog__form">
+      <p className="account-dialog__text">
         You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then choose
         one here, so you can still sign in while Ward is down.
       </p>
@@ -323,27 +275,15 @@ function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; d
 
 function Done({ desktop, onClose }: { desktop: boolean; onClose: () => void }) {
   return (
-    <div className="password-dialog__form">
-      <p className="password-dialog__text" role="status">
+    <div className="account-dialog__form">
+      <p className="account-dialog__text" role="status">
         You're still signed in here. Shelfmark signed you out everywhere else; use the new password there.
       </p>
-      <div className="password-dialog__actions">
-        <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} data-autofocus onClick={onClose}>
+      <div className="account-dialog__actions">
+        <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>
       </div>
-    </div>
-  );
-}
-
-/** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-function Actions({ desktop, onCancel, children }: { desktop: boolean; onCancel: () => void; children: ReactNode }) {
-  return (
-    <div className="password-dialog__actions">
-      <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
-        Cancel
-      </Button>
-      {children}
     </div>
   );
 }

@@ -1,4 +1,4 @@
-// ward-auth 0.3.1 — built from https://github.com/gandolh/ward-auth (shared-library/).
+// ward-auth 0.4.0 — built from https://github.com/gandolh/ward-auth (shared-library/).
 // MIT licensed; see LICENSE beside this file. Do not edit a vendored copy: copy a newer build in.
 import { useState, useCallback, useSyncExternalStore, useEffect } from 'react';
 
@@ -230,6 +230,14 @@ function createAuthClient(options) {
             }
             return { ok: true };
         },
+        async renameUser(username) {
+            const result = await act("/username", { username });
+            if (!result.ok)
+                return result;
+            // The answer is the session under the new name: no second request.
+            setState(stateFromBody((await result.response.json())));
+            return { ok: true };
+        },
         startWardSignIn: (startOptions = {}) => goToWard("/ward/start", startOptions.returnTo === undefined ? {} : { returnTo: startOptions.returnTo }),
         startWardLink: () => goToWard("/ward/link"),
         startWardReauthentication: () => goToWard("/ward/reauthenticate"),
@@ -364,6 +372,24 @@ function useChangePassword(options) {
     }, [client]);
     const { perform, ...state } = useAction(run);
     return { ...state, changePassword: perform, done };
+}
+/**
+ * `renameUser(username)` (0.4.0). On success every `useSession` shows the new
+ * name and no session ends. Errors: `invalid_username`, `username_taken`,
+ * `too_many_attempts`, `unauthorized`.
+ */
+function useRenameUser(options) {
+    const client = useClient(options);
+    const [done, setDone] = useState(false);
+    const run = useCallback(async (username) => {
+        setDone(false);
+        const result = await client.renameUser(username);
+        if (result.ok)
+            setDone(true);
+        return result;
+    }, [client]);
+    const { perform, ...state } = useAction(run);
+    return { ...state, renameUser: perform, done };
 }
 /**
  * `register(username, password)`, for the app that enables registration.
@@ -507,4 +533,4 @@ function useWardSignOut(options) {
     return { ...state, signOut: perform };
 }
 
-export { configureAuth, createAuthClient, getAuthClient, useChangePassword, useLogin, useLogout, useRegister, useSession, useSetLocalPassword, useWardLink, useWardResult, useWardSignIn, useWardSignOut, useWardUnlink };
+export { configureAuth, createAuthClient, getAuthClient, useChangePassword, useLogin, useLogout, useRegister, useRenameUser, useSession, useSetLocalPassword, useWardLink, useWardResult, useWardSignIn, useWardSignOut, useWardUnlink };

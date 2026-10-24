@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { linkWard, signOut, unlinkWard, wardLinkOf } from "./actions";
+import { linkWard, signOut, unlinkWard, usernameOf, wardLinkOf } from "./actions";
 import { checkPasswords } from "./ChangePassword";
+import { checkUsername } from "./ChangeUsername";
 
 const SIGNED_IN = {
   status: "signed_in",
@@ -14,6 +15,26 @@ describe("the menu's Ward row", () => {
     expect(wardLinkOf({ ...SIGNED_IN, ward: { enabled: false, linked: false } })).toEqual({ available: false, linked: false });
     expect(wardLinkOf({ status: "signed_out", ward: { enabled: true, linked: false } })).toEqual({ available: false, linked: false });
     expect(wardLinkOf({ status: "loading" })).toEqual({ available: false, linked: false });
+  });
+});
+
+describe("the menu's username", () => {
+  it("is the signed-in user's, and empty otherwise", () => {
+    expect(usernameOf({ ...SIGNED_IN, ward: { enabled: false, linked: false } })).toBe("owner");
+    expect(usernameOf({ status: "signed_out", ward: { enabled: false, linked: false } })).toBe("");
+    expect(usernameOf({ status: "loading" })).toBe("");
+  });
+});
+
+describe("checkUsername", () => {
+  it("wants a name, and a different one", () => {
+    expect(checkUsername("   ", "owner")).toBe("Enter a username.");
+    expect(checkUsername(" owner ", "owner")).toBe("That's already your username.");
+  });
+
+  it("leaves a new case of the same name, and the rest of the rules, to be sent", () => {
+    expect(checkUsername("Owner", "owner")).toBeUndefined();
+    expect(checkUsername("two  spaces", "owner")).toBeUndefined();
   });
 });
 

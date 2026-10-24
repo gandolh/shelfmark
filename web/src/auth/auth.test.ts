@@ -103,6 +103,8 @@ describe("messages", () => {
 
   it("covers every code an account action can come back with", () => {
     for (const code of [
+      "invalid_username",
+      "username_taken",
       "invalid_credentials",
       "password_too_short",
       "password_too_long",

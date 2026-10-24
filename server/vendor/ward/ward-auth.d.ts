@@ -1,4 +1,4 @@
-// ward-auth 0.3.1 — built from https://github.com/gandolh/ward-auth (shared-library/).
+// ward-auth 0.4.0 — built from https://github.com/gandolh/ward-auth (shared-library/).
 // MIT licensed; see LICENSE beside this file. Do not edit a vendored copy: copy a newer build in.
 import { FastifyRequest, preHandlerAsyncHookHandler, FastifyPluginAsync } from 'fastify';
 
@@ -89,6 +89,11 @@ interface AuthStore {
     /** `null` removes the local password (brief 21 never does; it is here for symmetry). */
     setPasswordHash(userId: string, passwordHash: string | null, now: number): Awaitable<void>;
     setRole(userId: string, role: string, now: number): Awaitable<void>;
+    /**
+     * Rename a user (0.4.0). Throws `UsernameTakenError` when another user holds
+     * the folded name; the user's own name in another case is not taken.
+     */
+    setUsername(userId: string, username: string, usernameFolded: string, now: number): Awaitable<void>;
     createSession(session: SessionRecord): Awaitable<void>;
     findSession(idHash: string): Awaitable<SessionRecord | undefined>;
     /** Push the sliding expiry out. */
@@ -228,6 +233,14 @@ interface Accounts {
     findUserById(id: string): Promise<AuthUser | undefined>;
     findUserByUsername(username: string): Promise<AuthUser | undefined>;
     setRole(userId: string, role: string): Promise<void>;
+    /**
+     * Rename a user (0.4.0). The name is trimmed and checked as a new one is
+     * (`UsernamePolicyError`) and must be free once folded (`UsernameTakenError`;
+     * the user's own name in another case is free). The id stays, and so does
+     * every session: a rename is not a credential change. `undefined` when there
+     * is no such user.
+     */
+    renameUser(userId: string, username: string): Promise<AuthUser | undefined>;
     /**
      * The password check. `undefined` for an unknown username, a user with no
      * local password, or a wrong password — **one answer, one cost**: every path
@@ -449,10 +462,10 @@ declare function hashSessionToken(token: string): string;
  *
  * ## Per-surface budgets
  *
- * Login, registration and password change hold **independent** budgets.
- * Spending the password-change budget (which needs a session first) must never
- * lock the same address out of login, which is how the person would recover,
- * and a registration flood must not stop existing users signing in.
+ * Login, registration, password change and rename hold **independent**
+ * budgets. Spending the password-change budget (which needs a session first)
+ * must never lock the same address out of login, which is how the person would
+ * recover, and a registration flood must not stop existing users signing in.
  *
  * ## No artificial delay
  *
@@ -487,7 +500,7 @@ declare const LOCKOUT_WINDOW_SECONDS: number;
  * one. The union is closed so that borrowing is a compile error rather than a
  * quiet coupling nobody notices until the two interfere.
  */
-type LockoutSurface = "login" | "register" | "change_password";
+type LockoutSurface = "login" | "register" | "change_password" | "rename";
 /** Who is attempting what, from where. */
 interface LockoutTarget {
     surface: LockoutSurface;
@@ -1289,11 +1302,11 @@ declare const FRESH_SIGN_IN_SECONDS: number;
  * | status | `error` | when |
  * |---|---|---|
  * | 400 | `invalid_request` | the body is not the expected shape |
- * | 400 | `invalid_username`, `password_too_short`, `password_too_long` | registration or a new password fails the policy |
+ * | 400 | `invalid_username`, `password_too_short`, `password_too_long` | registration, a rename or a new password fails the policy |
  * | 401 | `unauthorized` (+ `reason` when a session check rejected it) | the guard found no live session |
  * | 401 | `invalid_credentials` | wrong username or password, or wrong current password |
  * | 403 | `cross_site` | a browser said the request came from another origin |
- * | 409 | `username_taken` | registration |
+ * | 409 | `username_taken` | registration, a rename |
  * | 429 | `too_many_attempts` (+ `retryAfterSeconds`, and `Retry-After`) | lockout |
  *
  * The session `reason`s the library itself sets: `ward_unavailable` (Ward
@@ -1375,6 +1388,12 @@ interface WardAuthOptions {
     registration?: {
         role: string;
     };
+    /**
+     * `POST <routePrefix>/username`, where a signed-in user renames themselves.
+     * On by default (0.4.0); `false` turns it off for an app that keys anything
+     * on the name rather than the id, or names its users itself.
+     */
+    allowRename?: boolean;
     /**
      * Routes reachable with no session, as `"METHOD /pattern"` or `"/pattern"`
      * (any method), matched against the **route pattern** Fastify resolved —

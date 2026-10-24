@@ -1,4 +1,4 @@
-// ward-auth 0.3.1 — built from https://github.com/gandolh/ward-auth (shared-library/).
+// ward-auth 0.4.0 — built from https://github.com/gandolh/ward-auth (shared-library/).
 // MIT licensed; see LICENSE beside this file. Do not edit a vendored copy: copy a newer build in.
 /**
  * The browser half, without React: a small client for the plugin's routes and
@@ -140,6 +140,12 @@ interface AuthClient {
     login(username: string, password: string): Promise<ActionResult>;
     logout(): Promise<ActionResult>;
     changePassword(currentPassword: string, newPassword: string): Promise<ActionResult>;
+    /**
+     * Rename the signed-in user (0.4.0). On success the state already carries
+     * the new name. Errors: `invalid_username`, `username_taken`,
+     * `too_many_attempts`, `unauthorized`.
+     */
+    renameUser(username: string): Promise<ActionResult>;
     register(username: string, password: string): Promise<ActionResult>;
     /**
      * "Sign in with Ward": ask the server for Ward's URL and go there. On
@@ -230,6 +236,15 @@ declare function useChangePassword(options?: HookOptions): ActionState & {
     done: boolean;
 };
 /**
+ * `renameUser(username)` (0.4.0). On success every `useSession` shows the new
+ * name and no session ends. Errors: `invalid_username`, `username_taken`,
+ * `too_many_attempts`, `unauthorized`.
+ */
+declare function useRenameUser(options?: HookOptions): ActionState & {
+    renameUser: (username: string) => Promise<boolean>;
+    done: boolean;
+};
+/**
  * `register(username, password)`, for the app that enables registration.
  * Signs the new user in on success. Errors: `username_taken`,
  * `invalid_username`, `password_too_short`, `password_too_long`,
@@ -311,5 +326,5 @@ declare function useWardSignOut(options?: HookOptions): ActionState & {
     signOut: () => Promise<boolean>;
 };
 
-export { configureAuth, createAuthClient, getAuthClient, useChangePassword, useLogin, useLogout, useRegister, useSession, useSetLocalPassword, useWardLink, useWardResult, useWardSignIn, useWardSignOut, useWardUnlink };
+export { configureAuth, createAuthClient, getAuthClient, useChangePassword, useLogin, useLogout, useRegister, useRenameUser, useSession, useSetLocalPassword, useWardLink, useWardResult, useWardSignIn, useWardSignOut, useWardUnlink };
 export type { ActionResult, AuthClient, AuthClientOptions, AuthError, AuthErrorCode, HookOptions, SessionInfo, SessionState, SessionUser, WardResult, WardStatus };

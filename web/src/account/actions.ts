@@ -7,6 +7,7 @@ import { clearScanQueue } from "../offline/queueStore";
 import { COVER_CACHE } from "../pwa/routes";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
+import { openChangeUsername } from "./ChangeUsername";
 
 /**
  * What the account menu (layout/AccountMenu.tsx) does. Each action resolves
@@ -39,6 +40,21 @@ export function wardLinkOf(state: SessionState): WardLink {
 /** The Ward state for the menu, from the session. */
 export function useWardLink(): WardLink {
   return wardLinkOf(useSession());
+}
+
+/** Who is signed in, for the menu; empty while the session loads. */
+export function usernameOf(state: SessionState): string {
+  return state.status === "signed_in" ? state.user.username : "";
+}
+
+/** The signed-in username, from the session. */
+export function useUsername(): string {
+  return usernameOf(useSession());
+}
+
+/** Open the change-username dialog (account/ChangeUsername.tsx). */
+export async function changeUsername(): Promise<void> {
+  openChangeUsername();
 }
 
 /** Open the change-password dialog (account/ChangePassword.tsx). */

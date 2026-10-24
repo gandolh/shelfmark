@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
-import { changePassword, downloadBackup, linkWard, signOut, unlinkWard, useWardLink, useWardNotice } from "../account/actions";
+import {
+  changePassword,
+  changeUsername,
+  downloadBackup,
+  linkWard,
+  signOut,
+  unlinkWard,
+  useUsername,
+  useWardLink,
+  useWardNotice,
+} from "../account/actions";
 import { AlertIcon } from "../auth/icons";
 import { AccountIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/Menu";
@@ -9,12 +19,14 @@ const NOTICE_MS = 6000;
 
 /**
  * The account button and its menu, in place of a Settings page (design.md):
- * Change password, Sign in with Ward, Import a CSV, Stats, Download a backup, then Sign out.
+ * Change username (its detail says who is signed in), Change password, Sign in
+ * with Ward, Import a CSV, Stats, Download a backup, then Sign out.
  * `bar` is the 34 px button in the desktop top bar; `header` is the 44 px
  * target beside a phone page's title.
  */
 export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
   const ward = useWardLink();
+  const username = useUsername();
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // A Ward link comes back to this page with its result; it shows here like an action's, then goes.
@@ -43,6 +55,7 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
   const sections: MenuSection[] = [
     {
       items: [
+        { label: "Change username", detail: username, onSelect: run(changeUsername) },
         { label: "Change password", onSelect: run(changePassword) },
         ...(ward.available
           ? [

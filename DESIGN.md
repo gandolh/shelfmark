@@ -400,7 +400,7 @@ The workhorse switch: the two places in the top bar, Table / Covers, Add a book'
 ### Navigation
 - **Desktop:** the top bar; the two places as a centred segmented control with 18 px segment padding, the current place a white tile.
 - **Phone:** the tab bar, two items (Library, Add a book), each an icon over an 11 px label; muted at rest, ink-2 on hover, accent and semibold when current; the icon scales to 0.92 while pressed.
-- **Account:** a round control-grey disc (34 px on the desktop, 32 px in a 44 px target on a phone) that opens a menu: change password, Sign in with Ward (linked or not), download a backup, sign out.
+- **Account:** a round control-grey disc (34 px on the desktop, 32 px in a 44 px target on a phone) that opens a menu: change username (the signed-in name as its detail, cut with an ellipsis past 20em), change password, Sign in with Ward (linked or not), import a CSV, stats, download a backup, sign out.
 - **Icons:** one hand-drawn line set on a 24-unit grid, 1.9 stroke, round caps and joins, `currentColor`, decorative (the control names itself).
 
 ### Menus and sheets

@@ -72,9 +72,13 @@ export function sessionReasonMessage(reason: string | undefined): string | null 
   }
 }
 
-/** What an account action (password, Ward link) says went wrong. */
+/** What an account action (username, password, Ward link) says went wrong. */
 export function accountMessage(error: AuthError): string {
   switch (error.code) {
+    case "invalid_username":
+      return "Use visible characters, with one space between words.";
+    case "username_taken":
+      return "Another account has that username. Choose another.";
     case "invalid_credentials":
       return "That isn't your current password.";
     case "password_too_short":

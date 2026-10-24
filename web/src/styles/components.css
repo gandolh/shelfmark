@@ -307,9 +307,19 @@
   background: none;
 }
 
+.menu__item-label {
+  flex: none;
+}
+
+/* A long detail (a username can run to 256 characters) is cut, not the menu widened. */
 .menu__item-detail {
+  min-width: 0;
+  max-width: 20em;
+  overflow: hidden;
   color: var(--muted);
   font-size: var(--text-small);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 767.98px) {
