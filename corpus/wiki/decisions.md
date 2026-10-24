@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them.
-updated: 2026-10-23
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app).
+updated: 2026-10-24
 ---
 
 # Decisions
@@ -149,3 +149,17 @@ Base UI owns focus, keys, placement and ARIA. It costs about 56 kB gzip on the
 main chunk. TanStack Table stays, since Base UI has no table, and native
 checkboxes, radios and selects stay native. Rejected: keeping the hand-built
 widgets, and shadcn, which brings Tailwind.
+
+## Only lightweight tests
+_2026-10-24_, the owner's call. `npm test` holds unit tests only: nothing
+boots the whole app, signs in with a real scrypt hash, or starts a child
+process. The seven files that did were deleted (`app.test.ts`, `seed.test.ts`,
+and the route tests for books, covers, lookup, views and backup), with their
+harness `server/src/testing/testApp.ts`. They held about 130 of 844 tests and
+about 36 of the 39 seconds, and the 3,000-book timing test failed whenever the
+machine was busy. The suite now runs in about 3 s. What went untested: the
+routes' HTTP shapes, the auth guard over every route, sign-in and the seed
+script, so check those by hand or in a browser walk. Ward's routes keep their
+own tests in ward-auth. Rejected: dropping only the timing and seed tests, and
+moving the seven behind an opt-in `npm run test:heavy`. A new test that boots
+the app needs an explicit revisit of this entry.

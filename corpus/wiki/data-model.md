@@ -108,8 +108,9 @@ but doubles the join and the edit UI for a case that hardly happens.
 - Money in minor units (bani) to avoid float sums.
 - No FTS5 index: search runs in the browser over all rows
   ([library-table.md](library-table.md)). Add one only if the server ever needs
-  to search. `GET /api/books` answers 3,000 books in about 35-40 ms (measured
-  in the route test on 2026-10-14).
+  to search. `GET /api/books` answered 3,000 books in about 35-40 ms (measured
+  on 2026-10-14 by a route test, dropped on 2026-10-24 with the other
+  app-booting tests).
 
 ## Files
 

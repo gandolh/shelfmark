@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. Brief 22 (Base UI under the widgets) built 2026-10-23, not deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-23
+summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. Brief 22 (Base UI under the widgets) built 2026-10-23, not deployed. Briefs 23-31 (the v1.x set) built 2026-10-23, and brief 32 (change the username, on ward-auth 0.4.0) built 2026-10-24, none deployed. What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
+updated: 2026-10-24
 ---
 
 # Status
@@ -22,7 +22,7 @@ product calls are in [decisions.md](decisions.md), the look in
 1. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-2. Redeploy to ship briefs 15 to 21, then run the two checks in
+2. Redeploy to ship briefs 15 to 32, then run the two checks in
    owner-setup's "Romanian lookups after a deploy": the libraries over port
    9991, and the first CIP refresh in the logs. The phone checks of briefs 18
    to 21 are in their outcomes. Brief 21's `?camera` readout numbers, sent
@@ -70,6 +70,7 @@ product calls are in [decisions.md](decisions.md), the look in
 | 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
 | 30 | [Fill a book from a photo of its CIP block](../briefs/done/30-cip-photo-capture.md) | 22 | done 2026-10-23; fixtures are renders, real photos and a phone walk owed |
 | 31 | [A subtitle field on the by-hand form](../briefs/done/31-subtitle-on-the-by-hand-form.md) | 23 | done 2026-10-23 |
+| 32 | [Change the username](../briefs/done/32-change-username.md) | 24 | done 2026-10-24 |
 
 Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
 the web foundation from the server lookup and the scanner; accounts wait for
@@ -81,7 +82,8 @@ test then moves to a signed-in session in one place.
 None. On 2026-10-23 the v1.x todos became briefs 23–28, stats and the CIP photo
 became 29 and 30, and the Atrium link was dropped (the apps stay independent).
 The review's two todos went the same day: the subtitle field became 31, and the pinned
-bulk bar was dropped.
+bulk bar was dropped. The owner's change-username request (2026-10-24) went straight to
+brief 32, after the rename was built into ward-auth.
 Waves 15–22 were planned one at a time, since each touches the Library page or the add flow. On
 2026-10-23 they ran two at a time where the files did not overlap; 26 and 27 were built in a
 worktree and cherry-picked onto `main`.

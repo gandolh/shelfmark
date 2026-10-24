@@ -538,3 +538,29 @@ subtitle. [Brief 31](briefs/done/31-subtitle-on-the-by-hand-form.md). Built inli
 
 The timing test passed in the full run on an idle machine (load 0.64): its earlier failures
 came from the trips agent building alongside, so it stays as it is.
+
+## [2026-10-24] done | Brief 32: change the username
+
+The owner asked for a way to change their username. The vendored ward-auth had no
+rename, so the owner chose to put it in the library rather than have Shelfmark write
+`auth_users` itself. It was built in `../wzd_auth` as ward-auth 0.4.0 (its brief 37,
+commit `22251c4`), then re-vendored here. "Change username" now sits at the top of
+the account menu with the signed-in name as its detail. It opens a one-field dialog
+in the shell it now shares with Change password (`account/AccountDialog.tsx`). The
+id and every session stay. On the way, both dialogs' Done buttons got focus, which
+had fallen to the panel after a save. owner-setup says to give the seed the new name
+after a rename, since the seed matches by name. Checked: typecheck, lint, build,
+tests, and a browser walk at 1280 and 390 px on a scratch database.
+[Brief 32](briefs/done/32-change-username.md). Built inline.
+
+## [2026-10-24] decision | Only lightweight tests
+
+The owner asked to drop the heavy tests and keep the lightweight ones, then chose
+to drop every test that boots the app: `app.test.ts`, `seed.test.ts`, the route
+tests for books, covers, lookup, views and backup, and their harness
+`testing/testApp.ts`. They held about 130 tests and 36 of the suite's 39 seconds.
+The 3,000-book timing test among them had failed twice that day under load and
+passed alone. `npm test` now runs 715 tests in about 3 s. Rejected: dropping only
+the timing and seed tests, and an opt-in `test:heavy` script. The routes, the
+guard, sign-in and the seed are now checked by hand.
+[decisions.md](wiki/decisions.md) has the entry.

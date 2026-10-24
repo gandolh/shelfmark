@@ -1,6 +1,6 @@
 ---
 summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-10-23
+updated: 2026-10-24
 ---
 
 # Design
@@ -73,9 +73,10 @@ Two places only: **Library** and **Add a book**.
 - Desktop: a top bar in three columns: wordmark left, the two places as a
   segmented control in the centre, search and the account button right.
 - Phone: a two-tab bar at the bottom.
-- **No Settings tab.** The account button opens a menu with: change password,
-  Sign in with Ward (linked or not), download a backup (the database file),
-  sign out.
+- **No Settings tab.** The account button opens a menu with: change username
+  (its detail is the name signed in, since brief 32), change password, Sign in
+  with Ward (linked or not), import a CSV, stats, download a backup (the
+  database file), sign out.
 - **No loans** at all (owner, 2026-10-14).
 - The **wishlist** is not a place: Library has two collections, Owned and
   Wishlist, as text tabs under the page title ("Owned 14 · Wishlist 3").
