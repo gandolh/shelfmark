@@ -45,11 +45,6 @@ registered the same way.
    public JWK and these addresses:
    - redirect URI: `<production origin>/shelfmark-api/auth/ward/callback`
    - sign-out return URI: `<production origin>/shelfmark/`
-5. Redeploy Ward's UI, so its login allowlist knows `/shelfmark/`:
-
-   ```
-   cd ~/projects/vps-deploy && node cli.ts ward deploy
-   ```
 
 ## 3. Write the deploy secrets
 
