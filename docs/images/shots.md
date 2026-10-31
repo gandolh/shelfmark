@@ -12,11 +12,11 @@ publisher's artwork appears.
 
 | File | Shows | How to reach that state | Viewport | Taken |
 |---|---|---|---|---|
-| hero.webp | Library, Covers view, 27 books | Fresh seed, sign in, press Covers | 1440×900 @2x, scaled to 1600 px wide | 2026-10-16 |
-| library-table.webp | Table sorted by year with the Export menu open | Press Table. In Columns, untick Added (every seeded book was added the same day) and tick Rating and Language. Click the Year header, then Export | 1440×900 @2x, scaled to 1600 px | 2026-10-16 |
-| book-page.webp | The book page for Enigma Otiliei | Click Enigma Otiliei in the table | 1440×900 @2x, scaled to 1600 px | 2026-10-16 |
-| phone-search.webp | Search for `padurea` finding Pădurea spânzuraților | `set device "iPhone 14"`, open `/shelfmark/`, type `padurea` in the search box; cropped to the top 1300 px | iPhone 14, 390×844 @3x, crop scaled to 780 px | 2026-10-16 |
-| phone-add.webp | Add a book after a lookup that found nothing | Add a book, Type ISBN, `9789730000009` (a made-up ISBN with a valid check digit), Look up; type Moromeții and Marin Preda into the form, then scroll to the top | iPhone 14, scaled to 780 px | 2026-10-16 |
+| hero.webp | Library, Covers view, 27 books | Fresh seed, sign in, press Covers | 1440×900 @2x, scaled to 1600 px wide | 2026-10-31 |
+| library-table.webp | Table sorted by year, three rows ticked for a bulk edit | Press Table, click the Year header, tick the first three rows; the bulk-edit bar replaces the toolbar | 1440×900 @2x, scaled to 1600 px | 2026-10-31 |
+| book-page.webp | The book page for Enigma Otiliei | Click Enigma Otiliei in the table | 1440×900 @2x, scaled to 1600 px | 2026-10-31 |
+| phone-search.webp | Search for `padurea` finding Pădurea spânzuraților | `set device "iPhone 14"`, open `/shelfmark/`, type `padurea` in the search box; cropped to the top 1300 px | iPhone 14, 390×844 @3x, crop scaled to 780 px | 2026-10-31 |
+| phone-add.webp | Add a book after a lookup that found nothing | Add a book, Type ISBN, `9789730000009` (a made-up ISBN with a valid check digit), Look up. On 2026-10-31 the workspace could reach none of the catalogs, so the note says they didn't answer, and the screen shows the offer to read the CIP block | iPhone 14, scaled to 780 px | 2026-10-31 |
 
 ## Not taken
 
@@ -53,9 +53,9 @@ publisher's artwork appears.
 
 ## Capture method
 
-- Browser: `agent-browser --session shelfmark-readme`, `set viewport 1440 900 2`
-  for desktop, `set device "iPhone 14"` for the phone, then `screenshot` with
-  an absolute path. Sign in through the login page once; the session cookie
+- Browser: on 2026-10-31, Playwright with Chrome, a 1440×900 @2x context for
+  desktop and the `iPhone 14` device for the phone; earlier,
+  `agent-browser --session shelfmark-readme` with the same sizes. Sign in through the login page once; the session cookie
   carries over, and so does the column layout, which the app remembers.
 - Stills: PNG to WebP with
   `ffmpeg -i in.png -vf scale=1600:-1:flags=lanczos -c:v libwebp -quality 82 out.webp`

@@ -576,3 +576,7 @@ all three libraries accepted a connection on port 9991: the Academy in 168 ms,
 BCU Cluj in 134 ms, and BCU Timișoara in 5.2 s, against the lookup's 10 s per
 library. The in-app lookup of `9786068044873` and the phone checks stay with the
 owner.
+
+## [2026-10-31] maintenance | README: deployed, the v1.x features, and new images
+
+A README refresh pass with the readme-docs standard. The README still said version 1 was not deployed and described the library as it was on 2026-10-16. It now says briefs 15-32 went live on 2026-10-24 and lists what briefs 23-31 added: saved views, bulk edits from the table, the wishlist, CSV import, stats, the offline "do I own this?" check, queued offline scans, and reading the CIP block from a photo. All five images were taken again from `docs/images/demo-seed.mjs` on a scratch `DATA_DIR`. The table shot now shows three rows ticked and the bulk-edit bar instead of the Export menu, and the add-a-book shot shows the CIP offer; the catalogs were unreachable from the workspace, so its note says they didn't answer. Checked: `npm ci`, the seed, `npm run dev` on port 5176 and the demo seed. `shots.md` records the Playwright capture.

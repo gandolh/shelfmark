@@ -6,13 +6,17 @@ A catalog of the paper books on your shelves at home. Scan a barcode with your p
   <img src="docs/images/hero.webp" width="100%" alt="Shelfmark's Library in the Covers view: 27 books, newest first, as a grid of plain coloured covers that show each title and author, such as Amintiri din copilărie by Ion Creangă, Pride and Prejudice by Jane Austen and Enigma Otiliei by George Călinescu">
 </p>
 
-**Status:** Personal project. Version 1 is built and reviewed and runs locally. It is not deployed yet, and the camera scanner and the home-screen install still wait to be tried on a real phone.
+**Status:** Personal project, deployed on 2026-10-24 with everything up to brief 32. The camera scanner and the home-screen install still wait to be tried on a real phone.
 
 ## What it does
 
 - Adds a book from its barcode, through the phone camera, a typed ISBN or a USB barcode scanner on a laptop, and warns you when the book is already on your shelves.
 - Looks the ISBN up in Open Library, then in three Romanian library catalogs (the Romanian Academy Library, BCU Cluj and BCU Timișoara), then in a local copy of the national library's CIP lists of new books, and last in Google Books if you give it a key. You confirm the draft before anything is saved. When the lookup finds nothing, a short form asks for what the cover says.
-- Shows the library as a table or as covers, with a sort on several columns, a filter on each column, and search that ignores diacritics, so `padurea` finds *Pădurea spânzuraților*. The columns you show, hide, reorder and resize are remembered.
+- Shows the library as a table or as covers, with a sort on several columns, a filter on each column, and search that ignores diacritics, so `padurea` finds *Pădurea spânzuraților*. The columns you show, hide, reorder and resize are remembered, and a filter and sort can be saved as a named view.
+- Edits many books at once from the table: move them to a shelf, set their status, add or remove tags, or delete them.
+- Keeps a wishlist beside the books you own, imports a CSV, and shows stats on the library from the account menu.
+- Answers "do I own this?" offline, and queues scans made offline to look them up when the phone is back online.
+- Reads the CIP block from a photo of the copyright page, to fill the form when no catalog knows the ISBN.
 - Keeps your own details on every book: shelf, reading status, rating, tags, notes, format, condition, and where, when and for how much you got it.
 - Exports the current view or every book to Excel or CSV, and downloads a full backup as one SQLite file, covers included.
 - Installs to a phone's home screen. The app shell works offline.
@@ -21,13 +25,13 @@ Libib, BookBuddy and CLZ Books do much of this as hosted apps. Shelfmark keeps t
 
 ## Screenshots
 
-| The table, sorted by year, with the export menu open | A book page, with About the book and About this copy |
+| The table, sorted by year, with three books picked for a bulk edit | A book page, with About the book and About this copy |
 |---|---|
-| ![Library table sorted by year, newest first, with columns for book, publisher, year, shelf, status, rating and language; the Export menu offers Excel or CSV for the 27 books in view, or for every book with every field](docs/images/library-table.webp) | ![Book page for Enigma Otiliei by George Călinescu: a large generated cover with a Change cover button, an About the book card with publisher, year, pages and language, and an About this copy card with shelf, status, format, condition, tags and a note](docs/images/book-page.webp) |
+| ![Library table sorted by year, newest first, with Owned 27 and Wishlist 0 tabs and columns for book, publisher, year, shelf, status and added date; three rows are ticked and the bar above offers Move to shelf, Set status, Add tags, Remove tags and Delete](docs/images/library-table.webp) | ![Book page for Enigma Otiliei by George Călinescu: a large generated cover with a Change cover button, an About the book card with publisher, year, pages and language, and an About this copy card with shelf, status, format, condition, tags and a note](docs/images/book-page.webp) |
 
-| Search ignores diacritics | The lookup found nothing, so you type what the cover says |
+| Search ignores diacritics | The lookup found nothing, so you fill in what the book says |
 |---|---|
-| <img src="docs/images/phone-search.webp" width="300" alt="Phone screen: the search box holds 'padurea', the heading reads 1 of 27 books, and the one result is Pădurea spânzuraților by Liviu Rebreanu"> | <img src="docs/images/phone-add.webp" width="300" alt="Phone screen of Add a book: the Scan, Type ISBN and By hand tabs, an ISBN the lookup found nothing for, and a short form with the title and author filled in and shelf buttons below"> |
+| <img src="docs/images/phone-search.webp" width="300" alt="Phone screen: the search box holds 'padurea', the heading reads 1 of 27 books, and the one result is Pădurea spânzuraților by Liviu Rebreanu"> | <img src="docs/images/phone-add.webp" width="300" alt="Phone screen of Add a book: the Scan, Type ISBN and By hand tabs, an ISBN no source matched, a note on which catalogs were asked, and the offer to read the CIP block from a photo of the copyright page"> |
 
 The screens show a made-up `demo` account with 27 classics. None has a cover file, so the app draws its own covers from the title and author. How each image was made: [docs/images/shots.md](docs/images/shots.md).
 
