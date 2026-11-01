@@ -16,7 +16,7 @@ a phone over the LAN.
 ## Context
 
 See [architecture.md](../wiki/architecture.md). Copy conventions from
-`../satchel` (root `package.json`, `tsconfig.base.json`, `.npmrc`), not its
+`satchel` (root `package.json`, `tsconfig.base.json`, `.npmrc`), not its
 code. Pick current versions at build time; vite-plugin-pwa 2.0.0 was only eleven
 days old on 2026-10-14.
 

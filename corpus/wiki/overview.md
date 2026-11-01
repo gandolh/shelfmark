@@ -25,7 +25,7 @@ them poorly (see [metadata-lookup.md](metadata-lookup.md)).
 ## What it leaves out
 
 - **Ebook files.** Reading and storing PDF/EPUB files is Atrium's job
-  (`../atrium`). Shelfmark catalogs objects on shelves; it never holds a file
+  (`atrium`). Shelfmark catalogs objects on shelves; it never holds a file
   of the book. A later link from a book to its Atrium copy is in the backlog.
 - **Social features.** No reviews feed, friends, reading challenges or public
   profiles. Goodreads does that.
@@ -33,7 +33,7 @@ them poorly (see [metadata-lookup.md](metadata-lookup.md)).
 
 ## Lineage
 
-It follows the house stack and layout that Satchel (`../satchel`) uses: npm
+It follows the house stack and layout that Satchel (`satchel`) uses: npm
 workspaces with a Fastify + better-sqlite3 API, a Vite + React PWA, and a
 shared package of zod schemas. The research behind the feature set is in
 [features.md](features.md); the structure is in [architecture.md](architecture.md).

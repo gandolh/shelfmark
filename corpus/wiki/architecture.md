@@ -10,7 +10,7 @@ page and it disagree.
 
 ## Pieces
 
-npm workspaces, the Satchel layout (`../satchel`), Node 24, exact versions
+npm workspaces, the Satchel layout (`satchel`), Node 24, exact versions
 (`save-exact=true`), TypeScript strict, Vitest, ESLint:
 
 - `shared`: zod schemas for every route, the book field definitions, ISBN
@@ -41,7 +41,7 @@ No CLI workspace: nothing outside the browser needs the data yet.
 
 As Satchel: Caddy on the shared VPS serves the PWA at `/shelfmark/*` and
 forwards `/shelfmark-api/*` with `handle_path` to the API container on
-`127.0.0.1:<port>`, deployed by `../vps-deploy` as a `WebServiceStack`. The
+`127.0.0.1:<port>`, deployed by `vps-deploy` as a `WebServiceStack`. The
 port is 8796. Deploying is an owner step ([docs/owner-setup.md](../../docs/owner-setup.md)).
 
 ## Dev

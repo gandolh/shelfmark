@@ -7,7 +7,7 @@ tags: [v1, infra]
 
 # Deploy to the shared VPS
 
-A Dockerfile for the API, a `WebServiceStack` in `../vps-deploy` serving the PWA
+A Dockerfile for the API, a `WebServiceStack` in `vps-deploy` serving the PWA
 at `/shelfmark` and the API at `/shelfmark-api`, the data volume, and the
 owner's deploy commands written down. Deploying is an owner step.
 

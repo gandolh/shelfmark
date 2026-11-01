@@ -86,7 +86,7 @@ updated: <YYYY-MM-DD>
 
 - Standard relative markdown links. Code links from `wiki/` look like
   `../../server/src/app.ts`. Other repos are named in backticks
-  (`../satchel/server`), never linked.
+  (`satchel/server`), never linked.
 - Absolute dates only (`2026-10-14`), never "last week".
 - One concept per page. Split a page past 200 body lines.
 - Never write the production domain in the corpus or the docs.

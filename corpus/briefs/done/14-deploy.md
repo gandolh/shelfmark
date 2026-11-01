@@ -5,12 +5,12 @@
 Shelfmark runs on the owner's VPS like Satchel ([decisions.md](../../wiki/decisions.md),
 [architecture.md](../../wiki/architecture.md)): Caddy serves the PWA at
 `/shelfmark/` and forwards `/shelfmark-api/` with `handle_path` to an API
-container on `127.0.0.1:8796`, deployed by `../vps-deploy`. Satchel is the
-worked example for every file here: `../satchel/infrastructure/Dockerfile`,
-`../satchel/infrastructure/docker-compose.yml`,
-`../vps-deploy/stacks/satchel.ts`, its `SourceRepo` entry in
-`../vps-deploy/lib/estate.ts`, and `satchel.useWard(ward.identityFor(...))` in
-`../vps-deploy/app.ts`. Read `../vps-deploy/README.md` before touching it.
+container on `127.0.0.1:8796`, deployed by `vps-deploy`. Satchel is the
+worked example for every file here: `satchel/infrastructure/Dockerfile`,
+`satchel/infrastructure/docker-compose.yml`,
+`vps-deploy/stacks/satchel.ts`, its `SourceRepo` entry in
+`vps-deploy/lib/estate.ts`, and `satchel.useWard(ward.identityFor(...))` in
+`vps-deploy/app.ts`. Read `vps-deploy/README.md` before touching it.
 
 **Deploying is an owner step.** This brief prepares everything and writes the
 exact commands; it never runs a deploy, never pushes, and never installs git
@@ -25,9 +25,9 @@ Depends on all v1 briefs except 13 (they can run side by side).
 infrastructure/Dockerfile  infrastructure/docker-compose.yml
 docs/owner-setup.md
 README.md                                  (fill the "Owner setup" heading with a link)
-../vps-deploy/stacks/shelfmark.ts          (new; commit in that repo)
-../vps-deploy/lib/estate.ts                (the shelfmark SourceRepo entry)
-../vps-deploy/app.ts                       (construct the stack; useWard)
+vps-deploy/stacks/shelfmark.ts          (new; commit in that repo)
+vps-deploy/lib/estate.ts                (the shelfmark SourceRepo entry)
+vps-deploy/app.ts                       (construct the stack; useWard)
 ```
 
 ## Files you must NOT touch
@@ -48,20 +48,20 @@ in the outcome note). Other stacks in vps-deploy.
    published on `127.0.0.1` only, `env_file: .env` (written by the deploy),
    environment overrides that beat a stray dev `.env`, the data directory
    bind-mounted from `SHELFMARK_DATA_DIR`.
-3. **Stack** (`../vps-deploy/stacks/shelfmark.ts`): a `WebServiceStack` like Satchel's:
+3. **Stack** (`vps-deploy/stacks/shelfmark.ts`): a `WebServiceStack` like Satchel's:
    `basePath: "/shelfmark"`, `apiPrefix: "/shelfmark-api"`, client built with
    `npm run build` and `baseEnv: "SHELFMARK_BASE"`, `tryFiles: "spa"`,
    persistent state `/srv/shelfmark-api/data` (it holds every book and cover),
-   port 8796, environment from `../vps-deploy/secrets/shelfmark.env`:
+   port 8796, environment from `vps-deploy/secrets/shelfmark.env`:
    `GOOGLE_BOOKS_API_KEY` (and `WARD_OIDC_CLIENT_KEY` through `useWard`).
-   Register the repo in `../vps-deploy/lib/estate.ts`, construct the stack in `app.ts` among
+   Register the repo in `vps-deploy/lib/estate.ts`, construct the stack in `app.ts` among
    the applications, and add `shelfmark.useWard(ward.identityFor(shelfmark,
    "shelfmark"))`. Run `npm run check` and `npm run graph` in vps-deploy: no
    port or path clash; commit the synth output if the README says to.
 4. **Owner setup** (`docs/owner-setup.md`), every step with exact commands and
    no values: register Shelfmark as a client in production Ward (as Satchel was;
-   follow `../wzd_auth/shared-library/README.md`); write
-   `../vps-deploy/secrets/shelfmark.env` in vps-deploy with the two keys; run the deploy
+   follow `wzd_auth/shared-library/README.md`); write
+   `vps-deploy/secrets/shelfmark.env` in vps-deploy with the two keys; run the deploy
    (`node cli.ts shelfmark deploy` or the phases the README names, with a
    `--dry-run` first); create the owner account on the server with the seed
    script inside the container (`SEED_USERNAME`, `SEED_PASSWORD` passed on the
@@ -85,7 +85,7 @@ _2026-10-15_. Prepared; the deploy and the local container check are the
 owner's, in [docs/owner-setup.md](../../../docs/owner-setup.md). Docker isn't
 reachable from this WSL distro, so `docker compose … up --build` didn't run
 here; the Dockerfile and compose file are Satchel's tested ones with the
-names and port 8796, without the CLI workspace. In `../vps-deploy` (committed
+names and port 8796, without the CLI workspace. In `vps-deploy` (committed
 there): `stacks/shelfmark.ts`, the `SourceRepo` entry, the stack and
 `useWard` in `app.ts`, and the regenerated Caddyfile. `npm run typecheck` and
 `npm run check` pass (no port, path or directory clash), and `node cli.ts

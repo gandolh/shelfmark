@@ -1,6 +1,6 @@
 # Finish review packet: Shelfmark v1 web UI (brief 13)
 
-Round 1, 2026-10-15. Project root `/home/gandolh/projects/shelfmark`; the artifact
+Round 1, 2026-10-15. Project root: the repo root; the artifact
 is the React PWA in `web/src` (served by Vite at `/shelfmark/`, API at
 `/shelfmark-api`). Platform: web. Mode: Operate.
 
@@ -21,13 +21,13 @@ so conventional navigation is a hard preference.
 
 | What | Path |
 |---|---|
-| Direction contract | `/home/gandolh/projects/shelfmark/corpus/wiki/design.md` |
-| Product record | `/home/gandolh/projects/shelfmark/PRODUCT.md` |
-| Tokens (the only place a colour is written) | `/home/gandolh/projects/shelfmark/web/src/styles/tokens.css` |
-| Vocabulary for UI copy | `/home/gandolh/projects/shelfmark/corpus/wiki/glossary.md` |
-| Craft floor | `/home/gandolh/projects/my-personal-skills/skills/impeccable/reference/craft-floor.md` |
-| Critique reference | `/home/gandolh/projects/shelfmark/.impeccable/review/mockups.md` |
-| App icon | `/home/gandolh/projects/shelfmark/web/public/icon.svg`, rendered: `/home/gandolh/projects/shelfmark/web/public/icons/icon-192.png`, `maskable-512.png` |
+| Direction contract | `corpus/wiki/design.md` |
+| Product record | `PRODUCT.md` |
+| Tokens (the only place a colour is written) | `web/src/styles/tokens.css` |
+| Vocabulary for UI copy | `corpus/wiki/glossary.md` |
+| Craft floor | `my-personal-skills/skills/impeccable/reference/craft-floor.md` |
+| Critique reference | `.impeccable/review/mockups.md` |
+| App icon | `web/public/icon.svg`, rendered: `web/public/icons/icon-192.png`, `maskable-512.png` |
 
 - **Approved comp: none.** This is a code-led build. `mockups.md` is the
   critique reference: measurements transcribed from the owner's design canvas
@@ -72,7 +72,7 @@ so conventional navigation is a hard preference.
 
 ## Screenshots (all required; each one opened and checked)
 
-Directory: `/home/gandolh/projects/shelfmark/.impeccable/review/`.
+Directory: `.impeccable/review`.
 `desktop.png` is a copy of `desktop-library-table.png`; `mobile.png` is a copy
 of `mobile-library-covers.png`.
 

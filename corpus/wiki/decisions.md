@@ -14,7 +14,7 @@ them; [open-questions.md](open-questions.md) tracks what still needs an answer.
 ## Physical books only; ebooks stay in Atrium
 _2026-10-14_. Shelfmark catalogs printed books on the owner's shelves. It never
 stores or reads a book file. The owner asked for "what physical books do I
-own". Rejected: adding a physical-books section to Atrium (`../atrium`), which
+own". Rejected: adding a physical-books section to Atrium (`atrium`), which
 is built around uploaded files, readers and per-profile reading progress; a
 catalog of objects shares almost none of that, and would bend Atrium's single
 media grid around items with no file. **Revisited 2026-10-23:** there is no link
@@ -25,7 +25,7 @@ they will say when. Until then, no feature reaches from one app into the other.
 ## A web app with a PWA, on React + Fastify + SQLite
 _2026-10-14_. The owner chose the stack: a React PWA for the phone and laptop,
 a Fastify API, SQLite for storage. It matches the estate's house stack (Satchel,
-`../satchel`), so the layout, auth library and deploy pattern are reused.
+`satchel`), so the layout, auth library and deploy pattern are reused.
 Rejected: a native app, which would scan more easily (no browser camera
 quirks, see [scanning.md](scanning.md)) but means a second codebase and an
 app-store or sideload step for one user. Rejected: an existing service
@@ -34,8 +34,8 @@ app-store or sideload step for one user. Rejected: an existing service
 ## One user, deployed on the VPS with its own login
 _2026-10-14_. The owner answered: Shelfmark is for the owner alone, and it runs
 on the shared VPS like Satchel (HTTPS through Caddy, deployed by
-`../vps-deploy`), with Shelfmark's own login and "Sign in with Ward" as the
-second way in (the estate rule in `../wzd_auth`, decisions-oidc). Rejected:
+`vps-deploy`), with Shelfmark's own login and "Sign in with Ward" as the
+second way in (the estate rule in `wzd_auth`, decisions-oidc). Rejected:
 home network only, which still needs a local certificate for the phone camera
 and loses the "do I own this?" check in a bookshop. Rejected: household
 accounts and view-only guests, which would put an owner or role on every row

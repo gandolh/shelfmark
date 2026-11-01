@@ -26,7 +26,7 @@ GOOGLE_BOOKS_API_KEY=<the key>
 
 ## 2. Register Shelfmark in production Ward
 
-The adoption guide is `../wzd_auth/shared-library/README.md`. Satchel was
+The adoption guide is `wzd_auth/shared-library/README.md`. Satchel was
 registered the same way.
 
 1. Open `/ward/console` on the production site and sign in as the break-glass
@@ -36,7 +36,7 @@ registered the same way.
 3. Make the client's key pair, from Ward's repo root:
 
    ```
-   cd ~/projects/wzd_auth && npm run oidc-client-key --workspace=api -- shelfmark
+   cd path/to/wzd_auth && npm run oidc-client-key --workspace=api -- shelfmark
    ```
 
    It prints a private `WARD_OIDC_CLIENT_KEY=...` line and a public JWK. Keep
@@ -48,7 +48,7 @@ registered the same way.
 
 ## 3. Write the deploy secrets
 
-Create `~/projects/vps-deploy/secrets/shelfmark.env` with two lines, then
+Create `vps-deploy/secrets/shelfmark.env` with two lines, then
 `chmod 600` it:
 
 ```
@@ -81,7 +81,7 @@ docker compose -f infrastructure/docker-compose.yml down
 Dry run first. It prints every action and runs none:
 
 ```
-cd ~/projects/vps-deploy
+cd path/to/vps-deploy
 node cli.ts shelfmark all --dry-run
 ```
 

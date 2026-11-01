@@ -94,7 +94,7 @@ and Enter into the ISBN field on Add a book.
 ## Try "Sign in with Ward"
 
 Start Ward locally and run its seed, as
-`../wzd_auth/infrastructure/local/README.md` describes. The seed registers
+`wzd_auth/infrastructure/local/README.md` describes. The seed registers
 Shelfmark and writes the five `WARD_OIDC_*` values into this repo's `.env`.
 Restart `npm run dev` afterwards. The login page then shows the Ward button.
 

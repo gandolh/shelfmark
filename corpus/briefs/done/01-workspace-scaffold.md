@@ -9,7 +9,7 @@ Extend the existing `README.md` and `.gitignore` rather than replacing them.
 Read [architecture.md](../../wiki/architecture.md) for the three workspaces and
 the dev wiring, and [decisions.md](../../wiki/decisions.md) before choosing
 anything that could go another way. The house template is Satchel
-(`../satchel`): copy its tooling shape (root `package.json` scripts,
+(`satchel`): copy its tooling shape (root `package.json` scripts,
 `tsconfig.base.json`, `eslint.config.js`, `vitest.config.ts`, `.npmrc`), not
 its code.
 

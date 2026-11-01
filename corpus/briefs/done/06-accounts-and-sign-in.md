@@ -7,13 +7,13 @@ Shelfmark is for one person and runs on the VPS, so it needs a login
 owns its accounts and its login page, with "Sign in with Ward" as a second way
 in, through Ward's shared library vendored into the app. Read, in this order:
 
-- `../wzd_auth/corpus/wiki/integrating.md` and
-  `../wzd_auth/shared-library/README.md` (the adoption guide: vendoring,
+- `wzd_auth/corpus/wiki/integrating.md` and
+  `wzd_auth/shared-library/README.md` (the adoption guide: vendoring,
   `wardAuth`, the hooks, the gotchas).
-- Satchel, the worked example on this exact stack: `../satchel/server/vendor/ward/`
-  (library 0.3.1), the `wardAuth` registration in `../satchel/server/src/app.ts`,
-  `../satchel/server/src/auth/guard.ts`, `../satchel/server/src/seed.ts`, and
-  `../satchel/web/src/auth/` (login page, auth gate, session).
+- Satchel, the worked example on this exact stack: `satchel/server/vendor/ward`
+  (library 0.3.1), the `wardAuth` registration in `satchel/server/src/app.ts`,
+  `satchel/server/src/auth/guard.ts`, `satchel/server/src/seed.ts`, and
+  `satchel/web/src/auth` (login page, auth gate, session).
 
 Shelfmark is simpler than Satchel: one user, no roles, no bearer tokens, no
 WebSocket. Depends on briefs 02 and 04.
@@ -31,7 +31,7 @@ web/src/auth/LoginPage.tsx  web/src/auth/AuthGate.tsx  web/src/auth/session.ts  
 web/src/account/actions.ts                (change password, Ward link/unlink, sign out)
 web/src/account/ChangePassword.tsx
 web/src/App.tsx                           (wrap the shell in AuthGate)
-../wzd_auth/infrastructure/local/seed.mjs (one APPS entry; commit in that repo)
+wzd_auth/infrastructure/local/seed.mjs (one APPS entry; commit in that repo)
 ```
 
 ## Files you must NOT touch
@@ -104,7 +104,7 @@ browser opened the dev server at, because the library's own login compares
 "Sign in with Ward" creates the local user (the Ward grant is the gate), a
 user created that way can set a first password after confirming with Ward,
 and the guard's 401 body is the library's `{ error: "unauthorized" }`. The
-APPS entry and a README row are committed in `../wzd_auth`. 60 new tests;
+APPS entry and a README row are committed in `wzd_auth`. 60 new tests;
 impeccable's finish reviewer passed the login page and password dialog.
 
 **Owner checks:** with Docker Desktop's WSL integration on, run Ward's local

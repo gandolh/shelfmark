@@ -10,8 +10,8 @@ _2026-10-15_. v1 is built. All 14 briefs were built on 2026-10-14 and
 followed by a three-finder review and two fix rounds, then impeccable's
 design finish ([DESIGN.md](../../DESIGN.md)). 515 tests pass; typecheck,
 lint and build are clean. `main` is pushed to the GitHub repo
-gandolh/shelfmark, and so is `../wzd_auth`'s local seed entry (`55cf336`).
-`../vps-deploy` has no remote; its Shelfmark stack (`1c5438b`) is a local
+`<owner>/shelfmark`, and so is `wzd_auth`'s local seed entry (`55cf336`).
+`vps-deploy` has no remote; its Shelfmark stack (`1c5438b`) is a local
 commit, which is where the deploy runs from. Nothing is deployed. The README
 and `docs/` follow the readme-docs standard since 2026-10-16. The
 product calls are in [decisions.md](decisions.md), the look in

@@ -38,7 +38,7 @@ Shelfmark keeps all of it except loans.
 | Personal fields | Shelf, reading status, rating, tags, notes, format, condition, acquired date/where/price. These are what "filter by any column" filters. See [data-model.md](data-model.md). |
 | Export | CSV and XLSX of the current view or everything, plus a full backup. See [export.md](export.md). |
 | PWA | Installable; app shell works offline. |
-| Accounts | Own login with "Sign in with Ward" as the second way in (estate rule from `../wzd_auth`); its items live in the account menu, not a Settings page. Change username shipped 2026-10-24 (brief 32, on ward-auth 0.4.0's rename). |
+| Accounts | Own login with "Sign in with Ward" as the second way in (estate rule from `wzd_auth`); its items live in the account menu, not a Settings page. Change username shipped 2026-10-24 (brief 32, on ward-auth 0.4.0's rename). |
 
 ## v1.x — right after
 

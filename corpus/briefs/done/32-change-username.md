@@ -4,7 +4,7 @@
 
 Promoted 2026-10-24 from the todo [change-username](../../todos/change-username.md).
 The owner chose to put the rename in the ward-auth library. It is built there as
-0.4.0 (`../wzd_auth`, brief 37, commit `22251c4`): `accounts.renameUser`,
+0.4.0 (`wzd_auth`, brief 37, commit `22251c4`): `accounts.renameUser`,
 `POST <routePrefix>/username` (guarded, on by default), `client.renameUser` and
 `useRenameUser()`. A rename keeps the user id and every session, and the session
 state carries the new name as soon as it resolves. The library's errors are
@@ -29,7 +29,7 @@ Facts (checked 2026-10-24):
 ## Files you OWN
 
 - `server/vendor/ward/`, `web/vendor/ward/`: re-vendored to 0.4.0
-  (`npm run vendor -- ../shelfmark/<side>/vendor/ward` from `../wzd_auth`)
+  (`npm run vendor -- ../shelfmark/<side>/vendor/ward` from `wzd_auth`)
 - `server/src/app.test.ts`: the route is guarded and renames through the app
 - `web/src/account/`: a `ChangeUsername.tsx` dialog, the shared dialog shell pulled
   out of `ChangePassword.tsx`, `actions.ts`, tests, `account.css`
@@ -67,7 +67,7 @@ Facts (checked 2026-10-24):
 
 ## Outcome (2026-10-24)
 
-Built as specified, inline (no agent), on ward-auth 0.4.0 (`../wzd_auth`
+Built as specified, inline (no agent), on ward-auth 0.4.0 (`wzd_auth`
 `22251c4`, its brief 37), with these choices:
 
 - Both vendored copies were re-vendored with the library's own script. A

@@ -37,7 +37,7 @@ The screens show a made-up `demo` account with 27 classics. None has a cover fil
 
 ## How it works
 
-Three npm workspaces. `shared` holds the zod schemas for every route, the book fields, and ISBN parsing and check digits. `server` is a Fastify API on SQLite. It runs the ISBN lookups through a queue and a cache, keeps covers in the database, and serves the backup. `web` is the React PWA. TanStack Table sorts and filters every book in the browser, so the table needs no server round trip. The scanner reads barcodes with the browser's BarcodeDetector, or with a ZXing build in WebAssembly where the browser has none. You sign in with a local account, or with [Ward](https://github.com/gandolh/ward-auth), the sign-in service the owner's other apps share.
+Three npm workspaces. `shared` holds the zod schemas for every route, the book fields, and ISBN parsing and check digits. `server` is a Fastify API on SQLite. It runs the ISBN lookups through a queue and a cache, keeps covers in the database, and serves the backup. `web` is the React PWA. TanStack Table sorts and filters every book in the browser, so the table needs no server round trip. The scanner reads barcodes with the browser's BarcodeDetector, or with a ZXing build in WebAssembly where the browser has none. You sign in with a local account, or with Ward, the sign-in service the owner's other apps share.
 
 ```mermaid
 flowchart LR

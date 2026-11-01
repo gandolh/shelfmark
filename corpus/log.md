@@ -74,7 +74,7 @@ states in [wiki/status.md](wiki/status.md).
 ## [2026-10-15] build | Waves 1-3 built: briefs 01, 02, 03, 04, 05, 07
 
 Built with `plan-split-dispatch`, one commit per brief on `main`, not pushed.
-The remote is the GitHub repo gandolh/shelfmark (set 2026-10-14). Gate
+The remote is the GitHub repo `<owner>/shelfmark` (set 2026-10-14). Gate
 between waves: typecheck, lint, tests (280 after wave 3), build. Rulings worth
 keeping:
 
@@ -113,12 +113,12 @@ accounts alone; 465 tests after the wave. Rulings:
   `_writeToOutput` trick throws on Node 24's `readline/promises`); not fixed
   there.
 - Shelfmark's entry in Ward's local `seed.mjs` and its README row are
-  committed in `../wzd_auth`. The live Ward round trip waits for Docker.
+  committed in `wzd_auth`. The live Ward round trip waits for Docker.
 
 ## [2026-10-15] build | Wave 5, the deploy and the review gate
 
 Briefs 10, 11, 12 built side by side, then 14 (the deploy, prepared only;
-committed in `../vps-deploy` too). Then three review finders (server
+committed in `vps-deploy` too). Then three review finders (server
 security, web integration, conventions) and two fix rounds; 515 tests.
 
 Fixed from the review: covers keyed by `Book.coverUpdatedAt` instead of an
@@ -168,8 +168,8 @@ getting-started for local development. The images come from a throwaway
 clone with a made-up `demo` account and 27 classics with no cover files. The
 scanner and the "Already in your library" card were not captured (no camera;
 the card pulls the publisher's cover from Open Library). [status.md](wiki/status.md)
-caught up: `main` is pushed, `../wzd_auth`'s `55cf336` too, and
-`../vps-deploy` has no remote.
+caught up: `main` is pushed, `wzd_auth`'s `55cf336` too, and
+`vps-deploy` has no remote.
 
 ## [2026-10-17] research | Romanian lookups: Google misses, three library catalogs answer
 
@@ -543,7 +543,7 @@ came from the trips agent building alongside, so it stays as it is.
 
 The owner asked for a way to change their username. The vendored ward-auth had no
 rename, so the owner chose to put it in the library rather than have Shelfmark write
-`auth_users` itself. It was built in `../wzd_auth` as ward-auth 0.4.0 (its brief 37,
+`auth_users` itself. It was built in `wzd_auth` as ward-auth 0.4.0 (its brief 37,
 commit `22251c4`), then re-vendored here. "Change username" now sits at the top of
 the account menu with the signed-in name as its detail. It opens a one-field dialog
 in the shell it now shares with Change password (`account/AccountDialog.tsx`). The
