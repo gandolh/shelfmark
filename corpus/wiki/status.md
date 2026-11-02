@@ -7,8 +7,9 @@ updated: 2026-11-02
 
 _2026-11-02_. Everything is on `main` and pushed through `29bdad1`
 (2026-11-01). Deployed on 2026-10-24 with everything through the change of
-username. No brief is open; brief numbering restarted at 01 on 2026-11-02
-(see [log.md](../log.md)). The product calls are in
+username. Brief numbering restarted at 01 on 2026-11-02 (see
+[log.md](../log.md)); one brief waits:
+[pages in the Library](../briefs/todo/01-library-pages.md). The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 

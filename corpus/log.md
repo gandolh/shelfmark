@@ -598,3 +598,13 @@ snapshot; the phone checks on the scanner and the camera readout, which lived
 only in old outcome notes, are now in its "Next (owner)". Code comments no
 longer cite brief numbers.
 
+
+## [2026-11-02] todo | Brief 01 — Pages in the Library
+
+The owner asked for pagination on the books. [Brief 01](briefs/todo/01-library-pages.md)
+pages the Library in the browser, over the list the client already holds; the
+server and the books store are unchanged, since server-side paging stays
+rejected ([library-table.md](wiki/library-table.md)). 50 books per page by
+default (25 to 200, a pref per layout), the page kept for the session beside
+the filters, and the header's box and ", N not shown" keep today's meaning.
+That last call is the one to confirm when the brief is grilled.
