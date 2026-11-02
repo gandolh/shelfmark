@@ -1,7 +1,7 @@
 import type { Book } from "@shelfmark/shared";
 
 /**
- * Row selection (brief 26): the books ticked in the table, or long-pressed in
+ * Row selection: the books ticked in the table, or long-pressed in
  * the covers, for the bulk bar. Kept by id with the `createdAt` each had
  * when ticked, so a new book that takes a deleted one's id (SQLite reuses the
  * highest) is not selected by accident.

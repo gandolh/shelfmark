@@ -11,7 +11,7 @@ import { authClient } from "../auth/session";
 import { resetWhenSignedOut } from "../books/store";
 
 /**
- * The saved views client (brief 27): `GET /api/views` once per session, the
+ * The saved views client: `GET /api/views` once per session, the
  * list kept in memory by position, and every change made through here
  * applied to it in place. Like the books, the list belongs to a session and
  * is forgotten on sign-out. Views live on the server only, so they follow

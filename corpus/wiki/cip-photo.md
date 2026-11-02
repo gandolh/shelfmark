@@ -1,6 +1,6 @@
 ---
-summary: How "Read the CIP block" fills the by-hand form from a photo of a Romanian book's copyright page (brief 30, built 2026-10-23). Tesseract.js in the browser with the Romanian data, every file served from the app (no CDN) and cached by the service worker on first use (4.8 MB, not precached), Sauvola thresholds for shadowed photos, how the description is found in the OCR text and read with the CIP list parser, which fields are filled (only empty ones) and how they are marked, the fixtures and what is still unchecked.
-updated: 2026-10-23
+summary: How "Read the CIP block" fills the by-hand form from a photo of a Romanian book's copyright page (built 2026-10-23). Tesseract.js in the browser with the Romanian data, every file served from the app (no CDN) and cached by the service worker on first use (4.8 MB, not precached), Sauvola thresholds for shadowed photos, how the description is found in the OCR text and read with the CIP list parser, which fields are filled (only empty ones) and how they are marked, the fixtures and what is still unchecked.
+updated: 2026-11-02
 ---
 
 # Reading the CIP block from a photo
@@ -23,7 +23,7 @@ The fields the read found go into the form's empty fields only, or into ones sti
 an earlier read put there ([`web/src/add/cip.ts`](../../web/src/add/cip.ts)); a field the owner typed is
 never touched, and a hidden ISBN (from a scan) stays. Filled fields are tinted and ringed in the
 accent with "From the CIP block: check it." until they are edited. The subtitle (after " : " in
-the title part) has its own optional field under Title since brief 31; when the OCR lost the
+the title part) has its own optional field under Title since 2026-10-23; when the OCR lost the
 " / " before the statement of responsibility, an author's name run onto the end of the title part
 is taken off (`withoutAuthorTail` in [`web/src/ocr/block.ts`](../../web/src/ocr/block.ts)). The
 text Tesseract read stays under a disclosure, editable, with

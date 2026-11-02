@@ -7,7 +7,7 @@
  *
  * The server reads it from the monthly CIP lists (`server/src/cip/parse.ts`,
  * which also uses the helpers below for a volume's own part), and the web app
- * from OCR of the block a book prints on its copyright page (brief 30). Moved
+ * from OCR of the block a book prints on its copyright page. Moved
  * here from the server unchanged on 2026-10-23, so both read it with the same
  * tested code. No imports, so it runs anywhere.
  *

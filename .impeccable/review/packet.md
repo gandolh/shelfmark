@@ -1,4 +1,4 @@
-# Finish review packet: Shelfmark v1 web UI (brief 13)
+# Finish review packet: Shelfmark v1 web UI (2026-10-15)
 
 Round 1, 2026-10-15. Project root: the repo root; the artifact
 is the React PWA in `web/src` (served by Vite at `/shelfmark/`, API at

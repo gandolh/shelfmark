@@ -2,7 +2,7 @@ import type { CipStore } from "../cip/store.js";
 import { emptySourceDraft, record, text, texts, yearOf, type LookupSourceClient, type SourceDraft } from "./merge.js";
 
 /**
- * The CIP index as a lookup source (brief 16): the national library's lists
+ * The CIP index as a lookup source: the national library's lists
  * of books announced before printing, held locally in cip.db. It costs no
  * request, so it skips the lookup cache, and a record refreshed in the index
  * is seen at once. It gives title, subtitle, authors, publisher and year;

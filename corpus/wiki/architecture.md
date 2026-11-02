@@ -1,11 +1,11 @@
 ---
-summary: How Shelfmark is put together, as built by briefs 01-14 on 2026-10-14 and 2026-10-15. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
-updated: 2026-10-15
+summary: How Shelfmark is put together, as built on 2026-10-14 and 2026-10-15. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
+updated: 2026-11-02
 ---
 
 # Architecture
 
-Built by briefs 01 to 14 ([status.md](status.md)). The code wins where this
+Built on 2026-10-14 and 2026-10-15 ([status.md](status.md)). The code wins where this
 page and it disagree.
 
 ## Pieces

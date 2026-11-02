@@ -9,7 +9,7 @@ import type { LibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
 
 export interface ToolbarProps {
-  /** The rows and columns on show: what brief 11's Export takes. */
+  /** The rows and columns on show: what the Export takes. */
   view: LibraryView;
   desktop: boolean;
   mode: ViewMode;

@@ -2,7 +2,7 @@ import { z } from "zod";
 import { collectionSchema } from "./book.js";
 
 /**
- * Saved views (brief 27): the Library's filters, sort, shown columns and
+ * Saved views: the Library's filters, sort, shown columns and
  * collection tab under a name, kept on the server so they follow the owner
  * from the desktop to the phone. These schemas are the API's contract; the
  * server's store keeps the state as JSON in `saved_views.state`

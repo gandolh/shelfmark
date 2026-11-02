@@ -14,7 +14,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const OCR_CORES = ["relaxedsimd-lstm", "simd-lstm", "lstm"] as const;
 
 /**
- * Reading the CIP block (brief 30) runs Tesseract.js in a worker, and all of
+ * Reading the CIP block runs Tesseract.js in a worker, and all of
  * it comes from the app's own origin, never jsDelivr (tesseract.js's default):
  * the worker script, the core's glue and .wasm (one build per device, chosen
  * by ocr/files.ts), and the Romanian `ron` data (best_int, 1.7 MB gzipped).

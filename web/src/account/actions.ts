@@ -13,7 +13,7 @@ import { openChangeUsername } from "./ChangeUsername";
  * What the account menu (layout/AccountMenu.tsx) does. Each action resolves
  * when done; a rejection's `message` is shown to the owner under the account
  * button, so it says what went wrong and what to do. An action that opens its
- * own dialog resolves once it has opened it. The backup is brief 11's.
+ * own dialog resolves once it has opened it. The backup is the export module's.
  */
 
 /** Thrown by an action that isn't built yet. */

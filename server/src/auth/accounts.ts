@@ -2,7 +2,7 @@ import { createAccounts, createSqliteStore, seedUsers, type Accounts } from "../
 import type { Db } from "../db/open.js";
 
 /**
- * Shelfmark's local accounts, on the vendored ward-auth library (brief 06).
+ * Shelfmark's local accounts, on the vendored ward-auth library.
  * Shelfmark is for one person and has no roles; the library keeps a role on
  * every user, and this is the only one. A user made by a first "Sign in with
  * Ward" gets it too (`app.ts`), whatever Ward's grant names.

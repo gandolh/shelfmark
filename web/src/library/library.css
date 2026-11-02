@@ -32,7 +32,7 @@
 }
 
 /*
- * Views (brief 27): the button shows the saved view's name while the page is
+ * Views: the button shows the saved view's name while the page is
  * on it. A long name is cut short; a hidden semibold copy in the same grid
  * cell keeps the width from moving when the open button turns semibold.
  */
@@ -65,7 +65,7 @@
 }
 
 /*
- * The bulk bar (brief 26, BulkBar.tsx): in the toolbar's place while books
+ * The bulk bar (BulkBar.tsx): in the toolbar's place while books
  * are selected. "3 selected" in ink, then the actions as the toolbar's own
  * buttons; on a phone the count leads the row and Actions and Clear end it.
  */
@@ -100,7 +100,7 @@
 
 /*
  * Owned and Wishlist as text tabs under the title; the open one is ink with an
- * accent underline. On a phone the row ends with Views (brief 27).
+ * accent underline. On a phone the row ends with Views.
  */
 /* On the tabs' baseline, so "Views" reads on the line of "Owned" and "Wishlist"; the tabs stay on the hairline. */
 .library-tabs-row {
@@ -719,7 +719,7 @@
   background: var(--library-row-hover);
 }
 
-/* A selected row (brief 26) wears the selected menu row's wash, hovered or not. */
+/* A selected row wears the selected menu row's wash, hovered or not. */
 .library-table__rows > .library-table__row[data-selected] {
   background: var(--accent-tint-soft);
 }
@@ -989,7 +989,7 @@
   font: inherit;
   text-align: start;
   text-decoration: none;
-  /* A long press selects (brief 26): no link callout, no text selection. */
+  /* A long press selects: no link callout, no text selection. */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;

@@ -6,7 +6,7 @@ A catalog of the paper books on your shelves at home. Scan a barcode with your p
   <img src="docs/images/hero.webp" width="100%" alt="Shelfmark's Library in the Covers view: 27 books, newest first, as a grid of plain coloured covers that show each title and author, such as Amintiri din copilărie by Ion Creangă, Pride and Prejudice by Jane Austen and Enigma Otiliei by George Călinescu">
 </p>
 
-**Status:** Personal project, deployed on 2026-10-24 with everything up to brief 32. The camera scanner and the home-screen install still wait to be tried on a real phone.
+**Status:** Personal project, deployed on 2026-10-24 with everything up to the change of username. The camera scanner and the home-screen install still wait to be tried on a real phone.
 
 ## What it does
 

@@ -27,7 +27,7 @@ export interface ViewsMenuProps {
 }
 
 /**
- * Views (brief 27), in the Library's toolbar: the saved views by position
+ * Views, in the Library's toolbar: the saved views by position
  * (choosing one applies it; the one the page is on says "Current"), "Save
  * current view…", and, for the view the page is on (or was last on, once a
  * filter moved it off), "Update to current", "Rename…" and "Delete…". The

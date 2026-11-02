@@ -22,7 +22,7 @@ function plural(n: number, one: string, many: string): string {
 }
 
 /**
- * Stats (brief 29): reached from the account menu, not a place of its own.
+ * Stats: reached from the account menu, not a place of its own.
  * Counts of the owned books by author, language, shelf, status and decade,
  * and money spent per year, all worked out here from the books already loaded.
  * A count opens the Library on those books.

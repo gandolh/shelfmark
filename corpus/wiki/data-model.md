@@ -1,11 +1,11 @@
 ---
-summary: The SQLite schema as shipped by brief 02 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
-updated: 2026-10-23
+summary: The SQLite schema as shipped on 2026-10-15 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
+updated: 2026-11-02
 ---
 
 # Data model
 
-Shipped by brief 02 on 2026-10-14 as migration 1 in
+Shipped on 2026-10-15 on 2026-10-14 as migration 1 in
 [migrations.ts](../../server/src/db/migrations.ts). **One row per physical
 copy** is the owner's decision ([decisions.md](decisions.md)); the rest came
 from the 2026-10-14 research. Column names follow [glossary.md](glossary.md).
@@ -52,14 +52,14 @@ but doubles the join and the edit UI for a case that hardly happens.
   `mime`, `bytes` BLOB, `source`, `updated_at`, all NOT NULL. Covers live in
   the database, not in a folder ([decisions.md](decisions.md)); `Book.hasCover`
   and `Book.coverUpdatedAt` (its `updated_at`, the web app's `?v=` for the
-  image URL) are derived from it. Brief 02 created the table; brief 05 fills and serves it.
-- **`lookup_cache`** (migration 2, brief 05): `isbn13`, `source`, `outcome`
+  image URL) are derived from it. The table came with the schema (2026-10-15); the lookup fills and serves it.
+- **`lookup_cache`** (migration 2, 2026-10-15): `isbn13`, `source`, `outcome`
   (`found` or `not_found`, CHECK), `response` (the source's answer as JSON),
   `fetched_at`; primary key `(isbn13, source)`, `WITHOUT ROWID`. The
   `outcome` column lets expiry work without parsing each source's format, and
   its CHECK keeps an error from ever being stored. A found answer is reused
   forever, a not-found one for 7 days ([metadata-lookup.md](metadata-lookup.md)).
-- **`saved_views`** (migration 3, brief 27): `id`; `name` NOT NULL, not blank;
+- **`saved_views`** (migration 3, 2026-10-23): `id`; `name` NOT NULL, not blank;
   `name_key` NOT NULL UNIQUE; `state` TEXT, CHECKed to be a JSON object;
   `position` INTEGER ≥ 0; `created_at`, `updated_at`. One row per named view
   of the Library ([library-table.md](library-table.md)). `name_key` exists for
@@ -94,12 +94,12 @@ but doubles the join and the edit UI for a case that hardly happens.
   bulk (then it becomes a table).
 - A wishlist row has `collection = 'wishlist'` and no shelf, condition or
   acquisition; "I bought it" sets `collection = 'owned'` and asks for a shelf.
-  Shipped (brief 23, 2026-10-23) as one `PATCH /api/books/:id` with
+  Shipped (2026-10-23) as one `PATCH /api/books/:id` with
   `{ collection: "owned", shelf, acquiredOn: <today> }`: the same row moves, so
   no second row and the id keeps its cover and notes.
   The owned-check and "already in your library" only count owned rows. The
   server does not enforce the empty fields; the screens do.
-- A bulk change (brief 26, `POST /api/books/bulk`) is one transaction in
+- A bulk change (2026-10-23; `POST /api/books/bulk`) is one transaction in
   the books store: it checks every id first and changes nothing if one names
   no book. Only the rows whose shelf, status or tags actually change are
   written, so the rest keep their `updated_at`. A shelf change skips wishlist

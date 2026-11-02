@@ -11,7 +11,7 @@ import type { Database } from "better-sqlite3";
  * them on the way in.
  */
 export const migrations: readonly string[] = [
-  // 1 (brief 02): books, tags and covers.
+  // 1: books, tags and covers.
   `
   CREATE TABLE books (
     id               INTEGER PRIMARY KEY,
@@ -72,7 +72,7 @@ export const migrations: readonly string[] = [
   );
   `,
 
-  // 2 (brief 05): the lookup cache, one raw answer per ISBN and source.
+  // 2: the lookup cache, one raw answer per ISBN and source.
   // `outcome` is what expiry needs (lookup/cache.ts: found kept forever,
   // not_found 7 days) without parsing each source's format; errors are never
   // stored. `source` has no CHECK, as the list of sources may grow.
@@ -87,7 +87,7 @@ export const migrations: readonly string[] = [
   ) WITHOUT ROWID;
   `,
 
-  // 3 (brief 27): saved views, the Library's filters, sort, columns and tab
+  // 3: saved views, the Library's filters, sort, columns and tab
   // under a name. `state` is the shared SavedViewState as JSON, checked by
   // the shared schema on the way in and read leniently on the way out
   // (store/views.ts). `name_key` is the name folded to lower case in JS, as

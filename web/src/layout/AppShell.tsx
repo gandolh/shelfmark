@@ -23,8 +23,8 @@ type PageComponent<N extends RouteName> = ComponentType<{ params: RouteParams<N>
 
 /**
  * Each route's page, one line per route in router.ts's table (the typecheck
- * wants them all). `null` renders nothing: `/login` is the auth gate's
- * (brief 06), so a signed-in visit there goes on to the Library. A dev-only
+ * wants them all). `null` renders nothing: `/login` is the auth gate's,
+ * so a signed-in visit there goes on to the Library. A dev-only
  * screen is `import.meta.env.DEV ? lazy(() => import(…)) : null`, which a
  * build drops along with its chunk.
  */

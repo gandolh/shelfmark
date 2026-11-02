@@ -31,7 +31,7 @@ export interface BookStore {
   /** Every copy with this ISBN-13, owned and wishlist alike, by id. */
   findByIsbn(isbn13: string): Book[];
   /**
-   * One change to many books, in one transaction (brief 26). `ids` are
+   * One change to many books, in one transaction. `ids` are
    * distinct. When any of them names no book, nothing changes and the answer
    * is `{ unknown }`, those ids in order.
    */

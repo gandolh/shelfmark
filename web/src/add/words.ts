@@ -8,7 +8,7 @@ import type { FlowState, Notice } from "./flow";
 /**
  * Everything Add a book says that depends on data: what is wrong with an
  * ISBN, where a draft came from, which sources a miss was looked for in, and
- * why a lookup or a save failed. One place, so the network wording (brief 12)
+ * why a lookup or a save failed. One place, so the network wording
  * changes here only.
  */
 
@@ -175,7 +175,7 @@ export function sessionCount(added: number): string {
   return `${added} added this session`;
 }
 
-/** A failed call as the sheet shows it. `network` marks "the server can't be reached" (brief 12 words it for offline). */
+/** A failed call as the sheet shows it. `network` marks "the server can't be reached" (the PWA words it for offline). */
 export interface Failure {
   message: string;
   network: boolean;

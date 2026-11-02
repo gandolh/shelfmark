@@ -139,7 +139,7 @@ export function createBooksStore(source: BooksSource, hooks: BooksHooks = {}) {
     },
 
     /**
-     * One change to many books (`POST /api/books/bulk`, brief 26): the books
+     * One change to many books (`POST /api/books/bulk`): the books
      * it answers replace theirs in place, the ids it deleted leave the list.
      * The server changes all of them or none, so a failure leaves the list
      * alone.
@@ -152,7 +152,7 @@ export function createBooksStore(source: BooksSource, hooks: BooksHooks = {}) {
 
     /**
      * A cover was stored (`updatedAt`, its `CoverInfo`'s) or removed (`null`)
-     * outside these calls (brief 05's cover routes): the book's `hasCover` and
+     * outside these calls (the cover routes): the book's `hasCover` and
      * `coverUpdatedAt` follow, as the next fetch would say.
      */
     setCover(id: number, updatedAt: string | null): void {

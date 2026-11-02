@@ -35,7 +35,7 @@ export interface BulkBarProps {
 const STALE = "Nothing was changed: some of these books are no longer in your library. The list is up to date now, so try again.";
 
 /**
- * The bulk bar (brief 26): in place of the Library's toolbar while books are
+ * The bulk bar: in place of the Library's toolbar while books are
  * selected. "3 selected" (and how many of them are out of sight), then, on
  * the desktop, Move to shelf, Set status, Add tags, Remove tags, Delete and
  * Clear; on a phone, where six don't fit a row, an Actions menu and Clear.

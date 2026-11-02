@@ -8,7 +8,7 @@ import { NAME_TAKEN } from "./savedViewsStore";
 import "../auth/auth.css";
 
 /**
- * The Views menu's dialogs (brief 27): name a view (save, rename) and
+ * The Views menu's dialogs: name a view (save, rename) and
  * confirm a delete. A modal Base UI `Dialog`, as Change password is: a white
  * panel in the middle of the window on the desktop, the floating sheet over
  * the bottom of a phone. A name another view has is said under the field

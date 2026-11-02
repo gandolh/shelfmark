@@ -10,7 +10,7 @@ import { useIsDesktop } from "../layout/viewport";
 import { AccountDialog, Actions, dialogSwitch } from "./AccountDialog";
 
 /**
- * The account menu's "Change username" (brief 32), in the account dialog
+ * The account menu's "Change username", in the account dialog
  * shell (`AccountDialog.tsx`). One field, holding the current name and
  * selected, so typing replaces it. The rename is ward-auth's (0.4.0): the
  * user id and every session stay, and the session, the menu included, carries

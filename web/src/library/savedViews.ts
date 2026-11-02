@@ -6,7 +6,7 @@ import { normalizeOrder, normalizeSorting, type Layout, type LibraryPrefs, type 
 import { getFilters, getPrefs, setFilters, updatePrefs } from "./state";
 
 /**
- * Saved views (brief 27) on the Library's side: the page's state as a
+ * Saved views on the Library's side: the page's state as a
  * `SavedViewState` and back, whether the page is on a view right now, and
  * applying one. A view holds the collection tab, the active filters, the
  * sort and the table's shown columns in order; the search text, the Table /

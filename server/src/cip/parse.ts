@@ -21,7 +21,7 @@
 
 import { cip } from "@shelfmark/shared";
 
-// The description reading moved to shared/src/cip.ts (brief 30), unchanged; the web app reads OCR text with it too.
+// The description reading moved to shared/src/cip.ts, unchanged; the web app reads OCR text with it too.
 const { AREA, ISBN, isImprint, readDescription, readImprint, romanian, squash, tidy } = cip;
 
 export interface CipRecord {

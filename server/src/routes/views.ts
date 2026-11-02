@@ -21,7 +21,7 @@ function viewId(raw: string): number {
 const nameTaken = (error: ViewNameTaken) => new ApiError("conflict", error.message);
 
 /**
- * The saved views (brief 27). A list answers `{ views }` by position; one
+ * The saved views. A list answers `{ views }` by position; one
  * view answers the view. Bodies are parsed with the shared schemas, so a bad
  * state is a 400 `validation` naming the field; a name another view has is a
  * 409 `conflict`.

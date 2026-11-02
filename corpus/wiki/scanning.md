@@ -1,6 +1,6 @@
 ---
-summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (the stream's size, iPhone's lens switching, what Chrome on Android lets a page set) and what we ask for since brief 21 (1080p, continuous focus, a 1×/2× zoom chip, no lens picker), the `?camera` readout, scanning on a press (read until a code is read, *Stop reading*, a minute's limit, a sticker's 1 s wait, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
-updated: 2026-10-23
+summary: How the app reads a book's barcode. Browser support for BarcodeDetector (Chrome only by default), the barcode-detector polyfill on ZXing-C++ WASM and why its .wasm is self-hosted, the HTTPS rule, the iOS standalone-PWA camera bug that forces a single-screen scanner, why the picture looks soft (the stream's size, iPhone's lens switching, what Chrome on Android lets a page set) and what we ask for since 2026-10-21 (1080p, continuous focus, a 1×/2× zoom chip, no lens picker), the `?camera` readout, scanning on a press (read until a code is read, *Stop reading*, a minute's limit, a sticker's 1 s wait, the button only while no result is open), ISBN-10/13 validation, non-ISBN barcodes, and USB keyboard-wedge scanners.
+updated: 2026-11-02
 ---
 
 # Scanning
@@ -40,10 +40,10 @@ reads better).
 
 ## Camera quality
 
-Researched on 2026-10-20, after the owner found the picture soft. Brief 21
-acted on it on 2026-10-21.
+Researched on 2026-10-20, after the owner found the picture soft. The camera
+changes below followed on 2026-10-21.
 
-- **What we asked for until brief 21.** 1280×720 and nothing about focus or
+- **What we asked for until 2026-10-21.** 1280×720 and nothing about focus or
   zoom. In portrait, the 720 px side is stretched across the screen's width,
   about 1.6× on a 1170 px-wide iPhone screen. 720p is the usual default for
   barcode readers: STRICH's docs call it enough for good-quality codes and
@@ -74,7 +74,7 @@ acted on it on 2026-10-21.
   crops the sensor before scaling to the stream size, so 2× adds real detail.
   A lens picker doesn't help: the labels say nothing, and an iPhone switches
   lenses itself.
-- **What we ask for since brief 21**
+- **What we ask for since 2026-10-21**
   ([camera.ts](../../web/src/scanner/camera.ts)):
   - 1920×1080 as `ideal`, so the browser gives what it can.
   - Continuous focus, when `getCapabilities().focusMode` lists it.
@@ -101,7 +101,7 @@ acted on it on 2026-10-21.
 
 ## Scanning on a press
 
-Since brief 19 (2026-10-18), the camera reads only when the owner taps *Scan
+Since 2026-10-18 (2026-10-18), the camera reads only when the owner taps *Scan
 the barcode* (decisions.md, "The camera reads only on a press"). The picture
 runs so the owner can aim, but nothing is decoded and nothing is looked up
 between presses. A beep or vibration and the frame's flash mark a read. A
@@ -110,17 +110,17 @@ scanned ISBN already in the library shows "Already in your library" with
 
 - **A press reads every 150 ms until it reads a code**
   ([detector.ts](../../web/src/scanner/detector.ts) `readCode`). Since
-  brief 21 (2026-10-21) there is no deadline. On a real phone the tap moves
-  the camera and it refocuses, so brief 19's 3 s window often ran out before
+  2026-10-21 there is no deadline. On a real phone the tap moves
+  the camera and it refocuses, so the earlier 3 s window often ran out before
   the barcode was sharp.
   - The first ISBN read ends it. The owner sees the ISBN and presses again
-    if it looks wrong (brief 20). Brief 17 required two agreeing reads
+    if it looks wrong (2026-10-18). The 2026-10-17 version required two agreeing reads
     because the check digit misses some misreads (two wrong digits that
     cancel out, neighbouring digits that differ by 5 swapped). That mattered
     while the camera read by itself.
   - In one read, an ISBN wins over a sticker. A sticker read first counts
     only if no ISBN is read within 1 s (`ISBN_GRACE_MS`; 450 ms before
-    brief 21). The owner holds the book in view while the camera focuses,
+   , 2026-10-21). The owner holds the book in view while the camera focuses,
     so the ISBN beside a shop sticker needs time to come into focus.
   - While it reads, the button says *Stop reading*, and a tap stops it with
     no message. Hiding the page, switching mode and leaving the page stop it
@@ -135,12 +135,12 @@ scanned ISBN already in the library shows "Already in your library" with
   book seen again this visit shows its answer with no request (`memo.ts`).
   The server runs one lookup per ISBN at a time, with every answer cached
   ([metadata-lookup.md](metadata-lookup.md)).
-- **History.** Briefs 07 to 18 read continuously, at first every 150 ms.
-  Brief 17 then added two agreeing reads, plus a result that the next book in
-  view replaced until the owner touched it. Brief 18 added a 600 ms wait
+- **History.** From 2026-10-15 to 2026-10-17 the scanner read continuously,
+  at first every 150 ms. Then came two agreeing reads, plus a result that the
+  next book in view replaced until the owner touched it, and a 600 ms wait
   before a camera lookup. The owner then chose the press: no read or call
-  happens without one. Of those briefs, the memo and one lookup per ISBN remain; brief 20
-  dropped the two agreeing reads.
+  happens without one. Of those, the memo and one lookup per ISBN remain; the two agreeing reads
+  went on 2026-10-18.
 
 ## Offline
 

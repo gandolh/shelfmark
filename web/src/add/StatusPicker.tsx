@@ -9,7 +9,7 @@ export const STATUS_LABELS: Record<Status, string> = {
   abandoned: "Abandoned",
 };
 
-/** What Add a book offers; the book page (brief 10) can add `abandoned`. */
+/** What Add a book offers; the book page can add `abandoned`. */
 export const ADD_STATUSES: readonly Status[] = ["unread", "reading", "read"];
 
 export interface StatusPickerProps {

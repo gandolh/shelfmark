@@ -1,6 +1,6 @@
 ---
-summary: Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, three Romanian library catalogs over Z39.50 measured on 2026-10-17 (33/40 for 2012-2015 books, a year's lag for new ones), the national bibliography PDFs, the lookup flow and cache as shipped by brief 05 (two Open Library calls per found ISBN), how covers are downloaded (the host allowlist, Open Library's archive.org redirects) and stored, the measurement script, and the fallbacks for Romanian books.
-updated: 2026-10-23
+summary: Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, three Romanian library catalogs over Z39.50 measured on 2026-10-17 (33/40 for 2012-2015 books, a year's lag for new ones), the national bibliography PDFs, the lookup flow and cache as shipped on 2026-10-15 (two Open Library calls per found ISBN), how covers are downloaded (the host allowlist, Open Library's archive.org redirects) and stored, the measurement script, and the fallbacks for Romanian books.
+updated: 2026-11-02
 ---
 
 # Metadata lookup
@@ -48,8 +48,8 @@ The CIP lists include small and academic presses, so a home library of
 mainstream publishers should do better, but no free keyless service is good
 enough to be the Romanian fallback. Hence the owner's call
 ([decisions.md](decisions.md)): Google Books with a free key. Its Romanian
-coverage is **still untested**: brief 05 shipped on 2026-10-15 without the key,
-so the measurement waits for it.
+coverage was untested when the lookup shipped on 2026-10-15 without the key;
+the keyed measurement on 2026-10-17 is below.
 
 To measure, put ISBNs one per line in a file per sample (a fresh 40 from a CIP
 bibliography PDF, never from the CAPTCHA'd catalog) and run
@@ -110,7 +110,7 @@ of the 2010-2017 issues; take the largest capture of each file, since some
 were cut off at 1 MiB. The 2012-2015 sample above came from 49 of them
 (21,063 records).
 
-## The flow (shipped 2026-10-15, brief 05)
+## The flow (shipped 2026-10-15)
 
 1. The browser sends the ISBN to `POST /api/lookup`, unless the page has its
    answer from this visit ([memo.ts](../../web/src/add/memo.ts)); the server does the work
@@ -123,9 +123,9 @@ were cut off at 1 MiB. The 2012-2015 sample above came from 49 of them
    ([cache.ts](../../server/src/lookup/cache.ts)). A found answer is reused
    forever, a not-found one for 7 days; an error is never stored. A hit costs
    no request, even for Google after its key is gone. A request for an ISBN
-   whose lookup is running waits for it (brief 18), so no source is asked twice.
+   whose lookup is running waits for it (2026-10-17), so no source is asked twice.
 3. The sources in order: Open Library, the three library catalogs (the
-   Academy, BCU Cluj, BCU Timișoara, brief 15), Google Books. The next one is
+   Academy, BCU Cluj, BCU Timișoara, 2026-10-17), Google Books. The next one is
    asked only while no answer so far has a title, so Google isn't asked for a
    missing cover; without a key it is reported `skipped_no_key`. Merge field
    by field: the first non-empty value wins, in that order; cover candidates
@@ -184,12 +184,12 @@ index built from them would cover recent Romanian books, never older ones.
 The owner wants it (2026-10-17): Google Books found none of 80 recent
 Romanian trade books.
 
-The order, confirmed by the owner and built on 2026-10-17 (briefs 15, 16):
+The order, confirmed by the owner and built on 2026-10-17 (2026-10-17):
 Open Library, the three library catalogs, the CIP index, then Google Books
 only when nothing has a title. The libraries cover books more than a year
 old, and the CIP index covers the newest ones.
 
-The CIP index as built (brief 16): `<dataDir>/cip.db`, kept out of
+The CIP index as built (2026-10-17): `<dataDir>/cip.db`, kept out of
 shelfmark.db so the backup stays small. The server refreshes it a minute
 after it starts, then weekly ([job.ts](../../server/src/cip/job.ts)); the
 refresh lists the issues through the site's WordPress media API, downloads the

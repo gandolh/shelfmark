@@ -96,7 +96,7 @@ export function clearFilters(): void {
   notify();
 }
 
-/** Replace every filter at once: a saved view being applied (brief 27, savedViews.ts). */
+/** Replace every filter at once: a saved view being applied (savedViews.ts). */
 export function setFilters(next: Filters): void {
   if (next === filters) return;
   filters = next;
@@ -108,7 +108,7 @@ export function useLibraryFilters(): Filters {
   return useSyncExternalStore(subscribe, getFilters);
 }
 
-// --- Selection (brief 26) ------------------------------------------------------------
+// --- Selection ------------------------------------------------------------
 
 let selection: Selection = NO_SELECTION;
 

@@ -194,7 +194,7 @@ example with `scp`.
 
 ## Romanian lookups after a deploy
 
-Two checks after the first deploy with briefs 15 and 16. Use the `ssh` and
+Two checks after the first deploy with the Romanian catalogs and the CIP index. Use the `ssh` and
 `DOCKER_HOST` lines from step 6.
 
 1. **The library catalogs.** Look up `9786068044873` in the app. The draft

@@ -4,7 +4,7 @@ import { isbnProblem } from "./words";
 /**
  * The by-hand form as plain values: every text field as typed, so a draft can
  * fill it and an edit can be undone by typing. `readForm` turns it into book
- * fields or says what is wrong. Pure, for the tests and for brief 10's book
+ * fields or says what is wrong. Pure, for the tests and for the book
  * page, which edits the same fields.
  */
 

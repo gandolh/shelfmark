@@ -2,7 +2,7 @@ import type { CipFields } from "../ocr/block";
 import { joinAuthors, type FormField, type FormValues } from "./form";
 
 /**
- * Filling the by-hand form from a CIP block (brief 30). Pure, for the tests:
+ * Filling the by-hand form from a CIP block. Pure, for the tests:
  * CipReader.tsx reads the photo, ManualForm.tsx keeps what was filled so the
  * filled fields stand out until the owner has looked at them.
  */

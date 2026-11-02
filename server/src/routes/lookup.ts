@@ -16,7 +16,7 @@ const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string>
 };
 
 /**
- * `POST /api/lookup { isbn }` (brief 05): an ISBN to a draft, plus the copies
+ * `POST /api/lookup { isbn }`: an ISBN to a draft, plus the copies
  * already saved with it. Nothing is saved. The sources' queues live as long as
  * the app, so every lookup and every batch shares them: the library catalogs'
  * pause between requests holds across lookups.

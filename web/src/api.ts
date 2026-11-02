@@ -58,7 +58,7 @@ const signedOutListeners = new Set<() => void>();
 
 /**
  * Hear about every 401 from any call: the session is over (signed out, the
- * password changed elsewhere, a Ward session ended). Brief 06's auth gate
+ * password changed elsewhere, a Ward session ended). The auth gate
  * listens and shows the login page. Returns the unsubscribe function.
  */
 export function onSignedOut(listener: () => void): () => void {
@@ -185,7 +185,7 @@ function isErrorBody(body: unknown): body is { error: { code: string; message: s
 type CallOptions = Pick<RequestOptions, "signal">;
 
 /**
- * The book routes (brief 02). Create and patch bodies are strict on the
+ * The book routes. Create and patch bodies are strict on the
  * server: send only the fields being set or changed, never a whole `Book`
  * back. Most screens want `books/store.ts` instead, which keeps the list
  * current.
@@ -206,13 +206,13 @@ export const booksApi = {
   remove: (id: number, options?: CallOptions): Promise<void> =>
     apiRequest(`/api/books/${id}`, { ...options, method: "DELETE" }),
 
-  /** One change to many books (brief 26); an id that names no book is a 400 and nothing changes. */
+  /** One change to many books; an id that names no book is a 400 and nothing changes. */
   bulk: (body: BookBulk, options?: CallOptions): Promise<BookBulkResult> =>
     apiRequest("/api/books/bulk", { ...options, method: "POST", body, schema: bookBulkResultSchema }),
 };
 
 /**
- * A book's stored cover as an API path (brief 05 serves it, cached for a day,
+ * A book's stored cover as an API path (the server serves it, cached for a day,
  * and the service worker keeps it for 30 days). `version` is the book's
  * `coverUpdatedAt`: a replaced cover, or a new book on a deleted one's id,
  * gets a new address, so no cache shows the old image. The server ignores it.

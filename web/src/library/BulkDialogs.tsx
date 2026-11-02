@@ -6,7 +6,7 @@ import { bookCount, parseTags, type Choice } from "./bulk";
 import { DialogActions, DialogFailure, DialogFrame, messageOf } from "./ViewDialog";
 
 /**
- * The bulk bar's dialogs (brief 26): move to a shelf, add tags, remove tags,
+ * The bulk bar's dialogs: move to a shelf, add tags, remove tags,
  * and the delete that asks first. Each is the Views dialogs' frame (a panel
  * in the middle of the window on the desktop, the floating sheet on a
  * phone). Each saves through `onSubmit`, stays open with the reason if that

@@ -19,7 +19,7 @@ import { getSelection, setSelection, useLibrarySelection } from "./state";
  * scroll as lightly as thirty. Tab reaches one cover; arrows move around
  * the grid; Enter opens the book.
  *
- * Selecting (brief 26): a long press on a cover selects it, as a phone's
+ * Selecting: a long press on a cover selects it, as a phone's
  * photo grid does (a finger or a pen anywhere; the mouse too on a phone's
  * layout). While books are selected (`selecting`, the bulk bar is up) each
  * cover is a toggle with a mark in its corner: a tap, Enter or Space ticks

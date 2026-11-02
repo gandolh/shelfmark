@@ -16,7 +16,7 @@ import { useIsDesktop } from "../layout/viewport";
 import { AccountDialog, Actions, dialogSwitch } from "./AccountDialog";
 
 /**
- * The account menu's "Change password" (brief 06), in the account dialog shell
+ * The account menu's "Change password", in the account dialog shell
  * (`AccountDialog.tsx`).
  *
  * - With a password: the current one, the new one twice. Every other session

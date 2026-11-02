@@ -2,7 +2,7 @@ import { readSavedViewState, type SavedView, type SavedViewCreate, type SavedVie
 import type { Db } from "../db/open.js";
 
 /**
- * The saved views store (brief 27): the only module that runs SQL on
+ * The saved views store: the only module that runs SQL on
  * `saved_views`. Inputs are already parsed with the shared schemas; the store
  * keeps the names unique on their folded key, keeps the positions dense
  * (0, 1, 2… in the menu's order) and sets the times. A stored state is read

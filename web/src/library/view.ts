@@ -12,7 +12,7 @@ import { useLibraryFilters, useLibraryPrefs } from "./state";
 /**
  * What the Library holds right now: the open collection's books after the
  * search, the filters and the sort (the rows both views show), and the
- * table's shown columns in order. Brief 11's "What you see now" export writes exactly
+ * table's shown columns in order. The "What you see now" export writes exactly
  * these: `view.rows`, one line each, with `view.columns` (or
  * `exportColumns(view.columns)`), each cell from `exportValue(column, book)`
  * or `column.text(book)` (columns.ts) under `column.label`.

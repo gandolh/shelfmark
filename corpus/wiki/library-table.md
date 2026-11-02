@@ -1,6 +1,6 @@
 ---
-summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (brief 26), and why filtering does not need the server.
-updated: 2026-10-23
+summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23), and why filtering does not need the server.
+updated: 2026-11-02
 ---
 
 # Library table
@@ -76,7 +76,7 @@ saved per layout (`shelfmark.library.desktop`, `shelfmark.library.phone`) in
 losing it costs nothing. The filters live in page state for the session
 ([state.ts](../../web/src/library/state.ts)).
 
-**Saved views** (brief 27, 2026-10-23) are stored on the server, so they
+**Saved views** (2026-10-23) are stored on the server, so they
 follow the owner from the laptop to the phone: a name over the tab, the
 filters, the sort and the shown columns in order, behind `/api/views`
 (the `saved_views` table in [data-model.md](data-model.md)). The search
@@ -99,7 +99,7 @@ table does not fit a phone, and pretending otherwise is worse.
 
 ## Selection and the bulk bar
 
-Brief 26 (2026-10-23). A box before the columns selects a row; the header's
+Since 2026-10-23, a box before the columns selects a row; the header's
 box selects every row the search and filters let through (not every book),
 shows a dash when only some are, and unselects them once all are. The boxes
 are drawn by [BookTable.tsx](../../web/src/library/BookTable.tsx) outside

@@ -1,6 +1,6 @@
 ---
 summary: The researched feature set, in tiers (v1, v1.x, later, out; loans are out; the wishlist, the offline ownership check, saved views and bulk edit have shipped), with what comparable home-library apps (Libib, BookBuddy, CLZ Books, LibraryThing) offer and why each feature sits in its tier. Read before writing or promoting any brief; the todo files carry these tiers as tags.
-updated: 2026-10-24
+updated: 2026-11-02
 ---
 
 # Features
@@ -38,7 +38,7 @@ Shelfmark keeps all of it except loans.
 | Personal fields | Shelf, reading status, rating, tags, notes, format, condition, acquired date/where/price. These are what "filter by any column" filters. See [data-model.md](data-model.md). |
 | Export | CSV and XLSX of the current view or everything, plus a full backup. See [export.md](export.md). |
 | PWA | Installable; app shell works offline. |
-| Accounts | Own login with "Sign in with Ward" as the second way in (estate rule from `wzd_auth`); its items live in the account menu, not a Settings page. Change username shipped 2026-10-24 (brief 32, on ward-auth 0.4.0's rename). |
+| Accounts | Own login with "Sign in with Ward" as the second way in (estate rule from `wzd_auth`); its items live in the account menu, not a Settings page. Change username shipped 2026-10-24 (2026-10-24; on ward-auth 0.4.0's rename). |
 
 ## v1.x — right after
 
@@ -49,18 +49,18 @@ bulk edit had waited for row selection in the table.
 
 | Feature | Notes |
 |---|---|
-| Offline "do I own this?" | Shipped 2026-10-23 (brief 24). A scan with no signal is answered from a copy of the library kept in IndexedDB (ISBN, title, shelf, collection): on a shelf, on the wishlist, or not in the library, "as of" the copy's date. Needs one visit online first; sign out clears it. See [scanning.md](scanning.md). |
-| CIP photo | Shipped 2026-10-23 (brief 30). "Read the CIP block" on the by-hand form: a photo of a Romanian book's copyright page, read by Tesseract in the browser (no CDN, cached on first use, then offline), fills the empty fields (title, subtitle, author, publisher, year, ISBN) and marks them to check. See [cip-photo.md](cip-photo.md). |
-| Offline scan queue | Shipped 2026-10-23 (brief 25). Offline, a scan of a book not in the copy can be queued ("Look it up later", with a shelf); the queue survives a reload and shows as "Waiting to look up (N)" on Add a book. Back online the ISBNs are looked up one at a time and each opens as the usual sheet to confirm. Sign out clears it. See [scanning.md](scanning.md). |
-| Wishlist | Shipped 2026-10-23 (brief 23). Books wanted, not owned: a second collection inside Library (Owned / Wishlist tabs), "Add to wishlist" when a scanned book is not owned, and "I bought it" (on the scan sheet and the book's page) moving the row onto a shelf. Wanted by the owner (2026-10-14). |
-| CSV import | Shipped 2026-10-23 (brief 28). \"Import a CSV\" in the account menu: Goodreads, Libib, LibraryThing, a Shelfmark export or any spreadsheet, with the encoding detected, a preview with duplicates flagged, optional one-at-a-time lookups, and saving into Owned or Wishlist. See [import.md](import.md). |
-| Saved views | Shipped 2026-10-23 (brief 27). Named views of the Library ("Unread", "Unread, living room"): the tab, filters, sort and shown columns, stored on the server so they follow the owner across devices, from a Views menu. See [library-table.md](library-table.md). |
-| Bulk edit | Shipped 2026-10-23 (brief 26). Select rows (a box per row in the table, a long press in the covers), then move them to a shelf, set their status, add or remove tags, or delete them, each as one transaction. A shelf move leaves wishlist books out and says so. See [library-table.md](library-table.md). |
-| Stats | Shipped 2026-10-23 (brief 29). \"Stats\" in the account menu (not a third place): owned books by author, language, shelf (grouped by room), status and decade, money spent per year per currency, and a Wishlist count. Counted in the browser; each count opens Library filtered to those books. |
+| Offline "do I own this?" | Shipped 2026-10-23 (2026-10-23). A scan with no signal is answered from a copy of the library kept in IndexedDB (ISBN, title, shelf, collection): on a shelf, on the wishlist, or not in the library, "as of" the copy's date. Needs one visit online first; sign out clears it. See [scanning.md](scanning.md). |
+| CIP photo | Shipped 2026-10-23 (2026-10-23). "Read the CIP block" on the by-hand form: a photo of a Romanian book's copyright page, read by Tesseract in the browser (no CDN, cached on first use, then offline), fills the empty fields (title, subtitle, author, publisher, year, ISBN) and marks them to check. See [cip-photo.md](cip-photo.md). |
+| Offline scan queue | Shipped 2026-10-23 (2026-10-23). Offline, a scan of a book not in the copy can be queued ("Look it up later", with a shelf); the queue survives a reload and shows as "Waiting to look up (N)" on Add a book. Back online the ISBNs are looked up one at a time and each opens as the usual sheet to confirm. Sign out clears it. See [scanning.md](scanning.md). |
+| Wishlist | Shipped 2026-10-23 (2026-10-23). Books wanted, not owned: a second collection inside Library (Owned / Wishlist tabs), "Add to wishlist" when a scanned book is not owned, and "I bought it" (on the scan sheet and the book's page) moving the row onto a shelf. Wanted by the owner (2026-10-14). |
+| CSV import | Shipped 2026-10-23 (2026-10-23). \"Import a CSV\" in the account menu: Goodreads, Libib, LibraryThing, a Shelfmark export or any spreadsheet, with the encoding detected, a preview with duplicates flagged, optional one-at-a-time lookups, and saving into Owned or Wishlist. See [import.md](import.md). |
+| Saved views | Shipped 2026-10-23 (2026-10-23). Named views of the Library ("Unread", "Unread, living room"): the tab, filters, sort and shown columns, stored on the server so they follow the owner across devices, from a Views menu. See [library-table.md](library-table.md). |
+| Bulk edit | Shipped 2026-10-23 (2026-10-23). Select rows (a box per row in the table, a long press in the covers), then move them to a shelf, set their status, add or remove tags, or delete them, each as one transaction. A shelf move leaves wishlist books out and says so. See [library-table.md](library-table.md). |
+| Stats | Shipped 2026-10-23 (2026-10-23). \"Stats\" in the account menu (not a third place): owned books by author, language, shelf (grouped by room), status and decade, money spent per year per currency, and a Wishlist count. Counted in the browser; each count opens Library filtered to those books. |
 
 ## Later
 
-None. The last one, CIP photo capture, shipped on 2026-10-23 (brief 30).
+None. The last one, CIP photo capture, shipped on 2026-10-23 (2026-10-23).
 
 ## Out
 

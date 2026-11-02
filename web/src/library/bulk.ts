@@ -2,7 +2,7 @@ import type { Book, BookBulkResult, BulkChange } from "@shelfmark/shared";
 import { STATUS_LABELS } from "../add/StatusPicker";
 
 /**
- * The bulk bar's words and choices (brief 26): the shelves and tags its
+ * The bulk bar's words and choices: the shelves and tags its
  * dialogs offer, the tags a typed line holds, and the line it shows once a
  * change is saved.
  */

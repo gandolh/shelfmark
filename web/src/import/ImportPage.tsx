@@ -62,7 +62,7 @@ function plural(n: number, one: string, many: string): string {
 }
 
 /**
- * Import a CSV (brief 28): reached from the account menu, not a place of its
+ * Import a CSV: reached from the account menu, not a place of its
  * own. Choose the file, map its columns when it isn't a known export, look at
  * the rows with their flags, optionally look up the ones with only an ISBN,
  * then save the ticked ones into Owned or Wishlist.

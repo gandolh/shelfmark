@@ -1,6 +1,6 @@
 ---
 summary: How CSV and Excel export work and the traps they avoid. What gets exported (the current view or everything), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup (one `.db` file).
-updated: 2026-10-23
+updated: 2026-11-02
 ---
 
 # Export
@@ -47,7 +47,7 @@ write-only job and has not had a release since 2024.
 (better-sqlite3's `backup()`, safe while the server runs) as
 `shelfmark-<YYYY-MM-DD>.db`. Covers live in the database, so this one file is
 everything: books, covers, the wishlist and the lookup cache. Saved views
-(brief 27) are in it too, as their `saved_views` table: the backup copies the
+(2026-10-23) are in it too, as their `saved_views` table: the backup copies the
 whole database, so it needed no change for them. It is offered
 from the account menu, not the export menu ([design.md](design.md)). Restore is
 an owner step: stop the container, replace the file, start it.

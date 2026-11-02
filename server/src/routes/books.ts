@@ -23,9 +23,9 @@ function noSuchBooks(ids: readonly number[]): ApiError {
 }
 
 /**
- * The book routes (brief 02). A list answers `{ books }`; one book answers the
+ * The book routes. A list answers `{ books }`; one book answers the
  * book itself. Bodies are parsed with the shared schemas, so a bad one is a
- * 400 `validation` naming the field. `POST /api/books/bulk` (brief 26) makes
+ * 400 `validation` naming the field. `POST /api/books/bulk` makes
  * one change to many books in one transaction and answers `BookBulkResult`.
  */
 export const bookRoutes: FastifyPluginAsync<FeatureContext> = async (app, { books }) => {

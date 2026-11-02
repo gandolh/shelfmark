@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readDescription, romanian } from "./cip.js";
 
-// Moved from server/src/cip/parse.test.ts with the code (brief 30), unchanged.
+// Moved from server/src/cip/parse.test.ts with the code, unchanged.
 
 describe("readDescription", () => {
   it("a heading with an epithet, and a statement led by a phrase", () => {

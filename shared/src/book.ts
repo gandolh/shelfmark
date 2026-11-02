@@ -218,7 +218,7 @@ export const bulkChangeSchema = z.discriminatedUnion("kind", [
 export type BulkChange = z.infer<typeof bulkChangeSchema>;
 
 /**
- * `POST /api/books/bulk` (brief 26): one change to the books named by `ids`,
+ * `POST /api/books/bulk`: one change to the books named by `ids`,
  * in one transaction. Each id counts once. An id that names no book is a 400
  * and nothing changes.
  */

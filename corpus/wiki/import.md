@@ -1,11 +1,11 @@
 ---
 summary: How CSV import works and why it is shaped so. The account-menu entry (no third place), encoding detection, the header sets that map automatically, the preview flags and default ticks, the one-at-a-time lookups that spare the Google Books key, and how rows are saved. Read before changing web/src/import/.
-updated: 2026-10-23
+updated: 2026-11-02
 ---
 
 # CSV import
 
-Shipped by [brief 28](../briefs/done/28-csv-import.md). Code in
+Shipped by the 2026-10-23 work. Code in
 [`web/src/import/`](../../web/src/import/); it reads the field names
 [export](export.md) writes, so a Shelfmark export imports back cleanly.
 

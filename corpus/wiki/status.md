@@ -1,93 +1,74 @@
 ---
-summary: Snapshot as of 2026-10-15. v1 is built - all 14 briefs done, reviewed and committed on main (515 tests), pushed, not deployed. Briefs 15-16 (Romanian library catalogs, the CIP index) 17-20 (one lookup per ISBN, scan on a press, the first read wins) written and built 2026-10-17/18 (618 tests), not deployed. Brief 21 (a press reads until it finds the ISBN; a sharper camera and a camera readout) written 2026-10-20, built 2026-10-21 (633 tests), not deployed. Brief 22 (Base UI under the widgets) built 2026-10-23, not deployed. Briefs 23-31 (the v1.x set) built 2026-10-23, and brief 32 (change the username, on ward-auth 0.4.0) built 2026-10-24. Briefs 15-32 deployed 2026-10-24 and checked read-only (CIP refresh, port 9991). What waits on the owner (Google key, deploy, phone and Ward checks), one line per brief, and the todos left by tier.
-updated: 2026-10-24
+summary: Snapshot as of 2026-11-02, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24. Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+updated: 2026-11-02
 ---
 
 # Status
 
-_2026-10-15_. v1 is built. All 14 briefs were built on 2026-10-14 and
-2026-10-15 with `plan-split-dispatch`, one commit per brief on `main`,
-followed by a three-finder review and two fix rounds, then impeccable's
-design finish ([DESIGN.md](../../DESIGN.md)). 515 tests pass; typecheck,
-lint and build are clean. `main` is pushed to the GitHub repo
-`<owner>/shelfmark`, and so is `wzd_auth`'s local seed entry (`55cf336`).
-`vps-deploy` has no remote; its Shelfmark stack (`1c5438b`) is a local
-commit, which is where the deploy runs from. Nothing is deployed. The README
-and `docs/` follow the readme-docs standard since 2026-10-16. The
-product calls are in [decisions.md](decisions.md), the look in
-[design.md](design.md), and the run's rulings in [log.md](../log.md).
+_2026-11-02_. Everything is on `main` and pushed through `29bdad1`
+(2026-11-01). Deployed on 2026-10-24 with everything through the change of
+username. No brief is open; brief numbering restarted at 01 on 2026-11-02
+(see [log.md](../log.md)). The product calls are in
+[decisions.md](decisions.md), the look in [design.md](design.md) and
+`DESIGN.md`, and the run's rulings in [log.md](../log.md).
+
+## By area
+
+- **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app
+  shell, the lookup and covers, the camera scanner, accounts and sign-in, the
+  Library, Add a book, the book page, export and backup, the PWA, the design
+  finish and the deploy; a three-finder review and two fix rounds
+  ([architecture.md](architecture.md), [features.md](features.md)).
+- **Romanian books** (2026-10-17). Three library catalogs over Z39.50 and the
+  CIP index from the national bibliography PDFs
+  ([metadata-lookup.md](metadata-lookup.md)).
+- **Scanning** (2026-10-17 to 2026-10-21). One lookup per ISBN, scan on a
+  press, the first read wins, read until the ISBN is found, a sharper camera
+  and the `?camera` readout ([scanning.md](scanning.md)).
+- **Widgets** (2026-10-23). Base UI under the menus, panels, dialog and
+  switches ([overlays.md](overlays.md)).
+- **v1.x** (2026-10-23). Wishlist, offline "do I own this?", the offline scan
+  queue, bulk edit from the table, saved views, CSV import, stats, a CIP
+  block read from a photo ([cip-photo.md](cip-photo.md)), a subtitle field on
+  the by-hand form.
+- **Change the username** (2026-10-24), on ward-auth 0.4.0.
 
 ## Next (owner)
 
 1. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-2. **Deployed 2026-10-24** with briefs 15 to 32 (the owner ran it; the deploy
+2. **Deployed 2026-10-24** with everything since v1 (the owner ran it; the deploy
    mirrors the local tree, so the unpushed commits went too). Checked read-only
    the same day: the container runs ward-auth 0.4.0 and the web release has
    Change username. The first CIP refresh found 82 issues and 0 to import.
    The container reaches all three libraries on port 9991, but BCU
    Timișoara took 5.2 s to connect, against a 10 s budget per library.
    Left for the owner: look up `9786068044873` in the app (it should say the
-   Romanian Academy Library), the phone checks of briefs 18 to 21 in their
-   outcomes, and brief 21's `?camera` readout numbers from the phone.
+   Romanian Academy Library), and the phone checks below.
 3. The checks no agent could run here, listed in owner-setup: the scanner on
-   an Android phone and an iPhone (briefs 07, 09), the PWA install (12), the
-   local Ward round trip (06, needs Docker Desktop's WSL integration), the
-   exports opened in Excel (11). The container build (14) was checked locally
+   an Android phone and an iPhone, the PWA install, the local Ward round trip
+   (needs Docker Desktop's WSL integration), the exports opened in Excel. The container build was checked locally
    on 2026-10-17, poppler-utils included.
-4. After v1 ships, promote the v1.x todos below; the wishlist (done) was first in
-   line, since the Library already leaves room for its Owned / Wishlist tabs.
+4. **Phone checks on the scanner** (after the deploy):
+   - Scan a book, scan another, then the first again: it shows at once, and
+     the server log has no second `lookup` line for it.
+   - Nothing beeps until you tap *Scan the barcode*. Bring a book in: it reads
+     once the barcode is sharp, with no "nothing read" message in between,
+     and stops there; *Stop reading* stops it. With a result open the button
+     is gone; *Not this book* brings it back.
+   - On Android, a "2×" chip under the torch: check whether 2× reads better
+     than 1× from about 20 cm. On an iPhone a chip may show too; say if 2×
+     looks worse there.
+   - In the browser (not the installed app), open Add a book with `?camera` at
+     the end of the address and send the readout's four lines: resolution,
+     zoom range, focus modes, decode time. Over 150 ms is the cue to crop the
+     frame.
+5. **The CIP photo:** a few real photos of copyright pages, re-read with
+   `web/src/ocr/fixtures/record.ts`, and a walk on the phone; the fixtures so far are
+   renders ([cip-photo.md](cip-photo.md)).
 
-## Briefs
+## Todos
 
-| # | Brief | Wave | State |
-|---|---|---|---|
-| 01 | [Workspace scaffold](../briefs/done/01-workspace-scaffold.md) | 1 | done |
-| 02 | [Book store and API](../briefs/done/02-book-store-and-api.md) | 2 | done |
-| 03 | [ISBN utilities](../briefs/done/03-isbn-utilities.md) | 2 | done |
-| 04 | [App shell, tokens, books client](../briefs/done/04-app-shell-and-tokens.md) | 3 | done |
-| 05 | [Lookup and covers](../briefs/done/05-lookup-and-covers.md) | 3 | done |
-| 07 | [Camera scanner](../briefs/done/07-camera-scanner.md) | 3 | done |
-| 06 | [Accounts and sign-in](../briefs/done/06-accounts-and-sign-in.md) | 4 | done |
-| 08 | [Library page](../briefs/done/08-library-page.md) | 4 | done |
-| 09 | [Add a book page](../briefs/done/09-add-a-book-page.md) | 4 | done |
-| 10 | [Book page](../briefs/done/10-book-page.md) | 5 | done |
-| 11 | [Export and backup](../briefs/done/11-export-and-backup.md) | 5 | done |
-| 12 | [PWA](../briefs/done/12-pwa.md) | 5 | done |
-| 13 | [Design finish and DESIGN.md](../briefs/done/13-design-finish.md) | 6 | done |
-| 14 | [Deploy](../briefs/done/14-deploy.md) | 6 | done |
-| 15 | [Romanian library catalogs](../briefs/done/15-library-catalogs.md) | 7 | done |
-| 16 | [The CIP index](../briefs/done/16-cip-index.md) | 8 | done |
-| 17 | [Confirmed reads and live rescans](../briefs/superseded/17-confirmed-reads.md) | 9 | superseded by 19 and 20 |
-| 18 | [One lookup per ISBN](../briefs/done/18-one-lookup-per-isbn.md) | 10 | done; the settle undone by 19 |
-| 19 | [Scan on a press](../briefs/done/19-scan-on-a-press.md) | 11 | done |
-| 20 | [The first read wins](../briefs/done/20-first-read-wins.md) | 12 | done |
-| 21 | [Read until the ISBN, and a sharper camera](../briefs/done/21-read-until-found.md) | 13 | done |
-| 22 | [Base UI for the menus, panels, dialog and switches](../briefs/done/22-base-ui-widgets.md) | 14 | done 2026-10-23 |
-| 23 | [Wishlist](../briefs/done/23-wishlist.md) | 15 | done 2026-10-23 |
-| 24 | [Offline "do I own this?"](../briefs/done/24-offline-owned-check.md) | 16 | done 2026-10-23 |
-| 25 | [Offline scan queue](../briefs/done/25-offline-scan-queue.md) | 17 | done 2026-10-23 |
-| 26 | [Bulk edit from the table](../briefs/done/26-bulk-edit.md) | 18 | done 2026-10-23 |
-| 27 | [Saved views](../briefs/done/27-saved-views.md) | 19 | done 2026-10-23 |
-| 28 | [CSV import](../briefs/done/28-csv-import.md) | 20 | done 2026-10-23 |
-| 29 | [Stats, from the account menu](../briefs/done/29-stats.md) | 21 | done 2026-10-23 |
-| 30 | [Fill a book from a photo of its CIP block](../briefs/done/30-cip-photo-capture.md) | 22 | done 2026-10-23; fixtures are renders, real photos and a phone walk owed |
-| 31 | [A subtitle field on the by-hand form](../briefs/done/31-subtitle-on-the-by-hand-form.md) | 23 | done 2026-10-23 |
-| 32 | [Change the username](../briefs/done/32-change-username.md) | 24 | done 2026-10-24 |
-
-Waves run in order; briefs inside a wave can run in parallel. Wave 3 splits
-the web foundation from the server lookup and the scanner; accounts wait for
-the shell (wave 4) so the login page is in the design's world, and every route
-test then moves to a signed-in session in one place.
-
-## Todos left, by tier
-
-None. On 2026-10-23 the v1.x todos became briefs 23–28, stats and the CIP photo
-became 29 and 30, and the Atrium link was dropped (the apps stay independent).
-The review's two todos went the same day: the subtitle field became 31, and the pinned
-bulk bar was dropped. The owner's change-username request (2026-10-24) went straight to
-brief 32, after the rename was built into ward-auth.
-Waves 15–22 were planned one at a time, since each touches the Library page or the add flow. On
-2026-10-23 they ran two at a time where the files did not overlap; 26 and 27 were built in a
-worktree and cherry-picked onto `main`.
+None open. The Atrium link and the pinned bulk bar were dropped on
+2026-10-23 (their todos record why).

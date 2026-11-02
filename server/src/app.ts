@@ -17,7 +17,7 @@ import { createBookStore, type BookStore } from "./store/books.js";
 /** What every feature is handed. Add a field only when more than one feature needs it. */
 export interface FeatureContext {
   config: Config;
-  /** The one connection, migrated, closed with the app. Brief 11's backup reads it. */
+  /** The one connection, migrated, closed with the app. The backup reads it. */
   db: Db;
   /** Books go through this store, never through another module's SQL. */
   books: BookStore;
@@ -43,7 +43,7 @@ export { AUTH_ROUTE_PREFIX };
 export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
 
 /**
- * Accounts and the guard (brief 06). The vendored `wardAuth` plugin keeps the
+ * Accounts and the guard. The vendored `wardAuth` plugin keeps the
  * local accounts in this database and serves `/auth/*`: login, logout, the
  * session, the password, and "Sign in with Ward" when `config.ward` is set.
  * Its `onRequest` hook refuses every other route without a live session
@@ -88,8 +88,8 @@ const signIn: Feature = async (app, { config, db, fetch }) => {
 /**
  * A feature sets itself up on the root app. Usually that is registering its
  * route plugin with the context, which keeps the plugin's hooks to itself:
- * `(app, ctx) => app.register(bookRoutes, ctx)`. A root guard (brief 06's
- * `wardAuth`) registers on `app` directly and goes first, because Fastify
+ * `(app, ctx) => app.register(bookRoutes, ctx)`. A root guard (the
+ * `wardAuth` plugin) registers on `app` directly and goes first, because Fastify
  * copies root hooks into a plugin's context when the plugin is created.
  */
 export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike<unknown>;

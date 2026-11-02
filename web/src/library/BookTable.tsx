@@ -48,8 +48,8 @@ import { getSelection, setSelection, updatePrefs, useLibrarySelection } from "./
  * End move between rows; Enter opens the book. Header buttons sort (Shift
  * with Enter adds a key); the handle between headers resizes with ← →.
  *
- * Before the columns, a box per row selects the book for the bulk bar
- * (brief 26), and the header's box selects every row on show (what the
+ * Before the columns, a box per row selects the book for the bulk bar,
+ * and the header's box selects every row on show (what the
  * search and filters let through), or none of them once they all are. The
  * boxes are not a TanStack column: column order, visibility, widths and
  * saved views never see them. In the row, Tab goes from the box to the

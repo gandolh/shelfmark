@@ -8,7 +8,7 @@ import { AlertIcon, TextScanIcon } from "./icons";
 import { ImageReadError } from "./resize";
 
 /**
- * "Read the CIP block" on the by-hand form (brief 30): a photo of the
+ * "Read the CIP block" on the by-hand form: a photo of the
  * copyright page, an optional box dragged around the block, Tesseract in the
  * browser (ocr/engine.ts), then the description read (ocr/block.ts) and handed
  * to the form, which fills only its empty fields. The text Tesseract read stays

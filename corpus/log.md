@@ -93,7 +93,7 @@ keeping:
   restarted under another account; its Covers artboards were transcribed for
   the page agents from an earlier read.
 - Owner checks waiting: the scanner on an Android phone and an iPhone (steps in
-  [brief 07's outcome](briefs/done/07-camera-scanner.md)); the Google
+  brief 07's outcome); the Google
   measurement once `GOOGLE_BOOKS_API_KEY` is in `.env`.
 
 ## [2026-10-15] build | Wave 4 built: briefs 08, 09, then 06
@@ -182,7 +182,7 @@ searches over Z39.50 and found 33 of 40 trade books from 2012-2015. The owner
 rejected scraping again, said yes to the CIP index, and asked that the Google
 key be used as little as possible. Findings in
 [metadata-lookup.md](wiki/metadata-lookup.md), new todo
-[z3950-library-source](todos/z3950-library-source.md).
+z3950-library-source.
 
 ## [2026-10-17] plan | Briefs 15 and 16: library catalogs and the CIP index
 
@@ -203,7 +203,7 @@ and BCU Timișoara over Z39.50 after Open Library and before Google Books, and
 each source is asked only while nothing has a title. Checked against the real
 servers: three Romanian books found, Google never asked. BCU Timișoara
 sometimes misses the 10 s deadline; that is an uncached error. 563 tests.
-Outcome in [brief 15](briefs/done/15-library-catalogs.md).
+Outcome in brief 15.
 
 ## [2026-10-17] build | Brief 16: the CIP index
 
@@ -214,7 +214,7 @@ Against the real site, two issues imported (2,951 and 3,000 records), and a
 2026 book no library holds came from the index without asking Google. The
 image build was checked once the owner started Docker: the same 3,000
 records inside it, healthy. 610
-tests. Outcome in [brief 16](briefs/done/16-cip-index.md).
+tests. Outcome in brief 16.
 
 ## [2026-10-17] build | Brief 17: confirmed reads and live rescans
 
@@ -232,7 +232,7 @@ inline after the brief was written:
   rather than 2 s, so a correction lands in about a second.
 
 Checked in headless Chrome with a fake camera. 629 tests. Outcome in
-[brief 17](briefs/superseded/17-confirmed-reads.md).
+brief 17.
 
 ## [2026-10-17] build | Brief 18: one lookup per ISBN
 
@@ -247,7 +247,7 @@ already answers a repeated ISBN with no outside call. Three gaps remained:
   each visit's answers.
 
 The browser check found the scanner skipping reads during the settle; that
-is fixed. 639 tests. Outcome in [brief 18](briefs/done/18-one-lookup-per-isbn.md).
+is fixed. 639 tests. Outcome in brief 18.
 
 ## [2026-10-18] decision + build | Brief 19: scan on a press
 
@@ -262,7 +262,7 @@ This undoes brief 17's replaceable result and read pace, and brief 18's
 lookup per ISBN on the server. The glossary drops *Loose sheet*. Checked in
 headless Chrome with a fake camera: no reads between presses, two reads and
 one lookup per press. 624 tests. Outcome in
-[brief 19](briefs/done/19-scan-on-a-press.md).
+brief 19.
 
 ## [2026-10-18] revisit + build | Brief 20: the first read wins
 
@@ -270,7 +270,7 @@ The owner said a press doesn't need two agreeing reads: if the ISBN looks
 wrong, they press again. A press now takes the first code it reads, and the
 ISBN still wins over a sticker. The decision "The camera reads only on a
 press" is updated to match. 618 tests. Outcome in
-[brief 20](briefs/done/20-first-read-wins.md).
+brief 20.
 
 ## [2026-10-20] todo | Brief 21: read until the ISBN, and a sharper camera
 
@@ -285,7 +285,7 @@ Chrome on Android lets a page set focus and zoom. Brief 21 drops the 3 s
 deadline, adds *Stop reading* and a 60 s limit, asks for 1080p, adds focus
 and a 2× zoom where the camera offers them, and adds a `?camera` readout so
 the owner's phone can settle the question. Spec in
-[brief 21](briefs/done/21-read-until-found.md).
+brief 21.
 
 ## [2026-10-21] revisit + build | Brief 21: read until the ISBN, and a sharper camera
 
@@ -303,18 +303,18 @@ owner's phone to settle whether the soft picture is the stream or the lens.
 Checked in headless Chrome with a fake camera: a press over a blank picture
 read the book at about 8 s and sent one lookup; *Stop reading* stopped the
 reads; a blank-only camera stopped at 60 s. 633 tests. Outcome in
-[brief 21](briefs/done/21-read-until-found.md).
+brief 21.
 
 ## [2026-10-23] todo | Brief 22 filed: Base UI for the widgets
 
 The owner asked for Base UI in the apps that still hand-build their widgets.
-[Brief 22](briefs/done/22-base-ui-widgets.md) moves the menu, the Filter and
+Brief 22 moves the menu, the Filter and
 Columns panels, Change password, the Add tabs, the segmented control and two
 disclosures to Base UI. TanStack Table and the native inputs stay.
 
 ## [2026-10-23] done | Brief 22: Base UI for the widgets
 
-[Brief 22](briefs/done/22-base-ui-widgets.md) is built. The menus, the
+Brief 22 is built. The menus, the
 Filter/Columns panels (a modal Popover on the desktop, a Dialog sheet on a
 phone), Change password, the mode tabs, the segmented controls and Change
 cover are on Base UI.
@@ -334,14 +334,14 @@ is in [decisions.md](wiki/decisions.md).
 ## [2026-10-23] todo | Briefs 23–28: the v1.x todos
 
 All six v1.x todos are now briefs, one wave each, in this order:
-[23](briefs/done/23-wishlist.md) the wishlist as Owned / Wishlist tabs and "I bought
+23 the wishlist as Owned / Wishlist tabs and "I bought
 it" (the `collection` column and `wishlisted` lookups already exist);
-[24](briefs/done/24-offline-owned-check.md) an IndexedDB copy of the owned ISBNs answers
-a scan with no signal; [25](briefs/done/25-offline-scan-queue.md) offline scans wait and
+24 an IndexedDB copy of the owned ISBNs answers
+a scan with no signal; 25 offline scans wait and
 are looked up one at a time when back online, through the server's queues;
-[26](briefs/done/26-bulk-edit.md) row selection and one `POST /api/books/bulk`
-transaction; [27](briefs/done/27-saved-views.md) named views stored on the server;
-[28](briefs/done/28-csv-import.md) CSV import with encoding detection, from the account
+26 row selection and one `POST /api/books/bulk`
+transaction; 27 named views stored on the server;
+28 CSV import with encoding detection, from the account
 menu, lookups only for ISBN-only rows. The three "later" todos wait on the owner: the
 stats page needs a home that keeps "Two places only", the CIP photo needs OCR or Claude
 chosen, and the Atrium link needs a shape.
@@ -350,13 +350,13 @@ chosen, and the Atrium link needs a shape.
 
 Asked where stats should live under "Two places only", the owner chose an item in the
 account menu, over a button over the Library table or a third tab. The rule stands.
-[Brief 29](briefs/done/29-stats.md) counts owned books in the browser, with no server
+Brief 29 counts owned books in the browser, with no server
 route, and links each count to Library with that filter.
 
 ## [2026-10-23] decision | The CIP photo is read by OCR in the browser; brief 30
 
 Asked what reads a photo of a book's CIP block, the owner chose Tesseract in the browser,
-over Claude on the server or dropping the feature: free, private and offline. [Brief 30](briefs/done/30-cip-photo-capture.md)
+over Claude on the server or dropping the feature: free, private and offline. Brief 30
 moves `readDescription` from the CIP list parser into `shared/` so the browser reads the
 OCR text with the same tested code, and serves Tesseract and its Romanian data from the
 app's own origin.
@@ -372,7 +372,7 @@ features.md lists it under Out. No todos are left.
 
 Library got Owned / Wishlist tabs, the scan sheet "Add to wishlist" and "I bought it" (scan
 sheet and book page, one PATCH to owned with a shelf and today's `acquiredOn`). No migration.
-[Brief 23](briefs/done/23-wishlist.md) has the outcome; features.md, library-table.md,
+Brief 23 has the outcome; features.md, library-table.md,
 data-model.md and design.md caught up.
 
 ## [2026-10-23] done | Brief 24, offline "do I own this?"
@@ -381,7 +381,7 @@ The page keeps `{ isbn13, title, shelf, collection }` for every book in IndexedD
 whole whenever the library list loads or changes, and a scan whose lookup gets no answer
 (a `network` error) is answered from it: already on a shelf, on the wishlist, or not in the
 library, as of the copy's date, said plainly to be the offline answer. Sign out clears it.
-The service worker and the server are untouched. [Brief 24](briefs/done/24-offline-owned-check.md)
+The service worker and the server are untouched. Brief 24
 has the outcome; features.md and scanning.md caught up.
 
 ## [2026-10-23] done | Brief 25, offline scan queue
@@ -391,7 +391,7 @@ a second IndexedDB store; the queue survives a reload and shows as "Waiting to l
 on Add a book. Online (app start and the `online` event) the ISBNs are looked up one at a
 time through `POST /api/lookup`, and each opens as the usual sheet to confirm; nothing found
 opens the by-hand form with the ISBN filled. Sign out clears it. The service worker, the
-server and `books/store.ts` are untouched. [Brief 25](briefs/done/25-offline-scan-queue.md)
+server and `books/store.ts` are untouched. Brief 25
 has the outcome; features.md and scanning.md caught up.
 
 ## [2026-10-23] done | Brief 28, CSV import
@@ -403,7 +403,7 @@ themselves, any other file gets a mapping step. The preview flags rows already i
 repeated, with an invalid ISBN or needing a lookup, and rows can be unticked. Optional lookups
 run one at a time with a Stop button; ticked rows are saved one `POST /api/books` at a time into
 Owned or Wishlist, with saved / skipped / failed counts. No server change, no new dependency.
-[Brief 28](briefs/done/28-csv-import.md) has the outcome; features.md and import.md caught up.
+Brief 28 has the outcome; features.md and import.md caught up.
 
 ## [2026-10-23] done | Brief 29, Stats
 
@@ -412,13 +412,13 @@ place). Owned books only, counted in the browser: totals, ranked top-10 lists of
 languages, shelves (by room), status and decades, and money spent per year per currency with a
 footnote for books missing a price or date. Each count sets one Library filter through the
 existing `setFilter` and opens Library on Owned; no change to `web/src/library/`. No server
-change. [Brief 29](briefs/done/29-stats.md) has the outcome; features.md caught up.
+change. Brief 29 has the outcome; features.md caught up.
 
 ## [2026-10-23] done | Brief 27: saved views
 
 Named views of the Library (tab, filters, sort, columns) stored on the server in
 `saved_views` (migration 3) behind `/api/views`, applied from a Views menu.
-[Brief 27](briefs/done/27-saved-views.md) has the outcome. Built in a worktree and
+Brief 27 has the outcome. Built in a worktree and
 cherry-picked as `2b422c7`. Gates on its base: typecheck, lint, build, 778 tests (the
 "3,000 books in under 100 ms" timing test flakes under load and passed alone).
 
@@ -461,7 +461,7 @@ fields and marks them to check; the OCR text stays under a disclosure to fix and
 or to copy when there is no "Descrierea CIP" heading. Every Tesseract file is served from the
 app under `ocr/<name>-<hash>/` (no CDN), not precached, and cached by the service worker on
 first use: 4.8 MB a device. Sauvola thresholds, since the default lost words under a shadow.
-[Brief 30](briefs/done/30-cip-photo-capture.md) has the outcome, [cip-photo.md](wiki/cip-photo.md)
+Brief 30 has the outcome, [cip-photo.md](wiki/cip-photo.md)
 the detail; features.md, scanning.md, metadata-lookup.md and the glossary caught up.
 
 Gates: typecheck, lint, build, 800 tests (the "3,000 books in under 100 ms" timing test
@@ -476,7 +476,7 @@ Select rows (a box per row and a header box over the rows on show; a long press 
 covers), then move them to a shelf, set their status, add or remove tags, or delete them,
 from a bulk bar that stands in for the toolbar until Clear. Each change is one
 `POST /api/books/bulk` transaction; an unknown id is a `400` and nothing changes; a shelf
-change skips wishlist books and says how many. [Brief 26](briefs/done/26-bulk-edit.md) has
+change skips wishlist books and says how many. Brief 26 has
 the outcome. Built in a worktree on branch `brief-26` from `6ae6a2e`, code commit `fe7d22a`,
 cherry-picked onto `main` as `f6ed569`. Gates: typecheck, lint, build, 818 tests (the
 "3,000 books in under 100 ms" timing test flaked under load and passed alone).
@@ -509,7 +509,7 @@ counts are heard as "Bedroom · B1, 5 books" and "signed, on all"; the queue's l
 says "Ready to confirm (N)" once every scan is answered; a stale comment in
 `columns.ts`; status.md's waves line. Two todos filed:
 [bulk-bar-stays-in-view](todos/bulk-bar-stays-in-view.md) (the bar scrolls off when
-ticking rows further down) and [subtitle-on-the-by-hand-form](todos/subtitle-on-the-by-hand-form.md).
+ticking rows further down) and subtitle-on-the-by-hand-form.
 
 Still owed, needing a real phone or the owner: the long press with iOS and Android's
 own menus, the photo picker and box drag, real camera photos for the CIP fixtures,
@@ -523,7 +523,7 @@ the owner chose that over pinning it under the top bar, or in place of the phone
 bottom nav, and the todo [bulk-bar-stays-in-view](todos/bulk-bar-stays-in-view.md) is
 dropped. The subtitle gets an optional field under Title on the by-hand form, filled
 from the CIP block and marked to check, over saving it unseen or leaving it to Edit:
-[brief 31](briefs/done/31-subtitle-on-the-by-hand-form.md). Writing it found that a
+brief 31. Writing it found that a
 lookup draft's subtitle is today saved as a hidden detail from "Edit details", so 31
 moves it into the field as well.
 
@@ -534,7 +534,7 @@ marks it like the others, and "Edit details" on a found book shows the draft's s
 instead of saving it unseen. On the way, the reader takes an author's name off the end of the
 title part when the OCR lost the " / " before it (fixture `2-popa`). Checked with typecheck,
 lint, build, 840 tests and a browser read of `2-popa.jpg` at 390 px; the saved book had the
-subtitle. [Brief 31](briefs/done/31-subtitle-on-the-by-hand-form.md). Built inline.
+subtitle. Brief 31. Built inline.
 
 The timing test passed in the full run on an idle machine (load 0.64): its earlier failures
 came from the trips agent building alongside, so it stays as it is.
@@ -551,7 +551,7 @@ id and every session stay. On the way, both dialogs' Done buttons got focus, whi
 had fallen to the panel after a save. owner-setup says to give the seed the new name
 after a rename, since the seed matches by name. Checked: typecheck, lint, build,
 tests, and a browser walk at 1280 and 390 px on a scratch database.
-[Brief 32](briefs/done/32-change-username.md). Built inline.
+Brief 32. Built inline.
 
 ## [2026-10-24] decision | Only lightweight tests
 
@@ -580,3 +580,21 @@ owner.
 ## [2026-10-31] maintenance | README: deployed, the v1.x features, and new images
 
 A README refresh pass with the readme-docs standard. The README still said version 1 was not deployed and described the library as it was on 2026-10-16. It now says briefs 15-32 went live on 2026-10-24 and lists what briefs 23-31 added: saved views, bulk edits from the table, the wishlist, CSV import, stats, the offline "do I own this?" check, queued offline scans, and reading the CIP block from a photo. All five images were taken again from `docs/images/demo-seed.mjs` on a scratch `DATA_DIR`. The table shot now shows three rows ticked and the bulk-edit bar instead of the Export menu, and the add-a-book shot shows the CIP offer; the catalogs were unreachable from the workspace, so its note says they didn't answer. Checked: `npm ci`, the seed, `npm run dev` on port 5176 and the demo seed. `shots.md` records the Playwright capture.
+
+## [2026-11-02] maintenance | Briefs reset
+
+Part of an estate-wide reset. The thirty-one done briefs and the superseded
+17 are folded into the wiki and deleted, with the twenty-three todos they were
+promoted from; the two dropped todos (the Atrium link, the pinned bulk bar)
+stay as the record of those calls. Brief numbering restarts at 01. The old
+briefs read like the grilling that fed the first corpus. The last commit that
+held them is `ad0fb1a`: read one with
+`git show ad0fb1a:corpus/briefs/done/21-read-until-found.md`. Brief numbers in
+the entries above refer to that set.
+
+New page: [overlays.md](wiki/overlays.md), the Base UI move. The other pages
+cite dates instead of brief numbers. [status.md](wiki/status.md) is a per-area
+snapshot; the phone checks on the scanner and the camera readout, which lived
+only in old outcome notes, are now in its "Next (owner)". Code comments no
+longer cite brief numbers.
+

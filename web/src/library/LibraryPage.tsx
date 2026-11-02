@@ -44,7 +44,7 @@ const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist
  * The Library (design.md; corpus/wiki/library-table.md): the open collection
  * (Owned or Wishlist), as a table or as covers, searched from the box in the shell, filtered by
  * any column, sorted by any. "14 books, newest first" under the title.
- * While books are selected (brief 26) the bulk bar stands in for the
+ * While books are selected the bulk bar stands in for the
  * toolbar; Clear puts the toolbar back as it was.
  */
 export function LibraryPage() {

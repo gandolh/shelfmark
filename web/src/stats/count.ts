@@ -2,7 +2,7 @@ import type { Book } from "@shelfmark/shared";
 import { collectionCounts } from "../library/view";
 
 /**
- * The numbers behind the Stats screen (brief 29): pure functions of the books
+ * The numbers behind the Stats screen: pure functions of the books
  * already in the browser. Owned books only; the wishlist is one count.
  */
 

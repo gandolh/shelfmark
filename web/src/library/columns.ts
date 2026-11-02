@@ -22,7 +22,7 @@ import {
 
 export type ColumnKind = "text" | "pick" | "number" | "date" | "yesno";
 
-/** Every column's id, in the table's default order: the shared list, so a saved view (brief 27) names the same columns. */
+/** Every column's id, in the table's default order: the shared list, so a saved view names the same columns. */
 export const COLUMN_IDS = LIBRARY_COLUMN_IDS;
 
 export type ColumnId = LibraryColumnId;

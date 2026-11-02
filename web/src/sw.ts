@@ -8,7 +8,7 @@ import { OCR_CACHE, isOcrPath } from "./ocr/paths";
 import { COVER_CACHE, isApiPath, isCoverPath } from "./pwa/routes";
 
 /*
- * Shelfmark's service worker (vite-plugin-pwa, injectManifest; brief 12).
+ * Shelfmark's service worker (vite-plugin-pwa, injectManifest).
  *
  * v1 keeps the app shell offline, not the data: the shell and the scanner's
  * .wasm are precached, navigations get index.html, and of the API only book
@@ -52,7 +52,7 @@ registerRoute(
 );
 // No other route is registered for `/shelfmark-api/`, so the browser goes to the network for it.
 
-// Reading a CIP block (brief 30): Tesseract's worker, core and Romanian data,
+// Reading a CIP block: Tesseract's worker, core and Romanian data,
 // 4.8 MB a device only needs if it reads one, so not precached. Cache-first
 // from the first read on, so the next works offline; the directories carry a
 // hash of their contents, so a cached file is never stale. The page's own

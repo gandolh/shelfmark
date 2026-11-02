@@ -744,7 +744,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Filled from the CIP block (brief 30): tinted and ringed until the owner changes it. */
+/* Filled from the CIP block: tinted and ringed until the owner changes it. */
 .add-input[data-filled] {
   background: var(--accent-tint-soft);
   box-shadow: inset 0 0 0 1.5px var(--accent);
@@ -946,7 +946,7 @@ fieldset:disabled .add-chip {
   outline-offset: 2px;
 }
 
-/* --- Read the CIP block (brief 30): the cover row's look, opening into the photo and the read --- */
+/* --- Read the CIP block: the cover row's look, opening into the photo and the read --- */
 
 .add-cip {
   display: flex;

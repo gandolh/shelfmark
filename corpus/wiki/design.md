@@ -1,13 +1,13 @@
 ---
 summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-10-24
+updated: 2026-11-02
 ---
 
 # Design
 
 **The design system as built is [DESIGN.md](../../DESIGN.md)** at the repo
-root (with its sidecar `.impeccable/design.json`), written on 2026-10-15 by
-brief 13 from the shipped UI; its tokens equal
+root (with its sidecar `.impeccable/design.json`), written on 2026-10-15
+from the shipped UI; its tokens equal
 [tokens.css](../../web/src/styles/tokens.css). Build against DESIGN.md. This
 page keeps how the look was chosen, what the owner decided, and the finish
 review. Where the two disagree, DESIGN.md and the code win.
@@ -74,7 +74,7 @@ Two places only: **Library** and **Add a book**.
   segmented control in the centre, search and the account button right.
 - Phone: a two-tab bar at the bottom.
 - **No Settings tab.** The account button opens a menu with: change username
-  (its detail is the name signed in, since brief 32), change password, Sign in
+  (its detail is the name signed in, since 2026-10-24), change password, Sign in
   with Ward (linked or not), import a CSV, stats, download a backup (the
   database file), sign out.
 - **No loans** at all (owner, 2026-10-14).
@@ -127,10 +127,10 @@ What the mock-ups left open, as the v1 briefs drew it (DESIGN.md has the detail)
   typographic cover (title and author on one of eight tints picked from the
   title), not a grey box.
 - The book page, the filter chip row, empty and loading states, and the
-  account menu. The Owned / Wishlist tabs shipped with brief 23 (2026-10-23).
-- `DESIGN.md`, written from the built UI by brief 13 (below).
+  account menu. The Owned / Wishlist tabs shipped on 2026-10-23.
+- `DESIGN.md`, written from the built UI on 2026-10-15 (below).
 
-## Finish review (2026-10-15, brief 13)
+## Finish review (2026-10-15)
 
 Impeccable's finish reviewer, run fresh over desktop (1440) and phone (390)
 captures with 40 seeded books, against this page and the mock-ups'

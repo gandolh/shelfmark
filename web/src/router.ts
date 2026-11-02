@@ -11,7 +11,7 @@ import { appBase } from "./base";
  *   /shelfmark/books/:id   book      one book
  *   /shelfmark/import      import    Import a CSV (account menu; sits under Library)
  *   /shelfmark/stats    stats     Stats (account menu; sits under Library)
- *   /shelfmark/login       login     signing in (brief 06)
+ *   /shelfmark/login       login     signing in
  *
  * Anything else is the Library, and the shell rewrites the address to `/shelfmark/`.
  * Each route also needs its page in `PAGES` (layout/AppShell.tsx); the

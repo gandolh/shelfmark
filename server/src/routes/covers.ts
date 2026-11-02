@@ -168,7 +168,7 @@ function matchesEtag(header: string | undefined, etag: string): boolean {
 const isCoverMime = (value: string): value is CoverMime => (COVER_MIME_TYPES as readonly string[]).includes(value);
 
 /**
- * The cover routes (brief 05). `PUT` takes the raw image; `POST …/fetch`
+ * The cover routes. `PUT` takes the raw image; `POST …/fetch`
  * downloads a draft's candidate; both answer `CoverInfo`. `GET` serves the
  * bytes with an `ETag` and a day of private caching, so a client adds
  * `?v=<Book.coverUpdatedAt>` to the image URL (ignored here).
