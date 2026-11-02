@@ -1,5 +1,5 @@
 ---
-summary: How the main table of books works. TanStack Table running in the browser over every book, the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23), and why filtering does not need the server.
+summary: How the main table of books works. TanStack Table running in the browser over every book, shown a page at a time in the browser (50 by default, the pager, since 2026-11-02), the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23), and why filtering does not need the server.
 updated: 2026-11-02
 ---
 
@@ -15,7 +15,29 @@ megabytes of JSON and filters instantly. This also makes export trivial: the
 exported rows are exactly the rows the table holds after filtering.
 
 Rejected: server-side paging and filtering, which needs a query language and
-round trips for no gain at this size. Rejected: AG Grid and MUI Data Grid,
+round trips for no gain at this size.
+
+**Pages** (2026-11-02, the owner's ask). The table and the covers show one
+page of the list the client holds; the server still answers every book once
+per session, because search, filters, sort, the offline "do I own this?"
+check, stats, import's duplicate check and export all run over the whole
+list. `LibraryView.rows` keeps its meaning (every book the search and filters
+let through, sorted); `pageRows` is the page's slice of it, from the pure
+helpers in [pagination.ts](../../web/src/library/pagination.ts). Both
+virtualizers stay and get the page's rows. The page size is a pref per layout
+(25, 50, 100 or 200, default 50, the same for Table and Covers). The page is
+session state in [state.ts](../../web/src/library/state.ts), kept with what
+it was turned on: the tab, the search text, the filters, the sort and the
+size. When any of those changes, or a saved view is applied, the Library is on
+page 1 and the old page is forgotten; Back from a book finds the page and
+`scroll.ts` the scroll within it. A list that shrinks (a filter, a bulk
+delete, a book deleted on another device) shows its new last page. The pager
+sits under the list; it is gone when everything fits on one page, unless a
+size over 50 put more than 50 books there, so "Per page" stays in reach to go
+back down. Turning the page brings the list's top under the top bar, keeps
+focus on the control pressed and reads the new range in a polite live region.
+The arrows in the table and the grid stop at the page's first and last row.
+The caption under the title keeps the total. Rejected: AG Grid and MUI Data Grid,
 whose Excel export is behind a paid tier and whose look fights a custom design.
 
 ## Views
@@ -24,7 +46,7 @@ Library holds two collections, **Owned** and **Wishlist**, switched at the top
 of the page; everything below applies to whichever is open. Two views of the
 same rows, switched by a Table / Covers control ([design.md](design.md)): **Table**, the default on a laptop, and **Covers**,
 a cover grid that is the default on a phone. Search, filters and sort apply to
-both; export takes the rows either view holds.
+both; export ("This view") takes the rows either view holds, every page of them.
 
 The open collection is `LibraryPrefs.collection` (`"owned"` or `"wishlist"`, in
 [prefs.ts](../../web/src/library/prefs.ts)), saved per layout beside the view and
@@ -63,15 +85,16 @@ ignores hyphens.
 
 ## Sorting
 
-Click a header to sort; shift-click adds a second key. Text sorts with
+Click a header to sort; shift-click adds a second key. A sort is over the
+whole list, not the page, and lands on page 1. Text sorts with
 `Intl.Collator('ro', { sensitivity: 'base', numeric: true })`, so "ă" sorts
 after "a" and "Vol. 10" after "Vol. 2". Authors sort by the `author_sort` field
 ("Cărtărescu, Mircea"), not by the displayed name.
 
 ## Layout memory
 
-The open tab, Table / Covers, column order, widths, visibility and sort are
-saved per layout (`shelfmark.library.desktop`, `shelfmark.library.phone`) in
+The open tab, Table / Covers, column order, widths, visibility, sort and page
+size are saved per layout (`shelfmark.library.desktop`, `shelfmark.library.phone`) in
 `localStorage` by [prefs.ts](../../web/src/library/prefs.ts): a convenience;
 losing it costs nothing. The filters live in page state for the session
 ([state.ts](../../web/src/library/state.ts)).
@@ -101,7 +124,10 @@ table does not fit a phone, and pretending otherwise is worse.
 
 Since 2026-10-23, a box before the columns selects a row; the header's
 box selects every row the search and filters let through (not every book),
-shows a dash when only some are, and unselects them once all are. The boxes
+on every page and not only the one on show (2026-11-02), shows a dash when
+only some are, and unselects them once all are. The common alternative, a
+box that ticks only the page plus a "Select all 1,234" offer, was not taken;
+it is the one call the owner may want to revisit. The boxes
 are drawn by [BookTable.tsx](../../web/src/library/BookTable.tsx) outside
 TanStack's columns and are not in `LIBRARY_COLUMN_IDS`, so the column picker,
 layout memory and saved views never list or store them. In a row, Tab goes
@@ -114,8 +140,10 @@ the book.
 
 The selection ([selection.ts](../../web/src/library/selection.ts), kept in
 `state.ts` for the session) survives sorting, filtering, searching and
-switching tab until Clear, so the bar counts the selected books out of sight
-("3 selected, 1 not shown"). It keeps each id with the book's `createdAt`,
+switching tab until Clear, and survives a turn of the page, so the bar counts
+the selected books out of sight ("3 selected, 1 not shown"). "Not shown"
+counts books the search, a filter or the other tab hides, not books on other
+pages. It keeps each id with the book's `createdAt`,
 so a new book that takes a deleted one's id is not selected.
 
 While books are selected the **bulk bar** takes the toolbar's place: the

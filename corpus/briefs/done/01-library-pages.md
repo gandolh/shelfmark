@@ -123,3 +123,61 @@ collection, Owned, Wishlist.
 - At done time, [library-table.md](../../wiki/library-table.md) states the
   pages (its "Shape" and "Selection and the bulk bar" sections and the
   summary), and `DESIGN.md` matches what was built.
+
+## Outcome (2026-11-02)
+
+Built on local `main` in `1a9f484`, not pushed, not deployed.
+
+- `pagination.ts` holds the helpers (page count, slice, clamp, range, the
+  page numbers with gaps, and `showsPager`); `LibraryView` gained `page`,
+  `pageCount`, `pageSize`, `pageRows` and `pageBasis`; `rows` keeps its
+  meaning. Both virtualizers stay and render `pageRows`. The page size is
+  `LibraryPrefs.pageSize`, 50 when missing or unknown.
+- The current page lives in `state.ts` with what it was turned on (tab,
+  search text, filters, sort, size). When any of them changes the view is on
+  page 1 and forgets the old page, so a round trip (Wishlist and back, a
+  search typed and cleared) doesn't bring it back. Back from a book keeps it.
+- The header's box, ", N not shown" and the "This view · N books" export
+  cover every page, as the brief said; that call was not grilled with the
+  owner and stays open ([status.md](../../wiki/status.md)).
+- Fixed on the way: an arrow pressed at the page's first or last row or
+  cover left a pending focus target that the next render acted on, so a
+  page turn moved focus from Previous onto a cover and Enter opened a book.
+  The arrow now does nothing there, and a pending target is dropped when
+  the page's rows change.
+
+Calls made beyond the brief:
+
+- The pager also stays when a size over 50 puts more than 50 books on one
+  page, showing only the range and "Per page". Otherwise choosing 200 with
+  150 books would hide the only way back to 50.
+- A turn only scrolls up to the list's top, never down, so a short last
+  page whose top is already in sight doesn't jump.
+- Table / Covers keeps the page (the brief's reset list doesn't name it). A
+  switch between the desktop and phone layouts lands on page 1, since each
+  layout has its own sort and size.
+
+Checks: `npm run typecheck`, `npm run lint`, and the unit tests for the
+files touched (`pagination`, `prefs`, `view`, `savedViews`, `selection`,
+`bulk`: 6 files, 70 tests, 19 of them new in `pagination.test.ts` and 4 in
+`prefs.test.ts`). The full `npm test` was not run; this run keeps to the
+lightweight tests in [decisions.md](../../wiki/decisions.md). Nothing called
+Google Books or any catalog.
+
+Browser walk on a scratch `DATA_DIR` with 320 owned and 12 wishlist books
+added through `POST /api/books`, desktop 1280 px and a Pixel 7 profile
+(412 px): 50 a page in the table and the covers; Next puts the list's top
+at 63 px on the desktop and 0 on the phone with focus kept and the range
+announced; search, a status filter, a sort, the tab, and "25 per page"
+each land on page 1; a book opened from page 3 comes Back to page 3 at the
+same scroll; the header's box on page 2 says "80 selected" for an
+80-book filter and the selection survives a turn; deleting the 5 books of
+page 4 lands on page 3; the CSV of "This view · 75 books" had 75 rows while
+page 3 showed; the 12-book Wishlist has no pager; the phone's targets are
+44 px with no sideways scroll.
+
+Left as they were: the comments in `columns.ts` and `export/fields.ts` that
+still say "What you see now" (outside this brief's files).
+
+Owner: deploy the web app from `vps-deploy` with
+`node cli.ts shelfmark deploy`, then check the pager on the Android phone.

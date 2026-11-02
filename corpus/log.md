@@ -601,10 +601,26 @@ longer cite brief numbers.
 
 ## [2026-11-02] todo | Brief 01 — Pages in the Library
 
-The owner asked for pagination on the books. [Brief 01](briefs/todo/01-library-pages.md)
+The owner asked for pagination on the books. [Brief 01](briefs/done/01-library-pages.md)
 pages the Library in the browser, over the list the client already holds; the
 server and the books store are unchanged, since server-side paging stays
 rejected ([library-table.md](wiki/library-table.md)). 50 books per page by
 default (25 to 200, a pref per layout), the page kept for the session beside
 the filters, and the header's box and ", N not shown" keep today's meaning.
 That last call is the one to confirm when the brief is grilled.
+
+## [2026-11-02] build | Brief 01 — Pages in the Library
+
+[Brief 01](briefs/done/01-library-pages.md) built in `1a9f484`, on local
+`main`, not deployed. The table and the covers show one page of the list the
+client holds, 50 by default, with a pager under it; the server and the books
+store are unchanged. The page is kept with the tab, search, filters, sort and
+size it was turned on, and forgotten when any of them changes. The header's
+box and the export still cover every page; whether the box should tick only
+the page is the owner's call, not grilled. The pager stays (range and "Per
+page" only) when a size over 50 puts more than 50 books on one page, so the
+size can go back down. A focus bug at the page's edge was fixed on the way.
+Checked with the typecheck, lint, 70 unit tests and a browser walk on a
+scratch database, desktop and a Pixel 7 profile. [library-table.md](wiki/library-table.md),
+[export.md](wiki/export.md), [design.md](wiki/design.md), `DESIGN.md` and
+[status.md](wiki/status.md) say what was built.

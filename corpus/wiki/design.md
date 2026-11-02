@@ -95,8 +95,11 @@ Two places only: **Library** and **Add a book**.
   opens a column list, then that column's filter; active filters show as
   removable chips under the toolbar. The mock-up shows only the button; the
   chip row is the build's to draw in this world.
-- Export menu: "What you see now" and "Every book, every field", each as Excel
-  (.xlsx) or CSV ([export.md](export.md)).
+- Export menu: "This view" (called "What you see now" until 2026-11-02, when
+  the Library got pages; it writes every page) and "Every book, every field",
+  each as Excel (.xlsx) or CSV ([export.md](export.md)).
+- Pages (2026-11-02): the pager under the list; DESIGN.md's Library bullets
+  hold its look ([library-table.md](library-table.md)).
 
 ## Add a book
 

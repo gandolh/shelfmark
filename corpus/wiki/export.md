@@ -10,7 +10,9 @@ updated: 2026-11-02
 The export menu on the table offers two scopes:
 
 - **This view**: the rows left after filters and search, in the current sort,
-  with the visible columns in their current order. What you see is what you get.
+  with the visible columns in their current order, on every page: since the
+  Library got pages (2026-11-02) the menu reads "This view · 1,234 books",
+  not "What you see now", so it doesn't read as the page on show.
 - **Everything**: every book, every column.
 
 Both run in the browser from the rows the table already holds
