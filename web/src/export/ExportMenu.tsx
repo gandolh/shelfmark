@@ -35,8 +35,9 @@ async function saveXlsx(table: ExportTable): Promise<void> {
 }
 
 /**
- * Export, under the toolbar: what the Library shows now, or every book and
- * every field, as Excel or CSV. `quiet` draws the button as accent text (the
+ * Export, under the toolbar: the view the Library is on (every book the
+ * search and filters let through, on every page), or every book and every
+ * field, as Excel or CSV. `quiet` draws the button as accent text (the
  * phone's toolbar) instead of the desktop's flat secondary fill.
  */
 export function ExportMenu({ view, quiet = false }: { view: LibraryView; quiet?: boolean }) {
@@ -56,7 +57,8 @@ export function ExportMenu({ view, quiet = false }: { view: LibraryView; quiet?:
         align="end"
         sections={[
           {
-            label: `What you see now · ${count} ${count === 1 ? "book" : "books"}`,
+            // Every page of it, not only the one on show.
+            label: `This view · ${count.toLocaleString("en-GB")} ${count === 1 ? "book" : "books"}`,
             items: [
               { label: "Excel workbook (.xlsx)", onSelect: run(() => saveXlsx(viewTable(view, true))), disabled: count === 0 },
               { label: "CSV", onSelect: run(() => saveCsv(viewTable(view, false))), disabled: count === 0 },

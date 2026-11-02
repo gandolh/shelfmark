@@ -103,6 +103,34 @@ describe("the collection tab", () => {
   });
 });
 
+describe("the page size", () => {
+  it("is 50 on both layouts by default", () => {
+    expect(defaultPrefs("desktop").pageSize).toBe(50);
+    expect(defaultPrefs("phone").pageSize).toBe(50);
+  });
+
+  it("reads as 50 from prefs stored before there were pages", () => {
+    const storage = memoryStorage({
+      [prefsKey("desktop")]: JSON.stringify({ collection: "owned", view: "table", sorting: [{ id: "added", desc: true }] }),
+    });
+    expect(readPrefs(storage, "desktop").pageSize).toBe(50);
+  });
+
+  it("reads as 50 when the stored size isn't one the menu offers", () => {
+    for (const pageSize of [0, 10, 75, "100", null, 1e9]) {
+      const storage = memoryStorage({ [prefsKey("phone")]: JSON.stringify({ pageSize }) });
+      expect(readPrefs(storage, "phone").pageSize).toBe(50);
+    }
+  });
+
+  it("is remembered per layout", () => {
+    const storage = memoryStorage();
+    writePrefs(storage, "desktop", { ...defaultPrefs("desktop"), pageSize: 200 });
+    expect(readPrefs(storage, "desktop").pageSize).toBe(200);
+    expect(readPrefs(storage, "phone").pageSize).toBe(50);
+  });
+});
+
 describe("writePrefs", () => {
   it("round-trips, one entry per layout", () => {
     const storage = memoryStorage();
@@ -111,6 +139,7 @@ describe("writePrefs", () => {
       view: "table" as const,
       sorting: [{ id: "shelf" as const, desc: false }],
       columnSizing: { publisher: 180 },
+      pageSize: 25 as const,
     };
     expect(writePrefs(storage, "phone", prefs)).toBe(true);
     expect(Object.keys(storage.data)).toEqual(["shelfmark.library.phone"]);

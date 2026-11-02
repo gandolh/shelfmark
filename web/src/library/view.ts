@@ -4,16 +4,18 @@ import { useBooks } from "../books/store";
 import { useSearchQuery } from "../layout/search";
 import { BOOK_COLUMN_ID, columnById, type ColumnId, type LibraryColumn } from "./columns";
 import { applyFilters, compileView, type Filters } from "./filters";
+import { clampPage, DEFAULT_PAGE_SIZE, pageCount, pageSlice, type PageSize } from "./pagination";
 import type { Layout } from "./prefs";
 import { warmSearch } from "./search";
 import { sortBooks, type Sorting } from "./sort";
-import { useLibraryFilters, useLibraryPrefs } from "./state";
+import { forgetPage, pageFor, samePageBasis, useLibraryFilters, useLibraryPage, useLibraryPrefs, type PageBasis } from "./state";
 
 /**
  * What the Library holds right now: the open collection's books after the
- * search, the filters and the sort (the rows both views show), and the
- * table's shown columns in order. The "What you see now" export writes exactly
- * these: `view.rows`, one line each, with `view.columns` (or
+ * search, the filters and the sort (`rows`, every page of them), the page
+ * on show (`pageRows`, what the table and the covers render), and the
+ * table's shown columns in order. The "This view" export writes every page:
+ * `view.rows`, one line each, with `view.columns` (or
  * `exportColumns(view.columns)`), each cell from `exportValue(column, book)`
  * or `column.text(book)` (columns.ts) under `column.label`.
  */
@@ -26,8 +28,17 @@ export interface LibraryView {
   books: readonly Book[];
   /** How many books the open collection has, before search and filters. */
   total: number;
-  /** The books the search and filters let through, in the current order. */
+  /** The books the search and filters let through, in the current order, on every page. */
   rows: readonly Book[];
+  /** The page on show, from 1; never past the last one, so a list that shrinks lands on its new last page. */
+  page: number;
+  /** How many pages `rows` makes: 1 when it fits on one page, or is empty. */
+  pageCount: number;
+  pageSize: PageSize;
+  /** The page's rows: what the table and the covers render. */
+  pageRows: readonly Book[];
+  /** What the page number belongs to; turning the page records it with the number (state.ts `setPage`). */
+  pageBasis: PageBasis;
   /** The table's shown columns, in order; the book column (cover, title, author) first. */
   columns: readonly LibraryColumn[];
   sorting: Sorting;
@@ -45,6 +56,10 @@ export interface ViewState {
   sorting: Sorting;
   columnOrder: readonly ColumnId[];
   columnVisibility: Readonly<Record<ColumnId, boolean>>;
+  /** Default 50. */
+  pageSize?: PageSize;
+  /** Default 1; clamped to the pages there are. */
+  page?: number;
 }
 
 /** The books of one collection. */
@@ -100,12 +115,21 @@ export function exportColumns(columns: readonly LibraryColumn[]): readonly Libra
 export function deriveView(books: readonly Book[], state: ViewState): LibraryView {
   const inCollection = booksIn(books, state.collection);
   const sorted = sortBooks(inCollection, state.sorting);
+  const rows = applyFilters(sorted, state.filters, state.query);
+  const pageSize = state.pageSize ?? DEFAULT_PAGE_SIZE;
+  const pages = pageCount(rows.length, pageSize);
+  const page = clampPage(state.page ?? 1, pages);
   return {
     collection: state.collection,
     counts: collectionCounts(books),
     books: inCollection,
     total: inCollection.length,
-    rows: applyFilters(sorted, state.filters, state.query),
+    rows,
+    page,
+    pageCount: pages,
+    pageSize,
+    pageRows: pageSlice(rows, page, pageSize),
+    pageBasis: { collection: state.collection, query: state.query, filters: state.filters, sorting: state.sorting, pageSize },
     columns: visibleColumns(state.columnOrder, state.columnVisibility, state.collection),
     sorting: state.sorting,
     filters: state.filters,
@@ -133,6 +157,21 @@ export function useLibraryView(layout: Layout): LibraryView {
     [prefs.columnOrder, prefs.columnVisibility, collection],
   );
 
+  // The page: the one last turned to while nothing it belongs to changed, else 1; past the end, the last.
+  const { pageSize, sorting } = prefs;
+  const pageBasis = useMemo<PageBasis>(
+    () => ({ collection, query, filters, sorting, pageSize }),
+    [collection, query, filters, sorting, pageSize],
+  );
+  const choice = useLibraryPage();
+  // A page whose list has changed is forgotten, not kept for when the list comes back.
+  useEffect(() => {
+    if (choice !== null && !samePageBasis(choice.basis, pageBasis)) forgetPage();
+  }, [choice, pageBasis]);
+  const pages = pageCount(rows.length, pageSize);
+  const page = clampPage(pageFor(choice, pageBasis), pages);
+  const pageRows = useMemo(() => pageSlice(rows, page, pageSize), [rows, page, pageSize]);
+
   return useMemo(
     () => ({
       collection,
@@ -140,12 +179,17 @@ export function useLibraryView(layout: Layout): LibraryView {
       books: inCollection,
       total: inCollection.length,
       rows,
+      page,
+      pageCount: pages,
+      pageSize,
+      pageRows,
+      pageBasis,
       columns,
-      sorting: prefs.sorting,
+      sorting,
       filters,
       query,
       narrowed: compileView(filters, query) !== null,
     }),
-    [collection, counts, inCollection, rows, columns, prefs.sorting, filters, query],
+    [collection, counts, inCollection, rows, page, pages, pageSize, pageRows, pageBasis, columns, sorting, filters, query],
   );
 }

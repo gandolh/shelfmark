@@ -15,9 +15,11 @@ import { getSelection, setSelection, useLibrarySelection } from "./state";
 /**
  * The Covers view (the `Covers-Library` mock-up): a grid of covers, each
  * with a two-line title and the author, three across on a phone and as
- * many as fit on a desktop. Rows of covers are virtual, so 3,000 books
- * scroll as lightly as thirty. Tab reaches one cover; arrows move around
- * the grid; Enter opens the book.
+ * many as fit on a desktop. It shows one page of the list (`rows`); the
+ * pager under it turns the page (LibraryPage). Rows of covers are virtual,
+ * so a page of 200 scrolls as lightly as thirty. Tab reaches one cover;
+ * arrows move around the page's grid and stop at its first and last cover,
+ * never turning the page; Enter opens the book.
  *
  * Selecting: a long press on a cover selects it, as a phone's
  * photo grid does (a finger or a pen anywhere; the mouse too on a phone's
@@ -39,13 +41,17 @@ const ROW_GAP = { desktop: 28, phone: 18 };
 const CAPTION = { desktop: 8 + 2 * 17.5 + 2 + 18, phone: 8 + 2 * 16.25 + 2 + 16.8 };
 
 export interface CoversGridProps {
+  /** The page's rows: what the grid renders. */
   rows: readonly Book[];
+  /** How many books come before this page, and how many the whole list holds: each cover's position in it. */
+  pageStart: number;
+  total: number;
   layout: Layout;
   /** Books are selected: a cover ticks instead of opening. */
   selecting: boolean;
 }
 
-export function CoversGrid({ rows, layout, selecting }: CoversGridProps) {
+export function CoversGrid({ rows, pageStart, total, layout, selecting }: CoversGridProps) {
   const desktop = layout === "desktop";
   const selection = useLibrarySelection();
   const grid = useRef<HTMLDivElement>(null);
@@ -88,15 +94,21 @@ export function CoversGrid({ rows, layout, selecting }: CoversGridProps) {
   // --- Keyboard: one cover in the Tab order, arrows around the grid -----------------
 
   const [active, setActive] = useState(0);
-  const pendingFocus = useRef<number | null>(null);
+  // The cover an arrow moved to, for the page's rows it was pressed on: a turned page drops it.
+  const pendingFocus = useRef<{ index: number; rows: readonly Book[] } | null>(null);
   const items = virtualizer.getVirtualItems();
   const firstShown = (items[0]?.index ?? 0) * columns;
   const lastShown = ((items.at(-1)?.index ?? 0) + 1) * columns - 1;
   const tabbable = active >= firstShown && active <= lastShown && active < rows.length ? active : firstShown;
 
   useLayoutEffect(() => {
-    const index = pendingFocus.current;
-    if (index === null) return;
+    const pending = pendingFocus.current;
+    if (pending === null) return;
+    if (pending.rows !== rows) {
+      pendingFocus.current = null;
+      return;
+    }
+    const { index } = pending;
     const link = grid.current?.querySelector<HTMLElement>(`[data-book-index="${index}"]`);
     if (link) {
       pendingFocus.current = null;
@@ -121,8 +133,10 @@ export function CoversGrid({ rows, layout, selecting }: CoversGridProps) {
     if (target === undefined) return;
     event.preventDefault();
     const next = Math.max(0, Math.min(rows.length - 1, target));
+    // At the page's first or last cover the arrow stops; it never turns the page.
+    if (next === index) return;
     setActive(next);
-    pendingFocus.current = next;
+    pendingFocus.current = { index: next, rows };
     virtualizer.scrollToIndex(Math.floor(next / columns), { align: "auto" });
   };
 
@@ -239,7 +253,7 @@ export function CoversGrid({ rows, layout, selecting }: CoversGridProps) {
                 </>
               );
               return (
-                <div key={book.id} role="listitem" aria-posinset={index + 1} aria-setsize={rows.length}>
+                <div key={book.id} role="listitem" aria-posinset={pageStart + index + 1} aria-setsize={total}>
                   {selecting ? (
                     <button type="button" aria-pressed={selected} {...shared}>
                       {content}

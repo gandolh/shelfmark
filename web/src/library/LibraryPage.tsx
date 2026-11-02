@@ -15,12 +15,14 @@ import { FilterChips } from "./FilterChips";
 import { FilterPanel } from "./FilterPanel";
 import { activeFilters } from "./filters";
 import { LibraryMessage, LibrarySkeleton } from "./LibraryStates";
+import { Pager } from "./Pager";
+import { showsPager, type PageSize } from "./pagination";
 import { Panel } from "./Panel";
 import type { Layout, LibraryPrefs, ViewMode } from "./prefs";
 import { useScrollMemory } from "./scroll";
 import { describeSort, type Sorting } from "./sort";
 import { selectedBooks, type Selection } from "./selection";
-import { clearFilters, getSelection, updatePrefs, useLibraryPrefs, useLibrarySelection } from "./state";
+import { clearFilters, getSelection, setPage, updatePrefs, useLibraryPrefs, useLibrarySelection } from "./state";
 import { Toolbar } from "./Toolbar";
 import { columnApplies, useLibraryView, type LibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
@@ -44,6 +46,7 @@ const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist
  * The Library (design.md; corpus/wiki/library-table.md): the open collection
  * (Owned or Wishlist), as a table or as covers, searched from the box in the shell, filtered by
  * any column, sorted by any. "14 books, newest first" under the title.
+ * The list is shown a page at a time, with the pager under it.
  * While books are selected the bulk bar stands in for the
  * toolbar; Clear puts the toolbar back as it was.
  */
@@ -56,6 +59,7 @@ export function LibraryPage() {
   const [panel, setPanel] = useState<PanelState | null>(null);
   const filterButton = useRef<HTMLButtonElement>(null);
   const columnsButton = useRef<HTMLButtonElement>(null);
+  const list = useRef<HTMLDivElement>(null);
   // Focus lands here when a panel closes and its chip is gone. Stable, so the panel stays open across renders.
   const filterButtonNow = useCallback(() => filterButton.current, []);
 
@@ -117,6 +121,25 @@ export function LibraryPage() {
   // The phone's table has no Columns button: the sheet steps between its two panels.
   const phoneColumns = !desktop && mode === "table";
   const step = (kind: "filter" | "columns") => setPanel((open) => open && { ...open, kind, column: undefined, stepped: true });
+
+  // A turn of the page (or a new page size) brings the list's top back into view: just under
+  // the desktop's sticky top bar, at the top of the window on a phone. Only upwards, so a short
+  // last page whose list top is already in sight doesn't jump.
+  const toListTop = () => {
+    const box = list.current;
+    if (!box) return;
+    const covered = desktop ? (document.querySelector<HTMLElement>(".topbar")?.offsetHeight ?? 0) : 0;
+    const target = Math.max(0, Math.round(box.getBoundingClientRect().top + window.scrollY - covered));
+    if (window.scrollY > target) window.scrollTo(0, target);
+  };
+  const turnPage = (page: number) => {
+    toListTop();
+    setPage(page, view.pageBasis);
+  };
+  const setPageSize = (pageSize: PageSize) => {
+    toListTop();
+    updatePrefs(layout, (p) => ({ ...p, pageSize }));
+  };
 
   const count = view.narrowed ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}` : books(view.total);
   const caption = hasBooks ? `${count}, ${describeSort(view.sorting)}` : undefined;
@@ -211,10 +234,38 @@ export function LibraryPage() {
         </LibraryMessage>
       ) : view.rows.length === 0 ? (
         <NoMatch query={view.query} filtered={activeFilters(view.filters).length > 0} />
-      ) : mode === "table" ? (
-        <BookTable rows={view.rows} sorting={view.sorting} prefs={tablePrefs} layout={layout} />
       ) : (
-        <CoversGrid rows={view.rows} layout={layout} selecting={selecting} />
+        <div ref={list} className="library-list">
+          {mode === "table" ? (
+            <BookTable
+              rows={view.pageRows}
+              allRows={view.rows}
+              pageStart={(view.page - 1) * view.pageSize}
+              sorting={view.sorting}
+              prefs={tablePrefs}
+              layout={layout}
+            />
+          ) : (
+            <CoversGrid
+              rows={view.pageRows}
+              pageStart={(view.page - 1) * view.pageSize}
+              total={view.rows.length}
+              layout={layout}
+              selecting={selecting}
+            />
+          )}
+          {showsPager(view.rows.length, view.pageSize) && (
+            <Pager
+              page={view.page}
+              pageCount={view.pageCount}
+              pageSize={view.pageSize}
+              total={view.rows.length}
+              desktop={desktop}
+              onPage={turnPage}
+              onPageSize={setPageSize}
+            />
+          )}
+        </div>
       )}
 
       {panel && (

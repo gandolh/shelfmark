@@ -1,10 +1,11 @@
 import type { Collection } from "@shelfmark/shared";
 import { BOOK_COLUMN_ID, COLUMNS, columnById, isColumnId, type ColumnId } from "./columns";
+import { DEFAULT_PAGE_SIZE, isPageSize, type PageSize } from "./pagination";
 import { DEFAULT_SORTING, type SortKey, type Sorting } from "./sort";
 
 /**
  * The Library's layout memory (corpus/wiki/library-table.md): which
- * collection tab (Owned or Wishlist), which view, the sort, and the table's column order, visibility and widths, kept in
+ * collection tab (Owned or Wishlist), which view, the sort, the table's column order, visibility and widths, and the page size, kept in
  * this browser's `localStorage`, one entry per layout, since a phone and a
  * desktop window want different things. A convenience: when storage is
  * blocked, full, or holds something this version can't read, the defaults
@@ -25,6 +26,8 @@ export interface LibraryPrefs {
   columnVisibility: Readonly<Record<ColumnId, boolean>>;
   /** Widths the owner dragged to; the rest keep their default. */
   columnSizing: Readonly<Partial<Record<ColumnId, number>>>;
+  /** Books per page, for the table and the covers alike. */
+  pageSize: PageSize;
 }
 
 /** What prefs need from `localStorage`; a fake one in tests. */
@@ -56,6 +59,7 @@ export function defaultPrefs(layout: Layout): LibraryPrefs {
     columnOrder: DEFAULT_ORDER,
     columnVisibility: DEFAULT_VISIBILITY,
     columnSizing: {},
+    pageSize: DEFAULT_PAGE_SIZE,
   };
 }
 
@@ -116,6 +120,8 @@ export function parsePrefs(value: unknown, layout: Layout): LibraryPrefs {
     columnOrder: normalizeOrder(saved.columnOrder),
     columnVisibility: normalizeVisibility(saved.columnVisibility),
     columnSizing: normalizeSizing(saved.columnSizing),
+    // Prefs saved before there were pages have no size: 50, as for anything else unknown.
+    pageSize: isPageSize(saved.pageSize) ? saved.pageSize : DEFAULT_PAGE_SIZE,
   };
 }
 

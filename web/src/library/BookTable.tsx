@@ -44,16 +44,20 @@ import { getSelection, setSelection, updatePrefs, useLibrarySelection } from "./
  * rows. Rows are virtual and the page itself scrolls, so the header sticks
  * under the top bar. A header click sorts, shift-click adds a key.
  *
+ * The table shows one page of the list (`rows`); the pager under it turns
+ * the page (LibraryPage).
+ *
  * Keyboard: Tab reaches one row (the last one used); ↑ ↓ Page Up/Down Home
- * End move between rows; Enter opens the book. Header buttons sort (Shift
+ * End move between the page's rows and stop at its first and last; they
+ * never turn the page. Enter opens the book. Header buttons sort (Shift
  * with Enter adds a key); the handle between headers resizes with ← →.
  *
  * Before the columns, a box per row selects the book for the bulk bar,
- * and the header's box selects every row on show (what the
- * search and filters let through), or none of them once they all are. The
- * boxes are not a TanStack column: column order, visibility, widths and
- * saved views never see them. In the row, Tab goes from the box to the
- * title; the arrows move between rows in either.
+ * and the header's box selects every book the search and filters let
+ * through (`allRows`, on every page, not just this one), or none of them
+ * once they all are. The boxes are not a TanStack column: column order,
+ * visibility, widths and saved views never see them. In the row, Tab goes
+ * from the box to the title; the arrows move between rows in either.
  */
 
 const features = tableFeatures({
@@ -155,14 +159,15 @@ function SelectCell({ book, index, selected }: { book: Book; index: number; sele
   );
 }
 
-/** The header's box: all, some (a dash) or none of the rows on show. */
-function SelectAllCell({ rows, selection }: { rows: readonly Book[]; selection: Selection }) {
+/** The header's box: all, some (a dash) or none of the books the search and filters let through, on every page. */
+function SelectAllCell({ rows, paged, selection }: { rows: readonly Book[]; paged: boolean; selection: Selection }) {
   const state = selectAllState(selection, rows);
   const box = useRef<HTMLInputElement>(null);
   useLayoutEffect(() => {
     if (box.current) box.current.indeterminate = state === "some";
   }, [state]);
-  const shown = rows.length === 1 ? "the 1 book shown" : `all ${rows.length.toLocaleString("en-GB")} books shown`;
+  const count = rows.length.toLocaleString("en-GB");
+  const shown = rows.length === 1 ? "the 1 book shown" : paged ? `all ${count} books, on every page` : `all ${count} books shown`;
   return (
     <div role="columnheader" className="library-table__cell library-table__cell--select">
       <label className="library-select">
@@ -190,13 +195,18 @@ function onRowClick(event: MouseEvent<HTMLDivElement>, book: Book): void {
 // --- The table ----------------------------------------------------------------------------
 
 export interface BookTableProps {
+  /** The page's rows: what the table renders. */
   rows: readonly Book[];
+  /** Every book the search and filters let through, on every page: the header's box selects these. */
+  allRows: readonly Book[];
+  /** How many books come before this page, for the rows' positions in the whole list. */
+  pageStart: number;
   sorting: Sorting;
   prefs: LibraryPrefs;
   layout: Layout;
 }
 
-export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
+export function BookTable({ rows, allRows, pageStart, sorting, prefs, layout }: BookTableProps) {
   const desktop = layout === "desktop";
   const selection = useLibrarySelection();
   const selectWidth = SELECT_WIDTH[layout];
@@ -285,7 +295,8 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   // --- Keyboard: one row in the Tab order, arrows between rows ---------------------
 
   const [active, setActive] = useState(0);
-  const pendingFocus = useRef<{ index: number; part: RowPart } | null>(null);
+  // The row an arrow moved to, for the page's rows it was pressed on: a turned page drops it.
+  const pendingFocus = useRef<{ index: number; part: RowPart; rows: readonly Book[] } | null>(null);
   const firstShown = items[0]?.index ?? 0;
   const lastShown = items.at(-1)?.index ?? 0;
   // The row last used, while it is rendered; otherwise the first one on screen.
@@ -294,6 +305,10 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   useLayoutEffect(() => {
     const pending = pendingFocus.current;
     if (pending === null) return;
+    if (pending.rows !== rows) {
+      pendingFocus.current = null;
+      return;
+    }
     const selector = pending.part === "select" ? ".library-select input" : ".library-book__title";
     const target = body.current?.querySelector<HTMLElement>(`[data-index="${pending.index}"] ${selector}`);
     if (target) {
@@ -305,7 +320,7 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
   const moveTo = (index: number, part: RowPart) => {
     const next = Math.max(0, Math.min(tableRows.length - 1, index));
     setActive(next);
-    pendingFocus.current = { index: next, part };
+    pendingFocus.current = { index: next, part, rows };
     virtualizer.scrollToIndex(next, { align: "auto" });
   };
 
@@ -325,7 +340,9 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
       const step = steps[event.key];
       if (!step || event.altKey || event.ctrlKey || event.metaKey) return;
       event.preventDefault();
-      moveTo(step(), part);
+      // At the page's first or last row the arrow stops; it never turns the page.
+      const next = Math.max(0, Math.min(tableRows.length - 1, step()));
+      if (next !== index) moveTo(next, part);
     },
   };
 
@@ -371,14 +388,14 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
         className="library-table"
         role="table"
         aria-label="Books"
-        aria-rowcount={tableRows.length + 1}
+        aria-rowcount={allRows.length + 1}
         aria-colcount={headers.length + 1}
         style={style}
       >
         <div ref={head} className="library-table__head">
           <div role="rowgroup">
             <div role="row" aria-rowindex={1} className="library-table__row library-table__row--head">
-              <SelectAllCell rows={rows} selection={selection} />
+              <SelectAllCell rows={allRows} paged={allRows.length > rows.length} selection={selection} />
               {headers.map((header) => (
                 <HeaderCell key={header.id} header={header} sorting={sorting} onSort={onSort} onResize={onResize} />
               ))}
@@ -395,7 +412,7 @@ export function BookTable({ rows, sorting, prefs, layout }: BookTableProps) {
                 <div
                   key={row.id}
                   role="row"
-                  aria-rowindex={item.index + 2}
+                  aria-rowindex={pageStart + item.index + 2}
                   data-index={item.index}
                   data-selected={selected ? "" : undefined}
                   className="library-table__row"

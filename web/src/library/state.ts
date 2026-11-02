@@ -1,14 +1,16 @@
+import type { Collection } from "@shelfmark/shared";
 import { useSyncExternalStore } from "react";
 import type { ColumnId } from "./columns";
 import type { Filter, Filters } from "./filters";
 import { browserStorage, readPrefs, writePrefs, type Layout, type LibraryPrefs } from "./prefs";
 import { NO_SELECTION, type Selection } from "./selection";
+import type { Sorting } from "./sort";
 
 /**
  * The Library's state that outlives the page: the prefs (saved per layout,
- * read once per session), the filters and the row selection (this session
- * only). Opening a book unmounts the page; coming Back finds them as they
- * were left, as the search text is in layout/search.ts.
+ * read once per session), the filters, the page and the row selection (this
+ * session only). Opening a book unmounts the page; coming Back finds them as
+ * they were left, as the search text is in layout/search.ts.
  */
 
 const listeners = new Set<() => void>();
@@ -106,6 +108,74 @@ export function setFilters(next: Filters): void {
 /** The filters; re-renders when they change. */
 export function useLibraryFilters(): Filters {
   return useSyncExternalStore(subscribe, getFilters);
+}
+
+// --- Page ---------------------------------------------------------------------------
+
+/**
+ * What a page number belongs to: the tab, the search text, the filters, the
+ * sort and the page size it was turned on. Filters and sort are compared by
+ * identity: every change replaces them (as does applying a saved view), and
+ * nothing else does, so the same objects mean nothing changed.
+ */
+export interface PageBasis {
+  readonly collection: Collection;
+  readonly query: string;
+  readonly filters: Filters;
+  readonly sorting: Sorting;
+  readonly pageSize: number;
+}
+
+export interface PageChoice {
+  readonly page: number;
+  readonly basis: PageBasis;
+}
+
+let pageChoice: PageChoice | null = null;
+
+export function samePageBasis(a: PageBasis, b: PageBasis): boolean {
+  return (
+    a.collection === b.collection &&
+    a.query === b.query &&
+    a.filters === b.filters &&
+    a.sorting === b.sorting &&
+    a.pageSize === b.pageSize
+  );
+}
+
+/**
+ * The page asked for while `basis` holds; page 1 once any of it changed. So
+ * a new search, a filter, a sort, a page size, a tab or a saved view starts
+ * on page 1 without each of them having to say so, and Back from a book
+ * finds the page it left. view.ts forgets a page whose basis has gone
+ * (`forgetPage`), so going to the Wishlist and back, or clearing a search,
+ * doesn't bring an old page back either.
+ */
+export function pageFor(choice: PageChoice | null, basis: PageBasis): number {
+  return choice !== null && samePageBasis(choice.basis, basis) ? choice.page : 1;
+}
+
+/** Turn to a page of the list `basis` describes (view.ts's `pageBasis`). */
+export function setPage(page: number, basis: PageBasis): void {
+  if (pageChoice !== null && pageChoice.page === page && samePageBasis(pageChoice.basis, basis)) return;
+  pageChoice = { page, basis };
+  notify();
+}
+
+/** Drop the page last turned to: the list it belonged to is gone. */
+export function forgetPage(): void {
+  if (pageChoice === null) return;
+  pageChoice = null;
+  notify();
+}
+
+export function getPageChoice(): PageChoice | null {
+  return pageChoice;
+}
+
+/** The page last turned to, with what it belongs to; re-renders when it changes. */
+export function useLibraryPage(): PageChoice | null {
+  return useSyncExternalStore(subscribe, getPageChoice);
 }
 
 // --- Selection ------------------------------------------------------------
