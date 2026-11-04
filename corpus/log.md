@@ -697,3 +697,10 @@ lint, 140 unit tests and a browser look at 1920, 1280 and 390 px.
 [status.md](wiki/status.md), the README and owner-setup say what changed.
 Two done briefs got link fixes only: brief 02's link to brief 03, and brief
 01's link to the removed `ExportMenu.tsx`, now plain text.
+
+## [2026-11-04] decision | "Export library" keeps both formats
+
+The owner answered the question brief 03 left: the account menu's "Export library" keeps its two
+choices, Excel and CSV, rather than one row. CSV is what "Import a CSV" reads back. The question is
+deleted from [open-questions.md](wiki/open-questions.md); [export.md](wiki/export.md) already
+describes it as built.
