@@ -1,20 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { columnById, exportValue, formatAdded } from "./columns";
+import { COLUMNS, columnById, exportValue, formatAdded } from "./columns";
 import { applyFilters, type Filters } from "./filters";
-import { defaultPrefs } from "./prefs";
 import { searchBooks } from "./search";
 import { DEFAULT_SORTING, sortBooks } from "./sort";
 import { book, syntheticLibrary } from "./test-books";
-import { columnsIn, deriveView, exportColumns, visibleColumns, type ViewState } from "./view";
+import { columnsIn, deriveView, type ViewState } from "./view";
 
-const defaults = defaultPrefs("desktop");
 const state = (overrides: Partial<ViewState> = {}): ViewState => ({
   collection: "owned",
   query: "",
   filters: {},
   sorting: DEFAULT_SORTING,
-  columnOrder: defaults.columnOrder,
-  columnVisibility: defaults.columnVisibility,
   ...overrides,
 });
 
@@ -42,17 +38,6 @@ describe("deriveView", () => {
     expect(view.narrowed).toBe(true);
     expect(deriveView(books, state({ query: "orb" })).rows.map((b) => b.title)).toEqual(["Orbitor"]);
   });
-
-  it("holds the shown columns in order", () => {
-    const view = deriveView(
-      books,
-      state({
-        columnOrder: ["book", "shelf", "publisher", ...defaults.columnOrder.filter((id) => !["book", "shelf", "publisher"].includes(id))],
-        columnVisibility: { ...defaults.columnVisibility, year: false, notes: true },
-      }),
-    );
-    expect(view.columns.map((column) => column.id)).toEqual(["book", "shelf", "publisher", "status", "added", "notes"]);
-  });
 });
 
 describe("the wishlist collection", () => {
@@ -71,35 +56,18 @@ describe("the wishlist collection", () => {
     expect(view.books.map((b) => b.title)).toEqual(["Dune", "Orbitor"]);
   });
 
-  it("leaves out the columns a wishlist book never fills, even when shown", () => {
-    const all = Object.fromEntries(defaults.columnOrder.map((id) => [id, true])) as ViewState["columnVisibility"];
-    const owned = deriveView(books, state({ columnVisibility: all })).columns.map((c) => c.id);
-    const wishlist = deriveView(books, state({ collection: "wishlist", columnVisibility: all })).columns.map((c) => c.id);
+  it("leaves out the columns a wishlist book never fills", () => {
+    const owned = columnsIn("owned", COLUMNS).map((c) => c.id);
+    const wishlist = columnsIn("wishlist", COLUMNS).map((c) => c.id);
     for (const id of ["shelf", "condition", "acquiredOn", "acquiredFrom"] as const) {
       expect(owned).toContain(id);
       expect(wishlist).not.toContain(id);
     }
     expect(wishlist).toContain("publisher");
-    expect(columnsIn("wishlist", visibleColumns(defaults.columnOrder, all)).map((c) => c.id)).toEqual(wishlist);
   });
 });
 
-describe("exportColumns", () => {
-  it("writes the book column's author out after the title", () => {
-    const columns = visibleColumns(defaults.columnOrder, defaults.columnVisibility);
-    expect(exportColumns(columns).map((column) => column.label)).toEqual([
-      "Title",
-      "Author",
-      "Publisher",
-      "Year",
-      "Shelf",
-      "Status",
-      "Added",
-    ]);
-    const withAuthor = visibleColumns(defaults.columnOrder, { ...defaults.columnVisibility, authors: true });
-    expect(exportColumns(withAuthor)).toBe(withAuthor);
-  });
-
+describe("exportValue", () => {
   it("gives typed cell values", () => {
     const solenoid = book({ title: "Solenoid", authors: ["Mircea Cărtărescu"], priceMinor: 5990, status: "reading", signed: true });
     expect(exportValue(columnById("book"), solenoid)).toBe("Solenoid");

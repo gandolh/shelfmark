@@ -1,11 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { COLUMNS, columnById } from "../library/columns";
-import { defaultPrefs } from "../library/prefs";
-import { DEFAULT_SORTING } from "../library/sort";
 import { book } from "../library/test-books";
-import { deriveView, type ViewState } from "../library/view";
 import { BOM, csvCell, toCsv } from "./csv";
-import { cellOf, everythingTable, viewTable } from "./fields";
+import { cellOf, libraryTable } from "./fields";
 
 describe("toCsv", () => {
   it("starts with the BOM, uses CRLF and keeps diacritics", () => {
@@ -52,42 +49,15 @@ describe("fields", () => {
     expect(cellOf(columnById("signed"), b, false)).toBe(true);
   });
 
-  it("writes every field for every book, and the view's columns with Author after the title", () => {
-    const state: ViewState = {
-      collection: "owned",
-      query: "",
-      filters: {},
-      sorting: DEFAULT_SORTING,
-      columnOrder: defaultPrefs("desktop").columnOrder,
-      columnVisibility: defaultPrefs("desktop").columnVisibility,
-    };
-    const view = deriveView([b, book()], state);
-    const all = everythingTable(view, COLUMNS, false);
-    expect(all.header).toHaveLength(COLUMNS.length);
-    expect(all.rows).toHaveLength(2);
-    const seen = viewTable(view, false);
-    expect(seen.header.slice(0, 2)).toEqual(["Title", "Author"]);
-    const csv = toCsv(seen.header, seen.rows);
-    expect(csv).toContain("'=SUM(1)");
-  });
-
-  it("exports the wishlist's own books, without the columns it never fills", () => {
+  it("writes every book of both collections, every field, the collection first", () => {
     const wanted = book({ title: "Wanted", collection: "wishlist" });
-    const state: ViewState = {
-      collection: "wishlist",
-      query: "",
-      filters: {},
-      sorting: DEFAULT_SORTING,
-      columnOrder: defaultPrefs("desktop").columnOrder,
-      columnVisibility: defaultPrefs("desktop").columnVisibility,
-    };
-    const view = deriveView([b, wanted], state);
-    const all = everythingTable(view, COLUMNS, false);
-    expect(all.rows).toHaveLength(1);
-    expect(all.header).not.toContain("Shelf");
-    expect(all.header).toContain("Title");
-    const seen = viewTable(view, false);
-    expect(seen.rows).toHaveLength(1);
-    expect(seen.header).not.toContain("Shelf");
+    const table = libraryTable([b, wanted], false);
+    expect(table.header).toEqual(["Collection", ...COLUMNS.map((column) => column.label)]);
+    expect(table.rows.map((row) => [row[0], row[1]])).toEqual([
+      ["Owned", "=SUM(1)"],
+      ["Wishlist", "Wanted"],
+    ]);
+    expect(table.dateFormats).toHaveLength(table.header.length);
+    expect(toCsv(table.header, table.rows)).toContain("'=SUM(1)");
   });
 });

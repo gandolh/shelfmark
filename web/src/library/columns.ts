@@ -433,7 +433,7 @@ export function columnById(id: ColumnId): LibraryColumn {
   return column;
 }
 
-/** What "Every book, every field" and "What you see now" write to a cell: typed for a spreadsheet. */
+/** What "Export library" writes to a cell: typed for a spreadsheet. */
 export function exportValue(column: LibraryColumn, book: Book): string | number | boolean | null {
   switch (column.kind) {
     case "text":

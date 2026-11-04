@@ -18,7 +18,7 @@ A catalog of the paper books on your shelves at home. Scan a barcode with your p
 - Answers "do I own this?" offline, and queues scans made offline to look them up when the phone is back online.
 - Reads the CIP block from a photo of the copyright page, to fill the form when no catalog knows the ISBN.
 - Keeps your own details on every book: shelf, reading status, rating, tags, notes, format, condition, and where, when and for how much you got it.
-- Exports the current view or every book to Excel or CSV, and downloads a full backup as one SQLite file, covers included.
+- Exports the whole library to Excel or CSV from the account menu, and downloads a full backup as one SQLite file, covers included.
 - Installs to a phone's home screen. The app shell works offline.
 
 Libib, BookBuddy and CLZ Books do much of this as hosted apps. Shelfmark keeps the whole library in one SQLite file on your own server, and you can export all of it at any time. It also expects most books to be typed in by hand. On 2026-10-14 the free ISBN databases found 12 to 20% of the Romanian ISBNs tried, against 92% of the English ones. There are no loans, reviews, friends, ebook files or price tracking, and there is one account.

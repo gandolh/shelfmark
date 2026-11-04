@@ -1,5 +1,5 @@
 ---
-summary: Genuinely unresolved questions. One open since 2026-11-04 - whether ticked books should outlive a sort, filter, search or tab change in the Library. Add a question here the moment one opens, delete it the moment it is answered.
+summary: Genuinely unresolved questions. One open since 2026-11-04 - whether "Export library" in the account menu should be one row (one file format) instead of a section with Excel and CSV. Add a question here the moment one opens, delete it the moment it is answered.
 updated: 2026-11-04
 ---
 
@@ -8,19 +8,16 @@ updated: 2026-11-04
 Each answer either becomes a `decisions.md` entry or changes a concept page;
 the history is in `log.md`.
 
-## Should ticks outlive a change of the list? (2026-11-04)
+## "Export library": one row or two formats? (2026-11-04)
 
-The owner settled that a bulk change never reaches a book off the page on
-show unless "Select all" was chosen. Brief 02 took the conservative reading:
-the selection is let go when the page turns, and also when the sort, a
-filter, the search, the tab, the page size or a saved view changes. Until
-then ticks survived all of those ([library-table.md](library-table.md),
-"Selection and the bulk bar").
+The owner asked for one item, "Export library", in the account menu, writing
+every book in the same file format as the old export. The old export offered
+two formats, Excel (.xlsx) and CSV, so the build keeps both: the account
+menu has an "Export library" section with "Excel workbook (.xlsx)" and "CSV"
+under it ([export.md](export.md)).
 
-- **As built:** any change of the list clears the ticks. Simple, and the
-  bar always counts what is on screen.
-- **The other way:** keep the ticks across a sort or filter, and act only on
-  the ones still on the page. Then the bar must say what a change reaches
-  versus what is ticked, which needs a small design.
+- **As built:** two rows under one heading; nothing is lost, and the CSV is
+  what "Import a CSV" reads back.
+- **The other way:** one row that writes one format (Excel, most likely).
 
 The owner's call; nothing waits on it.

@@ -10,7 +10,7 @@ export interface MenuItem {
 }
 
 export interface MenuSection {
-  /** A small heading over the section ("Every book, every field"). Sections without one are split by a line. */
+  /** A small heading over the section ("Export library"). Sections without one are split by a line. */
   label?: string;
   items: readonly MenuItem[];
 }

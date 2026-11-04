@@ -1,5 +1,5 @@
 ---
-summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card and full width (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
+summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card, full width and toolbar (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
 updated: 2026-11-04
 ---
 
@@ -76,15 +76,17 @@ Two places only: **Library** and **Add a book**.
 - **No Settings tab.** The account button opens a menu with: change username
   (its detail is the name signed in, since 2026-10-24), change password, Sign in
   with Ward (linked or not), import a CSV, stats, download a backup (the
-  database file), sign out.
+  database file), "Export library" (since 2026-11-04), sign out.
 - **No loans** at all (owner, 2026-10-14).
 - The **wishlist** is not a place: Library has two collections, Owned and
   Wishlist, as text tabs under the page title ("Owned 14 · Wishlist 3").
 
 ## Library
 
-- Title, count and sort ("14 books, newest first"); on the right a
-  **Table / Covers** switch, Filter, Export and the accent "Add a book" pill.
+- Title, count and sort ("14 books, newest first"); on the right, as first
+  drawn, a **Table / Covers** switch, Filter, Export and the accent "Add a
+  book" pill. Since 2026-11-04 the right holds only the switch and the list
+  tools (below).
 - **Table** (desktop default): one white rounded container; the first column
   is the book itself, cover (46×69) plus title over author; then publisher,
   year, shelf, status, added. More columns come from the column picker. Status
@@ -95,9 +97,10 @@ Two places only: **Library** and **Add a book**.
   opens a column list, then that column's filter; active filters show as
   removable chips under the toolbar. The mock-up shows only the button; the
   chip row is the build's to draw in this world.
-- Export menu: "This view" (called "What you see now" until 2026-11-02, when
-  the Library got pages; it writes every page) and "Every book, every field",
-  each as Excel (.xlsx) or CSV ([export.md](export.md)).
+- Export: since 2026-11-04 one place, "Export library" in the account
+  menu, as Excel (.xlsx) or CSV, always every book whatever the Library
+  shows (the owner's call). The toolbar's Export menu ("This view" and
+  "Every book, every field") is gone ([export.md](export.md)).
 - Pages (2026-11-02): the pager under the list; DESIGN.md's Library bullets
   hold its look ([library-table.md](library-table.md)).
 - **Full width and a header card** (owner, 2026-11-04, from a 1920 px
@@ -107,10 +110,17 @@ Two places only: **Library** and **Add a book**.
   toolbar sit on a white card like the table's container (`surface`, 16 px
   radius, flat); the Owned / Wishlist tabs stay on the ground under it. On a
   phone the card runs edge to edge with its lower corners rounded, so the
-  toolbar row keeps the width it had. The toolbar's buttons are still one
-  row of like pills; grouping them is
-  [brief 03](../briefs/todo/03-library-toolbar-groups.md), alternatives
-  first.
+  toolbar row keeps the width it had.
+- **The toolbar** (owner, 2026-11-04, [brief 03](../briefs/done/03-library-toolbar-groups.md)).
+  The owner wanted the row of like grey pills visually separated. Of four
+  alternatives the owner took A (spaced groups) and changed it: "A, with Views/Filter/Columns
+  moved to the end as icons like D; Add a book removed since the top bar has
+  it; Export in the account dropdown". So the card holds the Table / Covers
+  switch, a hairline rule, then Views, Filter and Columns as quiet
+  icon-and-text tool buttons in ink-2. On a phone "Filter and sort" ends the
+  row in the same look, and Views (the same look) ends the tabs row.
+  Not taken: B (one joined button group), C (two rows in the card), and
+  the rest of D (an icon-only view switch).
 - The "Select all" band above the list (2026-11-04) wears the selected
   row's faint teal wash with the action as accent text.
 

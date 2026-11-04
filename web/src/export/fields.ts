@@ -1,11 +1,11 @@
-import type { Book } from "@shelfmark/shared";
-import { exportValue, type LibraryColumn } from "../library/columns";
-import { columnsIn, exportColumns, type LibraryView } from "../library/view";
+import type { Book, Collection } from "@shelfmark/shared";
+import { COLUMNS, exportValue, type LibraryColumn } from "../library/columns";
 
 /**
- * How the Library's books become a table of cells for a spreadsheet. Built on
- * the Library's column definitions (library/columns.ts), so no field is known
- * by name here except the three that hold several values.
+ * How the library becomes a table of cells for a spreadsheet: every book,
+ * owned and wishlist, every field. Built on the Library's column definitions
+ * (library/columns.ts), so no field is known by name here except the three
+ * that hold several values.
  */
 
 /** What a cell holds: a date is a real date (its time of day only for Added and Changed). */
@@ -61,20 +61,19 @@ function dateFormat(column: LibraryColumn): string | null {
   return column.sortKey ? TIMESTAMP_FORMAT : DAY_FORMAT;
 }
 
-function table(books: readonly Book[], columns: readonly LibraryColumn[], typedDates: boolean): ExportTable {
+/** The glossary's words for the two collections. */
+const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist: "Wishlist" };
+
+/**
+ * "Export library": every book whatever the Library shows, owned and
+ * wishlist alike, with a Collection column first so the two can be told
+ * apart, then every column in the table's default order. The books keep the
+ * order they are given in (the server's, oldest first).
+ */
+export function libraryTable(books: readonly Book[], typedDates: boolean, columns: readonly LibraryColumn[] = COLUMNS): ExportTable {
   return {
-    header: columns.map((column) => column.label),
-    rows: books.map((book) => columns.map((column) => cellOf(column, book, typedDates))),
-    dateFormats: columns.map(dateFormat),
+    header: ["Collection", ...columns.map((column) => column.label)],
+    rows: books.map((book) => [COLLECTION_LABELS[book.collection], ...columns.map((column) => cellOf(column, book, typedDates))]),
+    dateFormats: [null, ...columns.map(dateFormat)],
   };
-}
-
-/** "What you see now": the filtered, sorted rows, the visible columns in order (Author added after the title if hidden). */
-export function viewTable(view: LibraryView, typedDates: boolean): ExportTable {
-  return table(view.rows, exportColumns(view.columns), typedDates);
-}
-
-/** "Every book, every field": all the open collection's books, all the columns it fills, in the table's default order. */
-export function everythingTable(view: LibraryView, columns: readonly LibraryColumn[], typedDates: boolean): ExportTable {
-  return table(view.books, columnsIn(view.collection, columns), typedDates);
 }

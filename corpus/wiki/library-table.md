@@ -11,8 +11,9 @@ Recommended: **TanStack Table** (headless, v9 current on 2026-10-14) with
 `@tanstack/react-virtual` for long lists. The page loads **every book** once
 (`GET /api/books`) and sorts, filters and searches in the browser. A home
 library is hundreds to a few thousand rows; 5,000 books is a couple of
-megabytes of JSON and filters instantly. This also makes export trivial: the
-exported rows are exactly the rows the table holds after filtering.
+megabytes of JSON and filters instantly. This also makes export trivial:
+"Export library" writes the list the client already holds
+([export.md](export.md)).
 
 Rejected: server-side paging and filtering, which needs a query language and
 round trips for no gain at this size.
@@ -47,7 +48,8 @@ Library holds two collections, **Owned** and **Wishlist**, switched at the top
 of the page; everything below applies to whichever is open. Two views of the
 same rows, switched by a Table / Covers control ([design.md](design.md)): **Table**, the default on a laptop, and **Covers**,
 a cover grid that is the default on a phone. Search, filters and sort apply to
-both; export ("This view") takes the rows either view holds, every page of them.
+both. Export is not the Library's: "Export library" in the account menu
+always writes every book (2026-11-04, [export.md](export.md)).
 
 The open collection is `LibraryPrefs.collection` (`"owned"` or `"wishlist"`, in
 [prefs.ts](../../web/src/library/prefs.ts)), saved per layout beside the view and
@@ -56,8 +58,7 @@ each. Everything is derived for the open collection (`LibraryView.collection`,
 `counts`, `books`). The wishlist leaves out the columns its books never fill
 (shelf, condition, acquired on, acquired from) even if the column picker has them
 on, and the saved choice is untouched. Switching tab clears the filters (they are
-session-only), so a shelf filter can't hide the other tab's books. Export on the
-Wishlist tab writes the wishlist's rows and the columns it fills. The Filter panel,
+session-only), so a shelf filter can't hide the other tab's books. The Filter panel,
 its sort list and the column picker leave the four out on the wishlist too
 (`columnsIn` / `columnApplies` in [view.ts](../../web/src/library/view.ts), since the
 2026-10-23 review); a sort carried over from Owned stays listed until changed.
@@ -111,9 +112,9 @@ last on, "Update to current", "Rename…" and "Delete…". While the page matche
 a view the button shows its name. In the covers view a view's columns don't
 count towards matching it, and applying one there still sets the table's
 columns for when the owner switches back. On the
-desktop Views sits in the toolbar right after the Table / Covers control; on
-a phone it ends the Owned / Wishlist row, because the phone's toolbar row has
-no room for a fourth control.
+desktop Views leads the list tools at the toolbar's end, after the Table /
+Covers control and a thin rule (2026-11-04); on a phone it ends the Owned /
+Wishlist row, because the phone's toolbar row has no room for it.
 
 ## Rows
 
@@ -153,8 +154,9 @@ list after "Select all". Unticking one book after "Select all" goes back to
 the page's ticks. Opening a book and coming Back keeps the selection, as it
 keeps the page. Until 2026-11-04 the selection survived sorting, filtering,
 searching and the tab, and the bar counted the ticked books out of sight
-(", 1 not shown"); both went with the rule. Whether ticks should outlive a
-filter change again is in [open-questions.md](open-questions.md). A
+(", 1 not shown"); both went with the rule, and the owner confirmed on
+2026-11-04 that ticks keep clearing on a sort, filter, search, tab or page
+change. A
 selection keeps each id with the book's `createdAt`, so a new book that
 takes a deleted one's id is not selected.
 

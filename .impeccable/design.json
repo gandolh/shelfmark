@@ -682,8 +682,8 @@
       "name": "Menu",
       "kind": "custom",
       "refersTo": "menu",
-      "description": "The account and Export menus: white, float shadow, faint teal row hover.",
-      "html": "<div class=\"ds-menu\" role=\"menu\"><div class=\"ds-menu__label\">What you see now</div><button class=\"ds-menu__item\" role=\"menuitem\">Excel <span class=\"ds-menu__detail\">.xlsx</span></button><button class=\"ds-menu__item\" role=\"menuitem\">CSV <span class=\"ds-menu__detail\">.csv</span></button></div>",
+      "description": "The account menu (with its Export library section) and the Views menu: white, float shadow, faint teal row hover.",
+      "html": "<div class=\"ds-menu\" role=\"menu\"><div class=\"ds-menu__label\">Export library</div><button class=\"ds-menu__item\" role=\"menuitem\">Excel <span class=\"ds-menu__detail\">.xlsx</span></button><button class=\"ds-menu__item\" role=\"menuitem\">CSV <span class=\"ds-menu__detail\">.csv</span></button></div>",
       "css": ".ds-menu { display: flex; flex-direction: column; min-width: 224px; padding: 6px; border-radius: var(--radius-menu); background: var(--surface); box-shadow: var(--shadow-float); color: var(--ink); font-family: var(--font-sans); } .ds-menu__label { padding: 6px 10px 2px; color: var(--muted); font-size: var(--text-label); font-weight: var(--weight-semibold); } .ds-menu__item { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 36px; padding: 0 10px; border: 0; border-radius: var(--radius-menu-item); background: none; color: var(--ink); font: inherit; font-size: var(--text-meta); text-align: left; cursor: pointer; } .ds-menu__item:hover, .ds-menu__item:focus { background: var(--accent-tint-soft); } .ds-menu__item:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: -2px; } .ds-menu__detail { color: var(--muted); font-size: var(--text-small); }"
     },
     {

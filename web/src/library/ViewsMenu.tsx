@@ -1,6 +1,7 @@
 import type { SavedView } from "@shelfmark/shared";
 import { useMemo, useState } from "react";
 import { Menu, type MenuSection } from "../components/Menu";
+import { ChevronDownIcon, ViewsIcon } from "./icons";
 import type { Layout, ViewMode } from "./prefs";
 import {
   applyView,
@@ -22,8 +23,8 @@ export interface ViewsMenuProps {
   layout: Layout;
   /** Table or covers: in the covers view a view's columns don't count. */
   mode: ViewMode;
-  /** The phone's toolbar: accent text instead of the desktop's flat fill. */
-  quiet?: boolean;
+  /** Which edge of the button the menu lines up with: `end` at the end of the phone's tabs row. */
+  align?: "start" | "end";
 }
 
 /**
@@ -33,7 +34,7 @@ export interface ViewsMenuProps {
  * filter moved it off), "Update to current", "Rename…" and "Delete…". The
  * button shows the view's name while the page matches it, "Views" otherwise.
  */
-export function ViewsMenu({ layout, mode, quiet = false }: ViewsMenuProps) {
+export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
   const { views, status, refresh } = useSavedViews();
   const prefs = useLibraryPrefs(layout);
   const filters = useLibraryFilters();
@@ -99,14 +100,18 @@ export function ViewsMenu({ layout, mode, quiet = false }: ViewsMenuProps) {
         label="Views"
         sections={sections}
         trigger={
-          // The name may be long: it is cut short with an ellipsis, and keeps its width while the open button turns semibold.
-          <span className="library-views__label" data-label={text}>
-            <span className="library-views__text">{text}</span>
-          </span>
+          <>
+            <ViewsIcon />
+            {/* The name may be long: it is cut short with an ellipsis, and keeps its width while the open button turns semibold. */}
+            <span className="library-views__label" data-label={text}>
+              <span className="library-views__text">{text}</span>
+            </span>
+            <ChevronDownIcon size={14} />
+          </>
         }
         triggerLabel={matched ? `Views, ${matched.name}` : undefined}
-        triggerClassName={`button button--${quiet ? "quiet" : "secondary"} button--regular menu-trigger library-views`}
-        align={quiet ? "end" : "start"}
+        triggerClassName="button button--regular menu-trigger library-views library-tool"
+        align={align}
       />
       {failed && (
         <span role="alert" className="visually-hidden">

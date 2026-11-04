@@ -70,3 +70,42 @@ export function MoveDownIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** Views: a saved view is a bookmark on the list. */
+export function ViewsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M6.5 4h11v16L12 16l-5.5 4z" />
+    </Icon>
+  );
+}
+
+/** Filter: a funnel. */
+export function FilterIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 5h16l-6 7.5V18l-4 2v-7.5z" />
+    </Icon>
+  );
+}
+
+/** Columns: a table cut into three. */
+export function ColumnsIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
+      <path d="M9.5 4.5v15M14.5 4.5v15" />
+    </Icon>
+  );
+}
+
+/** "Filter and sort" on a phone: two sliders. */
+export function SlidersIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M4 7h9M17 7h3M4 17h3M11 17h9" />
+      <circle cx="15" cy="7" r="2" />
+      <circle cx="9" cy="17" r="2" />
+    </Icon>
+  );
+}

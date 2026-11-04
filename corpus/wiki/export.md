@@ -1,23 +1,30 @@
 ---
-summary: How CSV and Excel export work and the traps they avoid. What gets exported (the current view or everything), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup (one `.db` file).
-updated: 2026-11-02
+summary: How CSV and Excel export work and the traps they avoid. What gets exported (since 2026-11-04 always the whole library, from "Export library" in the account menu), the UTF-8 BOM that makes Excel show ș and ț, spreadsheet formula injection, why write-excel-file and not SheetJS, and the full backup (one `.db` file).
+updated: 2026-11-04
 ---
 
 # Export
 
 ## What gets exported
 
-The export menu on the table offers two scopes:
+**Export library**, in the account menu (since 2026-11-04, the owner's call),
+as an Excel workbook or a CSV file: every book, owned and wishlist alike,
+whatever the Library shows. A **Collection** column comes first ("Owned" or
+"Wishlist"), then every column in the table's default order, one row per
+book in the server's order (oldest first). It runs in the browser from the
+list the client already holds ([library-table.md](library-table.md)); no
+export endpoint is needed, and the account menu loads the export code only
+when it is chosen. Cover images are not exported in CSV/XLSX; the backup
+has them.
 
-- **This view**: the rows left after filters and search, in the current sort,
-  with the visible columns in their current order, on every page: since the
-  Library got pages (2026-11-02) the menu reads "This view · 1,234 books",
-  not "What you see now", so it doesn't read as the page on show.
-- **Everything**: every book, every column.
-
-Both run in the browser from the rows the table already holds
-([library-table.md](library-table.md)); no export endpoint is needed. Cover
-images are not exported in CSV/XLSX; the backup has them.
+Until 2026-11-04 an Export menu in the Library's toolbar offered two scopes:
+"This view" (the rows the search and filters let through, with the visible
+columns) and "Every book, every field" (the open tab's books). The owner
+moved Export to the account menu and chose the whole library every time, so
+the filtered export and the code only it used are gone. CSV import reads a
+Shelfmark export back ([import.md](import.md)); it doesn't read the
+Collection column, so every row goes into the collection the import is run
+for.
 
 ## CSV
 
@@ -51,5 +58,5 @@ write-only job and has not had a release since 2024.
 everything: books, covers, the wishlist and the lookup cache. Saved views
 (2026-10-23) are in it too, as their `saved_views` table: the backup copies the
 whole database, so it needed no change for them. It is offered
-from the account menu, not the export menu ([design.md](design.md)). Restore is
+from the account menu, beside "Export library" ([design.md](design.md)). Restore is
 an owner step: stop the container, replace the file, start it.

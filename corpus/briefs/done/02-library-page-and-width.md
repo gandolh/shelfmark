@@ -53,7 +53,7 @@ glossary's words: book, collection, Owned, Wishlist.
 - [tokens.css](../../../web/src/styles/tokens.css): `--page-width` stays
   1180 px for every other page. No new token or hue.
 - [Toolbar.tsx](../../../web/src/library/Toolbar.tsx): how its buttons are
-  grouped is [brief 03](../todo/03-library-toolbar-groups.md)'s.
+  grouped is [brief 03](03-library-toolbar-groups.md)'s.
 
 ## What to do
 

@@ -261,7 +261,7 @@ The app icon carries the same world: books on a shelf in the accent on the groun
 A neutral, slightly warm grey ladder on an off-white ground with a single deep teal as the only colour that means "you can press this"; the eight placeholder tints are the one place colour appears for its own sake, and only on a book's face.
 
 ### Primary
-- **Shelf Teal** (accent): the one interactive colour. Primary buttons and the "Add a book" pill, links, quiet text buttons ("Filter and sort", "Export" on a phone), the current tab, the focus ring, the caret, and the status "Reading" (semibold), which is the one status that is coloured.
+- **Shelf Teal** (accent): the one interactive colour. Primary buttons and the "Add a book" pill, links, quiet text buttons, the current tab, the focus ring, the caret, and the status "Reading" (semibold), which is the one status that is coloured.
 - **Pressed Teal** (accent-press): hover and pressed states of the accent; link hover; the text on any tinted selected state.
 - **Teal Wash** (accent-tint): a menu button while its menu is open, a selected choice chip, an active filter chip, the open account disc, text selection.
 - **Faint Teal Wash** (accent-tint-soft): the hovered or focused row inside a menu; a selected table row.
@@ -337,8 +337,8 @@ The shell picks the layout in script: from 768 px it is the desktop (`.shell--de
 
 **Library.**
 - Header card: the title, the caption and the toolbar sit on a white card like the table's container (`surface`, 16 px radius, no shadow), 22 px above and below and 24 px at the sides, so the title lines up with the table's first cell. On a phone the card holds the title and account disc, the search field and the toolbar row; it runs edge to edge under the top of the screen with its lower corners rounded and the header's usual padding, 10 px above the tabs. The tabs stay on the ground under it.
-- Desktop toolbar: Table / Covers switch, Views (the saved views' menu, a secondary button that shows the view's name while the page is on one), Filter, Columns (in the table), Export, then the accent "Add a book" pill.
-- Phone toolbar: one quiet row. The small segmented Covers / Table switch, then "Filter and sort" and "Export" as accent text. There is no Columns button on a phone: "Columns" is a row inside the "Filter and sort" sheet that steps the sheet to the column picker, with a back step to "Filter and sort". Views has no room in this row: it ends the Owned / Wishlist row as accent text, its menu lined up with the right edge.
+- Desktop toolbar: the small Table / Covers switch, a 1 px hairline rule 22 px tall with 16 px either side, then the list tools at the end: Views (the saved views' menu, showing the view's name while the page is on one, with a down chevron), Filter ("Filter and sort" in Covers) and Columns (in the table). The tools are quiet tool buttons (below). There is no Add a book here (the top bar's place does it) and no Export (it is in the account menu).
+- Phone toolbar: one row. The small segmented Covers / Table switch, then "Filter and sort" at the row's end as a quiet tool button with a sliders icon. There is no Columns button on a phone: "Columns" is a row inside the "Filter and sort" sheet that steps the sheet to the column picker, with a back step to "Filter and sort". Views has no room in this row: it ends the Owned / Wishlist row as a quiet tool button on the tabs' baseline, its menu lined up with the right edge.
 - Owned / Wishlist: text tabs under the title on a hairline, each with its count; the open one ink with a 2 px accent underline, the other muted.
 - Bulk bar: while books are selected it takes the toolbar's place. Desktop: "3 selected" in ink semibold, then Move to shelf…, Set status (a menu), Add tags…, Remove tags… and Delete… as secondary buttons, and a quiet Clear. Phone: the count, then Actions (a menu) and Clear as accent text; Views stays at the end of the tabs. Clear puts the toolbar back as it was. A line in ink-2 under the tabs says what the last change did. Its dialogs use the Views dialogs' frame; Delete asks first, naming the count, with no danger colour, and after "Select all" says the books run past the page on show.
 - Select all: when every book on the page is ticked and the list runs past it, a band above the list, in the selected row's teal wash (`accent-tint-soft`, 8 px radius, 14 px meta text in ink-2, centred), says "All 10 books on this page are selected." and offers "Select all 665 books" as semibold accent text; once chosen, "All 665 books are selected." and "Clear selection". The same button carries each step. In Covers, which has no header box, it also offers "Select all 10 on this page" while some covers are ticked. On a phone the text is 15 px and the action a 44 px target.
@@ -374,7 +374,8 @@ Gently rounded throughout, with the radius growing with the size of the thing: a
 Flat fills, no borders, no shadow.
 - **Shape:** 8 px corners, 34 px tall on the desktop (44 px on a phone); the "Add a book" pill and a sheet's large action are full pills.
 - **Primary:** accent fill, white semibold text, 16 px side padding; hover and press go to accent-press.
-- **Secondary:** control fill, ink text; hover and press darken by a mix toward ink. While its menu is open (Export, the account disc) it turns teal wash with accent-press semibold text.
+- **Secondary:** control fill, ink text; hover and press darken by a mix toward ink. While its menu is open (the account disc) it turns teal wash with accent-press semibold text.
+- **Tool:** the Library's list tools (Views, Filter, Columns, "Filter and sort"): a 16 px line icon and the label in ink-2 on nothing, 10 px side padding (8 on a phone), 6 px between icon and label; hover takes the control fill and ink; while its menu or panel is open, the teal wash with accent-press semibold text.
 - **Quiet:** accent text on nothing, 15 px, 4 px side padding; hover accent-press. A leaving action ("Not this book", "Discard this scan") is a quiet button in plain ink, apart from the primary.
 - **Large:** 48 px, 24 px side padding, 16 px semibold: a sheet's primary action ("Save and scan the next one") and the camera's *Scan the barcode*.
 - **Disabled:** 45% opacity, no pointer.
@@ -403,7 +404,7 @@ The workhorse switch: the two places in the top bar, Table / Covers, Add a book'
 ### Navigation
 - **Desktop:** the top bar; the two places as a centred segmented control with 18 px segment padding, the current place a white tile.
 - **Phone:** the tab bar, two items (Library, Add a book), each an icon over an 11 px label; muted at rest, ink-2 on hover, accent and semibold when current; the icon scales to 0.92 while pressed.
-- **Account:** a round control-grey disc (34 px on the desktop, 32 px in a 44 px target on a phone) that opens a menu: change username (the signed-in name as its detail, cut with an ellipsis past 20em), change password, Sign in with Ward (linked or not), import a CSV, stats, download a backup, sign out.
+- **Account:** a round control-grey disc (34 px on the desktop, 32 px in a 44 px target on a phone) that opens a menu: change username (the signed-in name as its detail, cut with an ellipsis past 20em), change password, Sign in with Ward (linked or not), import a CSV, stats, download a backup, then an "Export library" section (Excel workbook or CSV: every book, owned and wishlist, whatever the Library shows), sign out.
 - **Icons:** one hand-drawn line set on a 24-unit grid, 1.9 stroke, round caps and joins, `currentColor`, decorative (the control names itself).
 
 ### Menus and sheets

@@ -15,6 +15,73 @@
   margin-right: -4px;
 }
 
+/*
+ * The header card's toolbar (Toolbar.tsx): the view switch, a hairline rule
+ * 16 px either side, then the list tools at the end.
+ */
+.library-toolbar__divider {
+  flex: none;
+  width: 1px;
+  height: 22px;
+  margin-inline: 8px;
+  background: var(--hairline);
+}
+
+.library-toolbar__group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/*
+ * A list tool (Views, Filter, Columns; "Filter and sort" and Views on a
+ * phone): an icon and its label in ink-2 with no fill, the control fill on
+ * hover, and the open menu button's teal wash while its menu or panel is open.
+ */
+.button.library-tool {
+  padding: 0 10px;
+  background: none;
+  color: var(--ink-2);
+}
+
+.button.library-tool:hover {
+  background: var(--control);
+  color: var(--ink);
+}
+
+.button.library-tool[aria-expanded="true"] {
+  background: var(--accent-tint);
+  color: var(--accent-press);
+  font-weight: var(--weight-semibold);
+}
+
+@media (max-width: 767px) {
+  .button.library-tool {
+    padding-inline: 8px;
+  }
+
+  /* The row's last control ends with its text, not its padding, on the edge. */
+  .library-tool--end,
+  .library-tabs-row .library-tool {
+    margin-right: -8px;
+  }
+
+  /*
+   * Views on the tabs' baseline: its label, not its leading icon, gives the
+   * button its baseline, and padding instead of a min-height keeps the 44 px
+   * target without dropping the label to the top of the box.
+   */
+  .library-tabs-row .button.library-tool {
+    min-height: 0;
+    padding-block: 12px 13px;
+    align-items: baseline;
+  }
+
+  .library-tabs-row .library-tool svg {
+    align-self: center;
+  }
+}
+
 /* How many filters are on, inside the Filter button. */
 .library-count {
   display: inline-flex;

@@ -2,7 +2,7 @@ import type { Book, Collection } from "@shelfmark/shared";
 import { useDeferredValue, useEffect, useMemo } from "react";
 import { useBooks } from "../books/store";
 import { useSearchQuery } from "../layout/search";
-import { BOOK_COLUMN_ID, columnById, type ColumnId, type LibraryColumn } from "./columns";
+import type { ColumnId, LibraryColumn } from "./columns";
 import { applyFilters, compileView, type Filters } from "./filters";
 import { clampPage, DEFAULT_PAGE_SIZE, pageCount, pageSlice, type PageSize } from "./pagination";
 import type { Layout } from "./prefs";
@@ -12,19 +12,15 @@ import { forgetPage, pageFor, samePageBasis, useLibraryFilters, useLibraryPage, 
 
 /**
  * What the Library holds right now: the open collection's books after the
- * search, the filters and the sort (`rows`, every page of them), the page
- * on show (`pageRows`, what the table and the covers render), and the
- * table's shown columns in order. The "This view" export writes every page:
- * `view.rows`, one line each, with `view.columns` (or
- * `exportColumns(view.columns)`), each cell from `exportValue(column, book)`
- * or `column.text(book)` (columns.ts) under `column.label`.
+ * search, the filters and the sort (`rows`, every page of them), and the
+ * page on show (`pageRows`, what the table and the covers render).
  */
 export interface LibraryView {
   /** The open collection. */
   collection: Collection;
   /** How many books each collection holds, for the tabs. */
   counts: Readonly<Record<Collection, number>>;
-  /** Every book in the open collection, in the server's order (oldest first): "Every book, every field" exports these. */
+  /** Every book in the open collection, in the server's order (oldest first). */
   books: readonly Book[];
   /** How many books the open collection has, before search and filters. */
   total: number;
@@ -39,8 +35,6 @@ export interface LibraryView {
   pageRows: readonly Book[];
   /** What the page number belongs to; turning the page records it with the number (state.ts `setPage`). */
   pageBasis: PageBasis;
-  /** The table's shown columns, in order; the book column (cover, title, author) first. */
-  columns: readonly LibraryColumn[];
   sorting: Sorting;
   filters: Filters;
   /** The search text the rows reflect (it can trail the box by a frame while typing). */
@@ -54,8 +48,6 @@ export interface ViewState {
   query: string;
   filters: Filters;
   sorting: Sorting;
-  columnOrder: readonly ColumnId[];
-  columnVisibility: Readonly<Record<ColumnId, boolean>>;
   /** Default 10. */
   pageSize?: PageSize;
   /** Default 1; clamped to the pages there are. */
@@ -87,26 +79,6 @@ export function collectionCounts(books: readonly Book[]): Record<Collection, num
   return counts;
 }
 
-/** The shown columns in the saved order, less the ones the collection never fills. */
-export function visibleColumns(
-  order: readonly ColumnId[],
-  visibility: Readonly<Record<ColumnId, boolean>>,
-  collection: Collection = "owned",
-): readonly LibraryColumn[] {
-  const shown = order.filter((id) => (id === BOOK_COLUMN_ID || visibility[id]) && columnApplies(id, collection));
-  return [...new Set(shown)].map(columnById);
-}
-
-/**
- * The columns a spreadsheet of the view wants: the table's, with the book
- * column's author written out as an Author column right after the title,
- * unless Author is already shown.
- */
-export function exportColumns(columns: readonly LibraryColumn[]): readonly LibraryColumn[] {
-  if (columns.some((column) => column.id === "authors")) return columns;
-  return columns.flatMap((column) => (column.id === BOOK_COLUMN_ID ? [column, columnById("authors")] : [column]));
-}
-
 /**
  * The view from scratch: the collection's books, sorted, then searched and filtered
  * (filtering keeps the order, so the page sorts once per sort change and
@@ -130,7 +102,6 @@ export function deriveView(books: readonly Book[], state: ViewState): LibraryVie
     pageSize,
     pageRows: pageSlice(rows, page, pageSize),
     pageBasis: { collection: state.collection, query: state.query, filters: state.filters, sorting: state.sorting, pageSize },
-    columns: visibleColumns(state.columnOrder, state.columnVisibility, state.collection),
     sorting: state.sorting,
     filters: state.filters,
     query: state.query,
@@ -152,10 +123,6 @@ export function useLibraryView(layout: Layout): LibraryView {
   useEffect(() => warmSearch(inCollection), [inCollection]);
   const sorted = useMemo(() => sortBooks(inCollection, prefs.sorting), [inCollection, prefs.sorting]);
   const rows = useMemo(() => applyFilters(sorted, filters, query), [sorted, filters, query]);
-  const columns = useMemo(
-    () => visibleColumns(prefs.columnOrder, prefs.columnVisibility, collection),
-    [prefs.columnOrder, prefs.columnVisibility, collection],
-  );
 
   // The page: the one last turned to while nothing it belongs to changed, else 1; past the end, the last.
   const { pageSize, sorting } = prefs;
@@ -184,12 +151,11 @@ export function useLibraryView(layout: Layout): LibraryView {
       pageSize,
       pageRows,
       pageBasis,
-      columns,
       sorting,
       filters,
       query,
       narrowed: compileView(filters, query) !== null,
     }),
-    [collection, counts, inCollection, rows, page, pages, pageSize, pageRows, pageBasis, columns, sorting, filters, query],
+    [collection, counts, inCollection, rows, page, pages, pageSize, pageRows, pageBasis, sorting, filters, query],
   );
 }

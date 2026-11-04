@@ -635,7 +635,7 @@ page, with a Gmail-style line offering every page, and a bulk change never
 reaches a book off the page unless the owner chose "Select all"; the Library
 fills the window on the desktop; its title row sits on a white card; and the
 phone's sort picker that floated over the filter rows (two rules sharing
-`.library-select`). [Brief 03](briefs/todo/03-library-toolbar-groups.md):
+`.library-select`). [Brief 03](briefs/done/03-library-toolbar-groups.md):
 the toolbar's buttons in groups instead of one row of identical pills; a
 design step with alternatives first, then the owner's pick, then the build.
 
@@ -663,7 +663,7 @@ noted in `docs/images/shots.md`.
 
 ## [2026-11-04] design | Brief 03 — the toolbar's alternatives
 
-[Brief 03](briefs/todo/03-library-toolbar-groups.md)'s design step: four
+[Brief 03](briefs/done/03-library-toolbar-groups.md)'s design step: four
 groupings of the Library toolbar on the new header card, at desktop and
 phone widths, with Shelfmark's tokens and made-up books, in one private
 design canvas linked from the brief. A spaces the groups with dividers; B
@@ -672,3 +672,28 @@ into a row of library actions (Export, Add a book) and a row of list
 controls; D makes the tools quiet icon-and-text buttons with Add a book the
 only filled control. Nothing is built; the brief stays in `todo/` until the
 owner picks.
+
+## [2026-11-04] build | Brief 03 — the toolbar in groups
+
+The owner answered the same day. Toolbar: option A, changed: "A, with
+Views/Filter/Columns moved to the end as icons like D; Add a book removed
+since the top bar has it; Export in the account dropdown". Export: always
+the whole library. Ticks: keep clearing on a sort, filter, search, tab
+change and page turn, as built; the open question is closed.
+
+[Brief 03](briefs/done/03-library-toolbar-groups.md) built on local `main`,
+not deployed. The header card holds the Table / Covers switch, a hairline
+rule, then Views, Filter and Columns as quiet icon-and-text buttons; on a
+phone the row is the switch and "Filter and sort". Add a book and Export
+left the card. The account menu gained an "Export library" section (Excel
+or CSV, every book of both collections with a Collection column first);
+the Library's Export menu and its filtered "This view" export are gone,
+with the code only they used. Keeping both formats under one heading is a
+call made beyond the owner's "one item"; it is in
+[open-questions.md](wiki/open-questions.md). Checked with the typecheck,
+lint, 140 unit tests and a browser look at 1920, 1280 and 390 px.
+[design.md](wiki/design.md), `DESIGN.md`, [export.md](wiki/export.md),
+[library-table.md](wiki/library-table.md), [features.md](wiki/features.md),
+[status.md](wiki/status.md), the README and owner-setup say what changed.
+Two done briefs got link fixes only: brief 02's link to brief 03, and brief
+01's link to the removed `ExportMenu.tsx`, now plain text.

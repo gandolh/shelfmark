@@ -1,15 +1,13 @@
 import type { RefObject } from "react";
-import { ButtonLink } from "../components/Button";
 import { SegmentedControl } from "../components/SegmentedControl";
-import { ExportMenu } from "../export/ExportMenu";
-import { ADD_BOOK } from "../router";
 import { activeFilters } from "./filters";
+import { ColumnsIcon, FilterIcon, SlidersIcon } from "./icons";
 import type { ViewMode } from "./prefs";
 import type { LibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
 
 export interface ToolbarProps {
-  /** The rows and columns on show: what the Export takes. */
+  /** The filters on: the Filter button's count. */
   view: LibraryView;
   desktop: boolean;
   mode: ViewMode;
@@ -23,12 +21,14 @@ export interface ToolbarProps {
 }
 
 /**
- * The Library's controls (design.md). Desktop, right of the title: Table /
- * Covers, Views, Filter, Columns (in the table), Export, and the accent "Add a
- * book" pill. Phone, under the search box: Covers / Table, then the quiet
- * "Filter and sort" and "Export" as accent text; Add a book is the tab bar's,
- * and Views sits at the end of the collection tabs (LibraryPage), as a fourth
- * control doesn't fit this row at 390 px.
+ * The Library's controls on the header card (design.md): the view switch,
+ * then, at the end behind a thin rule, the list tools as quiet
+ * icon-and-text buttons. Desktop, right of the title: Table / Covers |
+ * Views, Filter, Columns (in the table). Phone, under the search box:
+ * Covers / Table, and "Filter and sort" at the row's end; Views sits at the
+ * end of the collection tabs (LibraryPage). Add a book is the top bar's (the
+ * tab bar's on a phone) and Export is in the account menu, so neither is
+ * here.
  *
  * While books are selected the bulk bar (BulkBar.tsx) stands in this place;
  * on a phone Views stays at the end of the tabs, as it is no part of this row.
@@ -58,34 +58,35 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
           value={mode}
           onChange={onModeChange}
         />
-        <ViewsMenu layout="desktop" mode={mode} />
-        <button
-          ref={filterButton}
-          type="button"
-          className="button button--secondary button--regular"
-          aria-haspopup="dialog"
-          aria-expanded={open === "filter"}
-          onClick={onFilter}
-        >
-          {mode === "table" ? "Filter" : "Filter and sort"}
-          {badge}
-        </button>
-        {mode === "table" && (
+        <span className="library-toolbar__divider" aria-hidden="true" />
+        <div className="library-toolbar__group">
+          <ViewsMenu layout="desktop" mode={mode} />
           <button
-            ref={columnsButton}
+            ref={filterButton}
             type="button"
-            className="button button--secondary button--regular"
+            className="button button--regular library-tool"
             aria-haspopup="dialog"
-            aria-expanded={open === "columns"}
-            onClick={onColumns}
+            aria-expanded={open === "filter"}
+            onClick={onFilter}
           >
-            Columns
+            <FilterIcon />
+            {mode === "table" ? "Filter" : "Filter and sort"}
+            {badge}
           </button>
-        )}
-        <ExportMenu view={view} />
-        <ButtonLink to={ADD_BOOK} variant="primary">
-          Add a book
-        </ButtonLink>
+          {mode === "table" && (
+            <button
+              ref={columnsButton}
+              type="button"
+              className="button button--regular library-tool"
+              aria-haspopup="dialog"
+              aria-expanded={open === "columns"}
+              onClick={onColumns}
+            >
+              <ColumnsIcon />
+              Columns
+            </button>
+          )}
+        </div>
       </>
     );
   }
@@ -104,20 +105,18 @@ export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onC
         value={mode}
         onChange={onModeChange}
       />
-      <div className="library-toolbar__end">
-        <button
-          ref={filterButton}
-          type="button"
-          className="button button--quiet button--regular"
-          aria-haspopup="dialog"
-          aria-expanded={open !== null}
-          onClick={onFilter}
-        >
-          Filter and sort
-          {badge}
-        </button>
-        <ExportMenu view={view} quiet />
-      </div>
+      <button
+        ref={filterButton}
+        type="button"
+        className="button button--regular library-tool library-tool--end"
+        aria-haspopup="dialog"
+        aria-expanded={open !== null}
+        onClick={onFilter}
+      >
+        <SlidersIcon size={18} />
+        Filter and sort
+        {badge}
+      </button>
     </>
   );
 }

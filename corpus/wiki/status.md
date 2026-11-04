@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar's groups (brief 03) waiting on the owner's pick of four alternatives. Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
 updated: 2026-11-04
 ---
 
@@ -11,10 +11,9 @@ _2026-11-04_. Pushed through `306793a` (2026-11-03), which includes brief
 2026-11-04 screenshots were of the live Library. Brief numbering restarted
 at 01 on 2026-11-02 (see [log.md](../log.md)). Brief 02,
 [ten a page, the page's tick box, the full width, a header card](../briefs/done/02-library-page-and-width.md),
-was built on 2026-11-04 on local `main`, not pushed and not deployed. Brief
-03, [the toolbar in groups](../briefs/todo/03-library-toolbar-groups.md),
-has four alternatives in a design canvas (linked in the brief) and waits for
-the owner's pick. The product calls are in
+was built on 2026-11-04 on local `main`, not pushed and not deployed, and so
+was brief 03, [the toolbar in groups](../briefs/done/03-library-toolbar-groups.md),
+the owner's pick of its alternatives. No brief waits. The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
@@ -39,30 +38,33 @@ the owner's pick. The product calls are in
   the by-hand form.
 - **Change the username** (2026-10-24), on ward-auth 0.4.0.
 - **Pages in the Library** (2026-11-02). The table and the covers show one
-  page at a time, with a pager under the list; the "This view" export covers
-  every page ([library-table.md](library-table.md)).
+  page at a time, with a pager under the list
+  ([library-table.md](library-table.md)).
 - **Ten a page, the page's tick box, the full width, a header card**
   (2026-11-04). 10, 25, 50 or 100 a page, 10 by default; the header's box
   ticks the page and a band offers "Select all"; a bulk change never reaches
   a book off the page otherwise; the Library fills the desktop window under
   a white header card; the phone's sort picker sits under "Sort by" again.
   Web only; not deployed.
-- **The toolbar in groups** (brief 03). Four alternatives published on
-  2026-11-04; the build waits for the owner's pick.
+- **The toolbar in groups** (2026-11-04). The card holds the Table / Covers
+  switch and, behind a thin rule, Views, Filter and Columns as quiet
+  icon-and-text buttons; Add a book and Export left it. "Export library" in
+  the account menu writes every book as Excel or CSV
+  ([export.md](export.md)); the filtered "This view" export is gone. Web
+  only; not deployed.
 
 ## Next (owner)
 
-1. **Deploy brief 02** (web only, no server change), from `vps-deploy`:
-   `node cli.ts shelfmark deploy`. It also brings brief 01's pages if they
-   weren't live yet. Then on the Android phone: the white header card, "10
-   per page", a long press in Covers and the band's "Select all 10 on this
-   page" then "Select all", and "Filter and sort" (the sort picker under
-   "Sort by"). On the desktop at full width: the table with no sideways
-   scroll.
-2. **Pick a toolbar** for [brief 03](../briefs/todo/03-library-toolbar-groups.md)
-   from the four alternatives linked there (A spaced groups, B one button
-   group, C two rows, D quiet tools with icons), and say whether ticks
-   should outlive a filter change ([open-questions.md](open-questions.md)).
+1. **Deploy briefs 02 and 03** (web only, no server change), from
+   `vps-deploy`: `node cli.ts shelfmark deploy`. It also brings brief 01's
+   pages if they weren't live yet. Then on the Android phone: the white
+   header card with Covers / Table and "Filter and sort", Views on the tabs
+   row, "10 per page", a long press in Covers and the band's "Select all 10
+   on this page" then "Select all", the sort picker under "Sort by", and
+   "Export library" in the account menu (open the file). On the desktop at
+   full width: the table with no sideways scroll.
+2. **Say whether "Export library" should be one row**
+   ([open-questions.md](open-questions.md)).
 3. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).

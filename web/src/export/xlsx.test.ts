@@ -2,8 +2,7 @@ import { readSheet } from "read-excel-file/node";
 import { describe, expect, it } from "vitest";
 import { COLUMNS } from "../library/columns";
 import { book } from "../library/test-books";
-import type { LibraryView } from "../library/view";
-import { everythingTable } from "./fields";
+import { libraryTable } from "./fields";
 import { buildXlsx, columnWidths } from "./xlsx";
 
 const books = [
@@ -21,15 +20,15 @@ const books = [
 
 describe("buildXlsx", () => {
   it("parses back with typed cells", async () => {
-    const view = { books, collection: "owned" } as unknown as LibraryView;
-    const table = everythingTable(view, COLUMNS, true);
+    const table = libraryTable(books, true);
     const blob = await buildXlsx(table);
     const rows = await readSheet(Buffer.from(await blob.arrayBuffer()));
 
     const header = rows[0] as string[];
-    expect(header).toEqual(COLUMNS.map((column) => column.label));
+    expect(header).toEqual(["Collection", ...COLUMNS.map((column) => column.label)]);
     const at = (name: string) => header.indexOf(name);
     const first = rows[1] as unknown[];
+    expect(first[at("Collection")]).toBe("Owned");
     expect(first[at("Title")]).toBe("Orbitor");
     expect(first[at("Author")]).toBe("Mircea Cărtărescu; X");
     expect(first[at("ISBN")]).toBe("9789735025106");
@@ -43,9 +42,8 @@ describe("buildXlsx", () => {
   });
 
   it("sizes columns from the content", () => {
-    const view = { books, collection: "owned" } as unknown as LibraryView;
-    const widths = columnWidths(everythingTable(view, COLUMNS, true));
-    expect(widths).toHaveLength(COLUMNS.length);
+    const widths = columnWidths(libraryTable(books, true));
+    expect(widths).toHaveLength(COLUMNS.length + 1);
     expect(Math.max(...widths)).toBeLessThanOrEqual(60);
   });
 });

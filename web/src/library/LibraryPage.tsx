@@ -221,10 +221,6 @@ export function LibraryPage() {
       filterButton={filterButton}
       columnsButton={columnsButton}
     />
-  ) : desktop && !(ready && view.total === 0) ? (
-    <ButtonLink to={ADD_BOOK} variant="primary">
-      Add a book
-    </ButtonLink>
   ) : undefined;
 
   return (
@@ -240,7 +236,7 @@ export function LibraryPage() {
         <div className="library-tabs-row">
           <CollectionTabs view={view} onChange={setCollection} />
           {/* The phone's toolbar has no room for Views: it ends the tabs' row (desktop: Toolbar). */}
-          {!desktop && <ViewsMenu layout={layout} mode={mode} quiet />}
+          {!desktop && <ViewsMenu layout={layout} mode={mode} align="end" />}
         </div>
       )}
       {/* Said for every change; shown under the bar for the ones that leave it up. */}

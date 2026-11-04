@@ -227,8 +227,8 @@ Two checks after the first deploy with the Romanian catalogs and the CIP index. 
   [06-accounts-and-sign-in.md](../corpus/briefs/done/06-accounts-and-sign-in.md).
 - **PWA install**: step 8, details in
   [12-pwa.md](../corpus/briefs/done/12-pwa.md).
-- **CSV and XLSX exports in Excel**: open both files; see
-  [11-export-and-backup.md](../corpus/briefs/done/11-export-and-backup.md).
+- **CSV and XLSX exports in Excel**: export both from the account menu's
+  "Export library" and open them; see [export.md](../corpus/wiki/export.md).
 - **Google measurement**: once the key exists, run `server/scripts/measure-lookup.ts`
   on the Romanian samples as described in
   [05-lookup-and-covers.md](../corpus/briefs/done/05-lookup-and-covers.md), and

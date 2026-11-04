@@ -28,14 +28,11 @@ import {
 import { book } from "./test-books";
 import { deriveView, type ViewState } from "./view";
 
-const prefs = defaultPrefs("desktop");
 const state = (overrides: Partial<ViewState> = {}): ViewState => ({
   collection: "owned",
   query: "",
   filters: {},
   sorting: [{ id: "book", desc: false }],
-  columnOrder: prefs.columnOrder,
-  columnVisibility: prefs.columnVisibility,
   ...overrides,
 });
 

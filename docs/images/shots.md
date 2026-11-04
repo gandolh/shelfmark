@@ -22,9 +22,12 @@ publisher's artwork appears.
 
 - **hero.webp and library-table.webp** (noted 2026-11-04). Since then the
   Library's title, caption and toolbar sit on a white card, the page fills
-  the window, and it shows 10 books a page with the pager under them. Retake
-  both once the toolbar's grouping is built, so one pass covers both changes.
-  phone-search.webp shows the old phone header too.
+  the window, it shows 10 books a page with the pager under them, and the
+  toolbar is the Table / Covers switch with Views, Filter and Columns as
+  quiet icon buttons (no Add a book or Export; Export is "Export library" in
+  the account menu). Both changes are built, so one pass covers them; the
+  retake is left for later. phone-search.webp shows the old phone header
+  too.
 
 ## Not taken
 
