@@ -56,7 +56,7 @@ export interface ViewState {
   sorting: Sorting;
   columnOrder: readonly ColumnId[];
   columnVisibility: Readonly<Record<ColumnId, boolean>>;
-  /** Default 50. */
+  /** Default 10. */
   pageSize?: PageSize;
   /** Default 1; clamped to the pages there are. */
   page?: number;

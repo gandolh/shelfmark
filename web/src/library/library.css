@@ -77,9 +77,35 @@
   white-space: nowrap;
 }
 
-.library-bulk__hidden {
-  color: var(--muted);
-  font-weight: var(--weight-regular);
+/*
+ * Above the list while the page is ticked (LibraryPage's SelectionBand):
+ * "All 10 books on this page are selected. Select all 665 books", then
+ * "All 665 books are selected. Clear selection". The selected row's faint
+ * teal wash, the action as accent text.
+ */
+.library-selectline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 6px;
+  margin-bottom: 12px;
+  padding: 4px 14px;
+  border-radius: var(--radius-control);
+  background: var(--accent-tint-soft);
+  color: var(--ink-2);
+  font-size: var(--text-meta);
+  text-align: center;
+}
+
+.library-selectline__text:empty {
+  display: none;
+}
+
+.library-selectline__action.button--quiet {
+  min-height: 30px;
+  font-size: var(--text-meta);
+  font-weight: var(--weight-semibold);
 }
 
 /* What the last change did, under the tabs while the selection stays. */
@@ -775,7 +801,7 @@
   position: relative;
 }
 
-.library-select {
+.library-tick {
   position: absolute;
   inset: 0;
   display: flex;
@@ -784,7 +810,7 @@
   cursor: pointer;
 }
 
-.library-select input {
+.library-tick input {
   flex: none;
   width: 16px;
   height: 16px;
@@ -1324,11 +1350,25 @@ button.library-cover {
     padding-right: 16px;
   }
 
-  .library-select {
+  .library-tick {
     padding-left: 16px;
   }
 
-  .library-select input {
+  .library-selectline {
+    padding-block: 0;
+    font-size: var(--text-body);
+  }
+
+  .library-selectline__text {
+    padding-top: 10px;
+  }
+
+  .library-selectline__action.button--quiet {
+    min-height: var(--touch);
+    font-size: var(--text-body);
+  }
+
+  .library-tick input {
     width: 18px;
     height: 18px;
   }

@@ -26,6 +26,10 @@ export interface PageProps {
    * screen readers. No effect on the desktop.
    */
   bleed?: boolean;
+  /** Desktop only: the window's width less the gutters, instead of the 1180 px column (the Library). */
+  wide?: boolean;
+  /** The header (title, caption, toolbar; on a phone the search box too) on a white card like the table's container. */
+  card?: boolean;
   children?: ReactNode;
 }
 
@@ -34,7 +38,7 @@ export interface PageProps {
  * toolbar, then the content. On a phone the header also carries the
  * account button beside the title, as in the `Covers-Library` mock-up.
  */
-export function Page({ title, caption, toolbar, search, back, bleed = false, children }: PageProps) {
+export function Page({ title, caption, toolbar, search, back, bleed = false, wide = false, card = false, children }: PageProps) {
   const desktop = useIsDesktop();
   const hidden = bleed && !desktop;
 
@@ -50,7 +54,7 @@ export function Page({ title, caption, toolbar, search, back, bleed = false, chi
   );
 
   return (
-    <div className={["page", hidden ? "page--bleed" : null].filter(Boolean).join(" ")}>
+    <div className={["page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null].filter(Boolean).join(" ")}>
       {hidden ? (
         <h1 className="visually-hidden">{title}</h1>
       ) : (

@@ -7,8 +7,8 @@ import { Button } from "../components/Button";
 import { Menu, type MenuItem, type MenuSection } from "../components/Menu";
 import { bookCount, describeResult, shelfChoices, tagChoices } from "./bulk";
 import { AddTagsDialog, DeleteBooksDialog, RemoveTagsDialog, ShelfDialog } from "./BulkDialogs";
-import { summarizeSelection, withoutIds } from "./selection";
-import { clearSelection, getSelection, setSelection } from "./state";
+import { summarizeSelection } from "./selection";
+import { clearSelection, dropFromSelection } from "./state";
 import { messageOf } from "./ViewDialog";
 
 type DialogKind = "shelf" | "addTags" | "removeTags" | "delete";
@@ -20,10 +20,14 @@ export interface BulkNotice {
 }
 
 export interface BulkBarProps {
-  /** The selected books still in the list, in its order. */
+  /**
+   * The books a change reaches, in the list's order: the ticked books on the
+   * page on show, or, after "Select all", in the whole list (selection.ts
+   * `reachedBooks`). Never a book the owner can't see otherwise.
+   */
   selected: readonly Book[];
-  /** The rows on show, to count the selected books they leave out. */
-  rows: readonly Book[];
+  /** The owner chose "Select all": the books run past the page on show. */
+  everyPage: boolean;
   /** Every book: the shelves and tags in use. */
   books: readonly Book[];
   desktop: boolean;
@@ -36,16 +40,15 @@ const STALE = "Nothing was changed: some of these books are no longer in your li
 
 /**
  * The bulk bar: in place of the Library's toolbar while books are
- * selected. "3 selected" (and how many of them are out of sight), then, on
- * the desktop, Move to shelf, Set status, Add tags, Remove tags, Delete and
+ * selected. "3 selected", then, on the desktop, Move to shelf, Set status, Add tags, Remove tags, Delete and
  * Clear; on a phone, where six don't fit a row, an Actions menu and Clear.
  * Each change is one `POST /api/books/bulk`. The selection stays after a
  * change, so another can follow; a delete lets go of the deleted books.
  */
-export function BulkBar({ selected, rows, books, desktop, onNotice }: BulkBarProps) {
+export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkBarProps) {
   const [dialog, setDialog] = useState<DialogKind | null>(null);
   const [returnFocus, setReturnFocus] = useState<HTMLElement | null>(null);
-  const summary = summarizeSelection(selected, rows);
+  const summary = summarizeSelection(selected);
   const shelves = useMemo(() => shelfChoices(books), [books]);
   const tagsOnSelected = useMemo(() => tagChoices(selected), [selected]);
   const allTags = useMemo(() => tagChoices(books).map((tag) => tag.name), [books]);
@@ -71,7 +74,7 @@ export function BulkBar({ selected, rows, books, desktop, onNotice }: BulkBarPro
     }
     const text = describeResult(change, result);
     if (change.kind === "delete") {
-      setSelection(withoutIds(getSelection(), result.deleted));
+      dropFromSelection(result.deleted);
       onNotice({ text, visible: false });
     } else {
       onNotice({ text, visible: true });
@@ -91,11 +94,6 @@ export function BulkBar({ selected, rows, books, desktop, onNotice }: BulkBarPro
   const count = (
     <p className="library-bulk__count">
       <span className="tabular">{summary.count.toLocaleString("en-GB")}</span> selected
-      {summary.hidden > 0 && (
-        <span className="library-bulk__hidden">
-          , <span className="tabular">{summary.hidden.toLocaleString("en-GB")}</span> not shown
-        </span>
-      )}
     </p>
   );
 
@@ -171,7 +169,7 @@ export function BulkBar({ selected, rows, books, desktop, onNotice }: BulkBarPro
         <RemoveTagsDialog {...shared} count={summary.count} tags={tagsOnSelected} onSubmit={(tags) => run({ kind: "removeTags", tags })} />
       )}
       {dialog === "delete" && (
-        <DeleteBooksDialog {...shared} count={summary.count} hidden={summary.hidden} onConfirm={() => run({ kind: "delete" })} />
+        <DeleteBooksDialog {...shared} count={summary.count} everyPage={everyPage} onConfirm={() => run({ kind: "delete" })} />
       )}
     </>
   );

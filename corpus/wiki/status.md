@@ -1,16 +1,19 @@
 ---
-summary: Snapshot as of 2026-11-02, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-02
+summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar's groups (brief 03) in its design step. Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+updated: 2026-11-04
 ---
 
 # Status
 
-_2026-11-02_. Everything is on `main` and pushed through `29bdad1`
-(2026-11-01). Deployed on 2026-10-24 with everything through the change of
-username. Brief numbering restarted at 01 on 2026-11-02 (see
-[log.md](../log.md)). Brief 01,
-[pages in the Library](../briefs/done/01-library-pages.md), was built on
-2026-11-02 on local `main`, not pushed and not deployed; no brief waits. The product calls are in
+_2026-11-04_. Pushed through `306793a` (2026-11-03), which includes brief
+01, [pages in the Library](../briefs/done/01-library-pages.md). Deployed on
+2026-10-24 with everything through the change of username; the owner's
+2026-11-04 screenshots were of the live Library. Brief numbering restarted
+at 01 on 2026-11-02 (see [log.md](../log.md)). Brief 02,
+[ten a page, the page's tick box, the full width, a header card](../briefs/done/02-library-page-and-width.md),
+was built on 2026-11-04 on local `main`, not pushed and not deployed. Brief
+03, [the toolbar in groups](../briefs/todo/03-library-toolbar-groups.md),
+waits for its design step. The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
@@ -34,22 +37,33 @@ username. Brief numbering restarted at 01 on 2026-11-02 (see
   block read from a photo ([cip-photo.md](cip-photo.md)), a subtitle field on
   the by-hand form.
 - **Change the username** (2026-10-24), on ward-auth 0.4.0.
-- **Pages in the Library** (2026-11-02). The table and the covers show 50
-  books a page by default, with a pager under the list; the header's box and
-  the "This view" export still cover every page
-  ([library-table.md](library-table.md)). Web only; not deployed.
+- **Pages in the Library** (2026-11-02). The table and the covers show one
+  page at a time, with a pager under the list; the "This view" export covers
+  every page ([library-table.md](library-table.md)).
+- **Ten a page, the page's tick box, the full width, a header card**
+  (2026-11-04). 10, 25, 50 or 100 a page, 10 by default; the header's box
+  ticks the page and a band offers "Select all"; a bulk change never reaches
+  a book off the page otherwise; the Library fills the desktop window under
+  a white header card; the phone's sort picker sits under "Sort by" again.
+  Web only; not deployed.
+- **The toolbar in groups** (brief 03). Design step first, then the
+  owner's pick, then the build.
 
 ## Next (owner)
 
-1. **Deploy the pages** (web only, no server change), from `vps-deploy`:
-   `node cli.ts shelfmark deploy`. Then on the Android phone: the pager at
-   the end of the covers above the tab bar, Next and Previous, "50 per page",
-   and Back from a book on page 3. Say whether the header's box should tick
-   only the page instead (it ticks every page now).
-2. The Google Books key is in the deploy secrets, and the Romanian
+1. **Deploy brief 02** (web only, no server change), from `vps-deploy`:
+   `node cli.ts shelfmark deploy`. It also brings brief 01's pages if they
+   weren't live yet. Then on the Android phone: the white header card, "10
+   per page", a long press in Covers and the band's "Select all 10 on this
+   page" then "Select all", and "Filter and sort" (the sort picker under
+   "Sort by"). On the desktop at full width: the table with no sideways
+   scroll.
+2. **Say whether ticks should outlive a filter change**
+   ([open-questions.md](open-questions.md)).
+3. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
-3. **Deployed 2026-10-24** with everything since v1 (the owner ran it; the deploy
+4. **Deployed 2026-10-24** with everything since v1 (the owner ran it; the deploy
    mirrors the local tree, so the unpushed commits went too). Checked read-only
    the same day: the container runs ward-auth 0.4.0 and the web release has
    Change username. The first CIP refresh found 82 issues and 0 to import.
@@ -57,11 +71,11 @@ username. Brief numbering restarted at 01 on 2026-11-02 (see
    Timișoara took 5.2 s to connect, against a 10 s budget per library.
    Left for the owner: look up `9786068044873` in the app (it should say the
    Romanian Academy Library), and the phone checks below.
-4. The checks no agent could run here, listed in owner-setup: the scanner on
+5. The checks no agent could run here, listed in owner-setup: the scanner on
    an Android phone and an iPhone, the PWA install, the local Ward round trip
    (needs Docker Desktop's WSL integration), the exports opened in Excel. The container build was checked locally
    on 2026-10-17, poppler-utils included.
-5. **Phone checks on the scanner** (after the deploy):
+6. **Phone checks on the scanner** (after the deploy):
    - Scan a book, scan another, then the first again: it shows at once, and
      the server log has no second `lookup` line for it.
    - Nothing beeps until you tap *Scan the barcode*. Bring a book in: it reads
@@ -75,7 +89,7 @@ username. Brief numbering restarted at 01 on 2026-11-02 (see
      the end of the address and send the readout's four lines: resolution,
      zoom range, focus modes, decode time. Over 150 ms is the cue to crop the
      frame.
-6. **The CIP photo:** a few real photos of copyright pages, re-read with
+7. **The CIP photo:** a few real photos of copyright pages, re-read with
    `web/src/ocr/fixtures/record.ts`, and a walk on the phone; the fixtures so far are
    renders ([cip-photo.md](cip-photo.md)).
 

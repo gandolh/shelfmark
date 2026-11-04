@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 import type { ColumnId } from "./columns";
 import type { Filter, Filters } from "./filters";
 import { browserStorage, readPrefs, writePrefs, type Layout, type LibraryPrefs } from "./prefs";
-import { NO_SELECTION, type Selection } from "./selection";
+import { withoutIds, type Selection, type SelectionScope } from "./selection";
 import type { Sorting } from "./sort";
 
 /**
@@ -180,25 +180,62 @@ export function useLibraryPage(): PageChoice | null {
 
 // --- Selection ------------------------------------------------------------
 
-let selection: Selection = NO_SELECTION;
+/**
+ * The ticked books, what they cover (the page, or every page after "Select
+ * all"), and the list and page they were ticked on. The selection belongs to
+ * that list: a sort, a filter, the search, the tab, a page size or a saved
+ * view lets it go, as does a turn of the page unless the owner chose "Select
+ * all". So a bulk change never reaches a book the owner can't see
+ * (selection.ts). Opening a book and coming Back keeps it, as it keeps the page.
+ */
+export interface SelectionChoice {
+  readonly books: Selection;
+  readonly scope: SelectionScope;
+  readonly basis: PageBasis;
+  readonly page: number;
+}
 
-export function getSelection(): Selection {
+let selection: SelectionChoice | null = null;
+
+/** The selection in force on page `page` of the list `basis` describes; `null` once it no longer applies. */
+export function selectionFor(choice: SelectionChoice | null, basis: PageBasis, page: number): SelectionChoice | null {
+  if (choice === null || !samePageBasis(choice.basis, basis)) return null;
+  return choice.scope === "all" || choice.page === page ? choice : null;
+}
+
+export function getSelection(): SelectionChoice | null {
   return selection;
 }
 
-/** Replace the selection (selection.ts makes the next one). Sorting and filtering never call this. */
-export function setSelection(next: Selection): void {
-  if (next === selection) return;
-  selection = next;
+/** Tick `books` on page `page` of the list `basis` describes (selection.ts makes the set); none ticked lets go. */
+export function setSelection(books: Selection, basis: PageBasis, page: number, scope: SelectionScope = "page"): void {
+  if (books.size === 0) {
+    clearSelection();
+    return;
+  }
+  const old = selection;
+  if (old !== null && old.books === books && old.scope === scope && old.page === page && samePageBasis(old.basis, basis)) return;
+  selection = { books, scope, basis, page };
   notify();
 }
 
-/** The bulk bar's Clear. */
-export function clearSelection(): void {
-  setSelection(NO_SELECTION);
+/** A bulk delete took these books out of the selection. */
+export function dropFromSelection(ids: readonly number[]): void {
+  if (selection === null) return;
+  const books = withoutIds(selection.books, ids);
+  if (books === selection.books) return;
+  selection = books.size === 0 ? null : { ...selection, books };
+  notify();
 }
 
-/** The selection; re-renders when it changes. */
-export function useLibrarySelection(): Selection {
+/** The bulk bar's Clear, "Clear selection", or a selection that no longer applies. */
+export function clearSelection(): void {
+  if (selection === null) return;
+  selection = null;
+  notify();
+}
+
+/** The selection with where it was made; re-renders when it changes. */
+export function useLibrarySelection(): SelectionChoice | null {
   return useSyncExternalStore(subscribe, getSelection);
 }

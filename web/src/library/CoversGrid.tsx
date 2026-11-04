@@ -9,8 +9,7 @@ import { bookRoute } from "../router";
 import { TAB_BAR_HEIGHT } from "../layout/viewport";
 import type { Layout } from "./prefs";
 import { rememberScroll } from "./scroll";
-import { isSelected, toggleBook, withBooks } from "./selection";
-import { getSelection, setSelection, useLibrarySelection } from "./state";
+import { isSelected, type Selection } from "./selection";
 
 /**
  * The Covers view (the `Covers-Library` mock-up): a grid of covers, each
@@ -25,7 +24,9 @@ import { getSelection, setSelection, useLibrarySelection } from "./state";
  * photo grid does (a finger or a pen anywhere; the mouse too on a phone's
  * layout). While books are selected (`selecting`, the bulk bar is up) each
  * cover is a toggle with a mark in its corner: a tap, Enter or Space ticks
- * or unticks it, and nothing opens until the bar's Clear.
+ * or unticks it, and nothing opens until the bar's Clear. The ticks are the
+ * page's, as in the table; LibraryPage keeps them and offers the rest of
+ * the page, then every page, in the line above the grid.
  */
 
 /** How long a press lasts before it selects, and how far the finger may wander meanwhile. */
@@ -49,11 +50,16 @@ export interface CoversGridProps {
   layout: Layout;
   /** Books are selected: a cover ticks instead of opening. */
   selecting: boolean;
+  /** The ticked books (LibraryPage keeps them, with what they cover). */
+  selection: Selection;
+  /** A long press: tick this book. */
+  onPress: (book: Book) => void;
+  /** A tap while selecting: tick or untick this book. */
+  onToggle: (book: Book) => void;
 }
 
-export function CoversGrid({ rows, pageStart, total, layout, selecting }: CoversGridProps) {
+export function CoversGrid({ rows, pageStart, total, layout, selecting, selection, onPress, onToggle }: CoversGridProps) {
   const desktop = layout === "desktop";
-  const selection = useLibrarySelection();
   const grid = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ width: 0, margin: 0 });
 
@@ -156,7 +162,7 @@ export function CoversGrid({ rows, pageStart, total, layout, selecting }: Covers
   const selectNow = (book: Book) => {
     cancelPress();
     pressed.current = true;
-    setSelection(withBooks(getSelection(), [book], true));
+    onPress(book);
   };
 
   const onPointerDown = (event: PointerEvent<HTMLElement>, book: Book) => {
@@ -180,7 +186,7 @@ export function CoversGrid({ rows, pageStart, total, layout, selecting }: Covers
     }
     if (selecting) {
       event.preventDefault();
-      setSelection(toggleBook(getSelection(), book));
+      onToggle(book);
       return;
     }
     rememberScroll();

@@ -302,13 +302,13 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
 
 export interface DeleteBooksDialogProps extends DialogProps {
   count: number;
-  /** How many of them the page doesn't show now. */
-  hidden: number;
+  /** The owner chose "Select all": the books run past the page on show. */
+  everyPage: boolean;
   onConfirm: () => Promise<void>;
 }
 
 /** "Delete…": asks first, naming the count, and says there is no undo. Focus starts on "Keep them". */
-export function DeleteBooksDialog({ count, hidden, desktop, returnFocus, onClose, onConfirm }: DeleteBooksDialogProps) {
+export function DeleteBooksDialog({ count, everyPage, desktop, returnFocus, onClose, onConfirm }: DeleteBooksDialogProps) {
   const { pending, failure, save } = useSave(onClose, "The books weren't deleted. Try again.");
   return (
     <DialogFrame title={`Delete ${bookCount(count)}?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
@@ -317,12 +317,7 @@ export function DeleteBooksDialog({ count, hidden, desktop, returnFocus, onClose
           {count === 1 ? "It leaves" : "They leave"} your library with {count === 1 ? "its cover and notes" : "their covers and notes"}, on
           every device. There is no undo.
         </p>
-        {hidden > 0 && (
-          <p className="library-dialog__text">
-            {hidden === 1 ? "1 of them isn't" : `${hidden} of them aren't`} on show now: the search, a filter or the other tab hides{" "}
-            {hidden === 1 ? "it" : "them"}.
-          </p>
-        )}
+        {everyPage && <p className="library-dialog__text">That is every book in this list, on every page, not only the page on show.</p>}
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel={count === 1 ? "Keep it" : "Keep them"} onCancel={onClose}>
           <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} onClick={() => save(onConfirm)}>

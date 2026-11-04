@@ -1,4 +1,4 @@
-import type { Collection } from "@shelfmark/shared";
+import type { Book, Collection } from "@shelfmark/shared";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBooks } from "../books/store";
 import { Button, ButtonLink } from "../components/Button";
@@ -21,8 +21,31 @@ import { Panel } from "./Panel";
 import type { Layout, LibraryPrefs, ViewMode } from "./prefs";
 import { useScrollMemory } from "./scroll";
 import { describeSort, type Sorting } from "./sort";
-import { selectedBooks, type Selection } from "./selection";
-import { clearFilters, getSelection, setPage, updatePrefs, useLibraryPrefs, useLibrarySelection } from "./state";
+import {
+  isSelected,
+  NO_SELECTION,
+  pageTicks,
+  reachedBooks,
+  selectionLine,
+  toggleAll,
+  toggleBook,
+  withBooks,
+  type Selection,
+  type SelectionLine,
+  type SelectionScope,
+} from "./selection";
+import {
+  clearFilters,
+  clearSelection,
+  getSelection,
+  selectionFor,
+  setPage,
+  setSelection,
+  updatePrefs,
+  useLibraryPrefs,
+  useLibrarySelection,
+  type SelectionChoice,
+} from "./state";
 import { Toolbar } from "./Toolbar";
 import { columnApplies, useLibraryView, type LibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
@@ -48,7 +71,8 @@ const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist
  * any column, sorted by any. "14 books, newest first" under the title.
  * The list is shown a page at a time, with the pager under it.
  * While books are selected the bulk bar stands in for the
- * toolbar; Clear puts the toolbar back as it was.
+ * toolbar; Clear puts the toolbar back as it was. The ticks are the page's;
+ * a line above the list offers every page ("Select all").
  */
 export function LibraryPage() {
   const desktop = useIsDesktop();
@@ -67,13 +91,22 @@ export function LibraryPage() {
   const hasBooks = ready && view.total > 0;
   useScrollMemory(ready);
 
-  // The selection can hold books of either tab, and books out of sight; one deleted elsewhere drops out here.
-  const selection = useLibrarySelection();
-  const selected = useMemo(() => selectedBooks(selection, allBooks), [selection, allBooks]);
+  // The ticks belong to the list and the page they were made on (state.ts): another page, sort,
+  // filter, search, tab or size lets them go, except that "Select all" outlives a turn of the page.
+  const choice = useLibrarySelection();
+  const inForce = selectionFor(choice, view.pageBasis, view.page);
+  useEffect(() => {
+    if (ready && choice !== null && inForce === null) clearSelection();
+  }, [ready, choice, inForce]);
+  const ticked = inForce?.books ?? NO_SELECTION;
+  const scope: SelectionScope = inForce?.scope ?? "page";
+  // What a bulk change reaches: the ticked books on the page, or on every page after "Select all".
+  const selected = useMemo(() => reachedBooks(ticked, scope, view), [ticked, scope, view]);
   const selecting = ready && selected.length > 0;
+  const line = ready ? selectionLine(ticked, scope, view) : null;
   // What the last bulk change did, for as long as the selection it was made on stays.
-  const [notice, setNotice] = useState<(BulkNotice & { selection: Selection }) | null>(null);
-  const shownNotice = notice?.selection === selection ? notice : null;
+  const [notice, setNotice] = useState<(BulkNotice & { selection: SelectionChoice | null }) | null>(null);
+  const shownNotice = notice !== null && notice.selection === choice ? notice : null;
   // The bar takes the toolbar's place, and with it the buttons a panel hangs from.
   if (selecting && panel) setPanel(null);
   // Clear (or a delete) took away the focused button with the bar: focus goes on to the toolbar's Filter.
@@ -141,13 +174,37 @@ export function LibraryPage() {
     updatePrefs(layout, (p) => ({ ...p, pageSize }));
   };
 
+  // A tick starts from the selection in force now, and from the page's ticks only, so nothing off the page comes along.
+  const ticksNow = (): { books: Selection; scope: SelectionScope } => {
+    const now = selectionFor(getSelection(), view.pageBasis, view.page);
+    return { books: now?.books ?? NO_SELECTION, scope: now?.scope ?? "page" };
+  };
+  const tick = (next: Selection, nextScope: SelectionScope = "page") => setSelection(next, view.pageBasis, view.page, nextScope);
+  const onToggle = (book: Book) => tick(toggleBook(pageTicks(ticksNow().books, view.pageRows), book));
+  // A long press only ticks; on a book already ticked it keeps "Select all" as it is.
+  const onPress = (book: Book) => {
+    const now = ticksNow().books;
+    if (!isSelected(now, book)) tick(withBooks(pageTicks(now, view.pageRows), [book], true));
+  };
+  // The header's box: the page; after "Select all", it lets go of every book.
+  const onToggleAll = () => {
+    const now = ticksNow();
+    if (now.scope === "all") clearSelection();
+    else tick(toggleAll(pageTicks(now.books, view.pageRows), view.pageRows));
+  };
+  const selectPage = () => tick(withBooks(pageTicks(ticksNow().books, view.pageRows), view.pageRows, true));
+  const selectEverything = () => tick(withBooks(NO_SELECTION, view.rows, true), "all");
+  // The table's header box covers the page, so its line shows only to go past the page or after it;
+  // the covers have no header box, so theirs offers the page too.
+  const shownLine = line !== null && (mode === "covers" || line.kind === "more" || scope === "all") ? line : null;
+
   const count = view.narrowed ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}` : books(view.total);
   const caption = hasBooks ? `${count}, ${describeSort(view.sorting)}` : undefined;
 
   const toolbar = selecting ? (
     <BulkBar
       selected={selected}
-      rows={view.rows}
+      everyPage={scope === "all" && selected.length > view.pageRows.length}
       books={allBooks}
       desktop={desktop}
       onNotice={(next) => setNotice({ ...next, selection: getSelection() })}
@@ -171,7 +228,14 @@ export function LibraryPage() {
   ) : undefined;
 
   return (
-    <Page title="Library" caption={caption} toolbar={toolbar} search={{ placeholder: hasBooks ? `Search ${books(view.total)}` : "Search" }}>
+    <Page
+      title="Library"
+      caption={caption}
+      toolbar={toolbar}
+      search={{ placeholder: hasBooks ? `Search ${books(view.total)}` : "Search" }}
+      wide
+      card
+    >
       {ready && view.counts.owned + view.counts.wishlist > 0 && (
         <div className="library-tabs-row">
           <CollectionTabs view={view} onChange={setCollection} />
@@ -183,7 +247,8 @@ export function LibraryPage() {
       <span className="visually-hidden" role="status">
         {shownNotice?.text ?? ""}
       </span>
-      {selecting && shownNotice?.visible && (
+      {/* It stays when the change took the books off the page (a status filter, say), so the owner sees why they went. */}
+      {shownNotice?.visible && (
         <p className="library-notice" aria-hidden="true">
           {shownNotice.text}
         </p>
@@ -236,14 +301,21 @@ export function LibraryPage() {
         <NoMatch query={view.query} filtered={activeFilters(view.filters).length > 0} />
       ) : (
         <div ref={list} className="library-list">
+          {shownLine && (
+            <SelectionBand line={shownLine} onSelectPage={selectPage} onSelectAll={selectEverything} onClear={clearSelection} />
+          )}
           {mode === "table" ? (
             <BookTable
               rows={view.pageRows}
-              allRows={view.rows}
+              total={view.rows.length}
               pageStart={(view.page - 1) * view.pageSize}
               sorting={view.sorting}
               prefs={tablePrefs}
               layout={layout}
+              selection={ticked}
+              everything={scope === "all" ? selected.length : 0}
+              onToggle={onToggle}
+              onToggleAll={onToggleAll}
             />
           ) : (
             <CoversGrid
@@ -252,6 +324,9 @@ export function LibraryPage() {
               total={view.rows.length}
               layout={layout}
               selecting={selecting}
+              selection={ticked}
+              onPress={onPress}
+              onToggle={onToggle}
             />
           )}
           {showsPager(view.rows.length, view.pageSize) && (
@@ -321,6 +396,44 @@ function CollectionTabs({ view, onChange }: { view: LibraryView; onChange: (coll
           <span className="library-tab__count tabular">{view.counts[id].toLocaleString("en-GB")}</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+interface SelectionBandProps {
+  line: SelectionLine;
+  onSelectPage: () => void;
+  onSelectAll: () => void;
+  onClear: () => void;
+}
+
+/**
+ * The line above the list, Gmail's way (selection.ts `selectionLine`): "Select
+ * all 10 on this page" (covers), then "All 10 books on this page are
+ * selected. Select all 665 books", then "All 665 books are selected. Clear
+ * selection". The same text and button nodes carry each step, so focus
+ * stays on the button pressed.
+ */
+function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBandProps) {
+  const n = (count: number) => count.toLocaleString("en-GB");
+  const [text, action, onClick] =
+    line.kind === "page"
+      ? ["", `Select all ${n(line.page)} on this page`, onSelectPage]
+      : line.kind === "more"
+        ? [
+            line.page === 1 ? "The 1 book on this page is selected." : `All ${n(line.page)} books on this page are selected.`,
+            `Select all ${n(line.total)} books`,
+            onSelectAll,
+          ]
+        : [line.total === 1 ? "The 1 book is selected." : `All ${n(line.total)} books are selected.`, "Clear selection", onClear];
+  return (
+    <div className="library-selectline">
+      <span className="library-selectline__text" role="status">
+        {text}
+      </span>
+      <button type="button" className="button button--quiet button--regular library-selectline__action" onClick={onClick}>
+        {action}
+      </button>
     </div>
   );
 }

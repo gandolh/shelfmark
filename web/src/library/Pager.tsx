@@ -27,7 +27,7 @@ function where(page: number, pages: number, size: number, total: number): string
  * Desktop: the range on the left ("51–100 of 1,234"); on the right
  * Previous, the page numbers with gaps, Next and the "Per page" menu.
  * Phone: Previous, "Page 3 of 25" and Next, with "Per page" as accent text
- * under them. While a size over 50 puts everything on one page, only the
+ * under them. While a size over 10 puts everything on one page, only the
  * range (desktop) and "Per page" stay, so the size can go back down;
  * LibraryPage hides the pager otherwise (`showsPager`).
  *

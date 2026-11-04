@@ -104,30 +104,35 @@ describe("the collection tab", () => {
 });
 
 describe("the page size", () => {
-  it("is 50 on both layouts by default", () => {
-    expect(defaultPrefs("desktop").pageSize).toBe(50);
-    expect(defaultPrefs("phone").pageSize).toBe(50);
+  it("is 10 on both layouts by default", () => {
+    expect(defaultPrefs("desktop").pageSize).toBe(10);
+    expect(defaultPrefs("phone").pageSize).toBe(10);
   });
 
-  it("reads as 50 from prefs stored before there were pages", () => {
+  it("reads as 10 from prefs stored before there were pages", () => {
     const storage = memoryStorage({
       [prefsKey("desktop")]: JSON.stringify({ collection: "owned", view: "table", sorting: [{ id: "added", desc: true }] }),
     });
-    expect(readPrefs(storage, "desktop").pageSize).toBe(50);
+    expect(readPrefs(storage, "desktop").pageSize).toBe(10);
   });
 
-  it("reads as 50 when the stored size isn't one the menu offers", () => {
-    for (const pageSize of [0, 10, 75, "100", null, 1e9]) {
+  it("reads a saved 200, no longer offered, as 10", () => {
+    const storage = memoryStorage({ [prefsKey("desktop")]: JSON.stringify({ pageSize: 200 }) });
+    expect(readPrefs(storage, "desktop").pageSize).toBe(10);
+  });
+
+  it("reads as 10 when the stored size isn't one the menu offers", () => {
+    for (const pageSize of [0, 75, "100", null, 1e9]) {
       const storage = memoryStorage({ [prefsKey("phone")]: JSON.stringify({ pageSize }) });
-      expect(readPrefs(storage, "phone").pageSize).toBe(50);
+      expect(readPrefs(storage, "phone").pageSize).toBe(10);
     }
   });
 
-  it("is remembered per layout", () => {
+  it("keeps a saved size the menu still offers, per layout", () => {
     const storage = memoryStorage();
-    writePrefs(storage, "desktop", { ...defaultPrefs("desktop"), pageSize: 200 });
-    expect(readPrefs(storage, "desktop").pageSize).toBe(200);
-    expect(readPrefs(storage, "phone").pageSize).toBe(50);
+    writePrefs(storage, "desktop", { ...defaultPrefs("desktop"), pageSize: 50 });
+    expect(readPrefs(storage, "desktop").pageSize).toBe(50);
+    expect(readPrefs(storage, "phone").pageSize).toBe(10);
   });
 });
 

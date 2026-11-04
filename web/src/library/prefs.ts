@@ -120,7 +120,7 @@ export function parsePrefs(value: unknown, layout: Layout): LibraryPrefs {
     columnOrder: normalizeOrder(saved.columnOrder),
     columnVisibility: normalizeVisibility(saved.columnVisibility),
     columnSizing: normalizeSizing(saved.columnSizing),
-    // Prefs saved before there were pages have no size: 50, as for anything else unknown.
+    // Prefs saved before there were pages have no size: 10, as for a size no longer offered (200) or anything else unknown.
     pageSize: isPageSize(saved.pageSize) ? saved.pageSize : DEFAULT_PAGE_SIZE,
   };
 }

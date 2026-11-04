@@ -1,6 +1,6 @@
 ---
-summary: How the main table of books works. TanStack Table running in the browser over every book, shown a page at a time in the browser (50 by default, the pager, since 2026-11-02), the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23), and why filtering does not need the server.
-updated: 2026-11-02
+summary: How the main table of books works. TanStack Table running in the browser over every book, shown a page at a time in the browser (10 by default since 2026-11-04, the pager, since 2026-11-02), the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23; the header's box ticks the page and "Select all" every page since 2026-11-04), and why filtering does not need the server.
+updated: 2026-11-04
 ---
 
 # Library table
@@ -25,7 +25,8 @@ list. `LibraryView.rows` keeps its meaning (every book the search and filters
 let through, sorted); `pageRows` is the page's slice of it, from the pure
 helpers in [pagination.ts](../../web/src/library/pagination.ts). Both
 virtualizers stay and get the page's rows. The page size is a pref per layout
-(25, 50, 100 or 200, default 50, the same for Table and Covers). The page is
+(10, 25, 50 or 100, default 10, the same for Table and Covers; 2026-11-04,
+the owner's call after the first week. A saved 200 reads as 10). The page is
 session state in [state.ts](../../web/src/library/state.ts), kept with what
 it was turned on: the tab, the search text, the filters, the sort and the
 size. When any of those changes, or a saved view is applied, the Library is on
@@ -33,7 +34,7 @@ page 1 and the old page is forgotten; Back from a book finds the page and
 `scroll.ts` the scroll within it. A list that shrinks (a filter, a bulk
 delete, a book deleted on another device) shows its new last page. The pager
 sits under the list; it is gone when everything fits on one page, unless a
-size over 50 put more than 50 books there, so "Per page" stays in reach to go
+larger size put more than 10 books there, so "Per page" stays in reach to go
 back down. Turning the page brings the list's top under the top bar, keeps
 focus on the control pressed and reads the new range in a polite live region.
 The arrows in the table and the grid stop at the page's first and last row.
@@ -122,12 +123,14 @@ table does not fit a phone, and pretending otherwise is worse.
 
 ## Selection and the bulk bar
 
-Since 2026-10-23, a box before the columns selects a row; the header's
-box selects every row the search and filters let through (not every book),
-on every page and not only the one on show (2026-11-02), shows a dash when
-only some are, and unselects them once all are. The common alternative, a
-box that ticks only the page plus a "Select all 1,234" offer, was not taken;
-it is the one call the owner may want to revisit. The boxes
+Since 2026-10-23, a box before the columns selects a row. Since 2026-11-04
+the header's box ticks the books on the page on show, shows a dash when only
+some are, and unticks them once all are (the owner's call; the box covered
+every page from 2026-11-02 to 2026-11-04). When the whole page is ticked and
+the list runs past it, a band above the list says "All 10 books on this page
+are selected." and offers **Select all 665 books**, every book the search
+and filters let through; then "All 665 books are selected." with **Clear
+selection**. Gmail's pattern. The boxes
 are drawn by [BookTable.tsx](../../web/src/library/BookTable.tsx) outside
 TanStack's columns and are not in `LIBRARY_COLUMN_IDS`, so the column picker,
 layout memory and saved views never list or store them. In a row, Tab goes
@@ -136,15 +139,24 @@ from the box to the title and the arrows move between rows from either.
 In the covers, a long press (half a second, a finger or a pen, or the mouse
 on the phone's layout) selects a cover. While anything is selected each cover
 is a toggle with a mark in its corner, and a tap ticks it instead of opening
-the book.
+the book. Covers has no header box, so the band also offers "Select all 10 on
+this page" while some covers are ticked, then every page as in the table.
 
-The selection ([selection.ts](../../web/src/library/selection.ts), kept in
-`state.ts` for the session) survives sorting, filtering, searching and
-switching tab until Clear, and survives a turn of the page, so the bar counts
-the selected books out of sight ("3 selected, 1 not shown"). "Not shown"
-counts books the search, a filter or the other tab hides, not books on other
-pages. It keeps each id with the book's `createdAt`,
-so a new book that takes a deleted one's id is not selected.
+**A bulk change never reaches a book off the page unless the owner chose
+"Select all"** (owner, 2026-11-04). The selection
+([selection.ts](../../web/src/library/selection.ts), kept in `state.ts` for
+the session) is held with the list and the page it was made on: a turn of
+the page, a page size, a sort, a filter, the search, the tab or a saved view
+lets it go, and after "Select all" a turn keeps it. `reachedBooks` is the set
+a change sends and the bar counts: the ticked books on the page, or in the
+list after "Select all". Unticking one book after "Select all" goes back to
+the page's ticks. Opening a book and coming Back keeps the selection, as it
+keeps the page. Until 2026-11-04 the selection survived sorting, filtering,
+searching and the tab, and the bar counted the ticked books out of sight
+(", 1 not shown"); both went with the rule. Whether ticks should outlive a
+filter change again is in [open-questions.md](open-questions.md). A
+selection keeps each id with the book's `createdAt`, so a new book that
+takes a deleted one's id is not selected.
 
 While books are selected the **bulk bar** takes the toolbar's place: the
 count, then Move to shelf, Set status, Add tags, Remove tags, Delete and Clear
@@ -156,7 +168,9 @@ deleted ids and the skipped ids ([data-model.md](data-model.md)). A shelf
 change applies to owned books only; the dialog and the line after it say how
 many wishlist books it left out. Tags match case-insensitively. Delete asks
 first, names the count and says there is no undo. The selection stays after a
-change, so another can follow; deleted books drop out of it. A line under the
-tabs says what the last change did. An id the server no longer has (deleted
+change on the same page, so another can follow; deleted books drop out of
+it. Delete after "Select all" says the books run past the page on show. A
+line under the tabs says what the last change did, and stays when the change
+took the ticked books off the page (a status filter, say). An id the server no longer has (deleted
 on another device) is a `400` with nothing changed; the page then fetches the
 list again and asks the owner to retry.

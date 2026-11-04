@@ -6,11 +6,14 @@
  */
 
 /** The sizes the "Per page" menu offers, the same on both layouts. */
-export const PAGE_SIZES = [25, 50, 100, 200] as const;
+export const PAGE_SIZES = [10, 25, 50, 100] as const;
 
 export type PageSize = (typeof PAGE_SIZES)[number];
 
-export const DEFAULT_PAGE_SIZE: PageSize = 50;
+export const DEFAULT_PAGE_SIZE: PageSize = 10;
+
+/** The smallest size: past this many books on one page, a smaller size would page them. */
+const SMALLEST_PAGE_SIZE: PageSize = PAGE_SIZES[0];
 
 export function isPageSize(value: unknown): value is PageSize {
   return PAGE_SIZES.includes(value as PageSize);
@@ -69,10 +72,10 @@ export function pageItems(page: number, count: number): PageItem[] {
 
 /**
  * Whether the Library shows the pager: when the list runs past one page, or
- * past one page at the default size. The second keeps "Per page" in reach
+ * past one page at the smallest size. The second keeps "Per page" in reach
  * after a larger size has put everything on one page, so the owner can go
- * back to 50; at 50 or fewer, 50 books or fewer show no pager at all.
+ * back down to 10; 10 books or fewer show no pager at all.
  */
 export function showsPager(total: number, size: number): boolean {
-  return pageCount(total, size) > 1 || total > DEFAULT_PAGE_SIZE;
+  return pageCount(total, size) > 1 || total > SMALLEST_PAGE_SIZE;
 }

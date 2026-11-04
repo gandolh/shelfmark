@@ -4,11 +4,12 @@ import { clampPage, DEFAULT_PAGE_SIZE, isPageSize, pageCount, pageItems, pageRan
 const list = (n: number) => Array.from({ length: n }, (_, i) => i + 1);
 
 describe("page sizes", () => {
-  it("offers 25, 50, 100 and 200, 50 by default", () => {
-    expect(PAGE_SIZES).toEqual([25, 50, 100, 200]);
-    expect(DEFAULT_PAGE_SIZE).toBe(50);
+  it("offers 10, 25, 50 and 100, 10 by default", () => {
+    expect(PAGE_SIZES).toEqual([10, 25, 50, 100]);
+    expect(DEFAULT_PAGE_SIZE).toBe(10);
+    expect(isPageSize(10)).toBe(true);
     expect(isPageSize(100)).toBe(true);
-    for (const value of [0, 10, 75, "50", null, undefined]) expect(isPageSize(value)).toBe(false);
+    for (const value of [0, 75, 200, "50", null, undefined]) expect(isPageSize(value)).toBe(false);
   });
 });
 
@@ -123,19 +124,19 @@ describe("pageItems", () => {
 });
 
 describe("showsPager", () => {
-  it("is gone while everything fits on one page of 50 or fewer", () => {
-    expect(showsPager(0, 50)).toBe(false);
-    expect(showsPager(50, 50)).toBe(false);
-    expect(showsPager(25, 25)).toBe(false);
+  it("is gone while everything fits on one page of 10 or fewer", () => {
+    expect(showsPager(0, 10)).toBe(false);
+    expect(showsPager(10, 10)).toBe(false);
+    expect(showsPager(7, 25)).toBe(false);
   });
 
   it("shows when the list runs past one page", () => {
+    expect(showsPager(11, 10)).toBe(true);
     expect(showsPager(51, 50)).toBe(true);
-    expect(showsPager(26, 25)).toBe(true);
   });
 
-  it("stays when a larger size put more than 50 books on one page, so the size can go back", () => {
-    expect(showsPager(150, 200)).toBe(true);
-    expect(showsPager(40, 200)).toBe(false);
+  it("stays when a larger size put more than 10 books on one page, so the size can go back", () => {
+    expect(showsPager(11, 25)).toBe(true);
+    expect(showsPager(80, 100)).toBe(true);
   });
 });

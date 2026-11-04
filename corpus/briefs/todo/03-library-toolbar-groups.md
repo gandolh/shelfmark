@@ -11,7 +11,7 @@ is one quiet row (Covers / Table, then "Filter and sort" and "Export" as
 accent text), and Views ends the Owned / Wishlist row.
 
 The toolbar sits on the header card from
-[brief 02](02-library-page-and-width.md), which must be built first.
+[brief 02](../done/02-library-page-and-width.md), which must be built first.
 
 The owner prefers familiar, conventional UI over metaphor: a metaphor-heavy
 design for another app was rejected as hard to navigate. Group by what the

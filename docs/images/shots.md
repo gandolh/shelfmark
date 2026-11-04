@@ -18,6 +18,14 @@ publisher's artwork appears.
 | phone-search.webp | Search for `padurea` finding Pădurea spânzuraților | `set device "iPhone 14"`, open `/shelfmark/`, type `padurea` in the search box; cropped to the top 1300 px | iPhone 14, 390×844 @3x, crop scaled to 780 px | 2026-10-31 |
 | phone-add.webp | Add a book after a lookup that found nothing | Add a book, Type ISBN, `9789730000009` (a made-up ISBN with a valid check digit), Look up. On 2026-10-31 the workspace could reach none of the catalogs, so the note says they didn't answer, and the screen shows the offer to read the CIP block | iPhone 14, scaled to 780 px | 2026-10-31 |
 
+## Due for a retake
+
+- **hero.webp and library-table.webp** (noted 2026-11-04). Since then the
+  Library's title, caption and toolbar sit on a white card, the page fills
+  the window, and it shows 10 books a page with the pager under them. Retake
+  both once the toolbar's grouping is built, so one pass covers both changes.
+  phone-search.webp shows the old phone header too.
+
 ## Not taken
 
 - **The camera scanner.** The headless browser has no camera, so Scan only

@@ -53,7 +53,7 @@ glossary's words: book, collection, Owned, Wishlist.
 - [tokens.css](../../../web/src/styles/tokens.css): `--page-width` stays
   1180 px for every other page. No new token or hue.
 - [Toolbar.tsx](../../../web/src/library/Toolbar.tsx): how its buttons are
-  grouped is [brief 03](03-library-toolbar-groups.md)'s.
+  grouped is [brief 03](../todo/03-library-toolbar-groups.md)'s.
 
 ## What to do
 
@@ -133,3 +133,74 @@ glossary's words: book, collection, Owned, Wishlist.
     under "Sort by".
 - At done time, [library-table.md](../../wiki/library-table.md),
   [design.md](../../wiki/design.md) and `DESIGN.md` say what was built.
+
+## Outcome (2026-11-04)
+
+Built on local `main`, not pushed, not deployed.
+
+- `PAGE_SIZES` is `[10, 25, 50, 100]`, `DEFAULT_PAGE_SIZE` 10. A saved 200
+  reads as 10; a saved 25, 50 or 100 stays. `showsPager` keeps the pager
+  when more than 10 books (the smallest size) sit on one page.
+- The selection in `state.ts` is a `SelectionChoice`: the ticked books,
+  their scope (`page` or `all`), and the page basis and page number they
+  were ticked on. `selectionFor` answers the choice while they still hold
+  (a turn is allowed after "Select all"); LibraryPage clears a choice that
+  no longer applies, as view.ts forgets an old page. `reachedBooks` in
+  `selection.ts` is the set a bulk change sends and the bar counts: ticked
+  books on the page, or in the list after "Select all". Every tick starts
+  from the page's own ticks (`pageTicks`), so nothing off the page comes
+  along.
+- The band above the list (`SelectionBand`, `selectionLine`): "All 10 books
+  on this page are selected. Select all 126 books", then "All 126 books are
+  selected. Clear selection". The same button node carries each step, so
+  focus stays on it. In Covers it also offers "Select all 10 on this page"
+  while some covers are ticked. In the table it stays hidden while the page
+  is the whole list, as the header box already says it.
+- The bar's ", N not shown" is gone. The delete dialog says "That is every
+  book in this list, on every page, not only the page on show" after
+  "Select all".
+- `Page` has `wide` (desktop, no 1180 px cap) and `card` (the header on
+  `--surface` with `--radius-container`); only the Library uses them.
+- The tick-box label is `.library-tick`; `.library-select` is the sort
+  select's wrapper only.
+
+Calls made beyond the brief:
+
+- On a phone the card runs edge to edge with its lower corners rounded and
+  the header's old padding. Inset in the 16 px gutters it took 28 px from
+  the toolbar row, which then wrapped at 390 px (Covers / Table, "Filter and
+  sort" and "Export" need 334 px).
+- The "what the last change did" line stays when the change took the ticked
+  books off the page (a status filter, say), so the owner sees why they
+  went; before, it showed only while the bar was up.
+- Unticking one book after "Select all", or a long press on one, goes back
+  to the page's ticks; a long press on a book already ticked changes nothing.
+- Clearing the selection on a sort, filter, search, tab or saved view goes a
+  step past what the owner said; it is in
+  [open-questions.md](../../wiki/open-questions.md).
+
+Checks: `npm run typecheck`, `npm run lint`, and the unit tests in
+`web/src/library/` (10 files, 129 tests; `selection.test.ts` rewritten for
+the page, `pagination` and `prefs` for the sizes). The full `npm test` was
+not run, per the lightweight tests decision. Nothing called Google Books or
+any catalog.
+
+Browser look on a scratch `DATA_DIR` (126 owned and 6 wishlist made-up
+books added through `POST /api/books`, no ISBNs, `CIP_REFRESH=off`, no
+Google key): at 1920 px the table and the covers run the window less the
+gutters, the table has no sideways scroll, and a book page is still
+1180 px; the header box ticks 10 and the band offers 126; after it the bar
+says 126, a turn to page 13 keeps them, the delete dialog says every page;
+unticking one leaves the page's 5; Previous then leaves nothing ticked.
+"Per page" lists 10, 25, 50, 100. At 1280 px the table fits. On a Pixel 7
+(412 px), 390 px and 360 px: the card, the toolbar row as before (it wraps
+at 360 px, as it did), a long press then the band's "Select all 10 on this
+page" then "Select all 126 books", and the sort picker under "Sort by" in
+"Filter and sort".
+
+Seen, not changed: at 1920 px the covers grid fits 11 across, so a page of
+10 leaves its one row short.
+
+Owner: deploy the web app from `vps-deploy` with
+`node cli.ts shelfmark deploy`, then on the Android phone check the header
+card, a long press and the band in Covers, and "Filter and sort".

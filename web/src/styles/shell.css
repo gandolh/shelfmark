@@ -374,6 +374,21 @@
   padding: 36px var(--gutter-desktop) 48px;
 }
 
+/* Desktop, `wide`: the window's width less the gutters (the Library). */
+.shell--desktop .page--wide {
+  max-width: none;
+}
+
+/* `card`: the header on a white card like the table's container; flat, as every card is. */
+.page--card .page__header {
+  border-radius: var(--radius-container);
+  background: var(--surface);
+}
+
+.shell--desktop .page--card .page__header {
+  padding: 22px 24px;
+}
+
 /* Phone: the large title with the account button, then search and toolbar. */
 .shell--phone .page__header {
   padding: 14px var(--gutter-phone) 12px;
@@ -399,6 +414,16 @@
 
 .shell--phone .page__body {
   padding: 4px var(--gutter-phone) 24px;
+}
+
+/*
+ * Phone, `card`: the card runs edge to edge under the top of the screen, its
+ * lower corners rounded, with the header's own padding, so the toolbar row
+ * keeps every pixel it had (it fills 390 px today).
+ */
+.shell--phone .page--card .page__header {
+  margin-bottom: 10px;
+  border-radius: 0 0 var(--radius-container) var(--radius-container);
 }
 
 /* Phone, `bleed`: the content fills the screen down to the tab bar. */

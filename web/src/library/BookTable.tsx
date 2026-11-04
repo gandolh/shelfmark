@@ -31,9 +31,9 @@ import { SortIcon } from "./icons";
 import { TAB_BAR_HEIGHT } from "../layout/viewport";
 import { normalizeOrder, normalizeSizing, normalizeVisibility, type Layout, type LibraryPrefs } from "./prefs";
 import { rememberScroll } from "./scroll";
-import { isSelected, selectAllState, toggleAll, toggleBook, type Selection } from "./selection";
+import { isSelected, selectAllState, type Selection } from "./selection";
 import { directionLabel, toggleSort, type Sorting } from "./sort";
-import { getSelection, setSelection, updatePrefs, useLibrarySelection } from "./state";
+import { updatePrefs } from "./state";
 
 /**
  * The Table view (design.md, the `Covers-Desktop` mock-up): one white
@@ -53,9 +53,10 @@ import { getSelection, setSelection, updatePrefs, useLibrarySelection } from "./
  * with Enter adds a key); the handle between headers resizes with ← →.
  *
  * Before the columns, a box per row selects the book for the bulk bar,
- * and the header's box selects every book the search and filters let
- * through (`allRows`, on every page, not just this one), or none of them
- * once they all are. The boxes are not a TanStack column: column order,
+ * and the header's box selects the books on this page, or none of them
+ * once they all are; every page is the "Select all" line's (LibraryPage).
+ * After "Select all" the header's box lets go of every book. The boxes
+ * are not a TanStack column: column order,
  * visibility, widths and saved views never see them. In the row, Tab goes
  * from the box to the title; the arrows move between rows in either.
  */
@@ -71,7 +72,7 @@ const helper = createColumnHelper<typeof features, Book>();
 
 /** 12 + the 69 px cover + 12, and the divider over it. */
 export const ROW_HEIGHT = 94;
-/** The select boxes' track: the table's edge padding and the box (library.css, `.library-select`). */
+/** The select boxes' track: the table's edge padding and the box (library.css, `.library-tick`). */
 const SELECT_WIDTH = { desktop: 48, phone: 44 } as const;
 const MAX_WIDTH = 1200;
 const EMPTY: Book[] = [];
@@ -104,9 +105,11 @@ interface RowNav {
   tabbable: number;
   onFocus: (index: number) => void;
   onKeyDown: (event: KeyboardEvent<HTMLElement>, index: number, part: RowPart) => void;
+  /** A row's box pressed. */
+  onToggle: (book: Book) => void;
 }
 
-const RowNavContext = createContext<RowNav>({ tabbable: 0, onFocus: () => {}, onKeyDown: () => {} });
+const RowNavContext = createContext<RowNav>({ tabbable: 0, onFocus: () => {}, onKeyDown: () => {}, onToggle: () => {} });
 
 function Cell({ column, book, index }: { column: LibraryColumn; book: Book; index: number }) {
   if (column.id === BOOK_COLUMN_ID) return <BookCell book={book} index={index} />;
@@ -144,13 +147,13 @@ function SelectCell({ book, index, selected }: { book: Book; index: number; sele
   const nav = useContext(RowNavContext);
   return (
     <div role="cell" className="library-table__cell library-table__cell--select">
-      <label className="library-select">
+      <label className="library-tick">
         <input
           type="checkbox"
           checked={selected}
           aria-label={`Select “${book.title}”`}
           tabIndex={nav.tabbable === index ? 0 : -1}
-          onChange={() => setSelection(toggleBook(getSelection(), book))}
+          onChange={() => nav.onToggle(book)}
           onFocus={() => nav.onFocus(index)}
           onKeyDown={(event) => nav.onKeyDown(event, index, "select")}
         />
@@ -159,28 +162,40 @@ function SelectCell({ book, index, selected }: { book: Book; index: number; sele
   );
 }
 
-/** The header's box: all, some (a dash) or none of the books the search and filters let through, on every page. */
-function SelectAllCell({ rows, paged, selection }: { rows: readonly Book[]; paged: boolean; selection: Selection }) {
+/** The header's box: all, some (a dash) or none of the books on this page; after "Select all", every book. */
+function SelectAllCell({ rows, everything, selection, onToggle }: SelectAllCellProps) {
   const state = selectAllState(selection, rows);
   const box = useRef<HTMLInputElement>(null);
   useLayoutEffect(() => {
     if (box.current) box.current.indeterminate = state === "some";
   }, [state]);
-  const count = rows.length.toLocaleString("en-GB");
-  const shown = rows.length === 1 ? "the 1 book shown" : paged ? `all ${count} books, on every page` : `all ${count} books shown`;
+  const shown = everything
+    ? `all ${everything.toLocaleString("en-GB")} books`
+    : rows.length === 1
+      ? "the 1 book on this page"
+      : `the ${rows.length.toLocaleString("en-GB")} books on this page`;
   return (
     <div role="columnheader" className="library-table__cell library-table__cell--select">
-      <label className="library-select">
+      <label className="library-tick">
         <input
           ref={box}
           type="checkbox"
           checked={state === "all"}
           aria-label={state === "all" ? `Unselect ${shown}` : `Select ${shown}`}
-          onChange={() => setSelection(toggleAll(getSelection(), rows))}
+          onChange={onToggle}
         />
       </label>
     </div>
   );
+}
+
+interface SelectAllCellProps {
+  /** The page's rows. */
+  rows: readonly Book[];
+  /** After "Select all": how many books that ticked, on every page; 0 otherwise. */
+  everything: number;
+  selection: Selection;
+  onToggle: () => void;
 }
 
 /** A plain click anywhere on a row opens its book, as the title link does. */
@@ -197,18 +212,24 @@ function onRowClick(event: MouseEvent<HTMLDivElement>, book: Book): void {
 export interface BookTableProps {
   /** The page's rows: what the table renders. */
   rows: readonly Book[];
-  /** Every book the search and filters let through, on every page: the header's box selects these. */
-  allRows: readonly Book[];
-  /** How many books come before this page, for the rows' positions in the whole list. */
+  /** How many books the search and filters let through, on every page, and how many come before this page: the rows' positions in the whole list. */
+  total: number;
   pageStart: number;
   sorting: Sorting;
   prefs: LibraryPrefs;
   layout: Layout;
+  /** The ticked books (LibraryPage keeps them, with what they cover). */
+  selection: Selection;
+  /** After "Select all": how many books that ticked; 0 while the ticks are the page's. */
+  everything: number;
+  /** A row's box pressed. */
+  onToggle: (book: Book) => void;
+  /** The header's box pressed. */
+  onToggleAll: () => void;
 }
 
-export function BookTable({ rows, allRows, pageStart, sorting, prefs, layout }: BookTableProps) {
+export function BookTable({ rows, total, pageStart, sorting, prefs, layout, selection, everything, onToggle, onToggleAll }: BookTableProps) {
   const desktop = layout === "desktop";
-  const selection = useLibrarySelection();
   const selectWidth = SELECT_WIDTH[layout];
 
   const table = useTable({
@@ -309,7 +330,7 @@ export function BookTable({ rows, allRows, pageStart, sorting, prefs, layout }: 
       pendingFocus.current = null;
       return;
     }
-    const selector = pending.part === "select" ? ".library-select input" : ".library-book__title";
+    const selector = pending.part === "select" ? ".library-tick input" : ".library-book__title";
     const target = body.current?.querySelector<HTMLElement>(`[data-index="${pending.index}"] ${selector}`);
     if (target) {
       pendingFocus.current = null;
@@ -328,6 +349,7 @@ export function BookTable({ rows, allRows, pageStart, sorting, prefs, layout }: 
   const nav: RowNav = {
     tabbable,
     onFocus: setActive,
+    onToggle,
     onKeyDown: (event, index, part) => {
       const steps: Record<string, () => number> = {
         ArrowDown: () => index + 1,
@@ -388,14 +410,14 @@ export function BookTable({ rows, allRows, pageStart, sorting, prefs, layout }: 
         className="library-table"
         role="table"
         aria-label="Books"
-        aria-rowcount={allRows.length + 1}
+        aria-rowcount={total + 1}
         aria-colcount={headers.length + 1}
         style={style}
       >
         <div ref={head} className="library-table__head">
           <div role="rowgroup">
             <div role="row" aria-rowindex={1} className="library-table__row library-table__row--head">
-              <SelectAllCell rows={allRows} paged={allRows.length > rows.length} selection={selection} />
+              <SelectAllCell rows={rows} everything={everything} selection={selection} onToggle={onToggleAll} />
               {headers.map((header) => (
                 <HeaderCell key={header.id} header={header} sorting={sorting} onSort={onSort} onResize={onResize} />
               ))}

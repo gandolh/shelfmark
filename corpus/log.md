@@ -629,7 +629,7 @@ scratch database, desktop and a Pixel 7 profile. [library-table.md](wiki/library
 
 The owner looked at the live Library (a 1920 px desktop screenshot of 665
 books, and Covers' "Filter and sort" sheet on the phone) and settled two
-briefs in a grill. [Brief 02](briefs/todo/02-library-page-and-width.md): 10,
+briefs in a grill. [Brief 02](briefs/done/02-library-page-and-width.md): 10,
 25, 50 or 100 books a page, 10 by default; the header's tick box ticks the
 page, with a Gmail-style line offering every page, and a bulk change never
 reaches a book off the page unless the owner chose "Select all"; the Library
@@ -638,3 +638,25 @@ phone's sort picker that floated over the filter rows (two rules sharing
 `.library-select`). [Brief 03](briefs/todo/03-library-toolbar-groups.md):
 the toolbar's buttons in groups instead of one row of identical pills; a
 design step with alternatives first, then the owner's pick, then the build.
+
+## [2026-11-04] build | Brief 02 — Ten a page, the page's tick box, the full width, a header card
+
+[Brief 02](briefs/done/02-library-page-and-width.md) built on local `main`,
+not deployed. "Per page" offers 10, 25, 50 and 100, 10 by default; a saved
+200 reads as 10. The header's box ticks the page; a band above the list
+offers every book ("Select all"), then Clear. A bulk change reaches only the
+ticked books on the page unless the owner chose "Select all", and the
+selection is let go when the page, the sort, a filter, the search, the tab,
+the size or a saved view changes ("Select all" outlives a turn). That
+reverses the 2026-10-23 rule that the selection survives filtering and
+searching; whether it should outlive a filter again is in
+[open-questions.md](wiki/open-questions.md). ", N not shown" is gone. The
+Library fills the window on the desktop; its header sits on a white card
+(edge to edge on a phone, so the toolbar row keeps its width). The phone's
+sort picker floated over the filter rows because the table's tick-box
+label shared `.library-select`; it is `.library-tick` now. Checked with the
+typecheck, lint, 129 unit tests and a browser look on a scratch database
+at 1920, 1280, 412, 390 and 360 px. [library-table.md](wiki/library-table.md),
+[design.md](wiki/design.md), `DESIGN.md` and [status.md](wiki/status.md)
+say what was built. The README images show the old header; a retake is
+noted in `docs/images/shots.md`.

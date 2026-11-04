@@ -1,6 +1,6 @@
 ---
-summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-11-02
+summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card and full width (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
+updated: 2026-11-04
 ---
 
 # Design
@@ -100,6 +100,19 @@ Two places only: **Library** and **Add a book**.
   each as Excel (.xlsx) or CSV ([export.md](export.md)).
 - Pages (2026-11-02): the pager under the list; DESIGN.md's Library bullets
   hold its look ([library-table.md](library-table.md)).
+- **Full width and a header card** (owner, 2026-11-04, from a 1920 px
+  screenshot where the table scrolled sideways with empty space either
+  side). On the desktop the Library runs the window's width less the 40 px
+  gutters; every other page keeps the 1180 px column. The title, caption and
+  toolbar sit on a white card like the table's container (`surface`, 16 px
+  radius, flat); the Owned / Wishlist tabs stay on the ground under it. On a
+  phone the card runs edge to edge with its lower corners rounded, so the
+  toolbar row keeps the width it had. The toolbar's buttons are still one
+  row of like pills; grouping them is
+  [brief 03](../briefs/todo/03-library-toolbar-groups.md), alternatives
+  first.
+- The "Select all" band above the list (2026-11-04) wears the selected
+  row's faint teal wash with the action as accent text.
 
 ## Add a book
 
