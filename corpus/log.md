@@ -660,3 +660,15 @@ at 1920, 1280, 412, 390 and 360 px. [library-table.md](wiki/library-table.md),
 [design.md](wiki/design.md), `DESIGN.md` and [status.md](wiki/status.md)
 say what was built. The README images show the old header; a retake is
 noted in `docs/images/shots.md`.
+
+## [2026-11-04] design | Brief 03 — the toolbar's alternatives
+
+[Brief 03](briefs/todo/03-library-toolbar-groups.md)'s design step: four
+groupings of the Library toolbar on the new header card, at desktop and
+phone widths, with Shelfmark's tokens and made-up books, in one private
+design canvas linked from the brief. A spaces the groups with dividers; B
+joins Views, Filter and Columns in one button group; C splits the card
+into a row of library actions (Export, Add a book) and a row of list
+controls; D makes the tools quiet icon-and-text buttons with Add a book the
+only filled control. Nothing is built; the brief stays in `todo/` until the
+owner picks.

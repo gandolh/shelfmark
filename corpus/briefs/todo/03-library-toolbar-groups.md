@@ -22,8 +22,27 @@ Columns), Export, and the one primary action (Add a book).
 
 1. **Design (done 2026-11-04).** Four alternatives on the header card, at
    desktop width and at phone width, with Shelfmark's real tokens and
-   made-up books, in one artifact:
-   <https://claude.ai/code/artifact/PENDING>
+   made-up books, in one private design canvas (page "Options"; today's
+   toolbar is the first row, for comparison):
+   <https://claude.ai/artifact/PojzgG7Ksm5yQgLBYnqbe5>
+   - **A. Spaced groups.** The same buttons, with wider gaps and a thin
+     divider between the view switch, the list tools and Export; Add a book
+     the accent pill. Phone: today's row with dividers. The smallest change.
+   - **B. One button group.** Views, Filter and Columns joined in one grey
+     group with hairlines between them; the view switch gains icons; Export
+     a plain icon-and-text button; Add a book the pill with a plus. Phone:
+     a two-icon view switch, Views and "Filter and sort" joined, Export as
+     an icon; Views leaves the tabs row.
+   - **C. Two rows.** Export and Add a book beside the title, as actions on
+     the library; under a divider inside the card, the view switch on the
+     left and Views, Filter, Columns as quiet icon-and-text buttons on the
+     right. Phone: Export as an icon by the account button, Views joins
+     "Filter and sort" in the toolbar row, and the tabs row holds only the
+     tabs.
+   - **D. Quiet tools with icons.** One row: the view switch as two icons,
+     Views, Filter, Columns and Export as unfilled icon-and-text buttons in
+     ink-2 with a divider before Export, Add a book the only filled control.
+     Phone: the same quiet style, Views stays at the end of the tabs.
 2. **The owner picks one.** Stop here until the owner has chosen. Record the
    pick and its date in this brief.
 3. **Build the pick.** Only then, and only what the pick draws.

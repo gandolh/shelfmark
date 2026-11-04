@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar's groups (brief 03) in its design step. Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar's groups (brief 03) waiting on the owner's pick of four alternatives. Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
 updated: 2026-11-04
 ---
 
@@ -13,7 +13,8 @@ at 01 on 2026-11-02 (see [log.md](../log.md)). Brief 02,
 [ten a page, the page's tick box, the full width, a header card](../briefs/done/02-library-page-and-width.md),
 was built on 2026-11-04 on local `main`, not pushed and not deployed. Brief
 03, [the toolbar in groups](../briefs/todo/03-library-toolbar-groups.md),
-waits for its design step. The product calls are in
+has four alternatives in a design canvas (linked in the brief) and waits for
+the owner's pick. The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
@@ -46,8 +47,8 @@ waits for its design step. The product calls are in
   a book off the page otherwise; the Library fills the desktop window under
   a white header card; the phone's sort picker sits under "Sort by" again.
   Web only; not deployed.
-- **The toolbar in groups** (brief 03). Design step first, then the
-  owner's pick, then the build.
+- **The toolbar in groups** (brief 03). Four alternatives published on
+  2026-11-04; the build waits for the owner's pick.
 
 ## Next (owner)
 
@@ -58,8 +59,10 @@ waits for its design step. The product calls are in
    page" then "Select all", and "Filter and sort" (the sort picker under
    "Sort by"). On the desktop at full width: the table with no sideways
    scroll.
-2. **Say whether ticks should outlive a filter change**
-   ([open-questions.md](open-questions.md)).
+2. **Pick a toolbar** for [brief 03](../briefs/todo/03-library-toolbar-groups.md)
+   from the four alternatives linked there (A spaced groups, B one button
+   group, C two rows, D quiet tools with icons), and say whether ticks
+   should outlive a filter change ([open-questions.md](open-questions.md)).
 3. The Google Books key is in the deploy secrets, and the Romanian
    measurement ran on 2026-10-17 (Google found none of 80;
    [metadata-lookup.md](metadata-lookup.md)).
