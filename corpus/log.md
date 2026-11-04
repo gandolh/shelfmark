@@ -624,3 +624,17 @@ Checked with the typecheck, lint, 70 unit tests and a browser walk on a
 scratch database, desktop and a Pixel 7 profile. [library-table.md](wiki/library-table.md),
 [export.md](wiki/export.md), [design.md](wiki/design.md), `DESIGN.md` and
 [status.md](wiki/status.md) say what was built.
+
+## [2026-11-04] todo | Briefs 02 and 03 — the Library after a look at it live
+
+The owner looked at the live Library (a 1920 px desktop screenshot of 665
+books, and Covers' "Filter and sort" sheet on the phone) and settled two
+briefs in a grill. [Brief 02](briefs/todo/02-library-page-and-width.md): 10,
+25, 50 or 100 books a page, 10 by default; the header's tick box ticks the
+page, with a Gmail-style line offering every page, and a bulk change never
+reaches a book off the page unless the owner chose "Select all"; the Library
+fills the window on the desktop; its title row sits on a white card; and the
+phone's sort picker that floated over the filter rows (two rules sharing
+`.library-select`). [Brief 03](briefs/todo/03-library-toolbar-groups.md):
+the toolbar's buttons in groups instead of one row of identical pills; a
+design step with alternatives first, then the owner's pick, then the build.
