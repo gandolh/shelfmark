@@ -704,3 +704,23 @@ The owner answered the question brief 03 left: the account menu's "Export librar
 choices, Excel and CSV, rather than one row. CSV is what "Import a CSV" reads back. The question is
 deleted from [open-questions.md](wiki/open-questions.md); [export.md](wiki/export.md) already
 describes it as built.
+
+## [2026-11-09] todo | Brief 04: book recommendations
+
+The owner asked for a page of recommendations drawn from the library that
+never repeats a book already in the database. Research for the brief:
+
+- Open Library's search source: its sorts, and the series fields that make
+  "next in a series" possible;
+- the Romanian catalogs' author search;
+- the hallucination record of language-model recommendations;
+- lantern's suggestion scoring.
+
+The defaults it builds:
+
+- catalogs only;
+- a refresh on a press;
+- a third place in the navigation, which revisits "Two places only".
+
+These wait on the owner's grilling on 2026-11-10. See the
+[brief](briefs/todo/04-book-recommendations.md).
