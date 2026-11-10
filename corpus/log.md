@@ -723,7 +723,7 @@ The defaults it builds:
 - a third place in the navigation, which revisits "Two places only".
 
 These wait on the owner's grilling on 2026-11-10. See the
-[brief](briefs/todo/04-book-recommendations.md).
+[brief](briefs/todo/04-wishlist-with-recommendations.md).
 
 ## [2026-11-10] todo | Briefs 05-08: the owner's estate calls of 2026-11-09 applied to Shelfmark
 
@@ -752,3 +752,35 @@ differ from the estate drafts:
 The defaults wait on the owner's grilling of 2026-11-10. Brief 04
 (recommendations) is unchanged; whichever lands second adopts the first's
 styling and layout.
+
+## [2026-11-10] decision | Brief 04 rewritten as Wishlist; "Two places only" revisited; briefs 05-08 revised; brief 09 added
+
+The owner's grilling of 2026-11-10 (Q36) changed brief 04. The third place in
+the navigation is **Wishlist**; it takes the wishlist out of Library and holds
+the wished-for books plus the recommendations, with an Add a book button. Where
+the picks come from, in order: a spike on the owner's real library of TasteDive
+and a small embedding model (all-MiniLM-L6-v2, about 23 MB, run in Node);
+otherwise a download of the library with a prompt for Claude and an Import
+button for the JSON it returns; and that path stays as a second source if the
+spike works. The file is now
+[04-wishlist-with-recommendations.md](briefs/todo/04-wishlist-with-recommendations.md).
+
+**Revisit:** [decisions.md](wiki/decisions.md) now says "Two places only" was
+revisited on 2026-11-10: three places, Library, Add a book and Wishlist, for
+the owner's request. The old entry stays. The wishlist wording elsewhere
+(design.md, DESIGN.md, PRODUCT.md, import.md) changes when brief 04 is built.
+
+Briefs 05-08 were revised to the owner's and the technical calls: house-style
+vendored (05), Prettier width 120 with its one-off cost (628 lines in 140
+files), `!` an error in source and a warning in tests, the 7 switch findings
+to 0 with `considerDefaultExhaustiveForUnions`; Base UI by the conventions
+(06) keeps the inline confirms and the two delete dialogs as dialogs, sets
+`disablePointerDismissal` on form dialogs and drops the collection tabs the
+Wishlist removes; Tailwind (07) gains the Light / Dark / System switch, moves
+the 15 px root onto `body` and takes "close enough" parity; the server (08)
+renames the entry and the Dockerfile `CMD` in one commit, keeps "nothing
+boots the app" (tests without `inject()`), and puts the transform-free
+saved-view output schema in the views feature. Order: 05, 04, 06, 07, 09, with
+08 apart from 06 and 07. Brief 09, [a redesign with Hallmark, on the estate
+board](briefs/todo/09-a-redesign-with-hallmark-on-the-estate-board.md), covers
+Library, Add a book, Wishlist and the rest.

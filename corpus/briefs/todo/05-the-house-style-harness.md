@@ -4,11 +4,11 @@
 
 - In Shelfmark: nothing. This brief runs first.
 - In the owner's skills library:
-  - brief 27, *A house style, and a quality harness that enforces it*: the `house-style` package at `v1.0.0`, the `house-style` skill, the plugin's `Stop` and `PostToolUse` hooks;
+  - brief 27, *A house style, and a quality harness that enforces it*: the `house-style` package at `v1.0.0` (vendored into each repo, see decision 1), the `house-style` skill, the plugin's `Stop` and `PostToolUse` hooks;
   - brief 15, *Enforce the base-ui and code-structure skills in every repo*: how the two convention checkers are wired, and when they run `--warn-only`.
-- The owner's grilling of 2026-11-10, questions Q5-Q14 of the skills library's open questions.
+- The owner's grilling of 2026-11-10: the technical calls Q6-Q14, Q45-Q48 and Q51 (all decided below).
 
-**Runs before:** 06, 07 and 08. The reformat touches 98 TypeScript files, and those briefs rewrite or move most of them. Format first, once.
+**Runs before:** 04, 06, 07 and 08. The reformat at width 120 touches 140 files (about 628 lines), and those briefs rewrite or move most of them. Format first, once.
 
 **Before you start:** run `brief-board guide` ([corpus/CLAUDE.md](../../CLAUDE.md)).
 
@@ -33,24 +33,24 @@ On a scratch copy (`git ls-files` copied outside the repo, then `npm ci --ignore
 
 **Baseline.** `npx tsc -b` 6.0 s and `npx tsc -p web --noEmit` 8.3 s, both clean. `npx eslint .` 12.2 s, 0 findings. `npx vitest run`: 63 files, 743 tests, 5.5 s.
 
-**Prettier churn.** `prettier --print-width <N> --trailing-comma all --write` over the 235 TypeScript and JavaScript files outside `vendor/` (32,068 lines), counting old lines changed with `diff old new | grep -c '^<'`:
+**Prettier churn** (measured 2026-11-10 at several widths; the owner's estate width is 120, Q8 and Q51). `prettier --print-width <N> --trailing-comma all --write` over the 235 TypeScript and JavaScript files outside `vendor/` (32,068 lines), counting old lines changed with `diff old new | grep -c '^<'`:
 
 | `printWidth` | Lines changed | Files changed |
 |---|---|---|
 | 100 | 1,540 | 194 |
 | 110 | 997 | 175 |
-| 120 | 628 | 140 |
-| **130** | **391 (1.2%)** | **98** |
+| **120 (chosen)** | **628 (2.0%)** | **140** |
+| 130 | 391 (1.2%) | 98 |
 | 135 | 474 | 97 |
 | 140 | 588 | 94 |
 | 150 | 868 | 115 |
 
-130 is Shelfmark's least churn, as it is in Almanac. The other file types at 130:
+Shelfmark's least churn is 130, but the estate takes one width, 120 (Q8 and Q51), so **the one-off cost is 628 lines in 140 files, 237 lines and 42 files more than at 130.** The other file types, measured at 130 and re-measured at 120 on a scratch copy:
 
-- **CSS:** 29 lines, all in `web/src/styles/tokens.css` (hex colours lowercased).
-- **JSON:** 147 lines in 13 files, **all recorded fixtures** under `server/src/**/fixtures/`. Those must stay byte-for-byte; they go in `.prettierignore`.
+- **CSS:** 29 lines, all in `web/src/styles/tokens.css` (hex colours lowercased), the same at 120.
+- **JSON:** at 130, 147 lines in 13 files, **all recorded fixtures** under `server/src/**/fixtures/`. Those must stay byte-for-byte at any width; they go in `.prettierignore`.
 - **HTML:** 0.
-- **Markdown:** 252 lines in 23 files.
+- **Markdown:** 271 lines in 23 files at 120. Markdown stays out of Prettier (Q45).
 
 **TypeScript flags** (added to `tsconfig.base.json` one at a time, then run `npx tsc -b` and `npx tsc -p web --noEmit`):
 
@@ -104,19 +104,20 @@ On a scratch copy (`git ls-files` copied outside the repo, then `npm ci --ignore
 
 ## Owner decisions (defaults this brief builds)
 
-1. **Where the configs come from** (Q6). Default: the `house-style` package, extended from Shelfmark's configs. The Docker `deps` stage has no `git`, and `server/tsconfig.json` would extend the package's base. Depend on the tagged tarball URL, which npm fetches without git; if the owner prefers `github:`, add `git` to the `apk add` line in the same commit. If Q6 goes the other way, the same rules land as local files with a version header.
-2. **Width** (Q8). Default: the estate's one width; if it isn't settled, 130, recorded.
-3. **Markdown and fixtures stay out of Prettier.** Default: `.prettierignore` lists `*.md` and `**/fixtures/`. *New question for the grilling* (the fixtures part is not optional: they are recordings).
-4. **tsconfig** (Q11). Default: add `verbatimModuleSyntax` and `erasableSyntaxOnly`, not `exactOptionalPropertyTypes` (63 web errors).
-5. **Typed lint** (Q12). Default: the six rules through `projectService`, with `considerDefaultExhaustiveForUnions: true` on `switch-exhaustiveness-check`, since the house writes a `default:` on its unions.
-6. **The house shapes** (Q13). Default: errors, with two departures that the counts force:
-   - **`no-non-null-assertion`: error in source (fix the 43), warning in `*.test.ts` (80 left, listed).** 123 is far past the roughly 20 that brief 27 says to bring back to the owner. *New question for the grilling*: fix the tests too, or leave the warning?
+1. **Where the configs come from** (decided 2026-11-10, technical call, Q6): `house-style` is **vendored**, not a git, `github:` or tarball dependency. Shelfmark holds a copy with a version header, refreshed by a `house-style:sync` script that finds the `house-style` checkout by name. The Docker `deps` stage has no `git`, and a git dependency would need it in every build; a vendored copy needs nothing. Shelfmark's configs extend the vendored copy, and the Dockerfile is not touched.
+2. **Width** (decided 2026-11-10, owner-confirmed estate call, Q8 and Q51): **120**. The one-off reformat is 628 lines in 140 files (table above).
+3. **Markdown and fixtures stay out of Prettier** (decided 2026-11-10, technical call, Q45 for Markdown; fixtures are recordings and must stay byte for byte). `.prettierignore` lists `*.md` and `**/fixtures/`.
+4. **tsconfig** (decided 2026-11-10, technical call, Q11 and Q50): add `verbatimModuleSyntax` and `erasableSyntaxOnly` now; `exactOptionalPropertyTypes` waits for a count (63 web errors today), in a later brief. `noUncheckedIndexedAccess` is already on. TypeScript is 6.0.3, past the 5.8 floor.
+5. **Typed lint** (decided 2026-11-10, technical call, Q12 and Q48): the six rules through `projectService`, with `considerDefaultExhaustiveForUnions: true` on `switch-exhaustiveness-check` (the 7 findings go to 0), and `no-floating-promises` naming `describe`/`it`/`test` in `allowForKnownSafeCalls` only if the repo's tests use `node:test` (they use vitest, so no).
+6. **The house shapes** (decided 2026-11-10, technical call, Q13 and Q47): errors, with these departures:
+   - **`no-non-null-assertion`: an error in source (fix the 43), a warning in `*.test.ts` (80 left, listed)** (Q47). 123 findings stand; the owner's rule is the warning in tests.
    - **`no-process-env`** is a warning, because its five findings are brief 08's.
-   - `ScannerDemo.tsx:150` is allowed a default export by an ESLint override (a `lazy` import needs it).
-7. **`check:fast`** (Q10). Default: typecheck plus ESLint on the changed files, about 11 s warm.
-8. **The Claude Code layer** (Q7). Default: the plugin's hooks.
-9. **A root `CLAUDE.md`.** Default: create one and move the Hard rules and brief-board sections out of [corpus/CLAUDE.md](../../CLAUDE.md). *New question for the grilling.*
+   - `console` is allowed in scripts and CLIs; a default export is allowed where a framework needs one, so `ScannerDemo.tsx:150` (a `lazy` import) and the config files get an ESLint override (Q13).
+7. **`check:fast`** (decided 2026-11-10, technical call, Q10): typecheck plus ESLint on the changed files, built incrementally; about 11 s warm, under the 15 s target.
+8. **The Claude Code layer** (decided 2026-11-10, technical call, Q7): the plugin's `Stop` hook runs `check:fast`, its `PostToolUse` hook formats the saved file.
+9. **A root `CLAUDE.md`** (decided 2026-11-10, technical call, Q46): yes, short, with the commands. The Hard rules and brief-board sections move out of [corpus/CLAUDE.md](../../CLAUDE.md).
 10. **`pretest`.** Default: add `"pretest": "tsc -b shared"`, as Almanac has.
+11. **The deploy** (decided 2026-11-10, fact, Q1): the build runs `npm ci` and `npx tsc -b server`, no tests or lint, and stays as it is. `npm run check` and the `Stop` hook are the gate.
 
 ## Files you OWN
 
@@ -127,12 +128,13 @@ On a scratch copy (`git ls-files` copied outside the repo, then `npm ci --ignore
 - The reformat: whitespace-only changes to every file Prettier covers.
 - The fixes the new rules ask for: `server/src/errors.ts`, `server/src/store/views.ts`, the 43 source `!`, the 9 type assertions, `ImportPage.tsx:323, 389`, `server/src/app.ts:146`, the four real vitest findings, `view.test.ts:120`.
 - New: `.claude/rules/web.md`, `.claude/rules/server.md`, `CLAUDE.md`, `scripts/conventions.json` (if an exception is needed).
-- `infrastructure/Dockerfile`: only the `apk add` line, only under decision 1's `github:` branch.
+- The vendored `house-style` copy and its `house-style:sync` script (root `package.json`).
 - [corpus/CLAUDE.md](../../CLAUDE.md): the Hard rules and brief-board sections move out.
 - Corpus: [wiki/decisions.md](../../wiki/decisions.md) (a new entry), [wiki/status.md](../../wiki/status.md), [log.md](../../log.md), [.planned-roots](../../.planned-roots) (drop `.claude` and `scripts` once they exist).
 
 ## Files you must NOT touch
 
+- `infrastructure/Dockerfile` (decision 1 means nothing in the build changes).
 - Behaviour. Apart from the fixes above, every change is formatting or configuration.
 - `server/vendor/` and `web/vendor/`: generated Ward copies, ignored by ESLint and Prettier.
 - The layout of `server/src` and the CSS (briefs 08 and 07).
@@ -145,14 +147,14 @@ One commit per step, with `npm run typecheck`, `npm test`, `npm run lint` and `n
 
 1. **Measure first.** Re-run the measurements above with the pinned tools and put the numbers in the `log.md` entry. Add the `pretest` first, so the test run is honest.
 2. **Prettier and the reformat.**
-   1. Add `prettier` (pinned) and the config: width per decision 2, `trailingComma: "all"`.
+   1. Add `prettier` (pinned) and the config: `printWidth: 120` (decision 2), `trailingComma: "all"`. Vendor `house-style` first (decision 1): copy it with its version header, add `house-style:sync`, and extend the configs from the copy.
    2. Add `.prettierignore`: `*.md`, `**/fixtures/`, `server/vendor/`, `web/vendor/`, `package-lock.json`, `dist/`, `dev-dist/`, `data/`, `coverage/`, `web/public/`, `.impeccable/`.
    3. Add `format` and `format:check`. Commit this alone.
-   4. Run `npm run format`; commit only that, as `style: format with Prettier`. Do it when no other brief has uncommitted work.
+   4. Run `npm run format`; commit only that, as `style: format with Prettier`. Do it when no other brief has uncommitted work, and push it straight to `main` with the rest (no branch).
    5. Put that commit's full hash in `.git-blame-ignore-revs`, in its own commit.
    6. Hand the owner `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
 3. **tsconfig.** Add the two flags. Fix `ApiError` and `ViewNameTaken` with a declared field assigned in the constructor (keep `readonly` and behaviour). Add `incremental` to `web/tsconfig.json`. `npx tsc -b server` (the Dockerfile's line) must still build.
-4. **ESLint.** Extend the house config with Shelfmark's roots: web is `web/src`, server is `server/src`, the CLIs are `server/src/index.ts` (later `server.ts`), `server/src/seed.ts`, `server/src/cip/cli.ts`, `server/scripts/*`, `docs/images/*.mjs`, `web/src/ocr/fixtures/record.ts`. In effect:
+4. **ESLint.** Extend the vendored house config with Shelfmark's roots: web is `web/src`, server is `server/src`, the CLIs are `server/src/index.ts` (later `server.ts`), `server/src/seed.ts`, `server/src/cip/cli.ts`, `server/scripts/*`, `docs/images/*.mjs`, `web/src/ocr/fixtures/record.ts`. In effect:
 
    | Rule | Today | After |
    |---|---|---|
@@ -167,7 +169,7 @@ One commit per step, with `npm run typecheck`, `npm test`, `npm run lint` and `n
    `allowDefaultProject`: `vitest.config.ts`, `eslint.config.js`, `server/scripts/*.ts`, `web/pwa-assets.config.ts`. `web/public/` and `docs/images/*.mjs` take `disableTypeChecked`. Fix each finding in "Files you OWN", or list it, with its reason, in the outcome note.
 5. **The gate.** `check` runs `typecheck`, `lint`, `format:check`, `check:conventions`, `test`. `check:conventions` is knip (entries for the CLIs and scripts, `ignoreBinaries: ["pdftotext"]`, exports as warnings, vendor ignored) plus the two checkers from `house-style`. `check-base-ui` runs `--warn-only` until brief 07, `check-structure` until brief 08. `check:fast` runs `typecheck`, then ESLint on files changed against `HEAD` plus untracked ones. No shell-only syntax (the owner works under WSL). Time both and record.
 6. **`.claude/rules/`**, each under about 40 lines.
-   - `web.md` (`paths: ["web/src/**"]`): read [DESIGN.md](../../../DESIGN.md) and [wiki/overlays.md](../../wiki/overlays.md); Base UI only through `ui/` wrappers; native checkboxes, radios and selects stay native ([wiki/decisions.md](../../wiki/decisions.md)); light only; calls go through `web/src/api.ts` with the shared schemas; the glossary's words in UI copy; English only.
+   - `web.md` (`paths: ["web/src/**"]`): read [DESIGN.md](../../../DESIGN.md) and [wiki/overlays.md](../../wiki/overlays.md); Base UI only through `ui/` wrappers; native checkboxes, radios and selects stay native ([wiki/decisions.md](../../wiki/decisions.md)); light only until brief 07 adds the Light / Dark / System switch (Q18); calls go through `web/src/api.ts` with the shared schemas; the glossary's words in UI copy; English only.
    - `server.md` (`paths: ["server/src/**", "shared/src/**"]`): `FeatureContext` fields only when two features need them; the sign-in feature registers first; errors are `ApiError` with the body `{ error: { code, message } }` that `web/src/api.ts:164` parses; every outbound request goes through `ctx.fetch` or `ctx.connect`; the catalogs are asked politely (`server/src/lookup/queue.ts`); no test boots the app; `server/vendor/` is generated.
    - Briefs 07 and 08 add their lines.
 7. **`CLAUDE.md`** at the root, under about 60 lines: one line on Shelfmark; read [corpus/index.md](../../index.md) first; `npm run dev`, `npm run dev:https`, `npm run check` before every hand-back, `npm run check:fast`, one test with `npx vitest run <file>`, `npm run seed -w @shelfmark/server`; what misleads (the typecheck is two runs, `shared/dist` must exist before tests, `.env` sits at the repo root, the dev API is on 8808 and Vite on 5176, production on 8796); the moved Hard rules and brief-board sections. [corpus/CLAUDE.md](../../CLAUDE.md) keeps the rest.
@@ -176,8 +178,8 @@ One commit per step, with `npm run typecheck`, `npm test`, `npm run lint` and `n
 ## Acceptance
 
 - [ ] `npm run check` passes. Its time and `check:fast`'s (warm, one changed file) are in the outcome note, and `check:fast` is under about 15 s or the owner accepted the time.
-- [ ] `npx prettier --check .` passes. `git diff -w <hash>^ <hash>` shows nothing for the reformat commit, `git diff <hash>^ <hash> -- '**/fixtures/**'` shows nothing, and the hash is in `.git-blame-ignore-revs`.
-- [ ] `tsconfig.base.json` has both flags; `npm run typecheck` and `docker build -f infrastructure/Dockerfile .` pass.
+- [ ] `npx prettier --check .` passes at width 120, and the vendored `house-style` copy carries its version header and `house-style:sync` runs. `git diff -w <hash>^ <hash>` shows nothing for the reformat commit, `git diff <hash>^ <hash> -- '**/fixtures/**'` shows nothing, and the hash is in `.git-blame-ignore-revs`.
+- [ ] `tsconfig.base.json` has both flags; `npm run typecheck` and `docker build -f infrastructure/Dockerfile .` pass, with the Dockerfile unchanged.
 - [ ] ESLint reports 0 errors. Counts before and after, and every finding left, are in the outcome note.
 - [ ] A deliberate `enum`, `!` in `server/src/app.ts`, `console.log` in `web/src/api.ts`, `// TODO` and an `export default` in a component each fail `npm run lint`. Revert them.
 - [ ] On a fresh clone (`rm -rf shared/dist server/dist`), `npm test` passes without a manual build.
@@ -186,6 +188,6 @@ One commit per step, with `npm run typecheck`, `npm test`, `npm run lint` and `n
 
 ## Interplay
 
-- Brief 04 (recommendations) adds files. If it lands first, the reformat covers them; if second, it is written formatted.
+- Brief 04 (Wishlist, with recommendations) adds files. If it lands first, the reformat covers them; if second, it is written formatted at 120.
 - Brief 06 adds nothing to the gate. Brief 07 adds `better-tailwindcss` and drops `check-base-ui`'s `--warn-only`. Brief 08 adds dependency-cruiser, drops `check-structure`'s `--warn-only`, makes `no-process-env` an error and the `exports` map goes.
 - The reformat lowercases `web/src/styles/tokens.css`'s hex, which brief 07 deletes anyway. `web/src/components/cover.test.ts:11` reads those lines with a case-insensitive regex, so it still passes.

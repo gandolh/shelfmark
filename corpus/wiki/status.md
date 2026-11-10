@@ -14,9 +14,9 @@ at 01 on 2026-11-02 (see [log.md](../log.md)). Brief 02,
 was built on 2026-11-04 on local `main`, not pushed and not deployed, and so
 was brief 03, [the toolbar in groups](../briefs/done/03-library-toolbar-groups.md),
 the owner's pick of its alternatives. Brief 04,
-[book recommendations](../briefs/todo/04-book-recommendations.md), was filed on
-2026-11-09 and waits on the owner's grilling of 2026-11-10, as do briefs
-05-08 (the house style harness, Base UI by the conventions, the web app to
+[Wishlist, with recommendations](../briefs/todo/04-wishlist-with-recommendations.md), was filed on
+2026-11-09 and rewritten on 2026-11-10 after the owner's grilling (the third
+place is Wishlist); briefs 05-08 (the house style harness, Base UI by the conventions, the web app to
 Tailwind, the server in feature folders), filed on 2026-11-10 from the owner's
 estate calls of 2026-11-09. The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
