@@ -724,3 +724,31 @@ The defaults it builds:
 
 These wait on the owner's grilling on 2026-11-10. See the
 [brief](briefs/todo/04-book-recommendations.md).
+
+## [2026-11-10] todo | Briefs 05-08: the owner's estate calls of 2026-11-09 applied to Shelfmark
+
+The owner decided on 2026-11-09, for every web app: Base UI 1.9.0 pinned
+exactly, Tailwind v4 for the whole app, and the researched conventions
+enforced in each repo. Four briefs, in order:
+
+- [05 the house style and the quality harness](briefs/todo/05-the-house-style-harness.md);
+- [06 Base UI by the conventions](briefs/todo/06-base-ui-by-the-conventions.md);
+- [07 the web app to Tailwind](briefs/todo/07-the-web-app-to-tailwind.md);
+- [08 the server in the code structure](briefs/todo/08-the-server-in-the-code-structure.md).
+
+No bump brief: `web/package.json` pins 1.9.0 and the lockfile resolves 1.9.0.
+Measured on a scratch copy (nothing in the repo changed). The numbers that
+differ from the estate drafts:
+
+- Prettier width 130 is the least churn: 391 lines in 98 files, and the 13
+  JSON fixtures must be ignored.
+- `no-non-null-assertion` finds 123 (the estate default assumed about 9).
+- The provider's serializer throws on `savedViewSchema`'s transform
+  (`shared/src/views.ts:174`), reproduced on zod 4.5.4 and provider 1.0.3.
+- `tokens.css` has 86 properties (the draft said 98); 14 keyframes are 7
+  distinct animations; the app is one CSS chunk, 76.7 kB raw, 13.4 kB gzip.
+- `npm test` fails on a fresh checkout until `shared/dist` is built.
+
+The defaults wait on the owner's grilling of 2026-11-10. Brief 04
+(recommendations) is unchanged; whichever lands second adopts the first's
+styling and layout.

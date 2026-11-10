@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # Status
@@ -15,7 +15,10 @@ was built on 2026-11-04 on local `main`, not pushed and not deployed, and so
 was brief 03, [the toolbar in groups](../briefs/done/03-library-toolbar-groups.md),
 the owner's pick of its alternatives. Brief 04,
 [book recommendations](../briefs/todo/04-book-recommendations.md), was filed on
-2026-11-09 and waits on the owner's grilling of 2026-11-10. The product calls are in
+2026-11-09 and waits on the owner's grilling of 2026-11-10, as do briefs
+05-08 (the house style harness, Base UI by the conventions, the web app to
+Tailwind, the server in feature folders), filed on 2026-11-10 from the owner's
+estate calls of 2026-11-09. The product calls are in
 [decisions.md](decisions.md), the look in [design.md](design.md) and
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
