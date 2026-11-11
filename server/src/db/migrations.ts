@@ -104,6 +104,43 @@ export const migrations: readonly string[] = [
     updated_at  TEXT NOT NULL
   );
   `,
+
+  // 4: recommendations (brief 04). `recommendations` is the last list only:
+  // a refresh replaces the list of its source in one transaction, an import
+  // appends. `key` is the work's Open Library key, else the title key.
+  // `recommendation_dismissals` keeps a "Not interested" for good, by work
+  // key and by title key (one row each, `kind` says which). `catalog_query_cache`
+  // keeps each catalog answer by its URL for 30 days (recommend/cache.ts).
+  `
+  CREATE TABLE recommendations (
+    key           TEXT PRIMARY KEY,
+    title         TEXT NOT NULL,
+    authors       TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(authors) AND json_type(authors) = 'array'),
+    year          INTEGER,
+    language      TEXT,
+    cover_url     TEXT,
+    isbn13        TEXT,
+    isbns         TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(isbns) AND json_type(isbns) = 'array'),
+    title_key     TEXT NOT NULL,
+    reasons       TEXT NOT NULL DEFAULT '[]' CHECK (json_valid(reasons) AND json_type(reasons) = 'array'),
+    source        TEXT NOT NULL,
+    score         REAL NOT NULL DEFAULT 0,
+    refreshed_at  TEXT NOT NULL
+  );
+
+  CREATE TABLE recommendation_dismissals (
+    key           TEXT NOT NULL,
+    kind          TEXT NOT NULL CHECK (kind IN ('work', 'title')),
+    dismissed_at  TEXT NOT NULL,
+    PRIMARY KEY (key, kind)
+  ) WITHOUT ROWID;
+
+  CREATE TABLE catalog_query_cache (
+    url         TEXT PRIMARY KEY,
+    response    TEXT NOT NULL CHECK (json_valid(response)),
+    fetched_at  TEXT NOT NULL
+  ) WITHOUT ROWID;
+  `,
 ];
 
 /** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */

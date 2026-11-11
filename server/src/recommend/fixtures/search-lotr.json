@@ -1,0 +1,15 @@
+{
+  "numFound": 2,
+  "docs": [
+    {
+      "key": "/works/OL27448W",
+      "title": "The Lord of the Rings",
+      "author_name": ["J. R. R. Tolkien"],
+      "first_publish_year": 1954,
+      "language": ["eng", "rum"],
+      "isbn": ["9780618640157", "9786069135624", "0618640150"],
+      "cover_i": 9255566
+    },
+    { "title": "A document with no work key" }
+  ]
+}
