@@ -38,6 +38,7 @@ import { BarcodeIcon, TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
 import { createLookupMemo } from "./memo";
 import { TabsPanel, TabsRoot } from "../components/ui/Tabs";
+import { Toggle } from "../components/ui/ToggleGroup";
 import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
@@ -373,15 +374,14 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
               {(torchAvailable || zoomAvailable) && (
                 <div className="add-controls">
                   {torchAvailable && (
-                    <button
-                      type="button"
+                    <Toggle
                       className="add-control add-torch"
-                      aria-pressed={torch}
+                      pressed={torch}
+                      onPressedChange={setTorch}
                       aria-label="Torch"
-                      onClick={() => setTorch((lit) => !lit)}
                     >
                       <TorchIcon size={20} on={torch} />
-                    </button>
+                    </Toggle>
                   )}
                   {zoomAvailable && (
                     <button
