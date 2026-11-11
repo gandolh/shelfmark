@@ -1,0 +1,19 @@
+# Markdown stays out of Prettier (decided 2026-11-10).
+*.md
+
+# Recorded responses: they must stay byte for byte.
+**/fixtures/
+
+# Generated or vendored copies.
+server/vendor/
+web/vendor/
+vendor/house-style/
+
+# Lockfile, build output, local data, public assets.
+package-lock.json
+dist/
+dev-dist/
+data/
+coverage/
+web/public/
+.impeccable/
