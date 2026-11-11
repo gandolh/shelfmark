@@ -4,6 +4,7 @@ import { createBook, useBooks } from "../books/store";
 import { authorLine } from "../components/cover";
 import { Button, ButtonLink } from "../components/Button";
 import { CoverImage } from "../components/CoverImage";
+import { Dialog, DialogActions } from "../components/ui/Dialog";
 import { exportLibrary } from "../export/exportLibrary";
 import { Page } from "../layout/Page";
 import { useIsDesktop } from "../layout/viewport";
@@ -193,7 +194,7 @@ function Card({ item, recs }: { item: Recommendation; recs: RecommendationsState
   );
 }
 
-/** Download your library, copy the prompt, and Import (a panel, not a dialog: the Base UI dialog wrapper comes with brief 06). */
+/** Download your library, copy the prompt, and Import (a dialog: paste Claude's answer or choose a file). */
 function ClaudePanel({ recs }: { recs: RecommendationsState }) {
   const { books } = useBooks();
   const [open, setOpen] = useState(false);
@@ -201,6 +202,8 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
   const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const file = useRef<HTMLInputElement>(null);
+  const importButton = useRef<HTMLButtonElement>(null);
+  const desktop = useIsDesktop();
   const running = recs.job?.state === "running";
 
   const copy = async () => {
@@ -231,53 +234,61 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
         <Button size="compact" onClick={() => void copy()}>
           {copied ? "Prompt copied" : "Copy the prompt"}
         </Button>
-        <Button size="compact" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <Button ref={importButton} size="compact" aria-haspopup="dialog" onClick={() => setOpen(true)}>
           Import
         </Button>
       </div>
       {open && (
-        <div className="wishlist__import">
-          <p className="wishlist__text">
-            Attach the downloaded file to Claude with the prompt, then paste its answer here, or choose a file. Each
-            book is looked up in Open Library first; one it cannot find is never shown. The shape:
-          </p>
-          <pre className="wishlist__schema">{IMPORT_SCHEMA_EXAMPLE}</pre>
-          <label className="wishlist__label" htmlFor="import-json">
-            Claude’s answer (JSON)
-          </label>
-          <textarea
-            id="import-json"
-            className="wishlist__textarea"
-            rows={6}
-            value={text}
-            onChange={(event) => setText(event.target.value)}
-          />
-          <div className="wishlist__actions">
-            <Button size="compact" variant="primary" disabled={running} onClick={() => void submit()}>
-              Check and import
-            </Button>
-            <Button size="compact" onClick={() => file.current?.click()}>
-              Choose a file
-            </Button>
-            <input
-              ref={file}
-              type="file"
-              accept=".json,application/json,text/plain"
-              hidden
-              onChange={(event) => {
-                const chosen = event.target.files?.[0];
-                if (chosen) void chosen.text().then(setText);
-                event.target.value = "";
-              }}
-            />
-          </div>
-          {message && (
-            <p className="wishlist__text" role="alert">
-              {message}
+        <Dialog title="Import from Claude" returnFocus={() => importButton.current} onClose={() => setOpen(false)}>
+          <div className="library-dialog__form">
+            <p className="wishlist__text">
+              Attach the downloaded file to Claude with the prompt, then paste its answer here, or choose a file. Each
+              book is looked up in Open Library first; one it cannot find is never shown. The shape:
             </p>
-          )}
-          <ImportProgress job={recs.job} />
-        </div>
+            <pre className="wishlist__schema">{IMPORT_SCHEMA_EXAMPLE}</pre>
+            <label className="wishlist__label" htmlFor="import-json">
+              Claude’s answer (JSON)
+            </label>
+            <textarea
+              id="import-json"
+              className="wishlist__textarea"
+              rows={6}
+              value={text}
+              onChange={(event) => setText(event.target.value)}
+            />
+            <DialogActions desktop={desktop} cancel="Close" onCancel={() => setOpen(false)}>
+              <Button size={desktop ? "regular" : "large"} block={!desktop} onClick={() => file.current?.click()}>
+                Choose a file
+              </Button>
+              <Button
+                size={desktop ? "regular" : "large"}
+                block={!desktop}
+                variant="primary"
+                disabled={running}
+                onClick={() => void submit()}
+              >
+                Check and import
+              </Button>
+              <input
+                ref={file}
+                type="file"
+                accept=".json,application/json,text/plain"
+                hidden
+                onChange={(event) => {
+                  const chosen = event.target.files?.[0];
+                  if (chosen) void chosen.text().then(setText);
+                  event.target.value = "";
+                }}
+              />
+            </DialogActions>
+            {message && (
+              <p className="wishlist__text" role="alert">
+                {message}
+              </p>
+            )}
+            <ImportProgress job={recs.job} />
+          </div>
+        </Dialog>
       )}
     </div>
   );
