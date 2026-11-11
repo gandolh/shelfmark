@@ -20,8 +20,9 @@ export function App() {
         <ChangePasswordDialog />
       </AuthGate>
       <OfflineNotice />
-      <UpdatePrompt />
+      {/* The host first: a toast raised before it mounts is lost. */}
       <ToastHost />
+      <UpdatePrompt />
     </>
   );
 }
