@@ -23,8 +23,11 @@ export interface ViewStore {
 
 /** Another view already has this name (matched without case). The route answers `409`. */
 export class ViewNameTaken extends Error {
-  constructor(readonly viewName: string) {
+  readonly viewName: string;
+
+  constructor(viewName: string) {
     super(`There is already a view called “${viewName}”.`);
+    this.viewName = viewName;
     this.name = "ViewNameTaken";
   }
 }

@@ -1,4 +1,6 @@
 {
+  // The house flags (verbatimModuleSyntax, erasableSyntaxOnly) are kept here, not extended from the vendored copy: the
+  // Docker build copies only this file before it compiles the server.
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
     "target": "ES2023",
@@ -16,6 +18,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "erasableSyntaxOnly": true,
     "sourceMap": true,
     "types": ["node"]
   }
