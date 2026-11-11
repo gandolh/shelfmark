@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { Toggle, ToggleGroup } from "../components/ui/ToggleGroup";
 
 export function StarIcon({ on, size = 24 }: { on: boolean; size?: number }) {
   return (
@@ -20,7 +21,7 @@ export function StarIcon({ on, size = 24 }: { on: boolean; size?: number }) {
 }
 
 /**
- * The rating as five real buttons. Pressing the current rating again clears
+ * The rating as five toggles in one group: one tab stop, ← → between the stars. Pressing the current rating again clears
  * it: a book can be unrated, and a slider or a select would hide that.
  */
 export function RatingField({
@@ -36,21 +37,25 @@ export function RatingField({
   return (
     <fieldset className="add-choice" disabled={disabled}>
       <legend className="add-label">Rating</legend>
-      <div className="book-rating" aria-describedby={hint}>
+      <ToggleGroup
+        aria-label="Rating"
+        className="book-rating"
+        aria-describedby={hint}
+        value={value === null ? null : String(value)}
+        onChoose={(next) => onChange(next === null ? null : Number(next))}
+      >
         {[1, 2, 3, 4, 5].map((n) => (
-          <button
+          <Toggle
             key={n}
-            type="button"
+            value={String(n)}
             className="book-rating__star"
-            aria-pressed={value === n}
             aria-label={`${n} ${n === 1 ? "star" : "stars"}`}
-            onClick={() => onChange(value === n ? null : n)}
           >
             <StarIcon on={value !== null && n <= value} />
-          </button>
+          </Toggle>
         ))}
         <span className="book-rating__text">{value === null ? "Not rated" : `${value} of 5`}</span>
-      </div>
+      </ToggleGroup>
       <p className="add-hint" id={hint}>
         Press the chosen star again to clear it.
       </p>
