@@ -5,7 +5,7 @@
 - In Shelfmark:
   - [brief 04](../done/04-wishlist-with-recommendations.md), which adds the Wishlist place and its page, so the redesign covers three places, not two;
   - [brief 07](07-the-web-app-to-tailwind.md), which moves the styling to one stylesheet of tokens in Tailwind and adds the Light / Dark / System switch. A redesign is then mostly a new token set and layout;
-  - [brief 06](06-base-ui-by-the-conventions.md), whose wrappers the redesign keeps working.
+  - [brief 06](../done/06-base-ui-by-the-conventions.md), whose wrappers the redesign keeps working.
 - In the owner's skills library:
   - brief 24, which vendors Hallmark as the design skill and adopts taste-skill 2.5's ideas (palettes and type dealt by trade, its copy layer);
   - the estate redesign board: one artifact with a page per app, owned by the skills library.

@@ -161,6 +161,14 @@ main chunk. TanStack Table stays, since Base UI has no table, and native
 checkboxes, radios and selects stay native. Rejected: keeping the hand-built
 widgets, and shadcn, which brings Tailwind.
 
+_2026-11-11_, brief 06: the 2026-11-09 conventions (the base-ui skill) are
+built. Base UI is imported only under `ui/` folders, behind a `Dialog`, `Menu`,
+`Tabs`, `Collapsible`, `ToggleGroup` and `Toast` wrapper and the Library's
+`Panel`. A form dialog no longer closes on a backdrop press. The rating, the
+shelf chips, the torch and the update prompt moved onto Base UI; inline
+confirms and `<datalist>`s stay as they were. Details in
+[overlays.md](overlays.md).
+
 ## Only lightweight tests
 _2026-10-24_, the owner's call. `npm test` holds unit tests only: nothing
 boots the whole app, signs in with a real scrypt hash, or starts a child

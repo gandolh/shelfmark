@@ -39,8 +39,9 @@ estate calls of 2026-11-09. The product calls are in
 - **Scanning** (2026-10-17 to 2026-10-21). One lookup per ISBN, scan on a
   press, the first read wins, read until the ISBN is found, a sharper camera
   and the `?camera` readout ([scanning.md](scanning.md)).
-- **Widgets** (2026-10-23). Base UI under the menus, panels, dialog and
-  switches ([overlays.md](overlays.md)).
+- **Widgets** (2026-10-23; by the conventions 2026-11-11). Base UI under the
+  menus, panels, dialogs, tabs, toggles and the update prompt, imported only
+  under `ui/` folders; built, not deployed ([overlays.md](overlays.md)).
 - **v1.x** (2026-10-23). Wishlist, offline "do I own this?", the offline scan
   queue, bulk edit from the table, saved views, CSV import, stats, a CIP
   block read from a photo ([cip-photo.md](cip-photo.md)), a subtitle field on

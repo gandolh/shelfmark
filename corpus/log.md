@@ -732,7 +732,7 @@ exactly, Tailwind v4 for the whole app, and the researched conventions
 enforced in each repo. Four briefs, in order:
 
 - [05 the house style and the quality harness](briefs/done/05-the-house-style-harness.md);
-- [06 Base UI by the conventions](briefs/todo/06-base-ui-by-the-conventions.md);
+- [06 Base UI by the conventions](briefs/done/06-base-ui-by-the-conventions.md);
 - [07 the web app to Tailwind](briefs/todo/07-the-web-app-to-tailwind.md);
 - [08 the server in the code structure](briefs/todo/08-the-server-in-the-code-structure.md).
 
@@ -792,3 +792,8 @@ House-style 1.0.0 vendored, Prettier at 120 (one reformat commit, bundle compare
 ## [2026-11-11] build | Wishlist is a third place; recommendations by Claude import
 
 Brief 04 built without its spike. Wishlist joins Library and Add a book (the "Two places only" entry in `decisions.md` keeps its 2026-10-14 text and carries the 2026-11-10 revisit, now marked built); the Library lost its Owned / Wishlist tabs, a saved Wishlist tab reads as Owned, and `/library?collection=wishlist` redirects. The Wishlist page shows the wished-for books, an Add a book button that saves into the wishlist (`/wishlist/add`), and Recommendations: download the library CSV, copy the prompt, import Claude's JSON. Each pick is checked in Open Library and never shown if not found; the dedup (ISBN, work key, title key, dismissal) runs on import and on every read. Migration 4 adds `recommendations`, `recommendation_dismissals` and `catalog_query_cache`. Not done: the TasteDive and embedding spike (needs the owner's library and judgment, filed as a todo), the profile and Refresh with it, and the capped title search for library books with no cached work key. Tests are unit tests with no network; the two Open Library answers are shaped from the documented fields, not recorded. Typecheck, lint, tests, build, conventions pass; no screenshots taken.
+
+## [2026-11-11] build | Base UI by the conventions
+
+Brief 06 built. Base UI is imported only under `ui/` folders (`web/src/components/ui/`, `web/src/library/ui/`): the `Dialog` wrapper (Escape guard, house initial focus, `Title`, no backdrop dismissal, `pending`) replaced three copies of one dialog, with `Menu`, `Tabs`, `Collapsible`, `ToggleGroup`, `Toast` and the Library `Panel`. The rating, shelf chips, torch and update prompt moved onto Base UI; the Wishlist's Claude import became a dialog; inline confirms, `<datalist>` and native controls stayed. `check-base-ui` reports 0 for rules 1, 2, 3, 9, 10, 11 and stays `--warn-only` for rule 5 (brief 07). The look is unchanged (before/after screenshots at 1280 and 390), except the Import panel. Web client only; deploy with `node cli.ts shelfmark deploy`.
+
