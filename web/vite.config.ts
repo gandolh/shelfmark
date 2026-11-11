@@ -62,7 +62,11 @@ function ocrAssets(): Plugin {
     ...engine.map(([name, buffer]) => [engineDir + name, buffer] as const),
     ...lang.map(([name, buffer]) => [langDir + name, buffer] as const),
   ]);
-  const size = (dir: string, name: string) => files.get(dir + name)!.length;
+  const size = (dir: string, name: string) => {
+    const file = files.get(dir + name);
+    if (!file) throw new Error(`missing OCR asset ${dir + name}`);
+    return file.length;
+  };
   const manifest = {
     engine: engineDir,
     lang: langDir,
@@ -94,10 +98,10 @@ function ocrAssets(): Plugin {
     // Dev: answer for them at the same paths the build emits.
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        const path = (req.url ?? "").split("?")[0]!;
+        const path = (req.url ?? "").split("?")[0] ?? "";
         const file = path.startsWith(base) ? files.get(path.slice(base.length)) : undefined;
         if (!file) return next();
-        res.setHeader("Content-Type", TYPES[path.split(".").at(-1)!] ?? "application/octet-stream");
+        res.setHeader("Content-Type", TYPES[path.split(".").at(-1) ?? ""] ?? "application/octet-stream");
         res.setHeader("Content-Length", file.length);
         res.end(file);
       });

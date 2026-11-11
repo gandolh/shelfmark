@@ -224,9 +224,12 @@ describe("readCode", () => {
   it("stops on cancel, rejecting with an AbortError", async () => {
     const detect = frames([isbn]);
     const reading = readCode(detect);
-    const rejected = expect(reading.result).rejects.toMatchObject({ name: "AbortError" });
+    const rejected = reading.result.then(
+      () => undefined,
+      (error: unknown) => error,
+    );
     reading.cancel();
-    await rejected;
+    expect(await rejected).toMatchObject({ name: "AbortError" });
     await vi.advanceTimersByTimeAsync(1000);
     expect(detect).not.toHaveBeenCalled();
   });
@@ -234,12 +237,15 @@ describe("readCode", () => {
   it("stops mid-reading on cancel: no reads after it", async () => {
     const detect = frames([]);
     const reading = readCode(detect);
-    const rejected = expect(reading.result).rejects.toMatchObject({ name: "AbortError" });
+    const rejected = reading.result.then(
+      () => undefined,
+      (error: unknown) => error,
+    );
     await vi.advanceTimersByTimeAsync(10_000);
     const reads = detect.mock.calls.length;
     expect(reads).toBeGreaterThan(60);
     reading.cancel();
-    await rejected;
+    expect(await rejected).toMatchObject({ name: "AbortError" });
     await vi.advanceTimersByTimeAsync(60_000);
     expect(detect).toHaveBeenCalledTimes(reads);
   });
@@ -307,8 +313,7 @@ describe("startDetectLoop", () => {
     const stop = startDetectLoop({ detect, onDetections, intervalMs: 150 });
     await vi.advanceTimersByTimeAsync(300);
     expect(detect).toHaveBeenCalledTimes(3);
-    expect(onDetections).toHaveBeenCalledOnce();
-    expect(onDetections).toHaveBeenCalledWith([{ rawValue: "x", format: "code_128" }]);
+    expect(onDetections).toHaveBeenCalledExactlyOnceWith([{ rawValue: "x", format: "code_128" }]);
     stop();
     await vi.advanceTimersByTimeAsync(1000);
     expect(detect).toHaveBeenCalledTimes(3);

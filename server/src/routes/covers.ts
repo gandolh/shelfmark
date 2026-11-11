@@ -122,7 +122,8 @@ export interface DownloadedCover {
 export async function downloadCover(raw: string, options: DownloadOptions): Promise<DownloadedCover> {
   const { fetch, timeoutMs = COVER_TIMEOUT_MS, maxBytes = COVER_MAX_BYTES } = options;
   let url = checkCoverUrl(raw, { redirect: false });
-  const source = COVER_HOSTS.get(url.hostname)!;
+  const source = COVER_HOSTS.get(url.hostname);
+  if (!source) throw refused(`${url.hostname} is not a cover host.`);
   const signal = AbortSignal.timeout(timeoutMs);
   const headers = { "User-Agent": USER_AGENT, Accept: COVER_MIME_TYPES.join(", ") };
 
@@ -199,7 +200,7 @@ export const coverRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db,
 
   app.put<IdParams>("/api/books/:id/cover", (request, reply): CoverInfo | typeof reply => {
     const id = bookId(request.params.id);
-    const declared = (request.headers["content-type"] ?? "").split(";")[0]!.trim().toLowerCase();
+    const declared = (request.headers["content-type"] ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
     if (!isCoverMime(declared) || !Buffer.isBuffer(request.body)) {
       return reply
         .code(415)

@@ -155,7 +155,8 @@ export function mergeDrafts(
   const found = answers.filter(
     (answer): answer is { source: LookupSource; draft: SourceDraft } => answer.draft !== null,
   );
-  if (found.length === 0) return null;
+  const [firstFound] = found;
+  if (!firstFound) return null;
 
   const merged: SourceDraft = emptySourceDraft();
   const contributors = new Set<LookupSource>();
@@ -175,7 +176,7 @@ export function mergeDrafts(
   }
 
   // A source that found the book but added nothing new still counts if nobody else added anything.
-  const sources = contributors.size > 0 ? [...contributors] : [found[0]!.source];
+  const sources = contributors.size > 0 ? [...contributors] : [firstFound.source];
   return { isbn13, ...merged, sources };
 }
 

@@ -52,8 +52,12 @@ function pdus(stream: Buffer): Buffer[] {
 
 const queues = new Map<LibrarySource, Queue>();
 const queueFor = (library: LibrarySource) => {
-  if (!queues.has(library)) queues.set(library, createQueue(LIBRARY_SPACING));
-  return queues.get(library)!;
+  let queue = queues.get(library);
+  if (!queue) {
+    queue = createQueue(LIBRARY_SPACING);
+    queues.set(library, queue);
+  }
+  return queue;
 };
 
 const only = process.argv.slice(2);

@@ -54,7 +54,7 @@ export function searchIsbns(target: Target, isbns: readonly string[], options: E
       clearTimeout(timer);
       socket?.destroy();
       if (error) reject(error);
-      else resolve(result!);
+      else if (result) resolve(result);
     };
 
     const timer = setTimeout(() => {

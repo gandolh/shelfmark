@@ -161,7 +161,7 @@ function settle(values: BookCreate | BookPatch): Partial<BookFields> {
     if (value === undefined) continue;
     out[key] = value === null ? DEFAULTS[key as keyof typeof DEFAULTS] : value;
   }
-  return out as Partial<BookFields>;
+  return out;
 }
 
 /**

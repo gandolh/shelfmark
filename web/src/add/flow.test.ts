@@ -743,7 +743,7 @@ describe("the scan queue", () => {
 
   it("opens an ISBN that is owned by now as the owned sheet", () => {
     const owned = lookup({
-      owned: [{ id: 1, shelf: null, createdAt: "2026-10-01T00:00:00.000Z" } as LookupResponse["owned"][number]],
+      owned: [{ id: 1, shelf: null, createdAt: "2026-10-01T00:00:00.000Z" }],
     });
     const queue = flowReducer(run("scan"), { type: "show-queue" });
     expect(

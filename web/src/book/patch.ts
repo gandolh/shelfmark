@@ -119,7 +119,7 @@ export function buildPatch(book: Book, baseline: EditValues, values: EditValues)
   const touched = <K extends EditField>(key: K): boolean => {
     const a = baseline[key];
     const b = values[key];
-    return Array.isArray(a) && Array.isArray(b) ? !sameList(a as string[], b as string[]) : a !== b;
+    return Array.isArray(a) && Array.isArray(b) ? !sameList(a, b) : a !== b;
   };
 
   const text = (key: "subtitle" | "publisher" | "series" | "seriesNumber" | "acquiredFrom") => {

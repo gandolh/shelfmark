@@ -145,7 +145,8 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
       done(null, undefined);
       return;
     }
-    parseJson(request, body as string, done);
+    // The type says the parser may also be async; the default one is synchronous and calls `done`.
+    void parseJson(request, body as string, done);
   });
 
   registerErrorHandling(app);

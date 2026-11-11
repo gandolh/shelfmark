@@ -187,8 +187,9 @@ export function readCode(
       const codes = codesFrom(detections);
       const isbn = codes.find((code) => code.kind === "isbn");
       if (isbn) return finish(isbn);
-      if (other === null && codes.length > 0) {
-        other = codes[0]!;
+      const [firstCode] = codes;
+      if (other === null && firstCode) {
+        other = firstCode;
         timers.push(setTimeout(() => finish(other), graceMs));
       }
     },

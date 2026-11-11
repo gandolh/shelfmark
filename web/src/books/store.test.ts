@@ -455,7 +455,7 @@ describe("the offline copy hooks", () => {
     expect(persist).toHaveBeenCalledTimes(1);
     expect(titles(persist.mock.calls[0]![0])).toEqual(["Solenoid"]);
 
-    await store.create({ title: "Orbitor", shelf: null, status: "unread" } as BookCreate);
+    await store.create({ title: "Orbitor", shelf: null, status: "unread" });
     expect(persist).toHaveBeenCalledTimes(2);
     expect(titles(persist.mock.calls[1]![0])).toEqual(["Solenoid", "Orbitor"]);
 

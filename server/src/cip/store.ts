@@ -110,7 +110,7 @@ export function openCipStore(path: string): CipStore {
     },
     importedMonths: () => new Set(months.all().map((row) => row.month)),
     importIssue: (issue, records, now = new Date()) => importIssue(issue, records, now),
-    size: () => count.get()!.n,
+    size: () => count.get()?.n ?? 0,
     close: () => db.close(),
   };
 }

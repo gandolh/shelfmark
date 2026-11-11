@@ -58,7 +58,7 @@ const EXPECTED: Record<string, Omit<CipFields, "year"> & { year: number }> = {
 
 describe("readCipBlock, on what Tesseract read from the fixture photos", () => {
   for (const [name, expected] of Object.entries(EXPECTED)) {
-    it(name, () => {
+    it(`${name}`, () => {
       const read = readCipBlock(fixture(name));
       expect(read.found).toBe(true);
       if (read.found) expect(read.fields).toEqual(expected);

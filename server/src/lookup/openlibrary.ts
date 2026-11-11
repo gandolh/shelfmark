@@ -79,7 +79,7 @@ export async function getJson(
     throw new Error(`${label} answered ${response.status}`);
   }
   try {
-    return (await response.json()) as unknown;
+    return await response.json();
   } catch (error) {
     throw new Error(`${label} sent an answer that is not JSON`, { cause: error });
   }
@@ -193,7 +193,7 @@ function coverIds(data: Record<string, unknown>, details: Record<string, unknown
   if (ids.length === 0) {
     const cover = record(data.cover);
     for (const size of ["large", "medium", "small"]) {
-      const match = typeof cover?.[size] === "string" ? COVER_ID_IN_URL.exec(cover[size] as string) : null;
+      const match = typeof cover?.[size] === "string" ? COVER_ID_IN_URL.exec(cover[size]) : null;
       if (match) {
         ids.push(Number(match[1]));
         break;

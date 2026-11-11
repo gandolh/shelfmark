@@ -256,7 +256,7 @@ export function BookTable({
     state: {
       columnOrder: prefs.columnOrder as ColumnId[],
       columnVisibility: prefs.columnVisibility,
-      columnSizing: prefs.columnSizing as Record<string, number>,
+      columnSizing: prefs.columnSizing,
     },
     // Whatever the table hands back goes through the same checks as stored prefs.
     onColumnOrderChange: (updater) =>

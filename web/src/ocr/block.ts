@@ -126,12 +126,12 @@ export function readCipBlock(ocr: string): CipRead {
   if (at < 0) return { found: false };
 
   let from = at + 1;
-  while (from < lines.length && HEADING_TAIL.test(lines[from]!)) from++;
+  while (from < lines.length && HEADING_TAIL.test(lines[from] ?? "")) from++;
 
   const taken: string[] = [];
   let to = from;
   for (; to < lines.length; to++) {
-    const line = lines[to]!;
+    const line = lines[to] ?? "";
     if (taken.length > 0 && AFTER.test(line)) break;
     if (/^ISBN\b/u.test(line)) break;
     taken.push(line);
@@ -144,7 +144,7 @@ export function readCipBlock(ocr: string): CipRead {
   const read = cip.readDescription(description);
 
   // ISBNs from the description's end on, so a number in a title never counts.
-  const found = [...lines.slice(to).join("\n").matchAll(cip.ISBN)].map((match) => isbnOf(match[1]!));
+  const found = [...lines.slice(to).join("\n").matchAll(cip.ISBN)].map((match) => isbnOf(match[1] ?? ""));
   const isbns = [...new Set(found.filter((isbn) => isbn !== null))];
 
   return {
@@ -158,7 +158,7 @@ export function readCipBlock(ocr: string): CipRead {
       authors: read.authors,
       publisher: read.publisher,
       year: read.year,
-      isbn13: isbns.length === 1 ? isbns[0]! : null,
+      isbn13: isbns.length === 1 ? (isbns[0] ?? null) : null,
     },
   };
 }

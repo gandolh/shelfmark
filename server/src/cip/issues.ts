@@ -64,7 +64,8 @@ export function issueMonth(url: string): string | null {
   if (parsed.origin !== SITE || !parsed.pathname.startsWith("/wp-content/uploads/")) return null;
   const name = decodeURIComponent(parsed.pathname.split("/").at(-1) ?? "");
   const match = /(?:^|[-_])CIP[-_]([a-z]+)[-_](20\d{2})(?:[-_]site)?\.pdf$/i.exec(name);
-  const month = match ? MONTHS.get(match[1]!.toLowerCase()) : undefined;
+  const monthName = match?.[1];
+  const month = monthName ? MONTHS.get(monthName.toLowerCase()) : undefined;
   return month && match ? `${match[2]}-${String(month).padStart(2, "0")}` : null;
 }
 

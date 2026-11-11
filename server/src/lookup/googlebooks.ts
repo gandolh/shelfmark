@@ -55,7 +55,7 @@ function coverCandidate(imageLinks: unknown) {
 /** "en", "ro", "zh-CN" → the ISO 639-1 part; anything else `null`. */
 function languageOf(value: unknown): string | null {
   const match = typeof value === "string" ? /^([a-z]{2})(?:[-_][a-z0-9]+)*$/i.exec(value.trim()) : null;
-  return match ? match[1]!.toLowerCase() : null;
+  return match?.[1]?.toLowerCase() ?? null;
 }
 
 /** The draft fields in a `volumes` answer; `null` when it has no volume. */

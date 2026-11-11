@@ -360,7 +360,7 @@ function Preview({
                 {plural(targets.length, "ticked row has", "ticked rows have")} an ISBN and no title. Looking them up
                 asks the book sources one request at a time, which takes a while for a long list.
               </p>
-              <Button variant="secondary" disabled={busy || !ready} onClick={look}>
+              <Button variant="secondary" disabled={busy || !ready} onClick={() => void look()}>
                 Look up the missing details ({targets.length})
               </Button>
             </>
@@ -426,7 +426,7 @@ function Preview({
             Saving {progress.done} of {progress.total}…
           </p>
         ) : (
-          <Button variant="primary" disabled={busy || !ready || saveable.length === 0} onClick={save}>
+          <Button variant="primary" disabled={busy || !ready || saveable.length === 0} onClick={() => void save()}>
             Save {plural(saveable.length, "book", "books")} to {collection === "owned" ? "Owned" : "the Wishlist"}
           </Button>
         )}

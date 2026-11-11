@@ -48,7 +48,7 @@ function namesIn(statement: string): string[] {
   if (/^\p{Ll}/u.test(first)) {
     const after = /\bde\s+(\p{Lu}.*)$/u.exec(first);
     if (!after) return [];
-    first = after[1]!;
+    first = after[1] ?? "";
   }
   return first
     .split(/,\s+|\s+&\s+|\s+(?:și|şi|cu|and)\s+/u)
@@ -63,8 +63,8 @@ function fromHeading(heading: string): string {
       .trim()
       .toLowerCase()
       .replace(/(^|[\s\-'’])(\p{L})/gu, (_, before: string, letter: string) => before + letter.toUpperCase());
-  const [surname, forename] = heading.split(/,\s*/);
-  return squash(forename ? `${cased(forename)} ${cased(surname!)}` : cased(surname!));
+  const [surname = "", forename] = heading.split(/,\s*/);
+  return squash(forename ? `${cased(forename)} ${cased(surname)}` : cased(surname));
 }
 
 export interface Description {
@@ -107,8 +107,9 @@ export function readDescription(text: string): Description {
   // An upper-case main heading, then ". ": a person ("SURNAME, FORENAME", "THEOPHYLACT, sfânt"),
   // one name ("PLATO"), or a body or event ("SALONUL NAŢIONAL DE PLASTICĂ MICĂ (2019 ; Brăila)").
   const heading = /^([\p{Lu}][\p{Lu}\p{M}'’\- ]*(?:\s*\([^)]*\))?(?:,\s*[^.,]{1,40})?)\.\s+(.*)$/u.exec(rest);
-  const headingName = heading && /^\p{Lu}[\p{Lu}\p{M}'’\- ]*\p{Lu}/u.test(heading[1]!) ? heading[1]! : null;
-  if (headingName) rest = heading![2]!;
+  const headingText = heading?.[1];
+  const headingName = headingText && /^\p{Lu}[\p{Lu}\p{M}'’\- ]*\p{Lu}/u.test(headingText) ? headingText : null;
+  if (headingName) rest = heading?.[2] ?? rest;
 
   const areas = rest.split(AREA);
   const [titleArea = "", ...others] = areas;

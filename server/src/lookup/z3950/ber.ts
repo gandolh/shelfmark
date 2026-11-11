@@ -54,7 +54,7 @@ export function integerContent(value: number): Buffer {
   if (!Number.isSafeInteger(value) || value < 0) throw new RangeError(`not a non-negative integer: ${value}`);
   const bytes: number[] = [];
   for (let rest = value; rest > 0; rest = Math.floor(rest / 256)) bytes.unshift(rest % 256);
-  if (bytes.length === 0 || bytes[0]! & 0x80) bytes.unshift(0);
+  if (bytes.length === 0 || (bytes[0] ?? 0) & 0x80) bytes.unshift(0);
   return Buffer.from(bytes);
 }
 
@@ -68,7 +68,8 @@ export function oidContent(oid: string): Buffer {
   if (arcs.length < 2 || arcs.some((arc) => !Number.isSafeInteger(arc) || arc < 0))
     throw new RangeError(`not an OID: ${oid}`);
   const out: number[] = [];
-  for (const arc of [arcs[0]! * 40 + arcs[1]!, ...arcs.slice(2)]) {
+  const [first = 0, second = 0] = arcs;
+  for (const arc of [first * 40 + second, ...arcs.slice(2)]) {
     const sevens: number[] = [];
     for (let rest = arc; ; rest = Math.floor(rest / 128)) {
       sevens.unshift(rest % 128);
@@ -83,7 +84,7 @@ export function oidContent(oid: string): Buffer {
 export function bitStringContent(bits: readonly boolean[]): Buffer {
   const bytes = Buffer.alloc(Math.ceil(bits.length / 8));
   bits.forEach((bit, i) => {
-    if (bit) bytes[i >> 3]! |= 0x80 >> (i & 7);
+    if (bit) bytes[i >> 3] = (bytes[i >> 3] ?? 0) | (0x80 >> (i & 7));
   });
   return Buffer.concat([Buffer.from([bytes.length * 8 - bits.length]), bytes]);
 }
@@ -103,8 +104,10 @@ function decodeAt(buf: Buffer, offset: number, depth: number): { tlv: Tlv; end: 
   if (depth > MAX_DEPTH) throw new Error("BER nesting is too deep");
   let at = offset;
   const byte = (): number => {
-    if (at >= buf.length) throw new Incomplete();
-    return buf[at++]!;
+    const value = buf[at];
+    if (value === undefined) throw new Incomplete();
+    at++;
+    return value;
   };
 
   const first = byte();
@@ -187,7 +190,7 @@ export function readOid(tlv: Tlv): string {
     }
   }
   if (arcs.length === 0) return "";
-  const head = arcs[0]!;
+  const [head = 0] = arcs;
   const [a, b] = head < 80 ? [Math.floor(head / 40), head % 40] : [2, head - 80];
   return [a, b, ...arcs.slice(1)].join(".");
 }

@@ -1,22 +1,40 @@
-import js from "@eslint/js";
-import reactHooks from "eslint-plugin-react-hooks";
-import tseslint from "typescript-eslint";
+import vitest from "@vitest/eslint-plugin";
+import { houseStyle } from "./vendor/house-style/eslint.config.js";
 
-export default tseslint.config(
-  { ignores: ["**/dist/**", "**/dev-dist/**", "**/node_modules/**", "data/**", "**/vendor/**"] },
-  js.configs.recommended,
-  ...tseslint.configs.recommended,
+/**
+ * The house config from the vendored house-style copy, given Shelfmark's folders. Thin on purpose: the
+ * compiler is the first gate, and the house adds only what it cannot see. The rules and the reason for
+ * each are in the copy.
+ */
+export default [
+  ...houseStyle({
+    root: import.meta.dirname,
+    web: "web/src",
+    server: "server/src",
+    // Scripts run by hand, which print and read the environment directly: the repo's own, the docs
+    // capture helper and the OCR fixture recorder.
+    scripts: ["server/scripts", "docs/images", "web/src/ocr/fixtures"],
+    // Allowed to print: the server entry, the seed and the CIP refresh talk to the person running them.
+    console: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
+    // ScannerDemo is loaded with lazy(import()), which reads `default`.
+    defaultExports: ["web/src/scanner/ScannerDemo.tsx"],
+    // data/ is the local database.
+    ignores: ["data/**", "**/dev-dist/**"],
+    // Files no tsconfig reaches; the tool configs and .mjs files are linted without types by the house.
+    typed: { allowDefaultProject: ["server/scripts/*.ts"] },
+  }),
   {
-    files: ["web/src/**/*.{ts,tsx}"],
-    plugins: { "react-hooks": reactHooks },
-    rules: reactHooks.configs.recommended.rules,
+    // A warning for now (2026-11-11): these files still read the environment themselves. When the
+    // server takes its settings from config.ts, this block goes and the rule is an error again.
+    name: "shelfmark/process-env-warns",
+    files: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
+    rules: { "n/no-process-env": "warn" },
   },
   {
-    rules: {
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" },
-      ],
-    },
+    // add/flow.test.ts asserts through the expectStep helper.
+    name: "shelfmark/vitest-helpers",
+    files: ["**/*.test.{ts,tsx}"],
+    plugins: { vitest },
+    rules: { "vitest/expect-expect": ["error", { assertFunctionNames: ["expect", "expectStep"] }] },
   },
-);
+];

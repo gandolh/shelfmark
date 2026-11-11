@@ -90,7 +90,8 @@ function readList(file: string): { isbns: string[]; rejected: string[] } {
 for (const file of files) {
   const { isbns, rejected } = readList(file);
   const n = isbns.length;
-  const tallies = new Map<LookupSource | "any", Tally>([["any", empty()]]);
+  const any = empty();
+  const tallies = new Map<LookupSource, Tally>();
   const asked = sources.filter((source) => source.enabled);
   for (const source of asked) tallies.set(source.source, empty());
 
@@ -99,7 +100,7 @@ for (const file of files) {
     // The sources at once: each has its own queue, so no server sees two requests at a time.
     const drafts = await Promise.all(
       asked.map(async (source): Promise<SourceDraft | null> => {
-        const tally = tallies.get(source.source)!;
+        const tally = tallies.get(source.source) ?? empty();
         try {
           const draft = source.read(isbn13, await source.fetch(isbn13));
           count(tally, draft);
@@ -112,7 +113,6 @@ for (const file of files) {
     );
     const found = drafts.filter((draft) => draft !== null);
     // "Any": found by at least one; a cover or pages from at least one.
-    const any = tallies.get("any")!;
     if (found.length > 0) any.found++;
     if (found.some((draft) => draft.coverCandidates.length > 0)) any.cover++;
     if (found.some((draft) => draft.pages !== null)) any.pages++;
@@ -136,7 +136,6 @@ for (const file of files) {
     );
   }
   if (!askGoogle) console.log("| Google Books | not asked (pass --google) | | | |");
-  const any = tallies.get("any")!;
   console.log(`| Any of them | ${cell(any.found)} | ${cell(any.cover)} | ${cell(any.pages)} | |`);
   for (const line of rejected) console.error(`skipped: ${line}`);
 }

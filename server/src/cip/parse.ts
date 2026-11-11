@@ -55,7 +55,7 @@ export function parseIssue(text: string): CipRecord[] {
   const starts: { line: number; entry: number; depth: number }[] = [];
   lines.forEach((line, i) => {
     const match = ENTRY_START.exec(line);
-    if (match) starts.push({ line: i, entry: Number(match[2]), depth: match[1]!.length });
+    if (match) starts.push({ line: i, entry: Number(match[2]), depth: (match[1] ?? "").length });
   });
 
   starts.forEach(({ line: from, entry, depth }, k) => {
@@ -63,10 +63,10 @@ export function parseIssue(text: string): CipRecord[] {
     const chunk = lines.slice(from, to).filter((line) => !PAGE_HEADER.test(line));
 
     // The description: the start line, then the lines indented less, up to the first that isn't.
-    let description = ENTRY_START.exec(chunk[0]!)![3]!;
+    let description = ENTRY_START.exec(chunk[0] ?? "")?.[3] ?? "";
     let i = 1;
     for (; i < chunk.length; i++) {
-      const line = chunk[i]!;
+      const line = chunk[i] ?? "";
       if (line.trim() === "") continue;
       if (indent(line) > depth - 3) break;
       // "Cluj-" at a line's end and "Napoca" on the next are one word.
@@ -75,20 +75,21 @@ export function parseIssue(text: string): CipRecord[] {
         : `${description} ${line}`;
     }
     const read = readDescription(romanian(description));
-    if (!read.title) return;
+    const title = read.title;
+    if (!title) return;
 
     // The rest, with ISBNs broken across lines put back together ("ISBN 978-\n973-50-9138-5"). The
     // other line breaks stay: an ISBN must not run on into the class number on the next line.
     const tail = romanian(chunk.slice(i).join("\n")).replace(/(\d)-[ \t]*\n\s*(?=\d)/g, "$1-");
     const found = [...tail.matchAll(ISBN)];
     found.forEach((match, n) => {
-      const isbn13 = isbn13Of(match[1]!);
+      const isbn13 = isbn13Of(match[1] ?? "");
       if (!isbn13) return;
-      const record: CipRecord = { isbn13, entry, ...read, title: read.title! };
-      if (n > 0) {
+      const record: CipRecord = { isbn13, entry, ...read, title };
+      const previous = found[n - 1];
+      if (previous) {
         // A volume: the text since the previous ISBN, "Vol. 1 : Apărarea lui Socrate, ... - 2026. - ISBN",
         // or with its own imprint, "Cartea 4 : ... - Timişoara : Artpress, 2019. - ISBN".
-        const previous = found[n - 1]!;
         const between = squash(tail.slice(previous.index + previous[0].length, match.index));
         const part = /(?:^|\s)((?:Vol|Cartea|Partea|Tom|Nr)\.?\s.+)$/u.exec(between)?.[1];
         if (part) {

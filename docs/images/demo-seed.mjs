@@ -14,8 +14,6 @@
 // its own typographic covers and no publisher's artwork appears in the images.
 // Shelves, prices, dates and notes are made up. To start over, stop the server
 // and delete the scratch folder.
-/* global process, console, fetch */
-
 const api = process.argv[2] ?? "http://127.0.0.1:8808";
 const { SHELFMARK_USER: username, SHELFMARK_PASSWORD: password } = process.env;
 if (!username || !password) {

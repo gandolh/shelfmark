@@ -56,8 +56,9 @@ export function parseRecord(record: Buffer): Field[] | null {
     const indicators = bytes.subarray(0, 2).toString("utf8");
     const subfields: [string, string][] = [];
     for (const part of split(bytes.subarray(2), SUBFIELD).slice(1)) {
-      if (part.length === 0) continue;
-      subfields.push([String.fromCharCode(part[0]!), part.subarray(1).toString("utf8")]);
+      const code = part[0];
+      if (code === undefined) continue;
+      subfields.push([String.fromCharCode(code), part.subarray(1).toString("utf8")]);
     }
     fields.push({ tag, indicators, subfields });
   }

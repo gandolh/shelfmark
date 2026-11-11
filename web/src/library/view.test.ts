@@ -104,7 +104,7 @@ describe("3,000 books", () => {
     return performance.now() - start;
   };
 
-  it("searches and filters in under 50 ms", () => {
+  it("searches and filters in under 50 ms", async ({ annotate }) => {
     // Best of five, so a busy test machine's hiccup doesn't count against the code.
     const best = (run: () => unknown) => Math.min(...Array.from({ length: 5 }, () => time(run)));
 
@@ -128,7 +128,7 @@ describe("3,000 books", () => {
     const toggles = [shelf, both, {}].map((filters) => best(() => applyFilters(sorted, filters, "cartarescu")));
     const full = best(() => deriveView(library, state({ query: "humanitas", filters: both })));
 
-    console.info(
+    await annotate(
       `3,000 books: sort newest ${sortTime.toFixed(1)} ms, title+author ${titleSortTime.toFixed(1)} ms; ` +
         `first search (cold) ${cold.toFixed(1)} ms; keystrokes ${keystrokes.map((t) => t.toFixed(1)).join("/")} ms; ` +
         `filter toggles ${toggles.map((t) => t.toFixed(1)).join("/")} ms; whole view from scratch ${full.toFixed(1)} ms`,

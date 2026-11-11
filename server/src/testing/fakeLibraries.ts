@@ -87,7 +87,8 @@ export function fakeLibraries(names: readonly FixtureName[] = [], options: FakeL
     calls.push(call);
     const own = fixtures.filter((fixture) => fixture.library === library);
     // Any recorded Init answer of this library will do; fall back on another library's.
-    const init = (own[0] ?? loadFixture("bcucluj-not-found")).answers[0]!;
+    const init = (own[0] ?? loadFixture("bcucluj-not-found")).answers[0];
+    if (init === undefined) throw new Error(`no recorded Init answer for ${library}`);
     let chosen: Fixture | undefined;
 
     const socket: Duplex = new Duplex({
@@ -102,7 +103,8 @@ export function fakeLibraries(names: readonly FixtureName[] = [], options: FakeL
         if (tlv.tag === 22) {
           call.isbns = terms(tlv);
           chosen = own.find((fixture) => fixture.isbns.join() === call.isbns.join());
-          answer = chosen ? Buffer.from(chosen.answers[1]!, "base64") : NO_HITS;
+          const hits = chosen?.answers[1];
+          answer = hits ? Buffer.from(hits, "base64") : NO_HITS;
         }
         if (tlv.tag === 24 && chosen?.answers[2]) answer = Buffer.from(chosen.answers[2], "base64");
         if (!answer) return;
