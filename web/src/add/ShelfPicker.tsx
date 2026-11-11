@@ -1,4 +1,5 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { Toggle, ToggleGroup } from "../components/ui/ToggleGroup";
 import { PlusIcon } from "./icons";
 import { matchShelf, normalizeShelf } from "./shelves";
 
@@ -67,25 +68,23 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
     <fieldset className="add-choice" disabled={disabled}>
       <legend className="add-label">{label}</legend>
       <div className="add-chips">
-        {chips.map((shelf) => {
-          const chosen = shelf === value && !writing;
-          return (
-            <button
-              key={shelf}
-              type="button"
-              className="add-chip"
-              aria-pressed={chosen}
-              onClick={() => {
-                close();
-                onChange(chosen ? null : shelf);
-              }}
-            >
+        <ToggleGroup
+          aria-label={label}
+          className="add-chips__group"
+          value={writing ? null : value}
+          onChoose={(next) => {
+            close();
+            onChange(next);
+          }}
+        >
+          {chips.map((shelf) => (
+            <Toggle key={shelf} value={shelf} className="add-chip">
               <span className="add-chip__label" data-label={shelf}>
                 {shelf}
               </span>
-            </button>
-          );
-        })}
+            </Toggle>
+          ))}
+        </ToggleGroup>
         {writing ? (
           <span className="add-chip add-chip--field">
             <input

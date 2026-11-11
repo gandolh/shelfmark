@@ -780,6 +780,11 @@
   margin-top: 8px;
 }
 
+/* The chips' toggle group takes no box of its own: the chips, the field and "New shelf" wrap together in `.add-chips`. */
+.add-chips__group {
+  display: contents;
+}
+
 .add-chip {
   position: relative;
   display: inline-flex;
