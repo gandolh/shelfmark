@@ -240,7 +240,7 @@ components:
 
 **Creative North Star: "The Lit Shelf"**
 
-Shelfmark is the familiar table app played straight, in its Covers variant: the book's cover leads and everything around it recedes. A quiet off-white ground, flat grey controls, white containers with no shadow, one teal for everything that can be pressed, and the system font. The only object in the app that sits up off the page is a book's cover. Navigation is conventional on purpose (the owner rejected a metaphor-driven UI elsewhere as hard to navigate): exactly two places, Library and Add a book, a top bar on the desktop and a two-tab bar on a phone, account items in a menu rather than a Settings page.
+Shelfmark is the familiar table app played straight, in its Covers variant: the book's cover leads and everything around it recedes. A quiet off-white ground, flat grey controls, white containers with no shadow, one teal for everything that can be pressed, and the system font. The only object in the app that sits up off the page is a book's cover. Navigation is conventional on purpose (the owner rejected a metaphor-driven UI elsewhere as hard to navigate): exactly three places, Library, Add a book and Wishlist, a top bar on the desktop and a three-tab bar on a phone, account items in a menu rather than a Settings page.
 
 The density is that of a working tool. The desktop Library is a table of 94 px rows inside one white rounded container; the phone defaults to a three-column grid of covers. Because free databases miss most Romanian covers, many books wear the no-cover placeholder, a typographic cover on one of eight tints picked from the title, so a library with few real covers still reads as a shelf rather than a wall of grey boxes.
 
@@ -254,7 +254,7 @@ The app icon carries the same world: books on a shelf in the accent on the groun
 - The cover is the only thing with a shadow, besides what floats (menus, sheets, dialogs).
 - Flat fills, no borders on controls, hairlines only on the bars and dividers in the table.
 - The system font at a small set of sizes; tabular figures for years, counts and ISBNs.
-- Two places only; account items live in a menu.
+- Three places only (Wishlist added 2026-11-10); account items live in a menu.
 
 ## Colors
 
@@ -331,15 +331,14 @@ Add a book keeps three feature-local sizes in `add/add.css`: a result's title 20
 
 The shell picks the layout in script: from 768 px it is the desktop (`.shell--desktop`), below it the phone (`.shell--phone`); stylesheets outside the shell use the matching media query at 767.98 px.
 
-**Desktop.** A sticky top bar 63 px tall on the ground with a hairline under it, in three columns: the wordmark left, the two places as a segmented control centred, the search field (up to 240 px) and the account disc right. Under it, one centred column up to 1180 px wide with 40 px gutters, 36 px above and 48 px below, its parts 18 px apart; the Library alone runs the window's full width less the gutters, so a wide screen gives the table its columns instead of empty sides. A page header is the title with its caption on the left and the toolbar on the right, bottom-aligned.
+**Desktop.** A sticky top bar 63 px tall on the ground with a hairline under it, in three columns: the wordmark left, the three places as a segmented control centred, the search field (up to 240 px) and the account disc right. Under it, one centred column up to 1180 px wide with 40 px gutters, 36 px above and 48 px below, its parts 18 px apart; the Library alone runs the window's full width less the gutters, so a wide screen gives the table its columns instead of empty sides. A page header is the title with its caption on the left and the toolbar on the right, bottom-aligned.
 
 **Phone.** No top bar. A large title with the account disc beside it, then search, then the toolbar, with 16 px gutters; a sticky two-tab bar at the bottom (76 px, its bottom 10 px growing into the home-indicator area) on the lighter `bar` ground with a hairline above. Every target is at least 44 px, often by an invisible extension around a smaller-looking control.
 
 **Library.**
 - Header card: the title, the caption and the toolbar sit on a white card like the table's container (`surface`, 16 px radius, no shadow), 22 px above and below and 24 px at the sides, so the title lines up with the table's first cell. On a phone the card holds the title and account disc, the search field and the toolbar row; it runs edge to edge under the top of the screen with its lower corners rounded and the header's usual padding, 10 px above the tabs. The tabs stay on the ground under it.
 - Desktop toolbar: the small Table / Covers switch, a 1 px hairline rule 22 px tall with 16 px either side, then the list tools at the end: Views (the saved views' menu, showing the view's name while the page is on one, with a down chevron), Filter ("Filter and sort" in Covers) and Columns (in the table). The tools are quiet tool buttons (below). There is no Add a book here (the top bar's place does it) and no Export (it is in the account menu).
-- Phone toolbar: one row. The small segmented Covers / Table switch, then "Filter and sort" at the row's end as a quiet tool button with a sliders icon. There is no Columns button on a phone: "Columns" is a row inside the "Filter and sort" sheet that steps the sheet to the column picker, with a back step to "Filter and sort". Views has no room in this row: it ends the Owned / Wishlist row as a quiet tool button on the tabs' baseline, its menu lined up with the right edge.
-- Owned / Wishlist: text tabs under the title on a hairline, each with its count; the open one ink with a 2 px accent underline, the other muted.
+- Phone toolbar: one row. The small segmented Covers / Table switch, then "Filter and sort" at the row's end as a quiet tool button with a sliders icon. There is no Columns button on a phone: "Columns" is a row inside the "Filter and sort" sheet that steps the sheet to the column picker, with a back step to "Filter and sort". Views has no room in this row: it gets a row of its own under the card, a quiet tool button on the hairline, its menu lined up with the right edge.
 - Bulk bar: while books are selected it takes the toolbar's place. Desktop: "3 selected" in ink semibold, then Move to shelf…, Set status (a menu), Add tags…, Remove tags… and Delete… as secondary buttons, and a quiet Clear. Phone: the count, then Actions (a menu) and Clear as accent text; Views stays at the end of the tabs. Clear puts the toolbar back as it was. A line in ink-2 under the tabs says what the last change did. Its dialogs use the Views dialogs' frame; Delete asks first, naming the count, with no danger colour, and after "Select all" says the books run past the page on show.
 - Select all: when every book on the page is ticked and the list runs past it, a band above the list, in the selected row's teal wash (`accent-tint-soft`, 8 px radius, 14 px meta text in ink-2, centred), says "All 10 books on this page are selected." and offers "Select all 665 books" as semibold accent text; once chosen, "All 665 books are selected." and "Clear selection". The same button carries each step. In Covers, which has no header box, it also offers "Select all 10 on this page" while some covers are ticked. On a phone the text is 15 px and the action a 44 px target.
 - Active filters show as removable chips under the toolbar, with a quiet "clear" at the end.
@@ -382,7 +381,7 @@ Flat fills, no borders, no shadow.
 - **Focus:** the one ring, 2 px accent, 2 px offset, keyboard only.
 
 ### Segmented control
-The workhorse switch: the two places in the top bar, Table / Covers, Add a book's three modes, sort direction. A control-grey track (10 px corners, 3 px inset) holding 32 px segments; the selected segment is a white 8 px tile with ink semibold text, the rest ink-2 at 14 px, hovering to the segment-hover mix. The small variant (8 px track, 2 px inset, 30 px segments with 6 px corners, 13 px) sits in toolbars. Over the camera the track sits on the ground, nearly opaque.
+The workhorse switch: the three places in the top bar, Table / Covers, Add a book's three modes, sort direction. A control-grey track (10 px corners, 3 px inset) holding 32 px segments; the selected segment is a white 8 px tile with ink semibold text, the rest ink-2 at 14 px, hovering to the segment-hover mix. The small variant (8 px track, 2 px inset, 30 px segments with 6 px corners, 13 px) sits in toolbars. Over the camera the track sits on the ground, nearly opaque.
 
 ### Chips
 - **Filter chip:** teal wash, accent-press text, 30 px pill, 13 px semibold label with a separate remove "x"; tapping the label reopens that filter.
@@ -402,7 +401,7 @@ The workhorse switch: the two places in the top bar, Table / Covers, Add a book'
 - **On a phone:** 16 px text so iOS does not zoom.
 
 ### Navigation
-- **Desktop:** the top bar; the two places as a centred segmented control with 18 px segment padding, the current place a white tile.
+- **Desktop:** the top bar; the three places as a centred segmented control with 18 px segment padding, the current place a white tile.
 - **Phone:** the tab bar, two items (Library, Add a book), each an icon over an 11 px label; muted at rest, ink-2 on hover, accent and semibold when current; the icon scales to 0.92 while pressed.
 - **Account:** a round control-grey disc (34 px on the desktop, 32 px in a 44 px target on a phone) that opens a menu: change username (the signed-in name as its detail, cut with an ellipsis past 20em), change password, Sign in with Ward (linked or not), import a CSV, stats, download a backup, then an "Export library" section (Excel workbook or CSV: every book, owned and wishlist, whatever the Library shows), sign out.
 - **Icons:** one hand-drawn line set on a 24-unit grid, 1.9 stroke, round caps and joins, `currentColor`, decorative (the control names itself).
@@ -428,7 +427,7 @@ State changes only, short, one curve: `cubic-bezier(0.22, 1, 0.36, 1)` at 120 ms
 - **Do** give every book a cover: the stored image, or the typographic placeholder on its title's tint.
 - **Do** keep the cover's shadow (`0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2)`) on the cover and the float shadow (`0 16px 40px rgba(27, 27, 29, 0.18)`) on menus, sheets and dialogs, and nothing else.
 - **Do** separate surfaces by tone: white containers (16 px corners) on the ground, grey controls inside them.
-- **Do** keep exactly two places, Library and Add a book; the book page and login are routes inside them, and account items live in the account menu.
+- **Do** keep exactly three places, Library, Add a book and Wishlist; the book page and login are routes inside them, and account items live in the account menu.
 - **Do** write English copy in the glossary's words: book, collection, shelf (written "Room · shelf"), status, lookup, draft.
 - **Do** keep the scanner one screen with internal states; nothing navigates while the camera runs.
 - **Do** give every phone target 44 px and every phone field 16 px text.

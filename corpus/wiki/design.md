@@ -1,6 +1,6 @@
 ---
-summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the two-place navigation (Library, Add a book) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card, full width and toolbar (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-11-04
+summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the three-place navigation (Library, Add a book, Wishlist; two places until 2026-11-10) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card, full width and toolbar (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
+updated: 2026-11-11
 ---
 
 # Design
@@ -68,18 +68,21 @@ palette, type or marks.
 
 ## Navigation
 
-Two places only: **Library** and **Add a book**.
+Three places: **Library**, **Add a book** and **Wishlist** (two until
+2026-11-10; see [decisions.md](decisions.md)).
 
-- Desktop: a top bar in three columns: wordmark left, the two places as a
+- Desktop: a top bar in three columns: wordmark left, the three places as a
   segmented control in the centre, search and the account button right.
-- Phone: a two-tab bar at the bottom.
+- Phone: a three-tab bar at the bottom.
 - **No Settings tab.** The account button opens a menu with: change username
   (its detail is the name signed in, since 2026-10-24), change password, Sign in
   with Ward (linked or not), import a CSV, stats, download a backup (the
   database file), "Export library" (since 2026-11-04), sign out.
 - **No loans** at all (owner, 2026-10-14).
-- The **wishlist** is not a place: Library has two collections, Owned and
-  Wishlist, as text tabs under the page title ("Owned 14 · Wishlist 3").
+- **Wishlist** is a place (since 2026-11-10, built 2026-11-11): the wished-for
+  books as covers, an Add a book button that lands in the wishlist, then the
+  recommendations ([recommendations.md](recommendations.md)). Library holds
+  the owned books only; the Owned / Wishlist tabs went.
 
 ## Library
 
@@ -108,7 +111,7 @@ Two places only: **Library** and **Add a book**.
   side). On the desktop the Library runs the window's width less the 40 px
   gutters; every other page keeps the 1180 px column. The title, caption and
   toolbar sit on a white card like the table's container (`surface`, 16 px
-  radius, flat); the Owned / Wishlist tabs stay on the ground under it. On a
+  radius, flat); on a phone the Views row stays on the ground under it. On a
   phone the card runs edge to edge with its lower corners rounded, so the
   toolbar row keeps the width it had.
 - **The toolbar** (owner, 2026-11-04, [brief 03](../briefs/done/03-library-toolbar-groups.md)).
@@ -153,7 +156,7 @@ What the mock-ups left open, as the v1 briefs drew it (DESIGN.md has the detail)
   typographic cover (title and author on one of eight tints picked from the
   title), not a grey box.
 - The book page, the filter chip row, empty and loading states, and the
-  account menu. The Owned / Wishlist tabs shipped on 2026-10-23.
+  account menu. The Owned / Wishlist tabs shipped on 2026-10-23 and went on 2026-11-11 when Wishlist became a place.
 - `DESIGN.md`, written from the built UI on 2026-10-15 (below).
 
 ## Finish review (2026-10-15)

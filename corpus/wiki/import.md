@@ -1,6 +1,6 @@
 ---
 summary: How CSV import works and why it is shaped so. The account-menu entry (no third place), encoding detection, the header sets that map automatically, the preview flags and default ticks, the one-at-a-time lookups that spare the Google Books key, and how rows are saved. Read before changing web/src/import/.
-updated: 2026-11-02
+updated: 2026-11-11
 ---
 
 # CSV import
@@ -13,8 +13,8 @@ Shipped by the 2026-10-23 work. Code in
 
 "Import a CSV" is an item in the account menu, beside the backup download. It
 opens the `import` route (`/import`), which counts as part of the Library
-place. It is not a third tab ("Two places only" in
-[decisions.md](decisions.md)).
+place. It is not a fourth place (the three places, "Two places only" revisited
+in [decisions.md](decisions.md)).
 
 ## Steps
 

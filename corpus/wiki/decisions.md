@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; two places only (Library, Add a book); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app).
-updated: 2026-11-02
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; three places (Library, Add a book, Wishlist; two until 2026-11-10); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app).
+updated: 2026-11-11
 ---
 
 # Decisions
@@ -62,7 +62,7 @@ same call the owner made for showcase); Calm, whose coloured tags get busy at
 library scale; Grid, which hides covers. Mock-ups and tokens:
 [design.md](design.md).
 
-## Two places only: Library and Add a book
+## Two places only: Library and Add a book (three since 2026-11-10: Wishlist)
 _2026-10-14_. The owner asked for no Loans tab and no Settings tab unless it
 has content. The account items (password, Sign in with Ward, backup download,
 sign out) live in a menu on the account button instead. The wishlist is a
@@ -77,8 +77,9 @@ recommendations and for a place to keep the books they hear about
 wishlist moves out of Library, which keeps the owned books; Wishlist holds the
 wished-for books and the recommendations, and has its own Add a book button.
 The account items still live in the menu, and a further top-level place still
-needs an explicit revisit. Until that brief is built, the entry above
-describes the app.
+needs an explicit revisit. Built 2026-11-11 (brief 04): the Library's
+Owned / Wishlist tabs are gone, and `/library?collection=wishlist` redirects to
+Wishlist.
 
 ## One row per physical copy
 _2026-10-14_. The owner confirmed the recommendation: a row in `books` is one

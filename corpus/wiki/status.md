@@ -24,6 +24,8 @@ estate calls of 2026-11-09. The product calls are in
 
 ## By area
 
+- **Wishlist and recommendations** (2026-11-11, brief 04). Wishlist is the third place; Library holds owned books only; the Claude import path, the dedup and the three tables are built on local `main`, not deployed. The spike of TasteDive and an embedding ranker is not run: it needs the owner's real library and verdict ([recommendations.md](recommendations.md), [todo](../todos/recommendations-spike.md)).
+
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
 - **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app

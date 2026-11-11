@@ -1,6 +1,6 @@
 ---
 summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status, lookup and draft, CIP and the CIP block, library catalog and CIP index. Use these words in code, UI copy and briefs.
-updated: 2026-10-23
+updated: 2026-11-11
 ---
 
 # Glossary
@@ -12,8 +12,24 @@ _Avoid_: item, copy (as a noun for the row), volume, record, entry
 
 **Collection**:
 Which list a book is on: **owned** (on a shelf at home) or **wishlist** (wanted,
-not owned). The Library shows one collection at a time.
+not owned). The Library shows the owned books; the Wishlist page shows the
+wishlist.
 _Avoid_: library (for the owned list), wanted list, to-buy list
+
+**Wishlist**:
+A place in the app (since 2026-11-10), after Library and Add a book: the books
+wished for, then the recommendations. Also the `wishlist` collection. No longer
+a tab of the Library.
+
+**Recommendation**:
+A book in no collection, suggested from what the library holds, or named by
+Claude and checked in Open Library. Never a book that is owned, wished for or
+dismissed ([recommendations.md](recommendations.md)).
+_Avoid_: suggestion, pick, discovery
+
+**Dismissed**:
+A recommendation the owner said "Not interested" to; never shown again, by work
+key or title key.
 
 **Shelf**:
 Where an owned book sits, written as "Room · shelf" ("Living room · A2"), or

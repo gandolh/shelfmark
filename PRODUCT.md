@@ -76,9 +76,10 @@ Romanian books' printed CIP block is a planned data source.
 - Visual direction: the standard in its "Covers" variant, calibrated on
   Apple's own apps (the cover leads, chrome recedes, one interactive colour),
   light. Tokens and layout in `corpus/wiki/design.md`.
-- Two places only: Library and Add a book. Account items live in a menu,
-  not a Settings page. There are no loans. The wishlist is a second
-  collection inside Library, not a third place.
+- Three places only: Library, Add a book and Wishlist (Wishlist since
+  2026-11-10). Account items live in a menu, not a Settings page. There are no
+  loans. The wishlist is a collection of its own, shown on the Wishlist page,
+  not inside Library.
 
 ## Evidence on Hand
 
