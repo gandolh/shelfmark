@@ -3,7 +3,7 @@
 **Depends on:**
 
 - In Shelfmark:
-  - [brief 04](04-wishlist-with-recommendations.md), which adds the Wishlist place and its page, so the redesign covers three places, not two;
+  - [brief 04](../done/04-wishlist-with-recommendations.md), which adds the Wishlist place and its page, so the redesign covers three places, not two;
   - [brief 07](07-the-web-app-to-tailwind.md), which moves the styling to one stylesheet of tokens in Tailwind and adds the Light / Dark / System switch. A redesign is then mostly a new token set and layout;
   - [brief 06](06-base-ui-by-the-conventions.md), whose wrappers the redesign keeps working.
 - In the owner's skills library:

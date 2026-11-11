@@ -73,7 +73,7 @@ explicit revisit of this entry.
 _Revisited 2026-11-10_. Shelfmark now has **three places**: Library, Add a
 book and **Wishlist**. The reason is the owner's request for book
 recommendations and for a place to keep the books they hear about
-([the brief](../briefs/todo/04-wishlist-with-recommendations.md)). The
+([the brief](../briefs/done/04-wishlist-with-recommendations.md)). The
 wishlist moves out of Library, which keeps the owned books; Wishlist holds the
 wished-for books and the recommendations, and has its own Add a book button.
 The account items still live in the menu, and a further top-level place still

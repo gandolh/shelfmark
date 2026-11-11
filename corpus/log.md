@@ -723,7 +723,7 @@ The defaults it builds:
 - a third place in the navigation, which revisits "Two places only".
 
 These wait on the owner's grilling on 2026-11-10. See the
-[brief](briefs/todo/04-wishlist-with-recommendations.md).
+[brief](briefs/done/04-wishlist-with-recommendations.md).
 
 ## [2026-11-10] todo | Briefs 05-08: the owner's estate calls of 2026-11-09 applied to Shelfmark
 
@@ -763,7 +763,7 @@ and a small embedding model (all-MiniLM-L6-v2, about 23 MB, run in Node);
 otherwise a download of the library with a prompt for Claude and an Import
 button for the JSON it returns; and that path stays as a second source if the
 spike works. The file is now
-[04-wishlist-with-recommendations.md](briefs/todo/04-wishlist-with-recommendations.md).
+[04-wishlist-with-recommendations.md](briefs/done/04-wishlist-with-recommendations.md).
 
 **Revisit:** [decisions.md](wiki/decisions.md) now says "Two places only" was
 revisited on 2026-11-10: three places, Library, Add a book and Wishlist, for
