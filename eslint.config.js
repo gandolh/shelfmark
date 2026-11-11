@@ -1,4 +1,3 @@
-import vitest from "@vitest/eslint-plugin";
 import { houseStyle } from "./vendor/house-style/eslint.config.js";
 
 /**
@@ -22,6 +21,8 @@ export default [
     ignores: ["data/**", "**/dev-dist/**"],
     // Files no tsconfig reaches; the tool configs and .mjs files are linted without types by the house.
     typed: { allowDefaultProject: ["server/scripts/*.ts"] },
+    // add/flow.test.ts asserts through the expectStep helper.
+    assertFunctionNames: ["expect", "expectTypeOf", "expectStep"],
   }),
   {
     // A warning for now (2026-11-11): these files still read the environment themselves. When the
@@ -29,12 +30,5 @@ export default [
     name: "shelfmark/process-env-warns",
     files: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
     rules: { "n/no-process-env": "warn" },
-  },
-  {
-    // add/flow.test.ts asserts through the expectStep helper.
-    name: "shelfmark/vitest-helpers",
-    files: ["**/*.test.{ts,tsx}"],
-    plugins: { vitest },
-    rules: { "vitest/expect-expect": ["error", { assertFunctionNames: ["expect", "expectStep"] }] },
   },
 ];
