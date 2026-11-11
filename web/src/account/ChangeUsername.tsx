@@ -7,11 +7,12 @@ import { accountMessage } from "../auth/messages";
 import "../auth/session";
 import { Button } from "../components/Button";
 import { useIsDesktop } from "../layout/viewport";
-import { AccountDialog, Actions, dialogSwitch } from "./AccountDialog";
+import { Dialog, DialogActions } from "../components/ui/Dialog";
+import { dialogSwitch } from "./dialogSwitch";
 
 /**
  * The account menu's "Change username", in the account dialog
- * shell (`AccountDialog.tsx`). One field, holding the current name and
+ * shell (`components/ui/Dialog.tsx`). One field, holding the current name and
  * selected, so typing replaces it. The rename is ward-auth's (0.4.0): the
  * user id and every session stay, and the session, the menu included, carries
  * the new name as soon as it is saved.
@@ -56,10 +57,11 @@ function UsernameDialog({ onClose }: { onClose: () => void }) {
   const rename = useRenameUser();
 
   return (
-    <AccountDialog
+    <Dialog
       title={rename.done ? "Username changed" : "Change username"}
       onClose={onClose}
       returnFocus={usernameDialog.takeReturnFocus}
+      pending={rename.pending}
     >
       {rename.done ? (
         <Done username={username} desktop={desktop} onClose={onClose} />
@@ -74,7 +76,7 @@ function UsernameDialog({ onClose }: { onClose: () => void }) {
           onCancel={onClose}
         />
       )}
-    </AccountDialog>
+    </Dialog>
   );
 }
 
@@ -115,7 +117,7 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
   const blockFailure = failure !== null && !aboutName ? accountMessage(failure) : null;
 
   return (
-    <form className="account-dialog__form" onSubmit={submit} noValidate>
+    <form className="library-dialog__form" onSubmit={submit} noValidate>
       <AuthField
         ref={fieldRef}
         label="Username"
@@ -145,7 +147,7 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
           <span className="auth-error__text">{blockFailure}</span>
         </p>
       )}
-      <Actions desktop={desktop} onCancel={onCancel}>
+      <DialogActions desktop={desktop} onCancel={onCancel}>
         <Button
           type="submit"
           variant="primary"
@@ -155,19 +157,19 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
         >
           {pending ? "Saving…" : "Change username"}
         </Button>
-      </Actions>
+      </DialogActions>
     </form>
   );
 }
 
 function Done({ username, desktop, onClose }: { username: string; desktop: boolean; onClose: () => void }) {
   return (
-    <div className="account-dialog__form">
-      <p className="account-dialog__text" role="status">
+    <div className="library-dialog__form">
+      <p className="library-dialog__text" role="status">
         You're now <strong>{username}</strong>. Sign in with that name from now on; you're still signed in everywhere.
         If your browser saved your password, it may still list it under the old name.
       </p>
-      <div className="account-dialog__actions">
+      <div className="library-dialog__actions">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>

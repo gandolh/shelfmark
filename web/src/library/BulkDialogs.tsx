@@ -3,7 +3,8 @@ import { matchShelf, normalizeShelf } from "../add/shelves";
 import { AuthField } from "../auth/Field";
 import { Button } from "../components/Button";
 import { bookCount, parseTags, type Choice } from "./bulk";
-import { DialogActions, DialogFailure, DialogFrame, messageOf } from "./ViewDialog";
+import { Dialog, DialogActions } from "../components/ui/Dialog";
+import { DialogFailure, messageOf } from "./ViewDialog";
 
 /**
  * The bulk bar's dialogs: move to a shelf, add tags, remove tags,
@@ -88,12 +89,7 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
   };
 
   return (
-    <DialogFrame
-      title={`Move ${bookCount(owned)} to a shelf`}
-      desktop={desktop}
-      returnFocus={returnFocus}
-      onClose={onClose}
-    >
+    <Dialog title={`Move ${bookCount(owned)} to a shelf`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         {wishlist > 0 && (
           <p className="library-dialog__text">
@@ -180,7 +176,7 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
           </Button>
         </DialogActions>
       </form>
-    </DialogFrame>
+    </Dialog>
   );
 }
 
@@ -211,12 +207,7 @@ export function AddTagsDialog({ count, suggestions, desktop, returnFocus, onClos
   };
 
   return (
-    <DialogFrame
-      title={`Add tags to ${bookCount(count)}`}
-      desktop={desktop}
-      returnFocus={returnFocus}
-      onClose={onClose}
-    >
+    <Dialog title={`Add tags to ${bookCount(count)}`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         <AuthField
           ref={input}
@@ -253,7 +244,7 @@ export function AddTagsDialog({ count, suggestions, desktop, returnFocus, onClos
           </Button>
         </DialogActions>
       </form>
-    </DialogFrame>
+    </Dialog>
   );
 }
 
@@ -291,11 +282,11 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
   };
 
   return (
-    <DialogFrame
+    <Dialog
       title={`Remove tags from ${bookCount(count)}`}
-      desktop={desktop}
       returnFocus={returnFocus}
       onClose={onClose}
+      pending={pending}
     >
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         <fieldset className="library-options" aria-describedby={fieldError ? `${id}-error` : undefined}>
@@ -334,7 +325,7 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
           </Button>
         </DialogActions>
       </form>
-    </DialogFrame>
+    </Dialog>
   );
 }
 
@@ -356,7 +347,7 @@ export function DeleteBooksDialog({
 }: DeleteBooksDialogProps) {
   const { pending, failure, save } = useSave(onClose, "The books weren't deleted. Try again.");
   return (
-    <DialogFrame title={`Delete ${bookCount(count)}?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <Dialog title={`Delete ${bookCount(count)}?`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <div className="library-dialog__form">
         <p className="library-dialog__text">
           {count === 1 ? "It leaves" : "They leave"} your library with{" "}
@@ -380,6 +371,6 @@ export function DeleteBooksDialog({
           </Button>
         </DialogActions>
       </div>
-    </DialogFrame>
+    </Dialog>
   );
 }

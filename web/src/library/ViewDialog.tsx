@@ -1,9 +1,9 @@
-import { Dialog } from "@base-ui/react/dialog";
-import { useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { isApiError } from "../api";
 import { AuthField } from "../auth/Field";
 import { AlertIcon } from "../auth/icons";
 import { Button } from "../components/Button";
+import { Dialog, DialogActions } from "../components/ui/Dialog";
 import { NAME_TAKEN } from "./savedViewsStore";
 import "../auth/auth.css";
 
@@ -13,71 +13,12 @@ import "../auth/auth.css";
  * panel in the middle of the window on the desktop, the floating sheet over
  * the bottom of a phone. A name another view has is said under the field
  * (the server's `409`); any other failure under the form. The bulk bar's
- * dialogs (BulkDialogs.tsx) are built from the same `DialogFrame`,
+ * dialogs (BulkDialogs.tsx) are built from the same `Dialog` wrapper,
  * `DialogActions` and `DialogFailure`.
  */
 
 /** As the server allows (shared/src/views.ts). */
 const NAME_MAX = 80;
-
-export interface FrameProps {
-  title: string;
-  desktop: boolean;
-  /** Where focus goes back to on close: the Views button. */
-  returnFocus: HTMLElement | null;
-  onClose: () => void;
-  children: ReactNode;
-}
-
-export function DialogFrame({ title, desktop, returnFocus, onClose, children }: FrameProps) {
-  const popupRef = useRef<HTMLDivElement>(null);
-  return (
-    <Dialog.Root
-      open
-      onOpenChange={(next, details) => {
-        // Esc, and a press on the backdrop, close it; an Esc a field already used doesn't.
-        if (!next && !(details.reason === "escape-key" && details.event.defaultPrevented)) onClose();
-      }}
-    >
-      <Dialog.Portal>
-        <Dialog.Backdrop className="library-dialog-backdrop" />
-        <Dialog.Popup
-          ref={popupRef}
-          className={desktop ? "library-dialog library-dialog--centered" : "library-dialog library-dialog--sheet"}
-          initialFocus={() => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true}
-          finalFocus={() => (returnFocus?.isConnected ? returnFocus : true)}
-        >
-          <div className="library-dialog__frame">
-            <Dialog.Title className="library-dialog__title">{title}</Dialog.Title>
-            {children}
-          </div>
-        </Dialog.Popup>
-      </Dialog.Portal>
-    </Dialog.Root>
-  );
-}
-
-/** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-export function DialogActions({
-  desktop,
-  cancel,
-  onCancel,
-  children,
-}: {
-  desktop: boolean;
-  cancel: string;
-  onCancel: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <div className="library-dialog__actions">
-      <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
-        {cancel}
-      </Button>
-      {children}
-    </div>
-  );
-}
 
 export function DialogFailure({ children }: { children: string }) {
   return (
@@ -153,7 +94,7 @@ export function NameDialog({
   };
 
   return (
-    <DialogFrame title={title} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <Dialog title={title} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         {intro && <p className="library-dialog__text">{intro}</p>}
         <AuthField
@@ -184,7 +125,7 @@ export function NameDialog({
           </Button>
         </DialogActions>
       </form>
-    </DialogFrame>
+    </Dialog>
   );
 }
 
@@ -216,7 +157,7 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
   };
 
   return (
-    <DialogFrame title={`Delete “${name}”?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <Dialog title={`Delete “${name}”?`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <div className="library-dialog__form">
         <p className="library-dialog__text">
           Only the saved view goes, on every device. Your books, and what the Library shows now, stay as they are.
@@ -235,6 +176,6 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
           </Button>
         </DialogActions>
       </div>
-    </DialogFrame>
+    </Dialog>
   );
 }

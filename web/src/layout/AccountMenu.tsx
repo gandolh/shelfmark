@@ -16,6 +16,7 @@ import { AccountIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/Menu";
 import type { ExportFormat } from "../export/exportLibrary";
 import { IMPORT_CSV, STATS, navigate } from "../router";
+import "../account/account.css";
 
 const NOTICE_MS = 6000;
 

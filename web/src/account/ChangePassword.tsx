@@ -13,11 +13,12 @@ import { accountMessage } from "../auth/messages";
 import "../auth/session";
 import { Button } from "../components/Button";
 import { useIsDesktop } from "../layout/viewport";
-import { AccountDialog, Actions, dialogSwitch } from "./AccountDialog";
+import { Dialog, DialogActions } from "../components/ui/Dialog";
+import { dialogSwitch } from "./dialogSwitch";
 
 /**
  * The account menu's "Change password", in the account dialog shell
- * (`AccountDialog.tsx`).
+ * (`components/ui/Dialog.tsx`).
  *
  * - With a password: the current one, the new one twice. Every other session
  *   ends; this one stays.
@@ -138,9 +139,14 @@ function PasswordDialog({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <AccountDialog title={title} onClose={onClose} returnFocus={passwordDialog.takeReturnFocus}>
+    <Dialog
+      title={title}
+      onClose={onClose}
+      returnFocus={passwordDialog.takeReturnFocus}
+      pending={change.pending || local.pending}
+    >
       {body}
-    </AccountDialog>
+    </Dialog>
   );
 }
 
@@ -200,8 +206,8 @@ function PasswordForm(props: PasswordFormProps) {
   const blockFailure = failure !== null && !wrongCurrent ? accountMessage(failure) : null;
 
   return (
-    <form className="account-dialog__form" onSubmit={submit} noValidate>
-      {intro && <p className="account-dialog__text">{intro}</p>}
+    <form className="library-dialog__form" onSubmit={submit} noValidate>
+      {intro && <p className="library-dialog__text">{intro}</p>}
       <input
         className="visually-hidden"
         type="text"
@@ -250,7 +256,7 @@ function PasswordForm(props: PasswordFormProps) {
           <span className="auth-error__text">{blockFailure}</span>
         </p>
       )}
-      <Actions desktop={desktop} onCancel={onCancel}>
+      <DialogActions desktop={desktop} onCancel={onCancel}>
         <Button
           type="submit"
           variant="primary"
@@ -260,7 +266,7 @@ function PasswordForm(props: PasswordFormProps) {
         >
           {pending ? "Saving…" : submitLabel}
         </Button>
-      </Actions>
+      </DialogActions>
     </form>
   );
 }
@@ -274,8 +280,8 @@ function ConfirmWithWard(props: {
 }) {
   const { pending, failure, desktop, onConfirm, onCancel } = props;
   return (
-    <div className="account-dialog__form">
-      <p className="account-dialog__text">
+    <div className="library-dialog__form">
+      <p className="library-dialog__text">
         You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then
         choose one here, so you can still sign in while Ward is down.
       </p>
@@ -285,7 +291,7 @@ function ConfirmWithWard(props: {
           <span className="auth-error__text">{accountMessage(failure)}</span>
         </p>
       )}
-      <Actions desktop={desktop} onCancel={onCancel}>
+      <DialogActions desktop={desktop} onCancel={onCancel}>
         <Button
           variant="primary"
           size={desktop ? "regular" : "large"}
@@ -296,18 +302,18 @@ function ConfirmWithWard(props: {
         >
           {pending ? "Opening Ward…" : "Confirm with Ward"}
         </Button>
-      </Actions>
+      </DialogActions>
     </div>
   );
 }
 
 function Done({ desktop, onClose }: { desktop: boolean; onClose: () => void }) {
   return (
-    <div className="account-dialog__form">
-      <p className="account-dialog__text" role="status">
+    <div className="library-dialog__form">
+      <p className="library-dialog__text" role="status">
         You're still signed in here. Shelfmark signed you out everywhere else; use the new password there.
       </p>
-      <div className="account-dialog__actions">
+      <div className="library-dialog__actions">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>
