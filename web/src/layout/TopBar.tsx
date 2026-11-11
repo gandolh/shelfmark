@@ -1,11 +1,11 @@
 import { Link } from "../components/Link";
-import { ADD_BOOK, LIBRARY, type Place } from "../router";
+import { ADD_BOOK, LIBRARY, WISHLIST, type Place } from "../router";
 import { AccountMenu } from "./AccountMenu";
 import { SearchField } from "./SearchField";
 
 /**
  * The desktop top bar, in three columns (the `Covers-Desktop` mock-up): the
- * wordmark; the two places as a segmented control, centred on the window;
+ * wordmark; the three places as a segmented control, centred on the window;
  * the search box and the account button. `current` is the place the page is
  * in, and `exact` whether the page is that place itself (rather than, say, a
  * book inside the Library).
@@ -24,6 +24,9 @@ export function TopBar({ current, exact }: { current: Place | null; exact: boole
         </Link>
         <Link to={ADD_BOOK} className="segmented__item" aria-current={mark("add")} data-label="Add a book">
           Add a book
+        </Link>
+        <Link to={WISHLIST} className="segmented__item" aria-current={mark("wishlist")} data-label="Wishlist">
+          Wishlist
         </Link>
       </nav>
       <div className="topbar__end">

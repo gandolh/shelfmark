@@ -1,11 +1,13 @@
 import { lazy, Suspense, useEffect, type ComponentType } from "react";
 import { AddBookPage } from "../add/AddBookPage";
+import { WishlistPage } from "../wishlist/WishlistPage";
 import { BookPage } from "../book/BookPage";
 import { ImportPage } from "../import/ImportPage";
 import { StatsPage } from "../stats/StatsPage";
 import { LibraryPage } from "../library/LibraryPage";
 import {
   LIBRARY,
+  WISHLIST,
   navigate,
   pathFor,
   placeOf,
@@ -30,7 +32,9 @@ type PageComponent<N extends RouteName> = ComponentType<{ params: RouteParams<N>
  */
 const PAGES: { [N in RouteName]: PageComponent<N> | null } = {
   library: LibraryPage,
-  add: AddBookPage,
+  add: () => <AddBookPage />,
+  wishlist: WishlistPage,
+  addWishlist: () => <AddBookPage target="wishlist" />,
   book: BookPage,
   import: ImportPage,
   stats: StatsPage,
@@ -40,8 +44,8 @@ const PAGES: { [N in RouteName]: PageComponent<N> | null } = {
 
 /**
  * The signed-in app. Desktop (768 px and up): the top bar over the page.
- * Phone: the page, with its large title, over the two-tab bar. Exactly two
- * places, Library and Add a book; the account menu holds the rest.
+ * Phone: the page, with its large title, over the three-tab bar. Exactly three
+ * places, Library, Add a book and Wishlist; the account menu holds the rest.
  */
 export function AppShell() {
   const route = useRoute();
@@ -52,7 +56,10 @@ export function AppShell() {
   // `/login` while signed in moves on to the Library.
   useEffect(() => {
     if (route.name === "login") navigate(LIBRARY, { replace: true });
-    else if (pathname !== pathFor(route)) replaceWithCanonical(route);
+    // A link from before the Wishlist became a place of its own.
+    else if (route.name === "library" && new URLSearchParams(window.location.search).get("collection") === "wishlist") {
+      navigate(WISHLIST, { replace: true });
+    } else if (pathname !== pathFor(route)) replaceWithCanonical(route);
   }, [pathname, route]);
 
   const place = placeOf(route);

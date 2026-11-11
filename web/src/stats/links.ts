@@ -1,5 +1,5 @@
 import { NO_VALUE, type Filter } from "../library/filters";
-import { clearFilters, setFilter, updatePrefs } from "../library/state";
+import { clearFilters, setFilter } from "../library/state";
 import type { ColumnId } from "../library/columns";
 import { setSearchQuery } from "../layout/search";
 import { LIBRARY, navigate } from "../router";
@@ -37,7 +37,7 @@ export function decadeFilter(key: string): LibraryFilter | null {
 }
 
 /**
- * Open the Library on Owned with only this filter. Filters and the search
+ * Open the Library with only this filter. Filters and the search
  * text are session state (library/state.ts, layout/search.ts), so setting them
  * before navigating is all it takes.
  */
@@ -45,8 +45,5 @@ export function openInLibrary({ column, filter }: LibraryFilter): void {
   setSearchQuery("");
   clearFilters();
   setFilter(column, filter);
-  // The tab last open may be Wishlist, and these counts are of Owned.
-  updatePrefs("desktop", (p) => (p.collection === "owned" ? p : { ...p, collection: "owned" }));
-  updatePrefs("phone", (p) => (p.collection === "owned" ? p : { ...p, collection: "owned" }));
   navigate(LIBRARY);
 }

@@ -189,13 +189,9 @@
   }
 }
 
-/* --- Collection tabs --------------------------------------------------------------- */
+/* --- Views row (phone) ------------------------------------------------------------- */
 
-/*
- * Owned and Wishlist as text tabs under the title; the open one is ink with an
- * accent underline. On a phone the row ends with Views.
- */
-/* On the tabs' baseline, so "Views" reads on the line of "Owned" and "Wishlist"; the tabs stay on the hairline. */
+/* On a phone the row under the title holds Views, ending on the hairline. */
 .library-tabs-row {
   display: flex;
   align-items: baseline;
@@ -203,49 +199,6 @@
   gap: 12px;
   margin-bottom: 14px;
   border-bottom: 1px solid var(--hairline);
-}
-
-.library-tabs {
-  display: flex;
-  gap: 20px;
-}
-
-.library-tab {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 6px;
-  min-height: 40px;
-  margin-bottom: -1px;
-  padding: 0 2px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: var(--text-body);
-  font-weight: var(--weight-semibold);
-  cursor: pointer;
-}
-
-.library-tab:hover {
-  color: var(--ink);
-}
-
-.library-tab[aria-pressed="true"] {
-  border-bottom-color: var(--accent);
-  color: var(--ink);
-}
-
-.library-tab__count {
-  color: var(--muted);
-  font-size: var(--text-small);
-  font-weight: var(--weight-regular, 400);
-}
-
-@media (max-width: 767px) {
-  .library-tab {
-    min-height: var(--touch);
-  }
 }
 
 /* --- Filter chips ------------------------------------------------------------------ */

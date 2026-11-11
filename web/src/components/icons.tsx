@@ -46,6 +46,15 @@ export function AddIcon(props: IconProps) {
   );
 }
 
+/** A bookmark: the Wishlist tab. */
+export function WishlistIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M7 4.5h10a1 1 0 0 1 1 1V20l-6-4-6 4V5.5a1 1 0 0 1 1-1z" />
+    </Icon>
+  );
+}
+
 export function SearchIcon(props: IconProps) {
   return (
     <Icon strokeWidth={2} {...props}>

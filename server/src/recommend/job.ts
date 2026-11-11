@@ -45,7 +45,7 @@ export function createImportJob(catalog: Catalog, store: RecommendationStore): I
   async function run(picks: RecommendationImport): Promise<void> {
     const found: StoredRecommendation[] = [];
     for (const pick of picks) {
-      let work: CatalogWork | null = null;
+      let work: CatalogWork | null;
       try {
         work = await resolve(catalog, pick);
       } catch {

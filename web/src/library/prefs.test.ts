@@ -101,11 +101,11 @@ describe("readPrefs", () => {
 });
 
 describe("the collection tab", () => {
-  it("opens on Owned, and remembers Wishlist per layout", () => {
+  it("opens on Owned, and reads a Wishlist saved before the Wishlist page as Owned", () => {
     const storage = memoryStorage();
     expect(readPrefs(storage, "desktop").collection).toBe("owned");
     writePrefs(storage, "phone", { ...defaultPrefs("phone"), collection: "wishlist" });
-    expect(readPrefs(storage, "phone").collection).toBe("wishlist");
+    expect(readPrefs(storage, "phone").collection).toBe("owned");
     expect(readPrefs(storage, "desktop").collection).toBe("owned");
   });
 

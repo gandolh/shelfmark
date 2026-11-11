@@ -1,5 +1,5 @@
 import { Tabs } from "@base-ui/react/tabs";
-import type { Book, BookCreate } from "@shelfmark/shared";
+import type { Book, BookCreate, Collection } from "@shelfmark/shared";
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { createBook, patchBook, useBooks } from "../books/store";
 import { isApiError } from "../api";
@@ -80,7 +80,7 @@ const NOTICE_MS = 5000;
  * page never navigates while the camera runs (scanning.md), and after each
  * save the scanner reads again with no extra tap.
  */
-export function AddBookPage() {
+export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) {
   const desktop = useIsDesktop();
   const [state, dispatch] = useReducer(flowReducer, undefined, startFlow);
   const { mode, step, notice, added } = state;
@@ -198,7 +198,12 @@ export function AddBookPage() {
   // The sheet is a queued scan's: saving or discarding it takes the scan out of the queue.
   const fromQueue = state.queued;
 
-  const save = async (body: BookCreate, cover: CoverPlan, photo: CoverPhoto | null) => {
+  const save = async (given: BookCreate, cover: CoverPlan, photo: CoverPhoto | null) => {
+    // Opened from the Wishlist (`target`): whatever the sheet offers, the book lands in the wishlist, with no shelf.
+    const body: BookCreate =
+      target === "wishlist" && given.collection !== "wishlist"
+        ? { ...given, collection: "wishlist", shelf: null, status: "unread" }
+        : given;
     // The button waits from the next render; a double tap before then stops here.
     if (saving.current) return;
     saving.current = true;
@@ -325,7 +330,11 @@ export function AddBookPage() {
     );
 
   return (
-    <Page title="Add a book" bleed caption={desktop ? status : undefined}>
+    <Page
+      title={target === "wishlist" ? "Add to your wishlist" : "Add a book"}
+      bleed
+      caption={desktop ? status : undefined}
+    >
       <Tabs.Root
         value={mode}
         // The arrow keys switch as they move focus, which stays on the tabs; a click (or Enter) moves it into the new form.

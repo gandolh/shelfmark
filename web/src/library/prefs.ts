@@ -114,7 +114,8 @@ export function normalizeSizing(value: unknown): Readonly<Partial<Record<ColumnI
 export function parsePrefs(value: unknown, layout: Layout): LibraryPrefs {
   const saved = isRecord(value) ? value : {};
   return {
-    collection: saved.collection === "wishlist" ? "wishlist" : "owned",
+    // The Wishlist tab is gone: a saved one reads as Owned.
+    collection: "owned",
     view: saved.view === "table" || saved.view === "covers" ? saved.view : defaultView(layout),
     sorting: normalizeSorting(saved.sorting),
     columnOrder: normalizeOrder(saved.columnOrder),

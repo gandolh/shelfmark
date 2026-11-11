@@ -131,7 +131,8 @@ export function useLibraryView(layout: Layout): LibraryView {
   // Typing stays instant; the rows catch up a frame later if they must.
   const query = useDeferredValue(useSearchQuery());
 
-  const { collection } = prefs;
+  // The Library holds owned books only; a saved Wishlist tab from before the Wishlist page is ignored.
+  const collection: Collection = "owned";
   const counts = useMemo(() => collectionCounts(books), [books]);
   const inCollection = useMemo(() => booksIn(books, collection), [books, collection]);
   useEffect(() => warmSearch(inCollection), [inCollection]);

@@ -1,4 +1,4 @@
-import type { Book, Collection } from "@shelfmark/shared";
+import type { Book } from "@shelfmark/shared";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBooks } from "../books/store";
 import { Button, ButtonLink } from "../components/Button";
@@ -18,7 +18,7 @@ import { LibraryMessage, LibrarySkeleton } from "./LibraryStates";
 import { Pager } from "./Pager";
 import { showsPager, type PageSize } from "./pagination";
 import { Panel } from "./Panel";
-import type { Layout, LibraryPrefs, ViewMode } from "./prefs";
+import type { Layout, ViewMode } from "./prefs";
 import { useScrollMemory } from "./scroll";
 import { describeSort, type Sorting } from "./sort";
 import {
@@ -47,7 +47,7 @@ import {
   type SelectionChoice,
 } from "./state";
 import { Toolbar } from "./Toolbar";
-import { columnApplies, useLibraryView, type LibraryView } from "./view";
+import { useLibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
 import "./library.css";
 
@@ -68,12 +68,9 @@ function books(count: number): string {
   return count === 1 ? "1 book" : `${count.toLocaleString("en-GB")} books`;
 }
 
-/** The tabs' words (glossary.md: collection). */
-const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist: "Wishlist" };
-
 /**
- * The Library (design.md; corpus/wiki/library-table.md): the open collection
- * (Owned or Wishlist), as a table or as covers, searched from the box in the shell, filtered by
+ * The Library (design.md; corpus/wiki/library-table.md): the owned books,
+ * as a table or as covers, searched from the box in the shell, filtered by
  * any column, sorted by any. "14 books, newest first" under the title.
  * The list is shown a page at a time, with the pager under it.
  * While books are selected the bulk bar stands in for the
@@ -128,30 +125,9 @@ export function LibraryPage() {
     wasSelecting.current = selecting;
   }, [selecting]);
 
+  // Owned books only: the wishlist is its own place (wishlist/WishlistPage.tsx).
   const collection = view.collection;
-  // The wishlist leaves out the columns a wishlist book never fills; the saved choice is untouched.
-  const tablePrefs = useMemo<LibraryPrefs>(
-    () =>
-      collection === "owned"
-        ? prefs
-        : {
-            ...prefs,
-            columnVisibility: Object.fromEntries(
-              Object.entries(prefs.columnVisibility).map(([id, shown]) => [
-                id,
-                shown && columnApplies(id as ColumnId, collection),
-              ]),
-            ) as LibraryPrefs["columnVisibility"],
-          },
-    [prefs, collection],
-  );
-  const setCollection = (next: Collection) => {
-    if (next === collection) return;
-    setPanel(null);
-    // A shelf filter means nothing on the wishlist, and a filter left behind would hide the other tab's books.
-    clearFilters();
-    updatePrefs(layout, (p) => ({ ...p, collection: next }));
-  };
+  const tablePrefs = prefs;
 
   const mode = prefs.view;
   const setMode = (next: ViewMode) => {
@@ -249,11 +225,10 @@ export function LibraryPage() {
       wide
       card
     >
-      {ready && view.counts.owned + view.counts.wishlist > 0 && (
+      {/* The phone's toolbar has no room for Views: it gets a row of its own (desktop: Toolbar). */}
+      {ready && !desktop && view.counts.owned > 0 && (
         <div className="library-tabs-row">
-          <CollectionTabs view={view} onChange={setCollection} />
-          {/* The phone's toolbar has no room for Views: it ends the tabs' row (desktop: Toolbar). */}
-          {!desktop && <ViewsMenu layout={layout} mode={mode} align="end" />}
+          <ViewsMenu layout={layout} mode={mode} align="end" />
         </div>
       )}
       {/* Said for every change; shown under the bar for the ones that leave it up. */}
@@ -286,17 +261,6 @@ export function LibraryPage() {
           }
         >
           {error?.message ?? "Something went wrong on the way."}
-        </LibraryMessage>
-      ) : view.total === 0 && collection === "wishlist" ? (
-        <LibraryMessage
-          title="Your wishlist is empty"
-          action={
-            <ButtonLink to={ADD_BOOK} variant="primary" size={desktop ? "regular" : "large"}>
-              Add a book
-            </ButtonLink>
-          }
-        >
-          Scan a book you don't own and choose “Add to wishlist”. It waits here until you buy it.
         </LibraryMessage>
       ) : view.total === 0 ? (
         <LibraryMessage
@@ -395,26 +359,6 @@ export function LibraryPage() {
         </Panel>
       )}
     </Page>
-  );
-}
-
-/** Owned and Wishlist as text tabs under the title, each with its count: "Owned 14 · Wishlist 3". */
-function CollectionTabs({ view, onChange }: { view: LibraryView; onChange: (collection: Collection) => void }) {
-  return (
-    <div className="library-tabs" role="group" aria-label="Collection">
-      {(["owned", "wishlist"] as const).map((id) => (
-        <button
-          key={id}
-          type="button"
-          className="library-tab"
-          aria-pressed={view.collection === id}
-          onClick={() => onChange(id)}
-        >
-          {COLLECTION_LABELS[id]}
-          <span className="library-tab__count tabular">{view.counts[id].toLocaleString("en-GB")}</span>
-        </button>
-      ))}
-    </div>
   );
 }
 

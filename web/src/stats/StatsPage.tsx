@@ -2,7 +2,8 @@ import { useMemo } from "react";
 import { useBooks } from "../books/store";
 import { formatPrice, languageName } from "../library/columns";
 import { Page } from "../layout/Page";
-import { LIBRARY } from "../router";
+import { Link } from "../components/Link";
+import { LIBRARY, WISHLIST } from "../router";
 import { computeStats, top, UNKNOWN_YEAR, type Room, type Tally } from "./count";
 import {
   authorFilter,
@@ -50,7 +51,9 @@ export function StatsPage() {
               <Total label="Authors" value={stats.distinctAuthors} />
               <Total label="Shelves in use" value={stats.shelvesInUse} />
             </dl>
-            <p className="stats__note">Wishlist: {stats.wishlist}</p>
+            <p className="stats__note">
+              <Link to={WISHLIST}>Wishlist: {stats.wishlist}</Link>
+            </p>
 
             <Section title="Authors">
               <List rows={stats.authors} label={(key) => key} filterFor={authorFilter} what="by" />

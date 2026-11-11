@@ -9,6 +9,8 @@ import {
   navigate,
   pathFor,
   placeOf,
+  ADD_TO_WISHLIST,
+  WISHLIST,
   replaceWithCanonical,
   route,
   ROUTES,
@@ -24,6 +26,8 @@ describe("matchRoute", () => {
     expect(matchRoute("/shelfmark", BASE)).toEqual(LIBRARY);
     expect(matchRoute("/shelfmark/add", BASE)).toEqual(ADD_BOOK);
     expect(matchRoute("/shelfmark/add/", BASE)).toEqual(ADD_BOOK);
+    expect(matchRoute("/shelfmark/wishlist", BASE)).toEqual(WISHLIST);
+    expect(matchRoute("/shelfmark/wishlist/add", BASE)).toEqual(ADD_TO_WISHLIST);
     expect(matchRoute("/shelfmark/login", BASE)).toEqual(LOGIN);
     expect(matchRoute("/shelfmark/books/12", BASE)).toEqual({ name: "book", params: { id: "12" } });
     expect(matchRoute("/shelfmark/books/12/", BASE)).toEqual(bookRoute(12));
@@ -122,6 +126,8 @@ describe("sameRoute and placeOf", () => {
     expect(placeOf(LIBRARY)).toBe("library");
     expect(placeOf(bookRoute(4))).toBe("library");
     expect(placeOf(ADD_BOOK)).toBe("add");
+    expect(placeOf(WISHLIST)).toBe("wishlist");
+    expect(placeOf(ADD_TO_WISHLIST)).toBe("wishlist");
     expect(placeOf(LOGIN)).toBeNull();
   });
 });

@@ -7,6 +7,11 @@ import {
   type BookBulkResult,
   type BookCreate,
   type BookPatch,
+  type ImportJob,
+  type Recommendation,
+  type RecommendationImport,
+  importJobSchema,
+  recommendationListSchema,
 } from "@shelfmark/shared";
 import { API_BASE } from "./base";
 
@@ -213,6 +218,22 @@ export const booksApi = {
   /** One change to many books; an id that names no book is a 400 and nothing changes. */
   bulk: (body: BookBulk, options?: CallOptions): Promise<BookBulkResult> =>
     apiRequest("/api/books/bulk", { ...options, method: "POST", body, schema: bookBulkResultSchema }),
+};
+
+/** The recommendations: the list, the import of Claude's picks and its progress, and "Not interested". */
+export const recommendationsApi = {
+  list: async (options?: CallOptions): Promise<Recommendation[]> =>
+    (await apiRequest("/api/recommendations", { ...options, schema: recommendationListSchema })).recommendations,
+
+  /** Starts the check of the picks; a 409 while another is running. */
+  startImport: (picks: RecommendationImport, options?: CallOptions): Promise<ImportJob> =>
+    apiRequest("/api/recommendations/import", { ...options, method: "POST", body: picks, schema: importJobSchema }),
+
+  importProgress: (options?: CallOptions): Promise<ImportJob> =>
+    apiRequest("/api/recommendations/import", { ...options, schema: importJobSchema }),
+
+  dismiss: (key: string, options?: CallOptions): Promise<void> =>
+    apiRequest(`/api/recommendations/${encodeURIComponent(key)}/dismiss`, { ...options, method: "POST" }),
 };
 
 /**

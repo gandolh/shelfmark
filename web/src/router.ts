@@ -8,6 +8,8 @@ import { appBase } from "./base";
  *
  *   /shelfmark/            library   the Library
  *   /shelfmark/add         add       Add a book
+ *   /shelfmark/wishlist    wishlist  Wishlist: wished-for books and recommendations
+ *   /shelfmark/wishlist/add  addWishlist  Add a book, landing in the wishlist
  *   /shelfmark/books/:id   book      one book
  *   /shelfmark/import      import    Import a CSV (account menu; sits under Library)
  *   /shelfmark/stats    stats     Stats (account menu; sits under Library)
@@ -20,6 +22,8 @@ import { appBase } from "./base";
 const APP_ROUTES = {
   library: "/",
   add: "/add",
+  wishlist: "/wishlist",
+  addWishlist: "/wishlist/add",
   book: "/books/:id",
   import: "/import",
   stats: "/stats",
@@ -56,6 +60,8 @@ export type RouteOf<N extends RouteName> = Extract<Route, { name: N }>;
 
 export const LIBRARY: RouteOf<"library"> = { name: "library", params: {} };
 export const ADD_BOOK: RouteOf<"add"> = { name: "add", params: {} };
+export const WISHLIST: RouteOf<"wishlist"> = { name: "wishlist", params: {} };
+export const ADD_TO_WISHLIST: RouteOf<"addWishlist"> = { name: "addWishlist", params: {} };
 export const IMPORT_CSV: RouteOf<"import"> = { name: "import", params: {} };
 export const STATS: RouteOf<"stats"> = { name: "stats", params: {} };
 export const LOGIN: RouteOf<"login"> = { name: "login", params: {} };
@@ -136,8 +142,8 @@ export function sameRoute(a: Route, b: Route): boolean {
   return a.name === b.name && pathFor(a, "/") === pathFor(b, "/");
 }
 
-/** The two places (design.md): every route belongs to one of them, or to neither. */
-export type Place = "library" | "add";
+/** The three places (design.md): every route belongs to one of them, or to neither. */
+export type Place = "library" | "add" | "wishlist";
 
 export function placeOf(to: Route): Place | null {
   switch (to.name) {
@@ -148,6 +154,9 @@ export function placeOf(to: Route): Place | null {
       return "library";
     case "add":
       return "add";
+    case "wishlist":
+    case "addWishlist":
+      return "wishlist";
     default:
       return null;
   }
