@@ -70,7 +70,9 @@ export function warmSearch(books: readonly Book[]): () => void {
  * an ISBN or a run of its digits, hyphenated or not, also matches the ISBN.
  */
 export function compileSearch(query: string): ((book: Book) => boolean) | null {
-  const words = fold(query).split(/\s+/).filter((word) => word !== "");
+  const words = fold(query)
+    .split(/\s+/)
+    .filter((word) => word !== "");
   if (words.length === 0) return null;
   const digits = compactIsbn(query);
   const isbnQuery = /^\d{3,}$/.test(digits) ? digits : null;

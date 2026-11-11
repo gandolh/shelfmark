@@ -83,7 +83,8 @@ function fakeSource(initial: Book[] = []) {
     // As the server: all or nothing, wishlist books skipped by a shelf change.
     bulk: vi.fn(async ({ ids, change }: BookBulk) => {
       const named = ids.map((id) => rows.find((b) => b.id === id));
-      if (named.some((b) => b === undefined)) throw new ApiError(400, "validation", "ids: There is no book 9, so nothing was changed.");
+      if (named.some((b) => b === undefined))
+        throw new ApiError(400, "validation", "ids: There is no book 9, so nothing was changed.");
       const found = named as Book[];
       if (change.kind === "delete") {
         rows = rows.filter((b) => !ids.includes(b.id));
@@ -92,7 +93,13 @@ function fakeSource(initial: Book[] = []) {
       const skipped = change.kind === "shelf" ? found.filter((b) => b.collection !== "owned").map((b) => b.id) : [];
       const books = found
         .filter((b) => !skipped.includes(b.id))
-        .map((b) => (change.kind === "shelf" ? { ...b, shelf: change.shelf } : change.kind === "status" ? { ...b, status: change.status } : b));
+        .map((b) =>
+          change.kind === "shelf"
+            ? { ...b, shelf: change.shelf }
+            : change.kind === "status"
+              ? { ...b, status: change.status }
+              : b,
+        );
       rows = rows.map((b) => books.find((x) => x.id === b.id) ?? b);
       return { books, deleted: [], skipped };
     }),
@@ -313,7 +320,11 @@ describe("changes", () => {
   });
 
   it("takes the books a bulk delete answers out of the list", async () => {
-    const { server, store } = await loadedStore([makeBook(1, "Solenoid"), makeBook(2, "Orbitor"), makeBook(3, "Nostalgia")]);
+    const { server, store } = await loadedStore([
+      makeBook(1, "Solenoid"),
+      makeBook(2, "Orbitor"),
+      makeBook(3, "Nostalgia"),
+    ]);
     await store.bulk({ ids: [3, 1], change: { kind: "delete" } });
     expect(titles(store.getState().books)).toEqual(["Orbitor"]);
     expect(server.source.list).toHaveBeenCalledTimes(1);

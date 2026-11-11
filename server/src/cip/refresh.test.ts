@@ -32,7 +32,15 @@ describe("refreshCip", () => {
   it("imports every issue on the site, newest first, then nothing the next time", async () => {
     const { store, fetch, run } = setup();
     const first = await run();
-    expect(first.imported.map((i) => i.month)).toEqual(["2026-03", "2026-02", "2026-01", "2025-03", "2024-09", "2023-07", "2019-01"]);
+    expect(first.imported.map((i) => i.month)).toEqual([
+      "2026-03",
+      "2026-02",
+      "2026-01",
+      "2025-03",
+      "2024-09",
+      "2023-07",
+      "2019-01",
+    ]);
     expect(first.failed).toEqual([]);
     expect(store.get("9786064031365")?.title).toBe("Ce ne facem cu atîția proști?");
     const downloads = fetch.calls.filter((call) => call.url.pathname.endsWith(".pdf"));

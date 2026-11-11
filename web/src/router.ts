@@ -87,7 +87,11 @@ function segments(path: string): string[] {
  * any path outside the base). Trailing and doubled slashes are forgiven; the
  * shell then rewrites the address to the canonical one.
  */
-export function matchRoute(pathname: string, base: string = appBase(), table: RouteTable = activeTable()): Route | null {
+export function matchRoute(
+  pathname: string,
+  base: string = appBase(),
+  table: RouteTable = activeTable(),
+): Route | null {
   const root = base.replace(/\/+$/, "");
   if (pathname !== root && !pathname.startsWith(`${root}/`)) return null;
   const parts = segments(pathname.slice(root.length));

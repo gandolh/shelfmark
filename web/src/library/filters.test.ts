@@ -13,17 +13,26 @@ describe("text filters", () => {
   ];
 
   it("contains, blind to case and diacritics", () => {
-    expect(titles(applyFilters(books, { book: { kind: "text", op: "contains", text: "INOCENTI" } }))).toEqual(["Inocenții"]);
-    expect(titles(applyFilters(books, { notes: { kind: "text", op: "contains", text: "semnata" } }))).toEqual(["Solenoid"]);
+    expect(titles(applyFilters(books, { book: { kind: "text", op: "contains", text: "INOCENTI" } }))).toEqual([
+      "Inocenții",
+    ]);
+    expect(titles(applyFilters(books, { notes: { kind: "text", op: "contains", text: "semnata" } }))).toEqual([
+      "Solenoid",
+    ]);
   });
 
   it("is empty and is not empty", () => {
-    expect(titles(applyFilters(books, { notes: { kind: "text", op: "empty", text: "" } }))).toEqual(["Inocenții", "The Road"]);
+    expect(titles(applyFilters(books, { notes: { kind: "text", op: "empty", text: "" } }))).toEqual([
+      "Inocenții",
+      "The Road",
+    ]);
     expect(titles(applyFilters(books, { notes: { kind: "text", op: "notEmpty", text: "" } }))).toEqual(["Solenoid"]);
   });
 
   it("ignores hyphens in an ISBN filter", () => {
-    expect(titles(applyFilters(books, { isbn: { kind: "text", op: "contains", text: "978-0307" } }))).toEqual(["The Road"]);
+    expect(titles(applyFilters(books, { isbn: { kind: "text", op: "contains", text: "978-0307" } }))).toEqual([
+      "The Road",
+    ]);
   });
 
   it("narrows nothing while contains has nothing typed", () => {
@@ -41,7 +50,11 @@ describe("pick-list filters", () => {
   ];
 
   it("keeps a book with any chosen value", () => {
-    expect(titles(applyFilters(books, { shelf: { kind: "pick", values: ["Bedroom", "Study · B1"] } }))).toEqual(["A", "B", "D"]);
+    expect(titles(applyFilters(books, { shelf: { kind: "pick", values: ["Bedroom", "Study · B1"] } }))).toEqual([
+      "A",
+      "B",
+      "D",
+    ]);
     expect(titles(applyFilters(books, { status: { kind: "pick", values: ["read"] } }))).toEqual(["B", "C"]);
   });
 
@@ -51,12 +64,19 @@ describe("pick-list filters", () => {
 
   it("can ask for the books without a value", () => {
     expect(titles(applyFilters(books, { shelf: { kind: "pick", values: [NO_VALUE] } }))).toEqual(["C"]);
-    expect(titles(applyFilters(books, { tags: { kind: "pick", values: [NO_VALUE, "Gift"] } }))).toEqual(["A", "C", "D"]);
+    expect(titles(applyFilters(books, { tags: { kind: "pick", values: [NO_VALUE, "Gift"] } }))).toEqual([
+      "A",
+      "C",
+      "D",
+    ]);
   });
 
   it("offers every value the books have, counted within the other filters", () => {
     const shelf = columnById("shelf") as PickColumn;
-    const filters: Filters = { status: { kind: "pick", values: ["read"] }, shelf: { kind: "pick", values: ["Bedroom"] } };
+    const filters: Filters = {
+      status: { kind: "pick", values: ["read"] },
+      shelf: { kind: "pick", values: ["Bedroom"] },
+    };
     expect(pickOptions(shelf, books, filters, "")).toEqual([
       { value: "Bedroom", label: "Bedroom", count: 0 },
       { value: "Study · B1", label: "Study · B1", count: 1 },
@@ -104,11 +124,12 @@ describe("number and date filters", () => {
   });
 
   it("keeps a date range by calendar day, both ends included", () => {
-    expect(titles(applyFilters(books, { acquiredOn: { kind: "date", from: "2016-03-01", to: "2020-06-15" } }))).toEqual([
-      "old",
+    expect(titles(applyFilters(books, { acquiredOn: { kind: "date", from: "2016-03-01", to: "2020-06-15" } }))).toEqual(
+      ["old", "mid"],
+    );
+    expect(titles(applyFilters(books, { acquiredOn: { kind: "date", from: "2017-01-01", to: null } }))).toEqual([
       "mid",
     ]);
-    expect(titles(applyFilters(books, { acquiredOn: { kind: "date", from: "2017-01-01", to: null } }))).toEqual(["mid"]);
   });
 
   it("filters Added by the local day of the timestamp", () => {
@@ -116,7 +137,9 @@ describe("number and date filters", () => {
       book({ title: "first", createdAt: new Date(2026, 9, 1, 12).toISOString() }),
       book({ title: "second", createdAt: new Date(2026, 9, 14, 23, 30).toISOString() }),
     ];
-    expect(titles(applyFilters(added, { added: { kind: "date", from: "2026-10-14", to: "2026-10-14" } }))).toEqual(["second"]);
+    expect(titles(applyFilters(added, { added: { kind: "date", from: "2026-10-14", to: "2026-10-14" } }))).toEqual([
+      "second",
+    ]);
   });
 });
 
@@ -159,7 +182,9 @@ describe("describeFilter", () => {
     );
     expect(describeFilter(columnById("status"), { kind: "pick", values: ["reading"] })).toBe("Status: Reading");
     expect(describeFilter(columnById("notes"), { kind: "text", op: "empty", text: "" })).toBe("Notes is empty");
-    expect(describeFilter(columnById("book"), { kind: "text", op: "contains", text: " road " })).toBe("Title contains “road”");
+    expect(describeFilter(columnById("book"), { kind: "text", op: "contains", text: " road " })).toBe(
+      "Title contains “road”",
+    );
     expect(describeFilter(columnById("year"), { kind: "number", min: 2000, max: 2010 })).toBe("Year: 2000 to 2010");
     expect(describeFilter(columnById("pages"), { kind: "number", min: 300, max: null })).toBe("Pages: at least 300");
     expect(describeFilter(columnById("price"), { kind: "number", min: null, max: 5050 })).toBe("Price: at most 50.50");

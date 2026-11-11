@@ -16,7 +16,11 @@ function subscribe(notify: () => void): () => void {
 export function OfflineNotice() {
   // App start: scans queued offline last time are looked up now (and on every `online`), whichever page is open.
   useEffect(() => startScanQueue(lookupIsbn), []);
-  const online = useSyncExternalStore(subscribe, () => navigator.onLine, () => true);
+  const online = useSyncExternalStore(
+    subscribe,
+    () => navigator.onLine,
+    () => true,
+  );
   if (online) return null;
   return (
     <p className="offline-notice" role="status">

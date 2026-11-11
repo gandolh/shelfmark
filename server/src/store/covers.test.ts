@@ -42,7 +42,12 @@ describe("createCoverStore", () => {
     clock = new Date("2026-10-16T08:00:00.000Z");
     const png = imageBytes("image/png", 500);
     covers.put(book.id, { mime: "image/png", bytes: png, source: "upload" });
-    expect(covers.get(book.id)).toEqual({ mime: "image/png", bytes: png, source: "upload", updatedAt: clock.toISOString() });
+    expect(covers.get(book.id)).toEqual({
+      mime: "image/png",
+      bytes: png,
+      source: "upload",
+      updatedAt: clock.toISOString(),
+    });
     expect(db.prepare("SELECT COUNT(*) AS n FROM covers").get()).toEqual({ n: 1 });
   });
 

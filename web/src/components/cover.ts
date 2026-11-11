@@ -13,12 +13,7 @@ export const COVER_TINT_COUNT = 8;
  * the same book's colour.
  */
 export function tintKey(title: string): string {
-  return title
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, " ");
+  return title.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim().replace(/\s+/g, " ");
 }
 
 /** 1 to 8, the same for the same title on every device: FNV-1a over the key's code points. */

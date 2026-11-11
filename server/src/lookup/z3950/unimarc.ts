@@ -46,7 +46,8 @@ export function parseRecord(record: Buffer): Field[] | null {
     const length = Number(entry.slice(3, 7));
     const start = base + Number(entry.slice(7, 12));
     let bytes = record.subarray(start, Math.min(start + length, record.length));
-    while (bytes.length > 0 && (bytes.at(-1) === FIELD_END || bytes.at(-1) === RECORD_END)) bytes = bytes.subarray(0, -1);
+    while (bytes.length > 0 && (bytes.at(-1) === FIELD_END || bytes.at(-1) === RECORD_END))
+      bytes = bytes.subarray(0, -1);
 
     if (/^00\d$/.test(tag)) {
       fields.push({ tag, data: bytes.toString("utf8") });

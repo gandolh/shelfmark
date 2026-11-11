@@ -96,7 +96,11 @@ describe("searchIsbns", () => {
   it("fails on an answer that isn't Z39.50, or a refused Init", async () => {
     // "HTTP/1.1 ..." reads as the start of a long element, so it ends as a timeout or as junk.
     await expect(
-      searchIsbns(LIBRARIES.bcucluj, ["9786064031365"], options(answering(Buffer.from("HTTP/1.1 400 Bad Request\r\n")), 100)),
+      searchIsbns(
+        LIBRARIES.bcucluj,
+        ["9786064031365"],
+        options(answering(Buffer.from("HTTP/1.1 400 Bad Request\r\n")), 100),
+      ),
     ).rejects.toThrow(/BCU Cluj (sent an answer that is not Z39.50|did not answer)/);
 
     const refusedInit = Buffer.from("b5038c0100", "hex"); // initResponse, result FALSE

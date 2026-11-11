@@ -120,7 +120,9 @@ for (const file of files) {
   process.stderr.write("\n");
 
   const cell = (value: number) => `${value}/${n}`;
-  console.log(`\n### ${basename(file)}: ${n} ISBNs${rejected.length ? `, ${rejected.length} line${rejected.length === 1 ? "" : "s"} skipped (not ISBNs)` : ""}\n`);
+  console.log(
+    `\n### ${basename(file)}: ${n} ISBNs${rejected.length ? `, ${rejected.length} line${rejected.length === 1 ? "" : "s"} skipped (not ISBNs)` : ""}\n`,
+  );
   console.log("| Source | Found | With cover | With page count | Errors |");
   console.log("|---|---|---|---|---|");
   for (const source of sources) {
@@ -129,7 +131,9 @@ for (const file of files) {
       console.log(`| ${LABELS[source.source]} | skipped: no GOOGLE_BOOKS_API_KEY | | | |`);
       continue;
     }
-    console.log(`| ${LABELS[source.source]} | ${cell(tally.found)} | ${cell(tally.cover)} | ${cell(tally.pages)} | ${tally.errors} |`);
+    console.log(
+      `| ${LABELS[source.source]} | ${cell(tally.found)} | ${cell(tally.cover)} | ${cell(tally.pages)} | ${tally.errors} |`,
+    );
   }
   if (!askGoogle) console.log("| Google Books | not asked (pass --google) | | | |");
   const any = tallies.get("any")!;

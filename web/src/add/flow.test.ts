@@ -159,7 +159,10 @@ describe("the scan flow", () => {
   it("ignores codes while a sheet is open, and in the other modes", () => {
     const found = scanAndAnswer(lookup());
     expect(flowReducer(found, scanIsbn(ISIDOR))).toBe(found);
-    expect(flowReducer(run("scan", { type: "scanned", code: { kind: "other", code: "2000000000008" } }), scanIsbn(ISIDOR)).step.kind).toBe("other");
+    expect(
+      flowReducer(run("scan", { type: "scanned", code: { kind: "other", code: "2000000000008" } }), scanIsbn(ISIDOR))
+        .step.kind,
+    ).toBe("other");
     const typing = initialFlow("isbn");
     expect(flowReducer(typing, scanIsbn(ISIDOR))).toBe(typing);
   });
@@ -200,7 +203,11 @@ describe("the scan flow", () => {
     expect(expectStep(state, "wishlisted").save).toEqual({ saving: false, failure: { message: "no", network: false } });
 
     state = flowReducer(state, { type: "save" });
-    state = flowReducer(state, { type: "saved", book: { id: 21, title: "The Hobbit", shelf: "Bedroom" }, outcome: "bought" });
+    state = flowReducer(state, {
+      type: "saved",
+      book: { id: 21, title: "The Hobbit", shelf: "Bedroom" },
+      outcome: "bought",
+    });
     expect(state.step.kind).toBe("ready");
     expect(state.lastShelf).toBe("Bedroom");
     expect(state.notice).toMatchObject({ kind: "saved", bookId: 21, outcome: "bought" });
@@ -214,11 +221,19 @@ describe("the scan flow", () => {
   it("a wishlist save keeps the default shelf, and its body has the wishlist and no shelf", () => {
     let state = scanAndAnswer(lookup());
     state = flowReducer(state, { type: "save" });
-    state = flowReducer(state, { type: "saved", book: { id: 30, title: "The Hobbit", shelf: null }, outcome: "wishlist" });
+    state = flowReducer(state, {
+      type: "saved",
+      book: { id: 30, title: "The Hobbit", shelf: null },
+      outcome: "wishlist",
+    });
     expect(state.lastShelf).toBeUndefined();
     expect(state.added).toBe(1);
     const proposal = proposalFromDraft({ ...draft(), title: "The Hobbit" });
-    expect(bodyFromProposal(proposal, null, "unread", "wishlist")).toMatchObject({ collection: "wishlist", shelf: null, status: "unread" });
+    expect(bodyFromProposal(proposal, null, "unread", "wishlist")).toMatchObject({
+      collection: "wishlist",
+      shelf: null,
+      status: "unread",
+    });
     expect(bodyFromProposal(proposal, "A", "unread")).not.toHaveProperty("collection");
   });
 
@@ -267,7 +282,9 @@ describe("an answer the page already has", () => {
 
   it("still waits for the owner: a result on the sheet ignores the camera", () => {
     const found = scanAndAnswer(lookup());
-    expect(flowReducer(found, { type: "scanned", code: { kind: "isbn", isbn13: ISIDOR }, known: NOT_FOUND })).toBe(found);
+    expect(flowReducer(found, { type: "scanned", code: { kind: "isbn", isbn13: ISIDOR }, known: NOT_FOUND })).toBe(
+      found,
+    );
   });
 });
 
@@ -297,7 +314,11 @@ describe("a barcode that isn't an ISBN", () => {
 
     const read = readForm({ ...form.initial, title: "Caiet", shelf: null });
     if (!read.ok) throw new Error("form should read");
-    expect(bodyFromForm(read.fields, form.base)).toMatchObject({ title: "Caiet", barcode: "2001234567890", isbn13: null });
+    expect(bodyFromForm(read.fields, form.base)).toMatchObject({
+      title: "Caiet",
+      barcode: "2001234567890",
+      isbn13: null,
+    });
   });
 
   it("by hand from the ISBN sheet keeps the code too", () => {
@@ -322,7 +343,11 @@ describe("discarding", () => {
 
   it("drops a failed lookup", () => {
     const looking = run("scan", scanIsbn(HOBBIT));
-    const failed = flowReducer(looking, { type: "lookup-failed", id: looking.step.id, failure: { message: "x", network: true } });
+    const failed = flowReducer(looking, {
+      type: "lookup-failed",
+      id: looking.step.id,
+      failure: { message: "x", network: true },
+    });
     expect(flowReducer(failed, { type: "discard" }).step.kind).toBe("ready");
   });
 
@@ -360,14 +385,18 @@ describe("lookup failures", () => {
     const looking = run("scan", scanIsbn(HOBBIT));
     const discarded = flowReducer(looking, { type: "discard" });
     expect(flowReducer(discarded, { type: "looked-up", id: looking.step.id, lookup: lookup() })).toBe(discarded);
-    expect(flowReducer(discarded, { type: "lookup-failed", id: looking.step.id, failure: { message: "x", network: false } })).toBe(
-      discarded,
-    );
+    expect(
+      flowReducer(discarded, { type: "lookup-failed", id: looking.step.id, failure: { message: "x", network: false } }),
+    ).toBe(discarded);
   });
 
   it("adds by hand after a failure, with the ISBN filled in", () => {
     const looking = run("scan", scanIsbn(ISIDOR));
-    const failed = flowReducer(looking, { type: "lookup-failed", id: looking.step.id, failure: { message: "x", network: false } });
+    const failed = flowReducer(looking, {
+      type: "lookup-failed",
+      id: looking.step.id,
+      failure: { message: "x", network: false },
+    });
     const form = expectStep(flowReducer(failed, { type: "by-hand" }), "form");
     expect(form.reason).toBe("failed");
     expect(form.initial.isbn).toBe(ISIDOR);
@@ -576,7 +605,11 @@ describe("proposals", () => {
     expect(proposal.details).not.toHaveProperty("sources");
     expect(proposal.details.metadataSource).toBe("openlibrary");
     expect(proposal.origin).toEqual(["openlibrary", "googlebooks"]);
-    expect(bodyFromProposal(proposal, "Bedroom", "unread")).toMatchObject({ title: "The Hobbit", shelf: "Bedroom", status: "unread" });
+    expect(bodyFromProposal(proposal, "Bedroom", "unread")).toMatchObject({
+      title: "The Hobbit",
+      shelf: "Bedroom",
+      status: "unread",
+    });
   });
 
   it("takes a Google-only draft's source and an absent cover", () => {
@@ -586,7 +619,10 @@ describe("proposals", () => {
   });
 
   it("credits a library catalog as the book's metadata source", () => {
-    const proposal = proposalFromDraft({ ...draft({ sources: ["bcucluj"], coverCandidates: [] }), title: "Piramida roșie" });
+    const proposal = proposalFromDraft({
+      ...draft({ sources: ["bcucluj"], coverCandidates: [] }),
+      title: "Piramida roșie",
+    });
     expect(proposal.details.metadataSource).toBe("bcucluj");
     expect(proposal.origin).toEqual(["bcucluj"]);
   });
@@ -594,7 +630,19 @@ describe("proposals", () => {
   it("copies a saved book's facts but not the owner's own fields", () => {
     const proposal = proposalFromBook(book(), null);
     expect(proposal.details).toMatchObject({ title: "The Hobbit, or There and Back Again", isbn13: HOBBIT });
-    for (const key of ["shelf", "status", "rating", "notes", "tags", "format", "condition", "authorSort", "id", "hasCover", "coverUpdatedAt"]) {
+    for (const key of [
+      "shelf",
+      "status",
+      "rating",
+      "notes",
+      "tags",
+      "format",
+      "condition",
+      "authorSort",
+      "id",
+      "hasCover",
+      "coverUpdatedAt",
+    ]) {
       expect(proposal.details).not.toHaveProperty(key);
     }
   });
@@ -685,15 +733,22 @@ describe("the scan queue", () => {
 
   it("opens a refused lookup as the by-hand form with the ISBN filled", () => {
     const queue = flowReducer(run("scan"), { type: "show-queue" });
-    const form = expectStep(flowReducer(queue, { type: "open-queued", id: 7, isbn13: ISIDOR, lookup: null, shelf: "Study" }), "form");
+    const form = expectStep(
+      flowReducer(queue, { type: "open-queued", id: 7, isbn13: ISIDOR, lookup: null, shelf: "Study" }),
+      "form",
+    );
     expect(form.reason).toBe("failed");
     expect(form.initial).toMatchObject({ isbn: ISIDOR, shelf: "Study" });
   });
 
   it("opens an ISBN that is owned by now as the owned sheet", () => {
-    const owned = lookup({ owned: [{ id: 1, shelf: null, createdAt: "2026-10-01T00:00:00.000Z" } as LookupResponse["owned"][number]] });
+    const owned = lookup({
+      owned: [{ id: 1, shelf: null, createdAt: "2026-10-01T00:00:00.000Z" } as LookupResponse["owned"][number]],
+    });
     const queue = flowReducer(run("scan"), { type: "show-queue" });
-    expect(flowReducer(queue, { type: "open-queued", id: 7, isbn13: HOBBIT, lookup: owned, shelf: null }).step.kind).toBe("owned");
+    expect(
+      flowReducer(queue, { type: "open-queued", id: 7, isbn13: HOBBIT, lookup: owned, shelf: null }).step.kind,
+    ).toBe("owned");
   });
 });
 
@@ -707,7 +762,9 @@ describe("a sheet that came from the queue", () => {
     const state = opened();
     expect(state.queued).toBe(7);
     expect(flowReducer(state, { type: "save" }).queued).toBe(7);
-    expect(flowReducer(flowReducer(state, { type: "edit", shelf: null, status: "unread" }), { type: "save" }).queued).toBe(7);
+    expect(
+      flowReducer(flowReducer(state, { type: "edit", shelf: null, status: "unread" }), { type: "save" }).queued,
+    ).toBe(7);
   });
 
   it("lets the page see the scan at the save, which then clears it", () => {

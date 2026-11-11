@@ -63,7 +63,8 @@ async function download(files: OcrFile[], onProgress: (stage: OcrStage) => void)
       } catch (error) {
         throw new OcrLoadError("The text reader couldn't be downloaded.", { cause: error });
       }
-      if (!response.ok || response.body === null) throw new OcrLoadError(`The text reader couldn't be downloaded (${response.status}).`);
+      if (!response.ok || response.body === null)
+        throw new OcrLoadError(`The text reader couldn't be downloaded (${response.status}).`);
       const reader = response.body.getReader();
       for (;;) {
         const { done, value } = await reader.read();

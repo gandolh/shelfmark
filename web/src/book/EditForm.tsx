@@ -73,7 +73,10 @@ function AreaField({
   hint,
   error,
   ...area
-}: { label: string; hint?: ReactNode; error?: string } & Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, "id">) {
+}: { label: string; hint?: ReactNode; error?: string } & Omit<
+  React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "id"
+>) {
   const id = useId();
   return (
     <div className="add-field">
@@ -171,10 +174,24 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
         />
         <div className="add-form__pair">
           <TextField label="Publisher" optional {...text("publisher")} autoCapitalize="words" />
-          <TextField label="Year" optional {...text("publishedYear")} inputMode="numeric" maxLength={4} className="add-field--year" />
+          <TextField
+            label="Year"
+            optional
+            {...text("publishedYear")}
+            inputMode="numeric"
+            maxLength={4}
+            className="add-field--year"
+          />
         </div>
         <div className="book-row">
-          <TextField label="Pages" optional {...text("pages")} inputMode="numeric" maxLength={6} className="add-field--year" />
+          <TextField
+            label="Pages"
+            optional
+            {...text("pages")}
+            inputMode="numeric"
+            maxLength={6}
+            className="add-field--year"
+          />
           <TextField
             label="Language"
             optional
@@ -216,7 +233,12 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
         <ShelfPicker value={values.shelf} onChange={(shelf) => set("shelf", shelf)} shelves={shelves} />
         <StatusPicker value={values.status} onChange={(status) => set("status", status)} options={STATUSES} />
         <RatingField value={values.rating} onChange={(rating) => set("rating", rating)} />
-        <OptionalChoice label="Format" value={values.format} options={FORMAT_LABELS} onChange={(next) => set("format", next)} />
+        <OptionalChoice
+          label="Format"
+          value={values.format}
+          options={FORMAT_LABELS}
+          onChange={(next) => set("format", next)}
+        />
         <OptionalChoice
           label="Condition"
           value={values.condition}
@@ -246,7 +268,12 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           suggestions={tagsInUse}
           hint="Your own words: gift, signed, to lend."
         />
-        <AreaField label="Notes" name="notes" value={values.notes} onChange={(event) => set("notes", event.target.value)} />
+        <AreaField
+          label="Notes"
+          name="notes"
+          value={values.notes}
+          onChange={(event) => set("notes", event.target.value)}
+        />
       </fieldset>
 
       {failure && <FailureLine>{failure}</FailureLine>}

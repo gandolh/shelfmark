@@ -180,7 +180,7 @@ export const coverRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db,
   // at most), so the PUT handler can answer every wrong type the same way.
   // Fastify's own text/plain parser would 400 on binary bytes first.
   app.removeContentTypeParser("text/plain");
-  app.addContentTypeParser("*",{ parseAs: "buffer", bodyLimit: COVER_MAX_BYTES }, (_request, body, done) => {
+  app.addContentTypeParser("*", { parseAs: "buffer", bodyLimit: COVER_MAX_BYTES }, (_request, body, done) => {
     done(null, body);
   });
 

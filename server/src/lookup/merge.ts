@@ -152,7 +152,9 @@ export function mergeDrafts(
   isbn13: string,
   answers: readonly { source: LookupSource; draft: SourceDraft | null }[],
 ): Draft | null {
-  const found = answers.filter((answer): answer is { source: LookupSource; draft: SourceDraft } => answer.draft !== null);
+  const found = answers.filter(
+    (answer): answer is { source: LookupSource; draft: SourceDraft } => answer.draft !== null,
+  );
   if (found.length === 0) return null;
 
   const merged: SourceDraft = emptySourceDraft();

@@ -69,7 +69,13 @@ describe("the wishlist collection", () => {
 
 describe("exportValue", () => {
   it("gives typed cell values", () => {
-    const solenoid = book({ title: "Solenoid", authors: ["Mircea Cărtărescu"], priceMinor: 5990, status: "reading", signed: true });
+    const solenoid = book({
+      title: "Solenoid",
+      authors: ["Mircea Cărtărescu"],
+      priceMinor: 5990,
+      status: "reading",
+      signed: true,
+    });
     expect(exportValue(columnById("book"), solenoid)).toBe("Solenoid");
     expect(exportValue(columnById("authors"), solenoid)).toBe("Mircea Cărtărescu");
     expect(exportValue(columnById("price"), solenoid)).toBe(59.9);
@@ -104,7 +110,12 @@ describe("3,000 books", () => {
 
     // The page sorts once per sort change; typing and filtering only filter the sorted list.
     const sortTime = best(() => sortBooks(library, DEFAULT_SORTING));
-    const titleSortTime = best(() => sortBooks(library, [{ id: "book", desc: false }, { id: "authors", desc: false }]));
+    const titleSortTime = best(() =>
+      sortBooks(library, [
+        { id: "book", desc: false },
+        { id: "authors", desc: false },
+      ]),
+    );
     const sorted = sortBooks(library, DEFAULT_SORTING);
 
     // The first search folds every book's text once; the page does that ahead, while idle.

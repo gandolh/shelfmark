@@ -64,10 +64,13 @@ function sameFilter(a: Filter, b: Filter): boolean {
 }
 
 function sameList<T>(a: readonly T[], b: readonly T[], same: (x: T, y: T) => boolean): boolean {
-  return a.length === b.length && a.every((x, i) => {
-    const y = b[i];
-    return y !== undefined && same(x, y);
-  });
+  return (
+    a.length === b.length &&
+    a.every((x, i) => {
+      const y = b[i];
+      return y !== undefined && same(x, y);
+    })
+  );
 }
 
 /**
@@ -76,7 +79,11 @@ function sameList<T>(a: readonly T[], b: readonly T[], same: (x: T, y: T) => boo
  * the default sort, as the page reads it. `columns: false` leaves the shown
  * columns out (the covers view).
  */
-export function sameViewState(a: SavedViewState, b: SavedViewState, { columns = true }: { columns?: boolean } = {}): boolean {
+export function sameViewState(
+  a: SavedViewState,
+  b: SavedViewState,
+  { columns = true }: { columns?: boolean } = {},
+): boolean {
   if (a.collection !== b.collection) return false;
 
   const fa = keptFilters(a.filters);
@@ -89,12 +96,17 @@ export function sameViewState(a: SavedViewState, b: SavedViewState, { columns = 
     if (!x || !y || !sameFilter(x, y)) return false;
   }
 
-  if (!sameList(normalizeSorting(a.sorting), normalizeSorting(b.sorting), (x, y) => x.id === y.id && x.desc === y.desc)) return false;
+  if (!sameList(normalizeSorting(a.sorting), normalizeSorting(b.sorting), (x, y) => x.id === y.id && x.desc === y.desc))
+    return false;
   return !columns || sameList(a.columns, b.columns, (x, y) => x === y);
 }
 
 /** The first view, by position, that the page is on right now; columns count only in the table. */
-export function matchingView(views: readonly SavedView[], current: SavedViewState, mode: ViewMode): SavedView | undefined {
+export function matchingView(
+  views: readonly SavedView[],
+  current: SavedViewState,
+  mode: ViewMode,
+): SavedView | undefined {
   return views.find((view) => sameViewState(view.state, current, { columns: mode === "table" }));
 }
 
@@ -110,9 +122,21 @@ export function updatedViewState(view: SavedView, current: SavedViewState, mode:
  */
 export function prefsWithView(prefs: LibraryPrefs, state: SavedViewState): LibraryPrefs {
   const shown = new Set<ColumnId>(state.columns);
-  const columnOrder = normalizeOrder([BOOK_COLUMN_ID, ...state.columns, ...prefs.columnOrder.filter((id) => !shown.has(id))]);
-  const columnVisibility = Object.fromEntries(columnOrder.map((id) => [id, id === BOOK_COLUMN_ID || shown.has(id)])) as LibraryPrefs["columnVisibility"];
-  return { ...prefs, collection: state.collection, sorting: normalizeSorting(state.sorting), columnOrder, columnVisibility };
+  const columnOrder = normalizeOrder([
+    BOOK_COLUMN_ID,
+    ...state.columns,
+    ...prefs.columnOrder.filter((id) => !shown.has(id)),
+  ]);
+  const columnVisibility = Object.fromEntries(
+    columnOrder.map((id) => [id, id === BOOK_COLUMN_ID || shown.has(id)]),
+  ) as LibraryPrefs["columnVisibility"];
+  return {
+    ...prefs,
+    collection: state.collection,
+    sorting: normalizeSorting(state.sorting),
+    columnOrder,
+    columnVisibility,
+  };
 }
 
 // --- The view the page is on -------------------------------------------------------------

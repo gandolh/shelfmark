@@ -56,14 +56,19 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
       pendingFocus.current = next ? `check:${next.id}` : `check:${id}`;
     } else {
       const index = shown.indexOf(id);
-      const next = [shown[index + 1], shown[index - 1]].find((other) => other !== undefined && other !== BOOK_COLUMN_ID);
+      const next = [shown[index + 1], shown[index - 1]].find(
+        (other) => other !== undefined && other !== BOOK_COLUMN_ID,
+      );
       pendingFocus.current = `check:${next ?? id}`;
     }
     updatePrefs(layout, (prefs) => {
       const order = prefs.columnOrder.filter((other) => other !== id);
       if (show) {
         // After the last shown column: it appears at the table's end.
-        const lastShown = order.reduce((last, other, i) => (prefs.columnVisibility[other] || other === BOOK_COLUMN_ID ? i : last), 0);
+        const lastShown = order.reduce(
+          (last, other, i) => (prefs.columnVisibility[other] || other === BOOK_COLUMN_ID ? i : last),
+          0,
+        );
         order.splice(lastShown + 1, 0, id);
       } else {
         order.push(id);
@@ -90,7 +95,12 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
   };
 
   const reset = () => {
-    updatePrefs(layout, (prefs) => ({ ...prefs, columnOrder: DEFAULT_ORDER, columnVisibility: DEFAULT_VISIBILITY, columnSizing: {} }));
+    updatePrefs(layout, (prefs) => ({
+      ...prefs,
+      columnOrder: DEFAULT_ORDER,
+      columnVisibility: DEFAULT_VISIBILITY,
+      columnSizing: {},
+    }));
   };
 
   return (

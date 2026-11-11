@@ -92,7 +92,9 @@ describe("tuneCamera", () => {
   it("applies one advanced set with what the camera offers", async () => {
     const { track, applyConstraints } = fakeTrack(ANDROID);
     await tuneCamera(track, { torch: false, zoom: 2 });
-    expect(applyConstraints).toHaveBeenCalledExactlyOnceWith({ advanced: [{ torch: false, zoom: 2, focusMode: "continuous" }] });
+    expect(applyConstraints).toHaveBeenCalledExactlyOnceWith({
+      advanced: [{ torch: false, zoom: 2, focusMode: "continuous" }],
+    });
   });
 
   it("applies nothing when the camera offers none of it (Safari without zoom, a laptop)", async () => {

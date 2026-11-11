@@ -202,7 +202,16 @@ function PasswordForm(props: PasswordFormProps) {
   return (
     <form className="account-dialog__form" onSubmit={submit} noValidate>
       {intro && <p className="account-dialog__text">{intro}</p>}
-      <input className="visually-hidden" type="text" name="username" autoComplete="username" value={username} readOnly tabIndex={-1} aria-hidden="true" />
+      <input
+        className="visually-hidden"
+        type="text"
+        name="username"
+        autoComplete="username"
+        value={username}
+        readOnly
+        tabIndex={-1}
+        aria-hidden="true"
+      />
       {needsCurrent && (
         <AuthField
           ref={currentRef}
@@ -242,7 +251,13 @@ function PasswordForm(props: PasswordFormProps) {
         </p>
       )}
       <Actions desktop={desktop} onCancel={onCancel}>
-        <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+        <Button
+          type="submit"
+          variant="primary"
+          size={desktop ? "regular" : "large"}
+          block={!desktop}
+          disabled={pending}
+        >
           {pending ? "Saving…" : submitLabel}
         </Button>
       </Actions>
@@ -250,13 +265,19 @@ function PasswordForm(props: PasswordFormProps) {
   );
 }
 
-function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; desktop: boolean; onConfirm: () => void; onCancel: () => void }) {
+function ConfirmWithWard(props: {
+  pending: boolean;
+  failure: AuthError | null;
+  desktop: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
   const { pending, failure, desktop, onConfirm, onCancel } = props;
   return (
     <div className="account-dialog__form">
       <p className="account-dialog__text">
-        You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then choose
-        one here, so you can still sign in while Ward is down.
+        You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then
+        choose one here, so you can still sign in while Ward is down.
       </p>
       {failure !== null && (
         <p className="auth-error" role="alert">
@@ -265,7 +286,14 @@ function ConfirmWithWard(props: { pending: boolean; failure: AuthError | null; d
         </p>
       )}
       <Actions desktop={desktop} onCancel={onCancel}>
-        <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} data-autofocus onClick={onConfirm}>
+        <Button
+          variant="primary"
+          size={desktop ? "regular" : "large"}
+          block={!desktop}
+          disabled={pending}
+          data-autofocus
+          onClick={onConfirm}
+        >
           {pending ? "Opening Ward…" : "Confirm with Ward"}
         </Button>
       </Actions>

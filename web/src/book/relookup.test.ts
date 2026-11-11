@@ -50,7 +50,10 @@ describe("diffDraft", () => {
   });
 
   it("lists what differs, with both sides as text", () => {
-    const rows = diffDraft(stored, draft({ title: "The Hobbit, or There and Back Again", pages: 310, subjects: ["Fantasy", "Dragons"] }));
+    const rows = diffDraft(
+      stored,
+      draft({ title: "The Hobbit, or There and Back Again", pages: 310, subjects: ["Fantasy", "Dragons"] }),
+    );
     expect(rows.map((r) => r.field)).toEqual(["title", "pages", "subjects"]);
     expect(rows[1]).toMatchObject({ label: "Pages", current: "300", proposed: "310" });
     expect(rows[2]).toMatchObject({ current: "Fantasy", proposed: "Fantasy; Dragons" });
@@ -58,7 +61,9 @@ describe("diffDraft", () => {
 
   it("proposes a value for an empty field but never clears one", () => {
     const bare = book({ title: "X" });
-    expect(diffDraft(bare, draft({ publisher: "Polirom" })).map((r) => [r.field, r.current])).toEqual([["publisher", ""]]);
+    expect(diffDraft(bare, draft({ publisher: "Polirom" })).map((r) => [r.field, r.current])).toEqual([
+      ["publisher", ""],
+    ]);
     // The draft says nothing about the publisher: the stored one stays.
     expect(diffDraft(stored, draft({ publisher: null, authors: [], pages: null }))).toEqual([]);
   });

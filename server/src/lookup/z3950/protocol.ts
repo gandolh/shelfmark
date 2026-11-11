@@ -164,4 +164,3 @@ export function readAnswer(buf: Buffer): Answer {
       return { kind: "other", tag: tlv.tag };
   }
 }
-

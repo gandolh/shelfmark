@@ -41,7 +41,8 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
   const { first, last } = pageRange(page, pageSize, total);
 
   const turn = (next: number) => (event: MouseEvent<HTMLButtonElement>) => {
-    if (event.currentTarget.getAttribute("aria-disabled") === "true" || next === page || next < 1 || next > pages) return;
+    if (event.currentTarget.getAttribute("aria-disabled") === "true" || next === page || next < 1 || next > pages)
+      return;
     onPage(next);
     setSaid(where(next, pages, pageSize, total));
   };

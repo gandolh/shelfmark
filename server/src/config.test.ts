@@ -35,13 +35,29 @@ describe("loadConfig", () => {
   });
 
   it("reads the overrides, and treats an empty value as unset", () => {
-    const config = loadConfig({ HOST: "0.0.0.0", PORT: "8796", DATA_DIR: "/data", GOOGLE_BOOKS_API_KEY: "k", SHELFMARK_BASE: "" });
-    expect(config).toMatchObject({ host: "0.0.0.0", port: 8796, dataDir: "/data", googleBooksApiKey: "k", webBase: "/shelfmark/" });
+    const config = loadConfig({
+      HOST: "0.0.0.0",
+      PORT: "8796",
+      DATA_DIR: "/data",
+      GOOGLE_BOOKS_API_KEY: "k",
+      SHELFMARK_BASE: "",
+    });
+    expect(config).toMatchObject({
+      host: "0.0.0.0",
+      port: 8796,
+      dataDir: "/data",
+      googleBooksApiKey: "k",
+      webBase: "/shelfmark/",
+    });
     expect(loadConfig({ GOOGLE_BOOKS_API_KEY: "" }).googleBooksApiKey).toBeUndefined();
   });
 
   it("names every key at fault", () => {
-    const message = problems({ PORT: "70000", SHELFMARK_API_PREFIX: "/shelfmark-api/", PUBLIC_ORIGIN: "https://example.com/" });
+    const message = problems({
+      PORT: "70000",
+      SHELFMARK_API_PREFIX: "/shelfmark-api/",
+      PUBLIC_ORIGIN: "https://example.com/",
+    });
     expect(message).toContain("PORT");
     expect(message).toContain("SHELFMARK_API_PREFIX");
     expect(message).toContain("PUBLIC_ORIGIN");
@@ -83,10 +99,16 @@ describe("loadConfig", () => {
     });
 
     it("wants the callback under the API prefix", () => {
-      const elsewhere = problems({ ...WARD, WARD_OIDC_REDIRECT_URI: "http://localhost:5176/shelfmark/auth/ward/callback" });
+      const elsewhere = problems({
+        ...WARD,
+        WARD_OIDC_REDIRECT_URI: "http://localhost:5176/shelfmark/auth/ward/callback",
+      });
       expect(elsewhere).toContain("WARD_OIDC_REDIRECT_URI");
       expect(elsewhere).toContain("/shelfmark-api/auth/ward/callback");
-      const prefix = { SHELFMARK_API_PREFIX: "/books-api", WARD_OIDC_REDIRECT_URI: "https://example.com/books-api/auth/ward/callback" };
+      const prefix = {
+        SHELFMARK_API_PREFIX: "/books-api",
+        WARD_OIDC_REDIRECT_URI: "https://example.com/books-api/auth/ward/callback",
+      };
       expect(loadConfig({ ...WARD, ...prefix }).ward?.redirectUri).toBe(prefix.WARD_OIDC_REDIRECT_URI);
     });
   });
@@ -106,7 +128,11 @@ describe("loadConfig", () => {
   });
 
   it("names the Ward and proxy keys along with the rest", () => {
-    const message = problems({ PORT: "0", AUTH_TRUSTED_PROXIES: "0.0.0.0/0", WARD_OIDC_ISSUER: "http://localhost:8792/ward-api/oidc" });
+    const message = problems({
+      PORT: "0",
+      AUTH_TRUSTED_PROXIES: "0.0.0.0/0",
+      WARD_OIDC_ISSUER: "http://localhost:8792/ward-api/oidc",
+    });
     expect(message).toContain("PORT");
     expect(message).toContain("AUTH_TRUSTED_PROXIES");
     expect(message).toContain("WARD_OIDC_CLIENT_ID");

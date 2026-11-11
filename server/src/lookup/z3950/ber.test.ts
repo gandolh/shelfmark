@@ -54,7 +54,12 @@ describe("BER encoding", () => {
 
 describe("BER decoding", () => {
   it("reads back what it writes, children included", () => {
-    const pdu = constructed(CONTEXT, 23, primitive(CONTEXT, 23, integerContent(300)), primitive(CONTEXT, 130, Buffer.from("x")));
+    const pdu = constructed(
+      CONTEXT,
+      23,
+      primitive(CONTEXT, 23, integerContent(300)),
+      primitive(CONTEXT, 130, Buffer.from("x")),
+    );
     const { tlv, end } = decode(Buffer.concat([pdu, Buffer.from("trailing")]));
     expect(end).toBe(pdu.length);
     expect(tlv).toMatchObject({ cls: CONTEXT, constructed: true, tag: 23 });
@@ -79,7 +84,10 @@ describe("BER decoding", () => {
   it("rejects what can't be BER instead of looping", () => {
     expect(() => decode(Buffer.from("0480", "hex"))).toThrow(/indefinite/);
     expect(() => decode(Buffer.from("0485ffffffffff", "hex"))).toThrow(/too large/);
-    const deep = Array.from({ length: 40 }).reduce<Buffer>((inner) => constructed(UNIVERSAL, 16, inner), Buffer.alloc(0));
+    const deep = Array.from({ length: 40 }).reduce<Buffer>(
+      (inner) => constructed(UNIVERSAL, 16, inner),
+      Buffer.alloc(0),
+    );
     expect(() => decode(deep)).toThrow(/too deep/);
   });
 });

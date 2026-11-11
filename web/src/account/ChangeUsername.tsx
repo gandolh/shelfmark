@@ -146,7 +146,13 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
         </p>
       )}
       <Actions desktop={desktop} onCancel={onCancel}>
-        <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+        <Button
+          type="submit"
+          variant="primary"
+          size={desktop ? "regular" : "large"}
+          block={!desktop}
+          disabled={pending}
+        >
           {pending ? "Saving…" : "Change username"}
         </Button>
       </Actions>
@@ -158,8 +164,8 @@ function Done({ username, desktop, onClose }: { username: string; desktop: boole
   return (
     <div className="account-dialog__form">
       <p className="account-dialog__text" role="status">
-        You're now <strong>{username}</strong>. Sign in with that name from now on; you're still signed in everywhere. If your
-        browser saved your password, it may still list it under the old name.
+        You're now <strong>{username}</strong>. Sign in with that name from now on; you're still signed in everywhere.
+        If your browser saved your password, it may still list it under the old name.
       </p>
       <div className="account-dialog__actions">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { BULK_MAX_BOOKS, bookBulkSchema, bookCreateSchema, bookPatchSchema, bookSchema, deriveAuthorSort, type Book } from "./book.js";
+import {
+  BULK_MAX_BOOKS,
+  bookBulkSchema,
+  bookCreateSchema,
+  bookPatchSchema,
+  bookSchema,
+  deriveAuthorSort,
+  type Book,
+} from "./book.js";
 
 const book: Book = {
   id: 1,
@@ -78,7 +86,13 @@ describe("bookCreateSchema", () => {
         authors: ["Mircea Cărtărescu ", "", "  "],
         tags: ["", " Romanian "],
       }),
-    ).toEqual({ title: "Solenoid", subtitle: null, shelf: "Bedroom", authors: ["Mircea Cărtărescu"], tags: ["Romanian"] });
+    ).toEqual({
+      title: "Solenoid",
+      subtitle: null,
+      shelf: "Bedroom",
+      authors: ["Mircea Cărtărescu"],
+      tags: ["Romanian"],
+    });
   });
 
   it("normalises the language and the currency codes", () => {
@@ -147,13 +161,22 @@ describe("bookBulkSchema", () => {
       ids: [1, 2],
       change: { kind: "shelf", shelf: "Bedroom · B1" },
     });
-    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "shelf", shelf: "  " } }).change).toEqual({ kind: "shelf", shelf: null });
-    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "status", status: "read" } }).change).toEqual({ kind: "status", status: "read" });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "shelf", shelf: "  " } }).change).toEqual({
+      kind: "shelf",
+      shelf: null,
+    });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "status", status: "read" } }).change).toEqual({
+      kind: "status",
+      status: "read",
+    });
     expect(bookBulkSchema.parse({ ids: [1], change: { kind: "addTags", tags: [" signed ", ""] } }).change).toEqual({
       kind: "addTags",
       tags: ["signed"],
     });
-    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "removeTags", tags: ["x"] } }).change).toEqual({ kind: "removeTags", tags: ["x"] });
+    expect(bookBulkSchema.parse({ ids: [1], change: { kind: "removeTags", tags: ["x"] } }).change).toEqual({
+      kind: "removeTags",
+      tags: ["x"],
+    });
     expect(bookBulkSchema.parse({ ids: [1], change: { kind: "delete" } }).change).toEqual({ kind: "delete" });
   });
 
@@ -162,7 +185,9 @@ describe("bookBulkSchema", () => {
   });
 
   it("refuses no ids, bad ids, too many ids and a change it doesn't know", () => {
-    expect(issue(bookBulkSchema.safeParse({ ids: [], change: { kind: "delete" } }))).toBe("ids: name at least one book");
+    expect(issue(bookBulkSchema.safeParse({ ids: [], change: { kind: "delete" } }))).toBe(
+      "ids: name at least one book",
+    );
     expect(issue(bookBulkSchema.safeParse({ ids: [0], change: { kind: "delete" } }))).toMatch(/^ids\.0:/);
     expect(issue(bookBulkSchema.safeParse({ ids: ["1"], change: { kind: "delete" } }))).toMatch(/^ids\.0:/);
     const many = Array.from({ length: BULK_MAX_BOOKS + 1 }, (_, i) => i + 1);
@@ -172,13 +197,19 @@ describe("bookBulkSchema", () => {
   });
 
   it("checks the change's own fields", () => {
-    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "status", status: "lost" } }))).toMatch(/^change\.status:/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "status", status: "lost" } }))).toMatch(
+      /^change\.status:/,
+    );
     expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "shelf" } }))).toMatch(/^change\.shelf:/);
     expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "addTags", tags: [" "] } }))).toBe(
       "change.tags: name at least one tag",
     );
-    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete", shelf: "x" } }))).toMatch(/Unrecognized key/);
-    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete" }, extra: 1 }))).toMatch(/Unrecognized key/);
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete", shelf: "x" } }))).toMatch(
+      /Unrecognized key/,
+    );
+    expect(issue(bookBulkSchema.safeParse({ ids: [1], change: { kind: "delete" }, extra: 1 }))).toMatch(
+      /Unrecognized key/,
+    );
   });
 });
 

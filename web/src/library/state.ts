@@ -214,7 +214,14 @@ export function setSelection(books: Selection, basis: PageBasis, page: number, s
     return;
   }
   const old = selection;
-  if (old !== null && old.books === books && old.scope === scope && old.page === page && samePageBasis(old.basis, basis)) return;
+  if (
+    old !== null &&
+    old.books === books &&
+    old.scope === scope &&
+    old.page === page &&
+    samePageBasis(old.basis, basis)
+  )
+    return;
   selection = { books, scope, basis, page };
   notify();
 }

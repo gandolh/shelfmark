@@ -43,5 +43,9 @@ function subscribe(notify: () => void): () => void {
 
 /** True while a new version is waiting for the owner's "Reload". */
 export function useUpdateWaiting(): boolean {
-  return useSyncExternalStore(subscribe, () => waiting, () => false);
+  return useSyncExternalStore(
+    subscribe,
+    () => waiting,
+    () => false,
+  );
 }

@@ -137,12 +137,17 @@ describe("the books routes", () => {
   it("knows where a cover is, and how to get past a cached one", () => {
     expect(coverUrl(7)).toBe("/shelfmark-api/api/books/7/cover");
     expect(coverUrl(7, null)).toBe("/shelfmark-api/api/books/7/cover");
-    expect(coverUrl(7, "2026-10-14T09:00:00.000Z")).toBe("/shelfmark-api/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z");
+    expect(coverUrl(7, "2026-10-14T09:00:00.000Z")).toBe(
+      "/shelfmark-api/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z",
+    );
     expect(coverPath(7, "2026-10-14T09:00:00.000Z")).toBe("/api/books/7/cover?v=2026-10-14T09%3A00%3A00.000Z");
   });
 
   it("fetches a cover's bytes, and a 401 there signs out like any call", async () => {
-    serve(() => new Response(new Uint8Array([0xff, 0xd8, 0xff]), { status: 200, headers: { "content-type": "image/jpeg" } }));
+    serve(
+      () =>
+        new Response(new Uint8Array([0xff, 0xd8, 0xff]), { status: 200, headers: { "content-type": "image/jpeg" } }),
+    );
     const image = await apiBlob(coverPath(7, "2026-10-14T09:00:00.000Z"));
     expect(image.type).toBe("image/jpeg");
     expect(image.size).toBe(3);
@@ -173,7 +178,9 @@ describe("errors", () => {
   });
 
   it("stand in for a proxy's page in front of a stopped API", async () => {
-    serve(() => new Response("<html>502 Bad Gateway</html>", { status: 502, headers: { "content-type": "text/html" } }));
+    serve(
+      () => new Response("<html>502 Bad Gateway</html>", { status: 502, headers: { "content-type": "text/html" } }),
+    );
     const error = await failure(booksApi.list());
     expect(error.status).toBe(502);
     expect(error.code).toBe("bad_response");
@@ -223,7 +230,9 @@ describe("a 401", () => {
 
   it("is the call's own answer with noSignOut (a login form's wrong password)", async () => {
     serve(() => apiError(401, "unauthorized", "Wrong username or password"));
-    const error = await failure(apiRequest("/auth/login", { method: "POST", body: { username: "u" }, noSignOut: true }));
+    const error = await failure(
+      apiRequest("/auth/login", { method: "POST", body: { username: "u" }, noSignOut: true }),
+    );
     expect(error).toMatchObject({ status: 401, code: "unauthorized", message: "Wrong username or password" });
     expect(signedOutCount).toBe(0);
   });

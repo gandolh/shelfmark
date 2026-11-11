@@ -28,7 +28,9 @@ const CONTACT = "johndoe@example.com";
 
 function appVersion(): string {
   try {
-    const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as { version?: unknown };
+    const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as {
+      version?: unknown;
+    };
     return typeof pkg.version === "string" ? pkg.version : "0.0.0";
   } catch {
     return "0.0.0";
@@ -65,9 +67,12 @@ export async function getJson(
     response = await fetch(url, { headers, signal: AbortSignal.timeout(timeoutMs) });
   } catch (error) {
     const timedOut = error instanceof Error && error.name === "TimeoutError";
-    throw new Error(timedOut ? `${label} did not answer within ${timeoutMs / 1000} s` : `${label} could not be reached`, {
-      cause: error,
-    });
+    throw new Error(
+      timedOut ? `${label} did not answer within ${timeoutMs / 1000} s` : `${label} could not be reached`,
+      {
+        cause: error,
+      },
+    );
   }
   if (!response.ok) {
     await response.body?.cancel();
@@ -87,21 +92,88 @@ export async function getJson(
  * upstream data: `/languages/constructor` or `__proto__` would find an
  * object's built-ins.
  */
-const MARC_TO_ISO6391: ReadonlyMap<string, string> = new Map(Object.entries({
-  alb: "sq", ara: "ar", arm: "hy", baq: "eu", bel: "be", bos: "bs", bul: "bg", cat: "ca", ces: "cs",
-  chi: "zh", cym: "cy", cze: "cs", dan: "da", deu: "de", dut: "nl", ell: "el", eng: "en", epo: "eo",
-  est: "et", eus: "eu", fas: "fa", fin: "fi", fra: "fr", fre: "fr", geo: "ka", ger: "de", gle: "ga",
-  gre: "el", heb: "he", hin: "hi", hrv: "hr", hun: "hu", hye: "hy", ice: "is", ind: "id", isl: "is",
-  ita: "it", jpn: "ja", kat: "ka", kor: "ko", lat: "la", lav: "lv", lit: "lt", mac: "mk", may: "ms",
-  mkd: "mk", mol: "ro", msa: "ms", nld: "nl", nor: "no", per: "fa", pol: "pl", por: "pt", ron: "ro",
-  rum: "ro", rus: "ru", slk: "sk", slo: "sk", slv: "sl", spa: "es", sqi: "sq", srp: "sr", swe: "sv",
-  tha: "th", tur: "tr", ukr: "uk", vie: "vi", wel: "cy", yid: "yi", zho: "zh",
-}));
+const MARC_TO_ISO6391: ReadonlyMap<string, string> = new Map(
+  Object.entries({
+    alb: "sq",
+    ara: "ar",
+    arm: "hy",
+    baq: "eu",
+    bel: "be",
+    bos: "bs",
+    bul: "bg",
+    cat: "ca",
+    ces: "cs",
+    chi: "zh",
+    cym: "cy",
+    cze: "cs",
+    dan: "da",
+    deu: "de",
+    dut: "nl",
+    ell: "el",
+    eng: "en",
+    epo: "eo",
+    est: "et",
+    eus: "eu",
+    fas: "fa",
+    fin: "fi",
+    fra: "fr",
+    fre: "fr",
+    geo: "ka",
+    ger: "de",
+    gle: "ga",
+    gre: "el",
+    heb: "he",
+    hin: "hi",
+    hrv: "hr",
+    hun: "hu",
+    hye: "hy",
+    ice: "is",
+    ind: "id",
+    isl: "is",
+    ita: "it",
+    jpn: "ja",
+    kat: "ka",
+    kor: "ko",
+    lat: "la",
+    lav: "lv",
+    lit: "lt",
+    mac: "mk",
+    may: "ms",
+    mkd: "mk",
+    mol: "ro",
+    msa: "ms",
+    nld: "nl",
+    nor: "no",
+    per: "fa",
+    pol: "pl",
+    por: "pt",
+    ron: "ro",
+    rum: "ro",
+    rus: "ru",
+    slk: "sk",
+    slo: "sk",
+    slv: "sl",
+    spa: "es",
+    sqi: "sq",
+    srp: "sr",
+    swe: "sv",
+    tha: "th",
+    tur: "tr",
+    ukr: "uk",
+    vie: "vi",
+    wel: "cy",
+    yid: "yi",
+    zho: "zh",
+  }),
+);
 
 /** `/languages/rum` (or `rum`) → `ro`. */
 export function languageOf(key: unknown): string | null {
   if (typeof key !== "string") return null;
-  const code = key.replace(/^\/languages\//, "").trim().toLowerCase();
+  const code = key
+    .replace(/^\/languages\//, "")
+    .trim()
+    .toLowerCase();
   return MARC_TO_ISO6391.get(code) ?? null;
 }
 
@@ -115,7 +187,9 @@ const MAX_CANDIDATES = 3;
 
 function coverIds(data: Record<string, unknown>, details: Record<string, unknown> | undefined): number[] {
   // Open Library marks a deleted cover with -1.
-  const ids = array(details?.covers).filter((id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0);
+  const ids = array(details?.covers).filter(
+    (id): id is number => typeof id === "number" && Number.isInteger(id) && id > 0,
+  );
   if (ids.length === 0) {
     const cover = record(data.cover);
     for (const size of ["large", "medium", "small"]) {

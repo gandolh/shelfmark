@@ -80,7 +80,10 @@ const PICK_VALUES_MAX = 500;
 export const savedFilterSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("text"), op: z.enum(TEXT_OPS), text: z.string().max(FILTER_TEXT_MAX) }),
   /** `""` stands for the books with no value ("No shelf"). */
-  z.strictObject({ kind: z.literal("pick"), values: z.array(z.string().max(FILTER_TEXT_MAX)).max(PICK_VALUES_MAX).readonly() }),
+  z.strictObject({
+    kind: z.literal("pick"),
+    values: z.array(z.string().max(FILTER_TEXT_MAX)).max(PICK_VALUES_MAX).readonly(),
+  }),
   /** In the column's stored units (a price in bani). */
   z.strictObject({ kind: z.literal("number"), min: z.number().nullable(), max: z.number().nullable() }),
   /** Calendar days, both ends included. */

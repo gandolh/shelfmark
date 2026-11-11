@@ -68,7 +68,11 @@ export function decadeOf(year: number): number {
 function rank(counts: Map<string, number>): Tally[] {
   return [...counts]
     .map(([key, count]) => ({ key, count }))
-    .sort((a, b) => b.count - a.count || (a.key === "" ? 1 : b.key === "" ? -1 : a.key.localeCompare(b.key, "en", { numeric: true })));
+    .sort(
+      (a, b) =>
+        b.count - a.count ||
+        (a.key === "" ? 1 : b.key === "" ? -1 : a.key.localeCompare(b.key, "en", { numeric: true })),
+    );
 }
 
 function bump(counts: Map<string, number>, key: string): void {
@@ -88,7 +92,8 @@ export function computeStats(books: readonly Book[]): Stats {
 
   for (const book of owned) {
     // Each author of a multi-author book counts once for that book, even when listed twice.
-    for (const name of new Set(book.authors.map((author) => author.trim()).filter((author) => author !== ""))) bump(authors, name);
+    for (const name of new Set(book.authors.map((author) => author.trim()).filter((author) => author !== "")))
+      bump(authors, name);
     bump(languages, book.language ?? "");
     bump(statuses, book.status);
     bump(decades, book.publishedYear === null ? UNKNOWN_YEAR : String(decadeOf(book.publishedYear)));
@@ -129,15 +134,17 @@ export function computeStats(books: readonly Book[]): Stats {
         // A room with one shelf named as the room itself has nothing to list inside it.
         shelves: room === "" || (inside.size === 1 && inside.has(room)) ? [] : rank(inside),
       }))
-      .sort((a, b) => b.count - a.count || (a.room === "" ? 1 : b.room === "" ? -1 : a.room.localeCompare(b.room, "en", { numeric: true }))),
+      .sort(
+        (a, b) =>
+          b.count - a.count ||
+          (a.room === "" ? 1 : b.room === "" ? -1 : a.room.localeCompare(b.room, "en", { numeric: true })),
+      ),
     statuses: rank(statuses),
     decades: rank(decades),
     spending: [...money]
       .map(([currency, byYear]) => ({
         currency,
-        years: [...byYear]
-          .map(([year, spent]) => ({ year, ...spent }))
-          .sort((a, b) => b.year.localeCompare(a.year)),
+        years: [...byYear].map(([year, spent]) => ({ year, ...spent })).sort((a, b) => b.year.localeCompare(a.year)),
       }))
       .sort((a, b) => a.currency.localeCompare(b.currency)),
     unpriced,

@@ -44,7 +44,9 @@ function setup(
     sources: [
       createOpenLibrarySource({ fetch, queue: createQueue(0) }),
       ...(libraries
-        ? LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) }))
+        ? LIBRARY_ORDER.map((library) =>
+            createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) }),
+          )
         : []),
       createGoogleBooksSource({ apiKey, fetch, queue: createQueue(0) }),
     ],
@@ -183,7 +185,12 @@ describe("createLookup", () => {
     const { draft, tried } = await lookup.lookup(OMUL);
     expect(tried).toEqual([{ source: "openlibrary", outcome: "found" }]);
     expect(hosts()).toEqual(["openlibrary.org", "openlibrary.org"]);
-    expect(draft).toMatchObject({ title: "Omul care mută norii", pages: 258, coverCandidates: [], sources: ["openlibrary"] });
+    expect(draft).toMatchObject({
+      title: "Omul care mută norii",
+      pages: 258,
+      coverCandidates: [],
+      sources: ["openlibrary"],
+    });
   });
 
   it("asks Google when nothing earlier found a title, and merges", async () => {
@@ -235,7 +242,9 @@ describe("createLookup", () => {
     const lookup = createLookup({
       sources: [
         createOpenLibrarySource({ fetch, queue: createQueue(0) }),
-        ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) })),
+        ...LIBRARY_ORDER.map((library) =>
+          createLibrarySource(library, { connect: catalogs.connect, queue: createQueue(0) }),
+        ),
         createGoogleBooksSource({ apiKey: "test-key", fetch, queue: createQueue(0) }),
       ],
       cache: createLookupCache(db, () => clock),

@@ -52,7 +52,12 @@ export function dialogSwitch(): DialogSwitch {
       set(true);
     },
     set,
-    useOpen: () => useSyncExternalStore(subscribe, () => open, () => false),
+    useOpen: () =>
+      useSyncExternalStore(
+        subscribe,
+        () => open,
+        () => false,
+      ),
     takeReturnFocus() {
       const target = returnFocus;
       returnFocus = null;
@@ -107,7 +112,15 @@ export function AccountDialog({ title, onClose, returnFocus, children }: Account
 }
 
 /** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-export function Actions({ desktop, onCancel, children }: { desktop: boolean; onCancel: () => void; children: ReactNode }) {
+export function Actions({
+  desktop,
+  onCancel,
+  children,
+}: {
+  desktop: boolean;
+  onCancel: () => void;
+  children: ReactNode;
+}) {
   return (
     <div className="account-dialog__actions">
       <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>

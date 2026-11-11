@@ -39,7 +39,14 @@ export function spreadsheetDate(value: string): Date | null {
   const stamp = new Date(value);
   if (Number.isNaN(stamp.getTime())) return null;
   return new Date(
-    Date.UTC(stamp.getFullYear(), stamp.getMonth(), stamp.getDate(), stamp.getHours(), stamp.getMinutes(), stamp.getSeconds()),
+    Date.UTC(
+      stamp.getFullYear(),
+      stamp.getMonth(),
+      stamp.getDate(),
+      stamp.getHours(),
+      stamp.getMinutes(),
+      stamp.getSeconds(),
+    ),
   );
 }
 
@@ -70,10 +77,17 @@ const COLLECTION_LABELS: Record<Collection, string> = { owned: "Owned", wishlist
  * apart, then every column in the table's default order. The books keep the
  * order they are given in (the server's, oldest first).
  */
-export function libraryTable(books: readonly Book[], typedDates: boolean, columns: readonly LibraryColumn[] = COLUMNS): ExportTable {
+export function libraryTable(
+  books: readonly Book[],
+  typedDates: boolean,
+  columns: readonly LibraryColumn[] = COLUMNS,
+): ExportTable {
   return {
     header: ["Collection", ...columns.map((column) => column.label)],
-    rows: books.map((book) => [COLLECTION_LABELS[book.collection], ...columns.map((column) => cellOf(column, book, typedDates))]),
+    rows: books.map((book) => [
+      COLLECTION_LABELS[book.collection],
+      ...columns.map((column) => cellOf(column, book, typedDates)),
+    ]),
     dateFormats: [null, ...columns.map(dateFormat)],
   };
 }

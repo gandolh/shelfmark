@@ -28,7 +28,12 @@ describe("compileSearch", () => {
     publisher: "Humanitas",
     isbn13: "9789735049225",
   });
-  const inocentii = book({ title: "Inocenții", subtitle: "roman", authors: ["Ioana Pârvulescu"], series: "Seria de autor" });
+  const inocentii = book({
+    title: "Inocenții",
+    subtitle: "roman",
+    authors: ["Ioana Pârvulescu"],
+    series: "Seria de autor",
+  });
   const road = book({ title: "The Road", authors: ["Cormac McCarthy"], tags: ["Gift"], notes: "Bought in Iași" });
   const books = [solenoid, inocentii, road];
   const find = (query: string) => searchBooks(books, query).map((b) => b.title);

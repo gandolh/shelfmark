@@ -125,7 +125,13 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
   const toolbar = editing ? undefined : (
     <>
       {book.collection === "wishlist" && (
-        <Button id="book-buy" variant="primary" pill aria-expanded={buying} onClick={() => (setNotice(null), setBuying(true))}>
+        <Button
+          id="book-buy"
+          variant="primary"
+          pill
+          aria-expanded={buying}
+          onClick={() => (setNotice(null), setBuying(true))}
+        >
           I bought it
         </Button>
       )}
@@ -159,7 +165,9 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
           <p className="book-notice" role="status">
             {notice}
           </p>
-          {buying && !editing && book.collection === "wishlist" && <BuyIt book={book} onBuy={buy} onClose={() => setBuying(false)} />}
+          {buying && !editing && book.collection === "wishlist" && (
+            <BuyIt book={book} onBuy={buy} onClose={() => setBuying(false)} />
+          )}
           {lookupOpen && !editing && (
             <RelookupDiff book={book} lookup={lookup} onApply={applyLookup} onClose={() => setLookupOpen(false)} />
           )}

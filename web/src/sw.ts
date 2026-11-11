@@ -1,6 +1,11 @@
 /// <reference lib="webworker" />
 import { ExpirationPlugin } from "workbox-expiration";
-import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute, type PrecacheEntry } from "workbox-precaching";
+import {
+  cleanupOutdatedCaches,
+  createHandlerBoundToURL,
+  precacheAndRoute,
+  type PrecacheEntry,
+} from "workbox-precaching";
 import { NavigationRoute, registerRoute } from "workbox-routing";
 import { CacheFirst } from "workbox-strategies";
 import { appBase } from "./base";
@@ -46,7 +51,11 @@ registerRoute(
   new CacheFirst({
     cacheName: COVER_CACHE.name,
     plugins: [
-      new ExpirationPlugin({ maxEntries: COVER_CACHE.maxEntries, maxAgeSeconds: COVER_CACHE.maxAgeSeconds, purgeOnQuotaError: true }),
+      new ExpirationPlugin({
+        maxEntries: COVER_CACHE.maxEntries,
+        maxAgeSeconds: COVER_CACHE.maxAgeSeconds,
+        purgeOnQuotaError: true,
+      }),
     ],
   }),
 );
@@ -58,7 +67,8 @@ registerRoute(
 // hash of their contents, so a cached file is never stale. The page's own
 // download (ocr/engine.ts) and the Tesseract worker's requests both land here.
 registerRoute(
-  ({ url, request }) => request.method === "GET" && url.origin === self.location.origin && isOcrPath(url.pathname, BASE),
+  ({ url, request }) =>
+    request.method === "GET" && url.origin === self.location.origin && isOcrPath(url.pathname, BASE),
   new CacheFirst({
     cacheName: OCR_CACHE.name,
     plugins: [new ExpirationPlugin({ maxEntries: OCR_CACHE.maxEntries, purgeOnQuotaError: true })],

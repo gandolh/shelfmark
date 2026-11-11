@@ -42,7 +42,12 @@ describe("readGoogleBooks", () => {
     const answer = {
       totalItems: 2,
       items: [
-        { volumeInfo: { title: "Another book", industryIdentifiers: [{ type: "ISBN_13", identifier: "9780261102217" }] } },
+        {
+          volumeInfo: {
+            title: "Another book",
+            industryIdentifiers: [{ type: "ISBN_13", identifier: "9780261102217" }],
+          },
+        },
         { volumeInfo: { title: "The Hobbit", industryIdentifiers: [{ type: "ISBN_10", identifier: "054792822X" }] } },
       ],
     };

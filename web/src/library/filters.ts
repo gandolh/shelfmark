@@ -70,12 +70,16 @@ export function isActive(filter: Filter | undefined): filter is Filter {
 export function activeFilters(filters: Filters): [LibraryColumn, Filter][] {
   const entries: [LibraryColumn, Filter][] = [];
   for (const [id, filter] of Object.entries(filters)) {
-    if (isColumnId(id) && isActive(filter) && columnById(id).kind === filter.kind) entries.push([columnById(id), filter]);
+    if (isColumnId(id) && isActive(filter) && columnById(id).kind === filter.kind)
+      entries.push([columnById(id), filter]);
   }
   return entries;
 }
 
-function textMatcher(column: LibraryColumn & { kind: "text" }, filter: Filter & { kind: "text" }): (book: Book) => boolean {
+function textMatcher(
+  column: LibraryColumn & { kind: "text" },
+  filter: Filter & { kind: "text" },
+): (book: Book) => boolean {
   const isBlank = (value: string | null) => value === null || value.trim() === "";
   if (filter.op === "empty") return (book) => isBlank(column.value(book));
   if (filter.op === "notEmpty") return (book) => !isBlank(column.value(book));
@@ -184,7 +188,10 @@ export function pickOptions(column: PickColumn, books: readonly Book[], filters:
 }
 
 /** The lowest and highest value the books have, for a range's placeholders. */
-export function valueRange(column: LibraryColumn, books: readonly Book[]): { min: number | string; max: number | string } | null {
+export function valueRange(
+  column: LibraryColumn,
+  books: readonly Book[],
+): { min: number | string; max: number | string } | null {
   if (column.kind !== "number" && column.kind !== "date") return null;
   let min: number | string | null = null;
   let max: number | string | null = null;
@@ -217,7 +224,11 @@ export function filterSummary(column: LibraryColumn, filter: Filter): string {
       return `contains “${filter.text.trim()}”`;
     case "pick": {
       const label = (value: string) =>
-        value === NO_VALUE ? `no ${column.label.toLowerCase()}` : column.kind === "pick" ? column.optionLabel(value) : value;
+        value === NO_VALUE
+          ? `no ${column.label.toLowerCase()}`
+          : column.kind === "pick"
+            ? column.optionLabel(value)
+            : value;
       return listOf(filter.values.map(label));
     }
     case "number": {

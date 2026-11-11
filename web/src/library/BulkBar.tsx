@@ -36,7 +36,8 @@ export interface BulkBarProps {
 }
 
 /** The answer to a bulk change that named a book the server no longer has: deleted on another device. */
-const STALE = "Nothing was changed: some of these books are no longer in your library. The list is up to date now, so try again.";
+const STALE =
+  "Nothing was changed: some of these books are no longer in your library. The list is up to date now, so try again.";
 
 /**
  * The bulk bar: in place of the Library's toolbar while books are
@@ -86,7 +87,10 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
       onNotice({ text: messageOf(error, "The status wasn't changed. Try again."), visible: true }),
     );
   };
-  const statusItems: MenuItem[] = STATUSES.map((status) => ({ label: STATUS_LABELS[status], onSelect: () => setStatus(status) }));
+  const statusItems: MenuItem[] = STATUSES.map((status) => ({
+    label: STATUS_LABELS[status],
+    onSelect: () => setStatus(status),
+  }));
 
   const noOwned = summary.owned === 0;
   const noTags = tagsOnSelected.length === 0;
@@ -108,12 +112,20 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
     bar = (
       <>
         {count}
-        <Button onClick={() => open("shelf")} disabled={noOwned} title={noOwned ? "Only owned books sit on shelves" : undefined}>
+        <Button
+          onClick={() => open("shelf")}
+          disabled={noOwned}
+          title={noOwned ? "Only owned books sit on shelves" : undefined}
+        >
           Move to shelf…
         </Button>
         <Menu label="Set status" sections={[{ items: statusItems }]} trigger="Set status" />
         <Button onClick={() => open("addTags")}>Add tags…</Button>
-        <Button onClick={() => open("removeTags")} disabled={noTags} title={noTags ? "None of these books has a tag" : undefined}>
+        <Button
+          onClick={() => open("removeTags")}
+          disabled={noTags}
+          title={noTags ? "None of these books has a tag" : undefined}
+        >
           Remove tags…
         </Button>
         <Button onClick={() => open("delete")}>Delete…</Button>
@@ -163,13 +175,28 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
         />
       )}
       {dialog === "addTags" && (
-        <AddTagsDialog {...shared} count={summary.count} suggestions={allTags} onSubmit={(tags) => run({ kind: "addTags", tags })} />
+        <AddTagsDialog
+          {...shared}
+          count={summary.count}
+          suggestions={allTags}
+          onSubmit={(tags) => run({ kind: "addTags", tags })}
+        />
       )}
       {dialog === "removeTags" && (
-        <RemoveTagsDialog {...shared} count={summary.count} tags={tagsOnSelected} onSubmit={(tags) => run({ kind: "removeTags", tags })} />
+        <RemoveTagsDialog
+          {...shared}
+          count={summary.count}
+          tags={tagsOnSelected}
+          onSubmit={(tags) => run({ kind: "removeTags", tags })}
+        />
       )}
       {dialog === "delete" && (
-        <DeleteBooksDialog {...shared} count={summary.count} everyPage={everyPage} onConfirm={() => run({ kind: "delete" })} />
+        <DeleteBooksDialog
+          {...shared}
+          count={summary.count}
+          everyPage={everyPage}
+          onConfirm={() => run({ kind: "delete" })}
+        />
       )}
     </>
   );

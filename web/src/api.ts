@@ -129,7 +129,11 @@ export async function apiRequest<T>(
   const data: unknown = await response.json().catch(() => undefined);
   const parsed = schema.safeParse(data);
   if (!parsed.success) {
-    throw new ApiError(response.status, "bad_response", "Shelfmark sent an answer this app doesn't understand. Reload the page.");
+    throw new ApiError(
+      response.status,
+      "bad_response",
+      "Shelfmark sent an answer this app doesn't understand. Reload the page.",
+    );
   }
   return parsed.data;
 }

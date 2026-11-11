@@ -25,7 +25,10 @@ describe("buildPatch", () => {
   });
 
   it("sends only the changed fields", () => {
-    expect(patchOf({ title: "Dune Messiah", rating: 5 })).toEqual({ ok: true, patch: { title: "Dune Messiah", rating: 5 } });
+    expect(patchOf({ title: "Dune Messiah", rating: 5 })).toEqual({
+      ok: true,
+      patch: { title: "Dune Messiah", rating: 5 },
+    });
   });
 
   it("drops a change that tidies back to the stored value", () => {
@@ -51,9 +54,16 @@ describe("buildPatch", () => {
   });
 
   it("reports what is wrong and sends nothing", () => {
-    const result = patchOf({ title: " ", publishedYear: "20x1", price: "4.999", language: "eng", acquiredOn: "2026-02-31" });
+    const result = patchOf({
+      title: " ",
+      publishedYear: "20x1",
+      price: "4.999",
+      language: "eng",
+      acquiredOn: "2026-02-31",
+    });
     expect(result.ok).toBe(false);
-    if (!result.ok) expect(Object.keys(result.errors).sort()).toEqual(["acquiredOn", "language", "price", "publishedYear", "title"]);
+    if (!result.ok)
+      expect(Object.keys(result.errors).sort()).toEqual(["acquiredOn", "language", "price", "publishedYear", "title"]);
   });
 
   it("doesn't check a field nobody touched", () => {

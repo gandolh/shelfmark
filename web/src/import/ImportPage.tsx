@@ -72,7 +72,13 @@ export function ImportPage() {
   return (
     <Page title="Import a CSV" back={{ to: LIBRARY, label: "Library" }}>
       <div className="import">
-        {step.kind === "choose" && <ChooseFile error={step.error} onLoaded={(file) => setStep({ kind: file.format ? "preview" : "map", file })} onError={(error) => setStep({ kind: "choose", error })} />}
+        {step.kind === "choose" && (
+          <ChooseFile
+            error={step.error}
+            onLoaded={(file) => setStep({ kind: file.format ? "preview" : "map", file })}
+            onError={(error) => setStep({ kind: "choose", error })}
+          />
+        )}
         {step.kind === "map" && (
           <MapColumns
             file={step.file}
@@ -96,7 +102,15 @@ export function ImportPage() {
 
 // --- Step 1: the file -----------------------------------------------------------
 
-function ChooseFile({ error, onLoaded, onError }: { error?: string; onLoaded: (file: Loaded) => void; onError: (message: string) => void }) {
+function ChooseFile({
+  error,
+  onLoaded,
+  onError,
+}: {
+  error?: string;
+  onLoaded: (file: Loaded) => void;
+  onError: (message: string) => void;
+}) {
   const input = useRef<HTMLInputElement>(null);
 
   const read = async (file: File) => {
@@ -104,7 +118,8 @@ function ChooseFile({ error, onLoaded, onError }: { error?: string; onLoaded: (f
     const table = parseCsv(text);
     const header = table[0];
     if (!header || table.length < 2) return onError("That file has no rows under its header line. Is it a CSV?");
-    if (table.length - 1 > MAX_ROWS) return onError(`That file has more than ${MAX_ROWS} rows. Split it and import the parts.`);
+    if (table.length - 1 > MAX_ROWS)
+      return onError(`That file has more than ${MAX_ROWS} rows. Split it and import the parts.`);
     const { format, mapping } = guessMapping(header);
     onLoaded({ name: file.name, encoding, format, table, mapping });
   };
@@ -143,7 +158,15 @@ function ChooseFile({ error, onLoaded, onError }: { error?: string; onLoaded: (f
 
 // --- Step 2: the columns --------------------------------------------------------
 
-function MapColumns({ file, onBack, onContinue }: { file: Loaded; onBack: () => void; onContinue: (mapping: Mapping) => void }) {
+function MapColumns({
+  file,
+  onBack,
+  onContinue,
+}: {
+  file: Loaded;
+  onBack: () => void;
+  onContinue: (mapping: Mapping) => void;
+}) {
   const [mapping, setMapping] = useState<Mapping>(file.mapping);
   const header = file.table[0] ?? [];
   const usable = isUsable(mapping);
@@ -152,12 +175,15 @@ function MapColumns({ file, onBack, onContinue }: { file: Loaded; onBack: () => 
     <section className="import__card">
       <h2 className="import__heading">Match the columns</h2>
       <p className="import__text">
-        {file.format ? `This looks like a ${file.format.name} export.` : "This isn't an export Shelfmark knows."} Say what each
-        column holds. One with a title or an ISBN is needed.
+        {file.format ? `This looks like a ${file.format.name} export.` : "This isn't an export Shelfmark knows."} Say
+        what each column holds. One with a title or an ISBN is needed.
       </p>
       <ul className="import-map">
         {header.map((name, column) => {
-          const samples = file.table.slice(1, 4).map((row) => row[column] ?? "").filter((cell) => cell !== "");
+          const samples = file.table
+            .slice(1, 4)
+            .map((row) => row[column] ?? "")
+            .filter((cell) => cell !== "");
           return (
             <li key={column} className="import-map__row">
               <div className="import-map__column">
@@ -199,7 +225,8 @@ function MapColumns({ file, onBack, onContinue }: { file: Loaded; onBack: () => 
 
 // --- Step 3: the preview --------------------------------------------------------
 
-type Progress = { kind: "idle" } | { kind: "looking"; done: number; total: number } | { kind: "saving"; done: number; total: number };
+type Progress =
+  { kind: "idle" } | { kind: "looking"; done: number; total: number } | { kind: "saving"; done: number; total: number };
 
 function Preview({
   file,
@@ -223,7 +250,8 @@ function Preview({
   const stop = useRef<AbortController | null>(null);
 
   const ticked = useMemo(
-    () => new Set(rows.flatMap((_, index) => ((touched.get(index) ?? tickedByDefault(flags[index] ?? [])) ? [index] : []))),
+    () =>
+      new Set(rows.flatMap((_, index) => ((touched.get(index) ?? tickedByDefault(flags[index] ?? [])) ? [index] : []))),
     [rows, flags, touched],
   );
   const targets = lookupTargets(rows, ticked);
@@ -240,21 +268,30 @@ function Preview({
     setLookupNote("");
     setProgress({ kind: "looking", done: 0, total: targets.length });
     let done = 0;
-    const run = await runLookups(rows, targets, (isbn, signal) => lookupIsbn(isbn, { signal }), controller.signal, (index, row) => {
-      done++;
-      setRows((current) => current.map((existing, i) => (i === index ? row : existing)));
-      setProgress({ kind: "looking", done, total: targets.length });
-    });
+    const run = await runLookups(
+      rows,
+      targets,
+      (isbn, signal) => lookupIsbn(isbn, { signal }),
+      controller.signal,
+      (index, row) => {
+        done++;
+        setRows((current) => current.map((existing, i) => (i === index ? row : existing)));
+        setProgress({ kind: "looking", done, total: targets.length });
+      },
+    );
     stop.current = null;
     setProgress({ kind: "idle" });
     if (run.stoppedBy === "signal") setLookupNote(`Stopped after ${plural(run.done, "row", "rows")}.`);
-    else if (run.stoppedBy === "error") setLookupNote("The lookups stopped: the server can't be reached. Try again in a moment.");
+    else if (run.stoppedBy === "error")
+      setLookupNote("The lookups stopped: the server can't be reached. Try again in a moment.");
   };
 
   const save = async () => {
     const chosen = saveable.map((index) => rows[index]).filter((row): row is ImportRow => row !== undefined);
     setProgress({ kind: "saving", done: 0, total: chosen.length });
-    const report = await saveRows(chosen, collection, createBook, (done) => setProgress({ kind: "saving", done, total: chosen.length }));
+    const report = await saveRows(chosen, collection, createBook, (done) =>
+      setProgress({ kind: "saving", done, total: chosen.length }),
+    );
     const unsaved = rows.map((_, index) => index).filter((index) => !saveable.includes(index));
     const skippedDuplicates = unsaved.filter((index) => isDuplicate(flags[index] ?? [])).length;
     onDone({ report, skippedDuplicates, leftOut: unsaved.length - skippedDuplicates, collection });
@@ -267,16 +304,19 @@ function Preview({
 
   return (
     <section className="import__card">
-      <h2 className="import__heading">{plural(rows.length, "row", "rows")} in {file.name}</h2>
+      <h2 className="import__heading">
+        {plural(rows.length, "row", "rows")} in {file.name}
+      </h2>
       <p className="import__text">
-        {ENCODING_NOTE[file.encoding]} {file.format ? `Recognised as a ${file.format.name} export.` : "Columns matched by hand."}{" "}
+        {ENCODING_NOTE[file.encoding]}{" "}
+        {file.format ? `Recognised as a ${file.format.name} export.` : "Columns matched by hand."}{" "}
         <button type="button" className="import__link" onClick={onChangeColumns} disabled={busy}>
           Change columns
         </button>
       </p>
       <p className="import__text">
-        {plural(counts.duplicates, "row is", "rows are")} already in your library or repeated, {plural(counts.invalid, "has an", "have an")} invalid ISBN. Both are
-        unticked.
+        {plural(counts.duplicates, "row is", "rows are")} already in your library or repeated,{" "}
+        {plural(counts.invalid, "has an", "have an")} invalid ISBN. Both are unticked.
       </p>
 
       <div className="import__bar">
@@ -317,8 +357,8 @@ function Preview({
           ) : (
             <>
               <p className="import__text">
-                {plural(targets.length, "ticked row has", "ticked rows have")} an ISBN and no title. Looking them up asks the
-                book sources one request at a time, which takes a while for a long list.
+                {plural(targets.length, "ticked row has", "ticked rows have")} an ISBN and no title. Looking them up
+                asks the book sources one request at a time, which takes a while for a long list.
               </p>
               <Button variant="secondary" disabled={busy || !ready} onClick={look}>
                 Look up the missing details ({targets.length})
@@ -395,7 +435,9 @@ function Preview({
         </Button>
       </div>
       {ticked.size > saveable.length && (
-        <p className="import__text">{plural(ticked.size - saveable.length, "ticked row has", "ticked rows have")} no title and will be left out.</p>
+        <p className="import__text">
+          {plural(ticked.size - saveable.length, "ticked row has", "ticked rows have")} no title and will be left out.
+        </p>
       )}
       {!ready && <p className="import__text">Loading your library to check for duplicates…</p>}
     </section>
@@ -410,11 +452,19 @@ function Done({
   leftOut,
   collection,
   onAgain,
-}: { report: SaveReport; skippedDuplicates: number; leftOut: number; collection: Collection; onAgain: () => void }) {
+}: {
+  report: SaveReport;
+  skippedDuplicates: number;
+  leftOut: number;
+  collection: Collection;
+  onAgain: () => void;
+}) {
   return (
     <section className="import__card">
       <h2 className="import__heading">
-        {report.saved === 0 ? "Nothing was saved" : `${plural(report.saved, "book", "books")} saved to ${collection === "owned" ? "Owned" : "the Wishlist"}`}
+        {report.saved === 0
+          ? "Nothing was saved"
+          : `${plural(report.saved, "book", "books")} saved to ${collection === "owned" ? "Owned" : "the Wishlist"}`}
       </h2>
       <ul className="import__text import__counts">
         <li>{plural(report.saved, "book", "books")} saved</li>

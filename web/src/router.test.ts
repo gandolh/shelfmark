@@ -95,7 +95,14 @@ describe("pathFor", () => {
   });
 
   it("round-trips through matchRoute", () => {
-    const routes: Route[] = [LIBRARY, ADD_BOOK, LOGIN, bookRoute(1), bookRoute("with/slash and space"), route("book", { id: "ș" })];
+    const routes: Route[] = [
+      LIBRARY,
+      ADD_BOOK,
+      LOGIN,
+      bookRoute(1),
+      bookRoute("with/slash and space"),
+      route("book", { id: "ș" }),
+    ];
     for (const each of routes) {
       const path = pathFor(each, BASE);
       expect(path.startsWith(BASE)).toBe(true);

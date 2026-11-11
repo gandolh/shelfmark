@@ -56,7 +56,13 @@ import "./library.css";
  * edges it lines up with. `stepped`: the phone's sheet went from "Filter and
  * sort" to Columns (or back), so each step knows where focus belongs.
  */
-type PanelState = { kind: "filter" | "columns"; anchor: HTMLElement; align: "start" | "end"; column?: ColumnId; stepped?: boolean };
+type PanelState = {
+  kind: "filter" | "columns";
+  anchor: HTMLElement;
+  align: "start" | "end";
+  column?: ColumnId;
+  stepped?: boolean;
+};
 
 function books(count: number): string {
   return count === 1 ? "1 book" : `${count.toLocaleString("en-GB")} books`;
@@ -112,7 +118,11 @@ export function LibraryPage() {
   // Clear (or a delete) took away the focused button with the bar: focus goes on to the toolbar's Filter.
   const wasSelecting = useRef(selecting);
   useEffect(() => {
-    if (wasSelecting.current && !selecting && (document.activeElement === null || document.activeElement === document.body)) {
+    if (
+      wasSelecting.current &&
+      !selecting &&
+      (document.activeElement === null || document.activeElement === document.body)
+    ) {
       filterButton.current?.focus();
     }
     wasSelecting.current = selecting;
@@ -127,7 +137,10 @@ export function LibraryPage() {
         : {
             ...prefs,
             columnVisibility: Object.fromEntries(
-              Object.entries(prefs.columnVisibility).map(([id, shown]) => [id, shown && columnApplies(id as ColumnId, collection)]),
+              Object.entries(prefs.columnVisibility).map(([id, shown]) => [
+                id,
+                shown && columnApplies(id as ColumnId, collection),
+              ]),
             ) as LibraryPrefs["columnVisibility"],
           },
     [prefs, collection],
@@ -153,7 +166,8 @@ export function LibraryPage() {
   };
   // The phone's table has no Columns button: the sheet steps between its two panels.
   const phoneColumns = !desktop && mode === "table";
-  const step = (kind: "filter" | "columns") => setPanel((open) => open && { ...open, kind, column: undefined, stepped: true });
+  const step = (kind: "filter" | "columns") =>
+    setPanel((open) => open && { ...open, kind, column: undefined, stepped: true });
 
   // A turn of the page (or a new page size) brings the list's top back into view: just under
   // the desktop's sticky top bar, at the top of the window on a phone. Only upwards, so a short
@@ -179,7 +193,8 @@ export function LibraryPage() {
     const now = selectionFor(getSelection(), view.pageBasis, view.page);
     return { books: now?.books ?? NO_SELECTION, scope: now?.scope ?? "page" };
   };
-  const tick = (next: Selection, nextScope: SelectionScope = "page") => setSelection(next, view.pageBasis, view.page, nextScope);
+  const tick = (next: Selection, nextScope: SelectionScope = "page") =>
+    setSelection(next, view.pageBasis, view.page, nextScope);
   const onToggle = (book: Book) => tick(toggleBook(pageTicks(ticksNow().books, view.pageRows), book));
   // A long press only ticks; on a book already ticked it keeps "Select all" as it is.
   const onPress = (book: Book) => {
@@ -198,7 +213,9 @@ export function LibraryPage() {
   // the covers have no header box, so theirs offers the page too.
   const shownLine = line !== null && (mode === "covers" || line.kind === "more" || scope === "all") ? line : null;
 
-  const count = view.narrowed ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}` : books(view.total);
+  const count = view.narrowed
+    ? `${view.rows.length.toLocaleString("en-GB")} of ${books(view.total)}`
+    : books(view.total);
   const caption = hasBooks ? `${count}, ${describeSort(view.sorting)}` : undefined;
 
   const toolbar = selecting ? (
@@ -298,7 +315,12 @@ export function LibraryPage() {
       ) : (
         <div ref={list} className="library-list">
           {shownLine && (
-            <SelectionBand line={shownLine} onSelectPage={selectPage} onSelectAll={selectEverything} onClear={clearSelection} />
+            <SelectionBand
+              line={shownLine}
+              onSelectPage={selectPage}
+              onSelectAll={selectEverything}
+              onClear={clearSelection}
+            />
           )}
           {mode === "table" ? (
             <BookTable
@@ -417,17 +439,27 @@ function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBa
       ? ["", `Select all ${n(line.page)} on this page`, onSelectPage]
       : line.kind === "more"
         ? [
-            line.page === 1 ? "The 1 book on this page is selected." : `All ${n(line.page)} books on this page are selected.`,
+            line.page === 1
+              ? "The 1 book on this page is selected."
+              : `All ${n(line.page)} books on this page are selected.`,
             `Select all ${n(line.total)} books`,
             onSelectAll,
           ]
-        : [line.total === 1 ? "The 1 book is selected." : `All ${n(line.total)} books are selected.`, "Clear selection", onClear];
+        : [
+            line.total === 1 ? "The 1 book is selected." : `All ${n(line.total)} books are selected.`,
+            "Clear selection",
+            onClear,
+          ];
   return (
     <div className="library-selectline">
       <span className="library-selectline__text" role="status">
         {text}
       </span>
-      <button type="button" className="button button--quiet button--regular library-selectline__action" onClick={onClick}>
+      <button
+        type="button"
+        className="button button--quiet button--regular library-selectline__action"
+        onClick={onClick}
+      >
         {action}
       </button>
     </div>

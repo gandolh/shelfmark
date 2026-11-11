@@ -38,7 +38,10 @@ export function CoverImage({ book, src, width, alt = "", loading = "lazy", class
   const url = src ?? (book.hasCover && book.id !== undefined ? coverUrl(book.id, book.coverUpdatedAt) : null);
   // The address that failed; a new address gets a fresh try.
   const [failed, setFailed] = useState<string | null>(null);
-  const style = width === undefined ? undefined : ({ "--cover-width": typeof width === "number" ? `${width}px` : width } as CSSProperties);
+  const style =
+    width === undefined
+      ? undefined
+      : ({ "--cover-width": typeof width === "number" ? `${width}px` : width } as CSSProperties);
   const classes = (...extra: string[]) => ["cover", ...extra, className].filter(Boolean).join(" ");
 
   if (url !== null && failed !== url) {

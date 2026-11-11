@@ -22,7 +22,12 @@ describe("decodeCsv", () => {
 
 describe("parseCsv", () => {
   it("splits cells and rows, with any line ending", () => {
-    expect(parseCsv("a,b\r\nc,d\ne,f\rg,h")).toEqual([["a", "b"], ["c", "d"], ["e", "f"], ["g", "h"]]);
+    expect(parseCsv("a,b\r\nc,d\ne,f\rg,h")).toEqual([
+      ["a", "b"],
+      ["c", "d"],
+      ["e", "f"],
+      ["g", "h"],
+    ]);
   });
 
   it("keeps commas, line breaks and doubled quotes inside quotes", () => {
@@ -30,7 +35,11 @@ describe("parseCsv", () => {
   });
 
   it("keeps empty cells and drops blank lines", () => {
-    expect(parseCsv("a,,c\n\n,,\nx,y,z\n")).toEqual([["a", "", "c"], ["", "", ""], ["x", "y", "z"]]);
+    expect(parseCsv("a,,c\n\n,,\nx,y,z\n")).toEqual([
+      ["a", "", "c"],
+      ["", "", ""],
+      ["x", "y", "z"],
+    ]);
   });
 
   it("reads a quoted empty cell on its own line", () => {
@@ -41,12 +50,23 @@ describe("parseCsv", () => {
     expect(detectDelimiter("a;b;c\n1,5;2;3")).toBe(";");
     expect(detectDelimiter("a\tb\tc")).toBe("\t");
     expect(detectDelimiter('"a;b",c,d')).toBe(",");
-    expect(parseCsv("a;b\n1,5;2")).toEqual([["a", "b"], ["1,5", "2"]]);
+    expect(parseCsv("a;b\n1,5;2")).toEqual([
+      ["a", "b"],
+      ["1,5", "2"],
+    ]);
   });
 
   it("reads what the export writes", () => {
-    const table = [["Title", "Notes"], ["Cărți, \"mari\"", "line\r\nbreak"], ["=SUM(1)", ""]];
+    const table = [
+      ["Title", "Notes"],
+      ['Cărți, "mari"', "line\r\nbreak"],
+      ["=SUM(1)", ""],
+    ];
     const parsed = parseCsv(toCsv(table[0] ?? [], table.slice(1)));
-    expect(parsed.map((row) => row.map(unguard))).toEqual([["Title", "Notes"], ["Cărți, \"mari\"", "line\r\nbreak"], ["=SUM(1)", ""]]);
+    expect(parsed.map((row) => row.map(unguard))).toEqual([
+      ["Title", "Notes"],
+      ['Cărți, "mari"', "line\r\nbreak"],
+      ["=SUM(1)", ""],
+    ]);
   });
 });

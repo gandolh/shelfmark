@@ -151,7 +151,12 @@ export function languageName(code: string): string {
   return code.toUpperCase();
 }
 
-const STATUS_LABELS: Record<string, string> = { unread: "Unread", reading: "Reading", read: "Read", abandoned: "Abandoned" };
+const STATUS_LABELS: Record<string, string> = {
+  unread: "Unread",
+  reading: "Reading",
+  read: "Read",
+  abandoned: "Abandoned",
+};
 const FORMAT_LABELS: Record<string, string> = { hardcover: "Hardcover", paperback: "Paperback", other: "Other" };
 const CONDITION_LABELS: Record<string, string> = { new: "New", good: "Good", worn: "Worn", damaged: "Damaged" };
 const SOURCE_LABELS: Record<string, string> = {
@@ -183,11 +188,15 @@ const YESNO_DIRECTIONS = ["no first", "yes first"] as const;
 
 const base = { minSize: 64, align: "start", defaultVisible: false } as const;
 
-function text(def: Omit<TextColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<TextColumn>): TextColumn {
+function text(
+  def: Omit<TextColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<TextColumn>,
+): TextColumn {
   return { ...base, directions: TEXT_DIRECTIONS, text: (book) => def.value(book) ?? "", ...def, kind: "text" };
 }
 
-function pick(def: Omit<PickColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<PickColumn>): PickColumn {
+function pick(
+  def: Omit<PickColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<PickColumn>,
+): PickColumn {
   return {
     ...base,
     directions: def.order ? ORDER_DIRECTIONS : TEXT_DIRECTIONS,
@@ -197,7 +206,10 @@ function pick(def: Omit<PickColumn, "kind" | "minSize" | "align" | "defaultVisib
   };
 }
 
-function number(def: Omit<NumberColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<NumberColumn>): NumberColumn {
+function number(
+  def: Omit<NumberColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> &
+    Partial<NumberColumn>,
+): NumberColumn {
   return {
     ...base,
     align: "end",
@@ -211,7 +223,9 @@ function number(def: Omit<NumberColumn, "kind" | "minSize" | "align" | "defaultV
   };
 }
 
-function date(def: Omit<DateColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<DateColumn>): DateColumn {
+function date(
+  def: Omit<DateColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<DateColumn>,
+): DateColumn {
   return {
     ...base,
     directions: DATE_DIRECTIONS,
@@ -224,8 +238,17 @@ function date(def: Omit<DateColumn, "kind" | "minSize" | "align" | "defaultVisib
   };
 }
 
-function yesno(def: Omit<YesNoColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> & Partial<YesNoColumn>): YesNoColumn {
-  return { ...base, directions: YESNO_DIRECTIONS, text: (book) => (def.value(book) ? "Yes" : "No"), ...def, kind: "yesno" };
+function yesno(
+  def: Omit<YesNoColumn, "kind" | "minSize" | "align" | "defaultVisible" | "directions" | "text"> &
+    Partial<YesNoColumn>,
+): YesNoColumn {
+  return {
+    ...base,
+    directions: YESNO_DIRECTIONS,
+    text: (book) => (def.value(book) ? "Yes" : "No"),
+    ...def,
+    kind: "yesno",
+  };
 }
 
 /** Every column, in the table's default order. */
@@ -333,7 +356,13 @@ export const COLUMNS: readonly LibraryColumn[] = [
     align: "end",
     value: (book) => book.seriesNumber,
   }),
-  text({ id: "description", label: "Description", header: "Description", size: 260, value: (book) => book.description }),
+  text({
+    id: "description",
+    label: "Description",
+    header: "Description",
+    size: 260,
+    value: (book) => book.description,
+  }),
   text({
     id: "subjects",
     label: "Subjects",
@@ -378,7 +407,13 @@ export const COLUMNS: readonly LibraryColumn[] = [
   }),
   text({ id: "notes", label: "Notes", header: "Notes", size: 240, value: (book) => book.notes }),
   date({ id: "acquiredOn", label: "Acquired", header: "Acquired", size: 110, value: (book) => book.acquiredOn }),
-  text({ id: "acquiredFrom", label: "Acquired from", header: "Acquired from", size: 160, value: (book) => book.acquiredFrom }),
+  text({
+    id: "acquiredFrom",
+    label: "Acquired from",
+    header: "Acquired from",
+    size: 160,
+    value: (book) => book.acquiredFrom,
+  }),
   number({
     id: "price",
     label: "Price",

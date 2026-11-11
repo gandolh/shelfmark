@@ -57,7 +57,10 @@ export interface FetchCall {
 
 export type FakeFetch = typeof globalThis.fetch & { calls: FetchCall[] };
 
-export type FakeHandler = (url: URL, init: RequestInit | undefined) => Response | undefined | Promise<Response | undefined>;
+export type FakeHandler = (
+  url: URL,
+  init: RequestInit | undefined,
+) => Response | undefined | Promise<Response | undefined>;
 
 /** Calls `handler` for each request; a request it returns nothing for fails like an unreachable host. */
 export function fakeFetch(handler: FakeHandler): FakeFetch {

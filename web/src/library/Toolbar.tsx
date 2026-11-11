@@ -33,7 +33,17 @@ export interface ToolbarProps {
  * While books are selected the bulk bar (BulkBar.tsx) stands in this place;
  * on a phone Views stays at the end of the tabs, as it is no part of this row.
  */
-export function Toolbar({ view, desktop, mode, onModeChange, open, onFilter, onColumns, filterButton, columnsButton }: ToolbarProps) {
+export function Toolbar({
+  view,
+  desktop,
+  mode,
+  onModeChange,
+  open,
+  onFilter,
+  onColumns,
+  filterButton,
+  columnsButton,
+}: ToolbarProps) {
   const count = activeFilters(view.filters).length;
   const badge =
     count > 0 ? (

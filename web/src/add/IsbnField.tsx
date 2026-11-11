@@ -125,7 +125,13 @@ export function IsbnField({
           </button>
         )}
       </div>
-      <Button type="submit" variant="primary" size="large" className="add-isbn__submit" aria-disabled={busy || undefined}>
+      <Button
+        type="submit"
+        variant="primary"
+        size="large"
+        className="add-isbn__submit"
+        aria-disabled={busy || undefined}
+      >
         {submitLabel}
       </Button>
       {problem ? (

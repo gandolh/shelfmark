@@ -50,7 +50,16 @@ describe("a Goodreads export", () => {
       title: "Dune (Dune, #1)",
       authors: ["Frank Herbert", "Brian Herbert", "Kevin J. Anderson"],
       isbn13: DUNE,
-      details: { rating: 5, publisher: "Ace", format: "paperback", pages: 604, publishedYear: 2005, status: "read", tags: ["favorites", "sf"], notes: "from a friend" },
+      details: {
+        rating: 5,
+        publisher: "Ace",
+        format: "paperback",
+        pages: 604,
+        publishedYear: 2005,
+        status: "read",
+        tags: ["favorites", "sf"],
+        notes: "from a friend",
+      },
     });
     expect(rows[1]).toMatchObject({ isbn13: SOLENOID, details: { format: "hardcover", status: "unread" } });
     expect(rows[1]?.details.rating).toBeUndefined();
@@ -98,7 +107,20 @@ describe("a Libib file with only ISBNs", () => {
     const controller = new AbortController();
     const response = (isbn: string): LookupResponse => ({
       isbn13: isbn,
-      draft: { isbn13: isbn, title: `T ${isbn}`, subtitle: null, authors: ["A"], publisher: "P", publishedYear: 2000, pages: null, language: null, description: null, subjects: [], coverCandidates: [], sources: ["openlibrary"] },
+      draft: {
+        isbn13: isbn,
+        title: `T ${isbn}`,
+        subtitle: null,
+        authors: ["A"],
+        publisher: "P",
+        publishedYear: 2000,
+        pages: null,
+        language: null,
+        description: null,
+        subjects: [],
+        coverCandidates: [],
+        sources: ["openlibrary"],
+      },
       tried: [],
       owned: [],
       wishlisted: [],
@@ -144,13 +166,34 @@ describe("a Libib file with only ISBNs", () => {
     const row = rows[0] as ImportRow;
     const found = applyLookup(row, {
       isbn13: DUNE,
-      draft: { isbn13: DUNE, title: "Dune", subtitle: null, authors: ["Frank Herbert"], publisher: "Ace", publishedYear: 1965, pages: 412, language: "en", description: null, subjects: [], coverCandidates: [], sources: ["bcucluj"] },
+      draft: {
+        isbn13: DUNE,
+        title: "Dune",
+        subtitle: null,
+        authors: ["Frank Herbert"],
+        publisher: "Ace",
+        publishedYear: 1965,
+        pages: 412,
+        language: "en",
+        description: null,
+        subjects: [],
+        coverCandidates: [],
+        sources: ["bcucluj"],
+      },
       tried: [],
       owned: [],
       wishlisted: [],
     });
-    expect(found).toMatchObject({ title: "Dune", authors: ["Frank Herbert"], lookup: "found", source: "bcucluj", details: { publisher: "Ace", pages: 412 } });
-    expect(applyLookup(row, { isbn13: DUNE, draft: null, tried: [], owned: [], wishlisted: [] }).lookup).toBe("not_found");
+    expect(found).toMatchObject({
+      title: "Dune",
+      authors: ["Frank Herbert"],
+      lookup: "found",
+      source: "bcucluj",
+      details: { publisher: "Ace", pages: 412 },
+    });
+    expect(applyLookup(row, { isbn13: DUNE, draft: null, tried: [], owned: [], wishlisted: [] }).lookup).toBe(
+      "not_found",
+    );
   });
 });
 
@@ -190,11 +233,33 @@ describe("saving", () => {
 describe("a Shelfmark export read back", () => {
   it("is recognised and every row is a duplicate of the library it came from", () => {
     const books = [
-      book({ title: "Solenoid", authors: ["Mircea Cărtărescu"], isbn13: SOLENOID, publishedYear: 2015, shelf: "Hall · A2", tags: ["ro", "novel"], status: "read", rating: 5, priceMinor: 4990, language: "ro", signed: true, notes: "=1+1" }),
-      book({ title: "Dune", authors: ["Frank Herbert", "Brian Herbert"], isbn13: DUNE, subjects: ["Fiction, general"], format: "paperback" }),
+      book({
+        title: "Solenoid",
+        authors: ["Mircea Cărtărescu"],
+        isbn13: SOLENOID,
+        publishedYear: 2015,
+        shelf: "Hall · A2",
+        tags: ["ro", "novel"],
+        status: "read",
+        rating: 5,
+        priceMinor: 4990,
+        language: "ro",
+        signed: true,
+        notes: "=1+1",
+      }),
+      book({
+        title: "Dune",
+        authors: ["Frank Herbert", "Brian Herbert"],
+        isbn13: DUNE,
+        subjects: ["Fiction, general"],
+        format: "paperback",
+      }),
     ];
     const columns = columnsIn("owned", COLUMNS);
-    const csv = toCsv(columns.map((c) => c.label), books.map((b) => columns.map((c) => cellOf(c, b, false))));
+    const csv = toCsv(
+      columns.map((c) => c.label),
+      books.map((b) => columns.map((c) => cellOf(c, b, false))),
+    );
     const { format, rows } = load(csv);
     expect(format?.id).toBe("shelfmark");
     expect(rows).toHaveLength(2);
@@ -202,9 +267,22 @@ describe("a Shelfmark export read back", () => {
       title: "Solenoid",
       authors: ["Mircea Cărtărescu"],
       isbn13: SOLENOID,
-      details: { publishedYear: 2015, shelf: "Hall · A2", tags: ["ro", "novel"], status: "read", rating: 5, priceMinor: 4990, language: "ro", signed: true, notes: "=1+1" },
+      details: {
+        publishedYear: 2015,
+        shelf: "Hall · A2",
+        tags: ["ro", "novel"],
+        status: "read",
+        rating: 5,
+        priceMinor: 4990,
+        language: "ro",
+        signed: true,
+        notes: "=1+1",
+      },
     });
-    expect(rows[1]).toMatchObject({ authors: ["Frank Herbert", "Brian Herbert"], details: { subjects: ["Fiction, general"], format: "paperback" } });
+    expect(rows[1]).toMatchObject({
+      authors: ["Frank Herbert", "Brian Herbert"],
+      details: { subjects: ["Fiction, general"], format: "paperback" },
+    });
     expect(flagRows(rows, books, "owned")).toEqual([["in-library"], ["in-library"]]);
   });
 });
@@ -214,7 +292,11 @@ describe("a LibraryThing export", () => {
     const csv = `Book Id,Title,Primary Author,Secondary Author,ISBN,Date,Tags\n9,Dune,"Herbert, Frank","Herbert, Brian",[0441172717],2005,"sf, classic"`;
     const { format, rows } = load(csv);
     expect(format?.id).toBe("librarything");
-    expect(rows[0]).toMatchObject({ authors: ["Frank Herbert", "Brian Herbert"], isbn13: DUNE, details: { publishedYear: 2005, tags: ["sf", "classic"] } });
+    expect(rows[0]).toMatchObject({
+      authors: ["Frank Herbert", "Brian Herbert"],
+      isbn13: DUNE,
+      details: { publishedYear: 2005, tags: ["sf", "classic"] },
+    });
   });
 });
 

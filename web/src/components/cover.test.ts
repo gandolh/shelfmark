@@ -46,7 +46,9 @@ describe("coverTint", () => {
     // Pinned: changing the hash recolours every placeholder in the owner's library.
     expect(coverTint("Solenoid")).toBe(coverTint("Solenoid"));
     expect(
-      ["Solenoid", "O vară cu Isidor", "Paturi oculte", "Inocenții", "The Road", "Sapiens", "Dune", "Orbitor"].map(coverTint),
+      ["Solenoid", "O vară cu Isidor", "Paturi oculte", "Inocenții", "The Road", "Sapiens", "Dune", "Orbitor"].map(
+        coverTint,
+      ),
     ).toEqual([7, 3, 5, 8, 3, 3, 4, 7]);
   });
 

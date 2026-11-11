@@ -41,18 +41,14 @@ export function to10(isbn13: string): string | null {
   return `${body}${check === 10 ? "X" : check}`;
 }
 
-export type ParseIsbnResult =
-  | { ok: true; isbn13: string }
-  | { ok: false; reason: "length" | "checksum" | "not_isbn" };
+export type ParseIsbnResult = { ok: true; isbn13: string } | { ok: false; reason: "length" | "checksum" | "not_isbn" };
 
 export function parseIsbn(input: string): ParseIsbnResult {
   const code = clean(input);
   if (code.length !== 10 && code.length !== 13) return { ok: false, reason: "length" };
   if (code.length === 10) {
     if (!/^\d{9}[\dX]$/.test(code)) return { ok: false, reason: "not_isbn" };
-    return isValid10(code)
-      ? { ok: true, isbn13: to13(code) }
-      : { ok: false, reason: "checksum" };
+    return isValid10(code) ? { ok: true, isbn13: to13(code) } : { ok: false, reason: "checksum" };
   }
   if (!/^\d{13}$/.test(code)) return { ok: false, reason: "not_isbn" };
   // Only a 978/979 prefix makes an EAN-13 an ISBN, so judge the prefix first.
@@ -60,10 +56,7 @@ export function parseIsbn(input: string): ParseIsbnResult {
   return isValid13(code) ? { ok: true, isbn13: code } : { ok: false, reason: "checksum" };
 }
 
-export type BarcodeClass =
-  | { kind: "isbn"; isbn13: string }
-  | { kind: "addon" }
-  | { kind: "other"; code: string };
+export type BarcodeClass = { kind: "isbn"; isbn13: string } | { kind: "addon" } | { kind: "other"; code: string };
 
 /**
  * Sort a scanned code. `format` is the BarcodeDetector format (`ean_13`,

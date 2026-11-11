@@ -110,7 +110,9 @@ describe("codesFrom", () => {
   });
 
   it("passes the format through: 13 digits in a Code-128 are not an ISBN", () => {
-    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }])).toEqual([{ kind: "other", code: "9786063205583" }]);
+    expect(codesFrom([{ rawValue: "9786063205583", format: "code_128" }])).toEqual([
+      { kind: "other", code: "9786063205583" },
+    ]);
   });
 
   it("skips empty values", () => {
@@ -292,7 +294,11 @@ describe("startDetectLoop", () => {
   });
 
   it("hands over frames with codes, survives a failed frame, and stops", async () => {
-    const frames: (Detection[] | Error)[] = [[], new Error("InvalidStateError"), [{ rawValue: "x", format: "code_128" }]];
+    const frames: (Detection[] | Error)[] = [
+      [],
+      new Error("InvalidStateError"),
+      [{ rawValue: "x", format: "code_128" }],
+    ];
     const detect = vi.fn(() => {
       const next = frames.shift() ?? [];
       return next instanceof Error ? Promise.reject(next) : Promise.resolve(next);
@@ -324,7 +330,9 @@ describe("startDetectLoop", () => {
 describe("the self-hosted .wasm", () => {
   it("is what locateFile hands the ponyfill, and nothing else is redirected", () => {
     const { locateFile } = zxingOverrides("/shelfmark/assets/zxing_reader-abc.wasm");
-    expect(locateFile("zxing_reader.wasm", "https://fastly.jsdelivr.net/")).toBe("/shelfmark/assets/zxing_reader-abc.wasm");
+    expect(locateFile("zxing_reader.wasm", "https://fastly.jsdelivr.net/")).toBe(
+      "/shelfmark/assets/zxing_reader-abc.wasm",
+    );
     expect(locateFile("other.data", "/prefix/")).toBe("/prefix/other.data");
   });
 

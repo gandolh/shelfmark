@@ -36,7 +36,15 @@ export function LibrarySkeleton({ mode }: { mode: ViewMode }) {
   );
 }
 
-export function LibraryMessage({ title, children, action }: { title: string; children?: ReactNode; action?: ReactNode }) {
+export function LibraryMessage({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children?: ReactNode;
+  action?: ReactNode;
+}) {
   return (
     <section className="library-message" aria-labelledby="library-message-title">
       <h2 id="library-message-title" className="library-message__title">

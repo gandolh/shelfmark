@@ -11,7 +11,11 @@ afterEach(() => {
   store = undefined;
 });
 
-const issue = (month: string) => ({ month, url: `https://bibnat.ro/wp-content/uploads/x/CIP_${month}.pdf`, uploaded: `${month}-20` });
+const issue = (month: string) => ({
+  month,
+  url: `https://bibnat.ro/wp-content/uploads/x/CIP_${month}.pdf`,
+  uploaded: `${month}-20`,
+});
 const record = (isbn13: string, fields: Partial<CipRecord> = {}): CipRecord => ({
   isbn13,
   entry: 1,
@@ -27,7 +31,10 @@ const record = (isbn13: string, fields: Partial<CipRecord> = {}): CipRecord => (
 describe("the CIP store", () => {
   it("stores an issue's records and remembers the month", () => {
     store = openCipStore(":memory:");
-    store.importIssue(issue("2026-02"), [record("9786064031365"), record("9789735091378", { title: "Opera integrală", authors: ["Platon"] })]);
+    store.importIssue(issue("2026-02"), [
+      record("9786064031365"),
+      record("9789735091378", { title: "Opera integrală", authors: ["Platon"] }),
+    ]);
     expect(store.importedMonths()).toEqual(new Set(["2026-02"]));
     expect(store.size()).toBe(2);
     expect(store.get("9786064031365")).toEqual({ ...record("9786064031365"), month: "2026-02" });

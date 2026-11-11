@@ -38,7 +38,17 @@ export interface PageProps {
  * toolbar, then the content. On a phone the header also carries the
  * account button beside the title, as in the `Covers-Library` mock-up.
  */
-export function Page({ title, caption, toolbar, search, back, bleed = false, wide = false, card = false, children }: PageProps) {
+export function Page({
+  title,
+  caption,
+  toolbar,
+  search,
+  back,
+  bleed = false,
+  wide = false,
+  card = false,
+  children,
+}: PageProps) {
   const desktop = useIsDesktop();
   const hidden = bleed && !desktop;
 
@@ -54,7 +64,11 @@ export function Page({ title, caption, toolbar, search, back, bleed = false, wid
   );
 
   return (
-    <div className={["page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null].filter(Boolean).join(" ")}>
+    <div
+      className={["page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null]
+        .filter(Boolean)
+        .join(" ")}
+    >
       {hidden ? (
         <h1 className="visually-hidden">{title}</h1>
       ) : (
@@ -72,7 +86,10 @@ export function Page({ title, caption, toolbar, search, back, bleed = false, wid
                 <AccountMenu placement="header" />
               </div>
               {search && (
-                <SearchField placement="header" placeholder={typeof search === "object" ? search.placeholder : "Search"} />
+                <SearchField
+                  placement="header"
+                  placeholder={typeof search === "object" ? search.placeholder : "Search"}
+                />
               )}
               {toolbar && <div className="page__toolbar">{toolbar}</div>}
             </>

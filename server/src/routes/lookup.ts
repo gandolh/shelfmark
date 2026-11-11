@@ -21,7 +21,10 @@ const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string>
  * the app, so every lookup and every batch shares them: the library catalogs'
  * pause between requests holds across lookups.
  */
-export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { config, db, books, fetch, connect, cip }) => {
+export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (
+  app,
+  { config, db, books, fetch, connect, cip },
+) => {
   const lookup = createLookup({
     sources: [
       createOpenLibrarySource({ fetch }),
@@ -31,7 +34,10 @@ export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { co
     ],
     cache: createLookupCache(db),
     onError: (source, isbn13, error) => {
-      app.log.warn({ source, isbn13, reason: error instanceof Error ? error.message : String(error) }, "lookup source failed");
+      app.log.warn(
+        { source, isbn13, reason: error instanceof Error ? error.message : String(error) },
+        "lookup source failed",
+      );
     },
   });
 

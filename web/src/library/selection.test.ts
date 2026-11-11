@@ -111,7 +111,10 @@ describe("the line above the list", () => {
   it("offers the page, then every page, then Clear", () => {
     const view = deriveView(shelf, paged);
     expect(selectionLine(NO_SELECTION, "page", view)).toBeNull();
-    expect(selectionLine(toggleBook(NO_SELECTION, view.pageRows[0]!), "page", view)).toEqual({ kind: "page", page: 10 });
+    expect(selectionLine(toggleBook(NO_SELECTION, view.pageRows[0]!), "page", view)).toEqual({
+      kind: "page",
+      page: 10,
+    });
     const page = toggleAll(NO_SELECTION, view.pageRows);
     expect(selectionLine(page, "page", view)).toEqual({ kind: "more", page: 10, total: 23 });
     const all = withBooks(NO_SELECTION, view.rows, true);

@@ -51,14 +51,25 @@ describe("sortBooks", () => {
   });
 
   it("puts empty values last, whichever way the column runs", () => {
-    const books = [book({ title: "none" }), book({ title: "old", publishedYear: 1990 }), book({ title: "new", publishedYear: 2020 })];
+    const books = [
+      book({ title: "none" }),
+      book({ title: "old", publishedYear: 1990 }),
+      book({ title: "new", publishedYear: 2020 }),
+    ];
     expect(titles(sortBooks(books, [{ id: "year", desc: false }]))).toEqual(["old", "new", "none"]);
     expect(titles(sortBooks(books, [{ id: "year", desc: true }]))).toEqual(["new", "old", "none"]);
   });
 
   it("orders statuses as a reader moves through them, not by the alphabet", () => {
-    const books = (["read", "abandoned", "unread", "reading"] as const).map((status) => book({ title: status, status }));
-    expect(titles(sortBooks(books, [{ id: "status", desc: false }]))).toEqual(["unread", "reading", "read", "abandoned"]);
+    const books = (["read", "abandoned", "unread", "reading"] as const).map((status) =>
+      book({ title: status, status }),
+    );
+    expect(titles(sortBooks(books, [{ id: "status", desc: false }]))).toEqual([
+      "unread",
+      "reading",
+      "read",
+      "abandoned",
+    ]);
   });
 
   it("is newest first by default, and on ties", () => {

@@ -42,7 +42,7 @@ const CASES: Case[] = [
 /** Splits what a server sent into its PDUs. */
 function pdus(stream: Buffer): Buffer[] {
   const out: Buffer[] = [];
-  for (let rest = stream; rest.length > 0; ) {
+  for (let rest = stream; rest.length > 0;) {
     const { end } = decode(rest);
     out.push(rest.subarray(0, end));
     rest = rest.subarray(end);

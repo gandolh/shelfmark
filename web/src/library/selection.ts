@@ -112,9 +112,7 @@ export function pageTicks(selection: Selection, pageRows: readonly Book[]): Sele
  * `null` when nothing is ticked.
  */
 export type SelectionLine =
-  | { kind: "page"; page: number }
-  | { kind: "more"; page: number; total: number }
-  | { kind: "all"; total: number };
+  { kind: "page"; page: number } | { kind: "more"; page: number; total: number } | { kind: "all"; total: number };
 
 export function selectionLine(selection: Selection, scope: SelectionScope, list: SelectionList): SelectionLine | null {
   if (scope === "all") {

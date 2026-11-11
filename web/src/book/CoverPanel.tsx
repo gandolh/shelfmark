@@ -53,7 +53,9 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
 
   return (
     <Collapsible.Root open={open} onOpenChange={setOpen} render={<div className="book-coverpanel" />}>
-      <Collapsible.Trigger render={<Button variant="secondary" size="compact" pill block />}>Change cover</Collapsible.Trigger>
+      <Collapsible.Trigger render={<Button variant="secondary" size="compact" pill block />}>
+        Change cover
+      </Collapsible.Trigger>
       {/* aria-live outside the panel: a result is read out even after it closes. */}
       <p className="book-coverpanel__note" role="status">
         {message}
@@ -80,7 +82,9 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
             )}
             {state.kind === "loading" && <p className="add-hint">Looking for covers…</p>}
             {state.kind === "failed" && <p className="add-error">{state.failure.message}</p>}
-            {state.kind === "done" && candidates.length === 0 && <p className="add-hint">The sources have no cover for this ISBN.</p>}
+            {state.kind === "done" && candidates.length === 0 && (
+              <p className="add-hint">The sources have no cover for this ISBN.</p>
+            )}
             {candidates.length > 0 && (
               <ul className="book-candidates__list">
                 {candidates.map((candidate) => (
@@ -105,7 +109,13 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
           (confirmRemove ? (
             <div className="book-confirm-inline" role="group" aria-label="Remove the cover">
               <span>Remove this cover?</span>
-              <Button variant="secondary" size="compact" pill disabled={busy} onClick={() => void act(() => removeCover(book.id), "Cover removed.")}>
+              <Button
+                variant="secondary"
+                size="compact"
+                pill
+                disabled={busy}
+                onClick={() => void act(() => removeCover(book.id), "Cover removed.")}
+              >
                 Remove it
               </Button>
               <Button variant="quiet" size="compact" onClick={() => setConfirmRemove(false)}>
@@ -113,7 +123,13 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
               </Button>
             </div>
           ) : (
-            <Button variant="quiet" size="compact" className="add-quiet-neutral" disabled={busy} onClick={() => setConfirmRemove(true)}>
+            <Button
+              variant="quiet"
+              size="compact"
+              className="add-quiet-neutral"
+              disabled={busy}
+              onClick={() => setConfirmRemove(true)}
+            >
               Remove cover
             </Button>
           ))}

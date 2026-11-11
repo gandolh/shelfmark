@@ -1,6 +1,14 @@
 import type { Book } from "@shelfmark/shared";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
-import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+} from "react";
 import { authorLine } from "../components/cover";
 import { CoverImage } from "../components/CoverImage";
 import { CheckIcon } from "../components/icons";
@@ -58,7 +66,16 @@ export interface CoversGridProps {
   onToggle: (book: Book) => void;
 }
 
-export function CoversGrid({ rows, pageStart, total, layout, selecting, selection, onPress, onToggle }: CoversGridProps) {
+export function CoversGrid({
+  rows,
+  pageStart,
+  total,
+  layout,
+  selecting,
+  selection,
+  onPress,
+  onToggle,
+}: CoversGridProps) {
   const desktop = layout === "desktop";
   const grid = useRef<HTMLDivElement>(null);
   const [box, setBox] = useState({ width: 0, margin: 0 });

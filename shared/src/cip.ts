@@ -28,7 +28,9 @@ export const squash = (text: string) => text.replace(/\s+/g, " ").trim();
 /** Strips what ISBD leaves at the end of a part: " /", " :", ".". Keeps "?" and "!". */
 export function tidy(text: string | undefined): string | null {
   if (text === undefined) return null;
-  const out = squash(text).replace(/[\s/:;,=]+$/u, "").replace(/(?<![.\s]\p{L})\.$/u, "");
+  const out = squash(text)
+    .replace(/[\s/:;,=]+$/u, "")
+    .replace(/(?<![.\s]\p{L})\.$/u, "");
   return out === "" ? null : out;
 }
 
@@ -36,7 +38,8 @@ export function tidy(text: string | undefined): string | null {
 const ROLE =
   /^\[?(trad|il|ilustr|ed|coord|pref|postf|cuv|red|sel|antol|adapt|prez|note|introd|ref|tr|transl|comp|îngr|ingr|cop|foto|desene|lb|vol)\b/iu;
 /** Academic and church titles before a name: "prof. univ. dr.", "assoc. prof. PhD. eng.", "pr.". */
-const HONORIFICS = /(^|,\s+|\s(?:și|şi|cu)\s+)(?:(?:prof|conf|lect|asist|univ|dr|ing|ec|pr|arhim|assoc|phd|eng|acad|av|col|gen|ș\.l|sl)\.?\s+)+/giu;
+const HONORIFICS =
+  /(^|,\s+|\s(?:și|şi|cu)\s+)(?:(?:prof|conf|lect|asist|univ|dr|ing|ec|pr|arhim|assoc|phd|eng|acad|av|col|gen|ș\.l|sl)\.?\s+)+/giu;
 
 function namesIn(statement: string): string[] {
   let first = squash((statement.split(" ; ")[0] ?? "").replace(/\[[^\]]*\]|\([^)]*\)/g, "").replace(HONORIFICS, "$1"));

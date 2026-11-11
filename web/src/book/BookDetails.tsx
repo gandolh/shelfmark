@@ -52,7 +52,10 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
  */
 export function BookDetails({ book }: { book: Book }) {
   const isbn10 = book.isbn13 === null ? null : to10(book.isbn13);
-  const acquired = [book.acquiredOn ? dayText(book.acquiredOn) : null, book.acquiredFrom ? `from ${book.acquiredFrom}` : null]
+  const acquired = [
+    book.acquiredOn ? dayText(book.acquiredOn) : null,
+    book.acquiredFrom ? `from ${book.acquiredFrom}` : null,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -84,7 +87,9 @@ export function BookDetails({ book }: { book: Book }) {
           )}
         </dl>
         {!book.publisher && book.publishedYear === null && book.pages === null && !book.description && (
-          <p className="book-empty">Nothing recorded about this book yet. Edit adds details; Re-run lookup finds them from the ISBN.</p>
+          <p className="book-empty">
+            Nothing recorded about this book yet. Edit adds details; Re-run lookup finds them from the ISBN.
+          </p>
         )}
       </section>
 

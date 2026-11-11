@@ -99,11 +99,15 @@ export function notFoundWording(tried: LookupResponse["tried"]): NotFoundWording
   const skipped = named("skipped_no_key");
   const notes: string[] = [];
   if (failed.length > 0) {
-    notes.push(`${sentence(either(failed))} didn't answer, so ${failed.length === 1 ? "it" : "they"} may still have it.`);
+    notes.push(
+      `${sentence(either(failed))} didn't answer, so ${failed.length === 1 ? "it" : "they"} may still have it.`,
+    );
   }
   if (skipped.length > 0) {
     const one = skipped.length === 1;
-    notes.push(`${sentence(either(skipped))} ${one ? "isn't" : "aren't"} set up yet, so ${one ? "it wasn't" : "they weren't"} searched.`);
+    notes.push(
+      `${sentence(either(skipped))} ${one ? "isn't" : "aren't"} set up yet, so ${one ? "it wasn't" : "they weren't"} searched.`,
+    );
   }
   return { searchedIn: searched.length > 0 ? either(searched) : null, notes, uncertain: failed.length > 0 };
 }
@@ -119,7 +123,11 @@ export function notFoundText(isbn13: string, tried: LookupResponse["tried"]): st
 const SEP = "\u00a0· ";
 
 /** "Polirom · 2021 · 218 pages", skipping what isn't known. */
-export function metaLine(book: { publisher?: string | null; publishedYear?: number | null; pages?: number | null }): string {
+export function metaLine(book: {
+  publisher?: string | null;
+  publishedYear?: number | null;
+  pages?: number | null;
+}): string {
   const parts: string[] = [];
   if (book.publisher) parts.push(book.publisher);
   if (book.publishedYear) parts.push(String(book.publishedYear));
@@ -184,7 +192,11 @@ export interface Failure {
 /** Why a lookup didn't run or didn't answer. */
 export function lookupFailure(error: unknown): Failure {
   if (isApiError(error, "network")) {
-    return { message: "Looking up a book needs the network, and Shelfmark can't be reached. Try again when you're back online.", network: true };
+    return {
+      message:
+        "Looking up a book needs the network, and Shelfmark can't be reached. Try again when you're back online.",
+      network: true,
+    };
   }
   if (isApiError(error)) return { message: `The lookup didn't work: ${error.message}`, network: false };
   return { message: "The lookup didn't work. Try again.", network: false };
@@ -196,7 +208,8 @@ export function lookupFailure(error: unknown): Failure {
  */
 export function noOfflineCopy(): Failure {
   return {
-    message: "Shelfmark can't be reached, and this device has no copy of your library yet. The offline check needs one visit online first.",
+    message:
+      "Shelfmark can't be reached, and this device has no copy of your library yet. The offline check needs one visit online first.",
     network: true,
   };
 }
@@ -272,7 +285,11 @@ export function offlineNote(answer: OfflineAnswer): string {
 /** Why a book wasn't saved. Nothing was saved when this shows. */
 export function saveFailure(error: unknown): Failure {
   if (isApiError(error, "network")) {
-    return { message: "Not saved: saving needs the network, and Shelfmark can't be reached. Try again when you're back online.", network: true };
+    return {
+      message:
+        "Not saved: saving needs the network, and Shelfmark can't be reached. Try again when you're back online.",
+      network: true,
+    };
   }
   if (isApiError(error)) return { message: `Not saved: ${error.message}`, network: false };
   return { message: "Not saved. Try again.", network: false };
@@ -300,7 +317,9 @@ export function announcement(state: Pick<FlowState, "step" | "notice" | "added">
     case "found":
       return `${sourceLine(step.proposal.origin)}: ${step.proposal.details.title}.`;
     case "owned":
-      return step.lookup.draft?.title ? `Already in your library: ${step.lookup.draft.title}.` : "Already in your library.";
+      return step.lookup.draft?.title
+        ? `Already in your library: ${step.lookup.draft.title}.`
+        : "Already in your library.";
     case "wishlisted":
       return step.lookup.draft?.title ? `On your wishlist: ${step.lookup.draft.title}.` : "On your wishlist.";
     case "form":

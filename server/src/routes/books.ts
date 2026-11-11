@@ -1,4 +1,10 @@
-import { bookBulkSchema, bookCreateSchema, bookPatchSchema, type BookBulkResult, type BookList } from "@shelfmark/shared";
+import {
+  bookBulkSchema,
+  bookCreateSchema,
+  bookPatchSchema,
+  type BookBulkResult,
+  type BookList,
+} from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
 import { ApiError } from "../errors.js";

@@ -88,15 +88,25 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
   };
 
   return (
-    <DialogFrame title={`Move ${bookCount(owned)} to a shelf`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <DialogFrame
+      title={`Move ${bookCount(owned)} to a shelf`}
+      desktop={desktop}
+      returnFocus={returnFocus}
+      onClose={onClose}
+    >
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         {wishlist > 0 && (
           <p className="library-dialog__text">
-            {wishlist === 1 ? "1 selected book is on the wishlist and stays" : `${wishlist} selected books are on the wishlist and stay`}{" "}
+            {wishlist === 1
+              ? "1 selected book is on the wishlist and stays"
+              : `${wishlist} selected books are on the wishlist and stay`}{" "}
             as {wishlist === 1 ? "it is" : "they are"}: only owned books sit on shelves.
           </p>
         )}
-        <fieldset className="library-options" aria-describedby={fieldError && choice !== NEW_SHELF ? `${id}-error` : undefined}>
+        <fieldset
+          className="library-options"
+          aria-describedby={fieldError && choice !== NEW_SHELF ? `${id}-error` : undefined}
+        >
           <legend className="visually-hidden">Shelf</legend>
           {shelves.map((shelf, index) => (
             <label key={shelf.name} className="library-option">
@@ -159,7 +169,13 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
         )}
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel="Cancel" onCancel={onClose}>
-          <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+          >
             {pending ? "Moving…" : `Move ${bookCount(owned)}`}
           </Button>
         </DialogActions>
@@ -195,7 +211,12 @@ export function AddTagsDialog({ count, suggestions, desktop, returnFocus, onClos
   };
 
   return (
-    <DialogFrame title={`Add tags to ${bookCount(count)}`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <DialogFrame
+      title={`Add tags to ${bookCount(count)}`}
+      desktop={desktop}
+      returnFocus={returnFocus}
+      onClose={onClose}
+    >
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         <AuthField
           ref={input}
@@ -221,7 +242,13 @@ export function AddTagsDialog({ count, suggestions, desktop, returnFocus, onClos
         </datalist>
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel="Cancel" onCancel={onClose}>
-          <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+          >
             {pending ? "Adding…" : "Add tags"}
           </Button>
         </DialogActions>
@@ -264,7 +291,12 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
   };
 
   return (
-    <DialogFrame title={`Remove tags from ${bookCount(count)}`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
+    <DialogFrame
+      title={`Remove tags from ${bookCount(count)}`}
+      desktop={desktop}
+      returnFocus={returnFocus}
+      onClose={onClose}
+    >
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         <fieldset className="library-options" aria-describedby={fieldError ? `${id}-error` : undefined}>
           <legend className="visually-hidden">Tags</legend>
@@ -291,7 +323,13 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
         )}
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel="Cancel" onCancel={onClose}>
-          <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+          >
             {pending ? "Removing…" : chosen.size > 1 ? `Remove ${chosen.size} tags` : "Remove tag"}
           </Button>
         </DialogActions>
@@ -308,19 +346,36 @@ export interface DeleteBooksDialogProps extends DialogProps {
 }
 
 /** "Delete…": asks first, naming the count, and says there is no undo. Focus starts on "Keep them". */
-export function DeleteBooksDialog({ count, everyPage, desktop, returnFocus, onClose, onConfirm }: DeleteBooksDialogProps) {
+export function DeleteBooksDialog({
+  count,
+  everyPage,
+  desktop,
+  returnFocus,
+  onClose,
+  onConfirm,
+}: DeleteBooksDialogProps) {
   const { pending, failure, save } = useSave(onClose, "The books weren't deleted. Try again.");
   return (
     <DialogFrame title={`Delete ${bookCount(count)}?`} desktop={desktop} returnFocus={returnFocus} onClose={onClose}>
       <div className="library-dialog__form">
         <p className="library-dialog__text">
-          {count === 1 ? "It leaves" : "They leave"} your library with {count === 1 ? "its cover and notes" : "their covers and notes"}, on
-          every device. There is no undo.
+          {count === 1 ? "It leaves" : "They leave"} your library with{" "}
+          {count === 1 ? "its cover and notes" : "their covers and notes"}, on every device. There is no undo.
         </p>
-        {everyPage && <p className="library-dialog__text">That is every book in this list, on every page, not only the page on show.</p>}
+        {everyPage && (
+          <p className="library-dialog__text">
+            That is every book in this list, on every page, not only the page on show.
+          </p>
+        )}
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel={count === 1 ? "Keep it" : "Keep them"} onCancel={onClose}>
-          <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} onClick={() => save(onConfirm)}>
+          <Button
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+            onClick={() => save(onConfirm)}
+          >
             {pending ? "Deleting…" : `Delete ${bookCount(count)}`}
           </Button>
         </DialogActions>

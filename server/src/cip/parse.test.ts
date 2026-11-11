@@ -37,16 +37,26 @@ describe("parseIssue, on excerpts of real issues", () => {
 
   it("an edition statement before the imprint", () => {
     expect(byIsbn(feb2026, "9786066398084")).toMatchObject({ title: "Verde", publisher: "For You", city: "București" });
-    expect(byIsbn(feb2026, "9786303143477")).toMatchObject({ publisher: "Editura Școala Ardeleană", city: "Cluj-Napoca" });
+    expect(byIsbn(feb2026, "9786303143477")).toMatchObject({
+      publisher: "Editura Școala Ardeleană",
+      city: "Cluj-Napoca",
+    });
   });
 
   it("anonymous works and editors name no author", () => {
-    expect(byIsbn(feb2026, "9786064916341")).toMatchObject({ title: "Jurnalismul tradițional și noile media", authors: [] });
+    expect(byIsbn(feb2026, "9786064916341")).toMatchObject({
+      title: "Jurnalismul tradițional și noile media",
+      authors: [],
+    });
     expect(byIsbn(feb2026, "9786306632176")).toMatchObject({ title: "30 ani de lumină în fraternitate", authors: [] });
   });
 
   it("a multi-volume work: the set's ISBN, and a volume's broken across lines with its own subtitle", () => {
-    expect(byIsbn(feb2026, "9789735091378")).toMatchObject({ title: "Opera integrală", subtitle: null, authors: ["Platon"] });
+    expect(byIsbn(feb2026, "9789735091378")).toMatchObject({
+      title: "Opera integrală",
+      subtitle: null,
+      authors: ["Platon"],
+    });
     expect(byIsbn(feb2026, "9789735091385")).toMatchObject({
       title: "Opera integrală",
       subtitle: expect.stringMatching(/^Vol\. 1 : Apărarea lui Socrate, Criton, .*, Lysis$/),
@@ -69,6 +79,10 @@ describe("parseIssue, on excerpts of real issues", () => {
 
   it("gives nothing for text that isn't an issue", () => {
     expect(parseIssue("")).toEqual([]);
-    expect(parseIssue("        1. Descrierile CIP sunt realizate exclusiv pe baza informaţiilor\nfurnizate de către editori.")).toEqual([]);
+    expect(
+      parseIssue(
+        "        1. Descrierile CIP sunt realizate exclusiv pe baza informaţiilor\nfurnizate de către editori.",
+      ),
+    ).toEqual([]);
   });
 });

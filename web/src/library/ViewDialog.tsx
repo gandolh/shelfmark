@@ -58,7 +58,17 @@ export function DialogFrame({ title, desktop, returnFocus, onClose, children }: 
 }
 
 /** Cancel and the action: on the desktop a row on the right, the action last; on a phone the action on top, full width. */
-export function DialogActions({ desktop, cancel, onCancel, children }: { desktop: boolean; cancel: string; onCancel: () => void; children: ReactNode }) {
+export function DialogActions({
+  desktop,
+  cancel,
+  onCancel,
+  children,
+}: {
+  desktop: boolean;
+  cancel: string;
+  onCancel: () => void;
+  children: ReactNode;
+}) {
   return (
     <div className="library-dialog__actions">
       <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
@@ -97,7 +107,16 @@ export interface NameDialogProps {
 }
 
 /** "Save current view…" and "Rename…": one name field. */
-export function NameDialog({ title, intro, submitLabel, initialName = "", desktop, returnFocus, onSubmit, onClose }: NameDialogProps) {
+export function NameDialog({
+  title,
+  intro,
+  submitLabel,
+  initialName = "",
+  desktop,
+  returnFocus,
+  onSubmit,
+  onClose,
+}: NameDialogProps) {
   const [name, setName] = useState(initialName);
   const [fieldError, setFieldError] = useState<string | undefined>();
   const [failure, setFailure] = useState<string | null>(null);
@@ -154,7 +173,13 @@ export function NameDialog({ title, intro, submitLabel, initialName = "", deskto
         />
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel="Cancel" onCancel={onClose}>
-          <Button type="submit" variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending}>
+          <Button
+            type="submit"
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+          >
             {pending ? "Saving…" : submitLabel}
           </Button>
         </DialogActions>
@@ -198,7 +223,14 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
         </p>
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}
         <DialogActions desktop={desktop} cancel="Keep it" onCancel={onClose}>
-          <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} disabled={pending} data-autofocus onClick={confirm}>
+          <Button
+            variant="primary"
+            size={desktop ? "regular" : "large"}
+            block={!desktop}
+            disabled={pending}
+            data-autofocus
+            onClick={confirm}
+          >
             {pending ? "Deleting…" : "Delete view"}
           </Button>
         </DialogActions>

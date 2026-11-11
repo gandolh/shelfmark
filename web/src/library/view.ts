@@ -8,7 +8,15 @@ import { clampPage, DEFAULT_PAGE_SIZE, pageCount, pageSlice, type PageSize } fro
 import type { Layout } from "./prefs";
 import { warmSearch } from "./search";
 import { sortBooks, type Sorting } from "./sort";
-import { forgetPage, pageFor, samePageBasis, useLibraryFilters, useLibraryPage, useLibraryPrefs, type PageBasis } from "./state";
+import {
+  forgetPage,
+  pageFor,
+  samePageBasis,
+  useLibraryFilters,
+  useLibraryPage,
+  useLibraryPrefs,
+  type PageBasis,
+} from "./state";
 
 /**
  * What the Library holds right now: the open collection's books after the
@@ -101,7 +109,13 @@ export function deriveView(books: readonly Book[], state: ViewState): LibraryVie
     pageCount: pages,
     pageSize,
     pageRows: pageSlice(rows, page, pageSize),
-    pageBasis: { collection: state.collection, query: state.query, filters: state.filters, sorting: state.sorting, pageSize },
+    pageBasis: {
+      collection: state.collection,
+      query: state.query,
+      filters: state.filters,
+      sorting: state.sorting,
+      pageSize,
+    },
     sorting: state.sorting,
     filters: state.filters,
     query: state.query,

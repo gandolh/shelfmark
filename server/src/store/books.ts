@@ -238,7 +238,13 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
 
   function get(id: number): Book | undefined {
     const row = getRow.get(id);
-    return row && toBook(row, getTags.all(id).map((tag) => tag.name));
+    return (
+      row &&
+      toBook(
+        row,
+        getTags.all(id).map((tag) => tag.name),
+      )
+    );
   }
 
   /** The tag's id, made if no tag has its key yet. */
@@ -279,7 +285,10 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     // "Derived" means the stored key is what the stored authors give: no flag
     // to keep in step. A key the owner typed differs, and survives new authors.
     const wasDerived = current.authorSort === deriveAuthorSort(current.authors);
-    if (changes.authorSort === null || (changes.authorSort === undefined && changes.authors !== undefined && wasDerived)) {
+    if (
+      changes.authorSort === null ||
+      (changes.authorSort === undefined && changes.authors !== undefined && wasDerived)
+    ) {
       next.authorSort = deriveAuthorSort(next.authors);
     }
 
@@ -300,53 +309,57 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     return withTags(rowsOf.all(param), tagsOf.all(param));
   }
 
-  const bulk = db.transaction((ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] } => {
-    const known = knownBooks.all({ ids: JSON.stringify(ids) });
-    if (known.length !== ids.length) {
-      const found = new Set(known.map((book) => book.id));
-      return { unknown: ids.filter((id) => !found.has(id)).sort((a, b) => a - b) };
-    }
-    const at = now().toISOString();
-
-    if (change.kind === "delete") {
-      deleteBooks.run({ ids: JSON.stringify(ids) });
-      dropUnusedTags.run();
-      return { done: { books: [], deleted: [...ids].sort((a, b) => a - b), skipped: [] } };
-    }
-
-    // A shelf is where an owned copy sits: a wishlist book has none to change.
-    const skipped = new Set(change.kind === "shelf" ? known.filter((book) => book.collection !== "owned").map((book) => book.id) : []);
-    const applied = skipped.size > 0 ? ids.filter((id) => !skipped.has(id)) : ids;
-    const param = JSON.stringify(applied);
-
-    switch (change.kind) {
-      case "shelf":
-        setShelves.run({ ids: param, shelf: change.shelf, at });
-        break;
-      case "status":
-        setStatuses.run({ ids: param, status: change.status, at });
-        break;
-      case "addTags": {
-        const tagIds = normalizeTags(change.tags).map(tagId);
-        for (const id of applied) {
-          let added = false;
-          for (const tag of tagIds) added = linkTagOnce.run(id, tag).changes > 0 || added;
-          if (added) touch.run(at, id);
-        }
-        break;
+  const bulk = db.transaction(
+    (ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] } => {
+      const known = knownBooks.all({ ids: JSON.stringify(ids) });
+      if (known.length !== ids.length) {
+        const found = new Set(known.map((book) => book.id));
+        return { unknown: ids.filter((id) => !found.has(id)).sort((a, b) => a - b) };
       }
-      case "removeTags": {
-        const keys = JSON.stringify(normalizeTags(change.tags).map((tag) => tag.key));
-        for (const id of applied) {
-          if (unlinkNamedTags.run({ book: id, keys }).changes > 0) touch.run(at, id);
-        }
+      const at = now().toISOString();
+
+      if (change.kind === "delete") {
+        deleteBooks.run({ ids: JSON.stringify(ids) });
         dropUnusedTags.run();
-        break;
+        return { done: { books: [], deleted: [...ids].sort((a, b) => a - b), skipped: [] } };
       }
-    }
 
-    return { done: { books: listOf(applied), deleted: [], skipped: [...skipped].sort((a, b) => a - b) } };
-  });
+      // A shelf is where an owned copy sits: a wishlist book has none to change.
+      const skipped = new Set(
+        change.kind === "shelf" ? known.filter((book) => book.collection !== "owned").map((book) => book.id) : [],
+      );
+      const applied = skipped.size > 0 ? ids.filter((id) => !skipped.has(id)) : ids;
+      const param = JSON.stringify(applied);
+
+      switch (change.kind) {
+        case "shelf":
+          setShelves.run({ ids: param, shelf: change.shelf, at });
+          break;
+        case "status":
+          setStatuses.run({ ids: param, status: change.status, at });
+          break;
+        case "addTags": {
+          const tagIds = normalizeTags(change.tags).map(tagId);
+          for (const id of applied) {
+            let added = false;
+            for (const tag of tagIds) added = linkTagOnce.run(id, tag).changes > 0 || added;
+            if (added) touch.run(at, id);
+          }
+          break;
+        }
+        case "removeTags": {
+          const keys = JSON.stringify(normalizeTags(change.tags).map((tag) => tag.key));
+          for (const id of applied) {
+            if (unlinkNamedTags.run({ book: id, keys }).changes > 0) touch.run(at, id);
+          }
+          dropUnusedTags.run();
+          break;
+        }
+      }
+
+      return { done: { books: listOf(applied), deleted: [], skipped: [...skipped].sort((a, b) => a - b) } };
+    },
+  );
 
   return {
     list: () => withTags(listRows.all(), listTags.all()),

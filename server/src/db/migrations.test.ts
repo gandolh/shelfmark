@@ -99,7 +99,9 @@ describe("migration 1", () => {
     const id = insertBook(db, "Solenoid");
     expect(
       db
-        .prepare("SELECT collection, status, signed, currency, metadata_source, authors, subjects FROM books WHERE id = ?")
+        .prepare(
+          "SELECT collection, status, signed, currency, metadata_source, authors, subjects FROM books WHERE id = ?",
+        )
         .get(id),
     ).toEqual({
       collection: "owned",
@@ -138,13 +140,13 @@ describe("migration 1", () => {
   it("deletes a book's cover and tag links with the book", () => {
     const db = open();
     const id = insertBook(db, "Solenoid");
-    const tagId = Number(db.prepare("INSERT INTO tags (name, name_key) VALUES ('Romanian', 'romanian')").run().lastInsertRowid);
-    db.prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)").run(id, tagId);
-    db.prepare("INSERT INTO covers (book_id, mime, bytes, source, updated_at) VALUES (?, 'image/jpeg', ?, 'upload', ?)").run(
-      id,
-      Buffer.from([0xff, 0xd8, 0xff]),
-      NOW,
+    const tagId = Number(
+      db.prepare("INSERT INTO tags (name, name_key) VALUES ('Romanian', 'romanian')").run().lastInsertRowid,
     );
+    db.prepare("INSERT INTO book_tags (book_id, tag_id) VALUES (?, ?)").run(id, tagId);
+    db.prepare(
+      "INSERT INTO covers (book_id, mime, bytes, source, updated_at) VALUES (?, 'image/jpeg', ?, 'upload', ?)",
+    ).run(id, Buffer.from([0xff, 0xd8, 0xff]), NOW);
 
     db.prepare("DELETE FROM books WHERE id = ?").run(id);
 
@@ -162,7 +164,9 @@ describe("migration 1", () => {
 describe("migration 3", () => {
   const insertView = (db: Db, name: string, key: string, state: string, position = 0) =>
     db
-      .prepare("INSERT INTO saved_views (name, name_key, state, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)")
+      .prepare(
+        "INSERT INTO saved_views (name, name_key, state, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+      )
       .run(name, key, state, position, NOW, NOW);
 
   it("keeps a view's name unique on its folded key", () => {

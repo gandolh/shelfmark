@@ -3,10 +3,22 @@ import { describe, expect, it, vi } from "vitest";
 import { ApiError } from "../api";
 import { createViewsStore, type ViewsSource } from "./savedViewsStore";
 
-const STATE: SavedViewState = { collection: "owned", filters: {}, sorting: [{ id: "added", desc: true }], columns: ["publisher"] };
+const STATE: SavedViewState = {
+  collection: "owned",
+  filters: {},
+  sorting: [{ id: "added", desc: true }],
+  columns: ["publisher"],
+};
 
 function view(id: number, name: string, position: number): SavedView {
-  return { id, name, state: STATE, position, createdAt: "2026-10-23T09:00:00.000Z", updatedAt: "2026-10-23T09:00:00.000Z" };
+  return {
+    id,
+    name,
+    state: STATE,
+    position,
+    createdAt: "2026-10-23T09:00:00.000Z",
+    updatedAt: "2026-10-23T09:00:00.000Z",
+  };
 }
 
 function source(overrides: Partial<ViewsSource> = {}): ViewsSource {
@@ -19,7 +31,8 @@ function source(overrides: Partial<ViewsSource> = {}): ViewsSource {
   };
 }
 
-const names = (store: ReturnType<typeof createViewsStore>) => store.getState().views.map((v) => `${v.position} ${v.name}`);
+const names = (store: ReturnType<typeof createViewsStore>) =>
+  store.getState().views.map((v) => `${v.position} ${v.name}`);
 
 describe("createViewsStore", () => {
   it("fetches once per session and keeps the views by position", async () => {

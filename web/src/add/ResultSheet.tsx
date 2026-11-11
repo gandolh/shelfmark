@@ -7,14 +7,33 @@ import { Sheet } from "../components/Sheet";
 import type { QueueItem } from "../offline/queueStore";
 import { bookRoute } from "../router";
 import { CoverCapture, type CoverPhoto } from "./CoverCapture";
-import { newestCopy, wishlistedCopy, type FormBase, type FormReason, type Mode, type Proposal, type Step } from "./flow";
+import {
+  newestCopy,
+  wishlistedCopy,
+  type FormBase,
+  type FormReason,
+  type Mode,
+  type Proposal,
+  type Step,
+} from "./flow";
 import type { FormFields, FormValues } from "./form";
 import { AlertIcon, BarcodeIcon } from "./icons";
 import { IsbnField } from "./IsbnField";
 import { FailureLine, ManualForm } from "./ManualForm";
 import { ShelfPicker } from "./ShelfPicker";
 import { StatusPicker } from "./StatusPicker";
-import { bylineLine, draftSources, metaLine, notFoundWording, offlineNote, offlineStatus, ownedLine, queueItemLine, sourceLine, waitingLine } from "./words";
+import {
+  bylineLine,
+  draftSources,
+  metaLine,
+  notFoundWording,
+  offlineNote,
+  offlineStatus,
+  ownedLine,
+  queueItemLine,
+  sourceLine,
+  waitingLine,
+} from "./words";
 
 /** What the sheet's buttons ask the page to do. */
 export interface SheetActions {
@@ -70,7 +89,17 @@ const WORDS: Record<Mode, { save: string; next: string; discard: string }> = {
  * way out ("Not this book", "Discard this scan") sits apart, under it, in
  * plain ink.
  */
-export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultShelf, books, queue, on }: ResultSheetProps) {
+export function ResultSheet({
+  step,
+  mode,
+  floating,
+  takeFocus,
+  shelves,
+  defaultShelf,
+  books,
+  queue,
+  on,
+}: ResultSheetProps) {
   const headingId = useId();
   const words = WORDS[mode];
   const shared = { headingId, takeFocus, words, on };
@@ -87,7 +116,9 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       content = <Owned key={step.id} step={step} books={books} {...shared} />;
       break;
     case "wishlisted":
-      content = <Wishlisted key={step.id} step={step} books={books} shelves={shelves} defaultShelf={defaultShelf} {...shared} />;
+      content = (
+        <Wishlisted key={step.id} step={step} books={books} shelves={shelves} defaultShelf={defaultShelf} {...shared} />
+      );
       break;
     case "other":
       content = <Other key={step.id} code={step.code} {...shared} />;
@@ -112,7 +143,12 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
           message={step.failure.message}
           later={
             step.failure.network
-              ? { isbn13: step.isbn13, shelves, defaultShelf, waiting: queue.some((item) => item.isbn13 === step.isbn13) }
+              ? {
+                  isbn13: step.isbn13,
+                  shelves,
+                  defaultShelf,
+                  waiting: queue.some((item) => item.isbn13 === step.isbn13),
+                }
               : null
           }
           {...shared}
@@ -123,7 +159,9 @@ export function ResultSheet({ step, mode, floating, takeFocus, shelves, defaultS
       content = <Queue key={step.id} queue={queue} {...shared} />;
       break;
     case "form":
-      content = <FormStep key={step.id} step={step} shelves={shelves} defaultShelf={defaultShelf} mode={mode} {...shared} />;
+      content = (
+        <FormStep key={step.id} step={step} shelves={shelves} defaultShelf={defaultShelf} mode={mode} {...shared} />
+      );
       break;
   }
 
@@ -209,7 +247,8 @@ function proposalCover(proposal: Proposal, photo: CoverPhoto | null): { book: Co
   const book: CoverBook = { title: details.title, authors: details.authors ?? [], language: details.language ?? null };
   if (photo) return { book, src: photo.preview };
   if (cover.kind === "candidates") return { book, src: cover.urls[0] };
-  if (cover.kind === "copy") return { book: { ...book, id: cover.fromId, hasCover: true, coverUpdatedAt: cover.coverUpdatedAt } };
+  if (cover.kind === "copy")
+    return { book: { ...book, id: cover.fromId, hasCover: true, coverUpdatedAt: cover.coverUpdatedAt } };
   return { book };
 }
 
@@ -244,9 +283,7 @@ function Found({
         {meta && <p className="add-meta">{meta}</p>}
         <p className="add-source">{sourceLine(proposal.origin)}</p>
       </Head>
-      {proposal.cover.kind === "none" && (
-        <CoverCapture photo={photo} onChange={setPhoto} disabled={save.saving} />
-      )}
+      {proposal.cover.kind === "none" && <CoverCapture photo={photo} onChange={setPhoto} disabled={save.saving} />}
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
       <StatusPicker value={status} onChange={setStatus} disabled={save.saving} />
       {save.failure && <FailureLine>{save.failure.message}</FailureLine>}
@@ -347,7 +384,12 @@ function Wishlisted({
   takeFocus,
   words,
   on,
-}: Shared & { step: Extract<Step, { kind: "wishlisted" }>; books: readonly Book[]; shelves: readonly string[]; defaultShelf: string | null }) {
+}: Shared & {
+  step: Extract<Step, { kind: "wishlisted" }>;
+  books: readonly Book[];
+  shelves: readonly string[];
+  defaultShelf: string | null;
+}) {
   const heading = useHeadingFocus(takeFocus);
   const [shelf, setShelf] = useState(defaultShelf);
   const { lookup, save } = step;
@@ -480,8 +522,8 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
             This barcode isn't an ISBN
           </h2>
           <p className="add-meta">
-            It reads <span className="tabular add-code">{code}</span>, a shop's sticker or another code. The ISBN is printed
-            near the barcode or on the copyright page.
+            It reads <span className="tabular add-code">{code}</span>, a shop's sticker or another code. The ISBN is
+            printed near the barcode or on the copyright page.
           </p>
         </div>
       </div>
@@ -509,8 +551,8 @@ function Typing({ code, headingId, takeFocus, on }: Shared & { code: string }) {
           Type the ISBN
         </h2>
         <p className="add-meta">
-          The code read was <span className="tabular add-code">{code}</span>. The ISBN is printed near the barcode or
-          on the copyright page.
+          The code read was <span className="tabular add-code">{code}</span>. The ISBN is printed near the barcode or on
+          the copyright page.
         </p>
       </div>
       <IsbnField size="regular" onSubmit={on.submitIsbn} keepFocus={false} autoFocus={takeFocus} hint={null} />
@@ -626,7 +668,12 @@ function FormIntro({
   onRetry: () => void;
 }) {
   const { reason, lookup } = step;
-  if (reason === "manual") return <h2 id={headingId} className="visually-hidden">Add a book by hand</h2>;
+  if (reason === "manual")
+    return (
+      <h2 id={headingId} className="visually-hidden">
+        Add a book by hand
+      </h2>
+    );
   if (reason === "edit") {
     return (
       <div className="add-head__text">
@@ -663,7 +710,8 @@ function FormIntro({
     case "untitled":
       notice = (
         <>
-          {lookup?.draft ? `Found in ${draftSources(lookup.draft.sources)}` : "Found"}, but without a title. {REST_CAN_WAIT}
+          {lookup?.draft ? `Found in ${draftSources(lookup.draft.sources)}` : "Found"}, but without a title.{" "}
+          {REST_CAN_WAIT}
         </>
       );
       break;
@@ -723,7 +771,10 @@ function FormStep({
   defaultShelf: string | null;
   mode: Mode;
 }) {
-  const initial: FormValues = { ...step.initial, shelf: step.initial.shelf === undefined ? defaultShelf : step.initial.shelf };
+  const initial: FormValues = {
+    ...step.initial,
+    shelf: step.initial.shelf === undefined ? defaultShelf : step.initial.shelf,
+  };
   const manual = step.reason === "manual";
   return (
     <ManualForm

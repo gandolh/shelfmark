@@ -1,7 +1,16 @@
 import type { LookupResponse } from "@shelfmark/shared";
 import { useSyncExternalStore } from "react";
 import { isApiError } from "../api";
-import { addScan, clearQueue, inScanOrder, isQueued, loadQueue, nextWaiting, removeScan, type QueuedScan } from "./queue";
+import {
+  addScan,
+  clearQueue,
+  inScanOrder,
+  isQueued,
+  loadQueue,
+  nextWaiting,
+  removeScan,
+  type QueuedScan,
+} from "./queue";
 
 /**
  * The scan queue as the app sees it: the persisted scans plus what this visit
@@ -51,7 +60,11 @@ function stateOf(id: number): QueueItemState {
 function publish(): void {
   snapshot = {
     loaded,
-    items: inScanOrder(entries).map((scan) => ({ ...scan, state: stateOf(scan.id), lookup: answers.get(scan.id) ?? null })),
+    items: inScanOrder(entries).map((scan) => ({
+      ...scan,
+      state: stateOf(scan.id),
+      lookup: answers.get(scan.id) ?? null,
+    })),
   };
   for (const listener of listeners) listener();
 }
@@ -155,5 +168,9 @@ function subscribe(listener: () => void): () => void {
 
 /** The queue as it stands; re-renders on every change. */
 export function useScanQueue(): QueueSnapshot {
-  return useSyncExternalStore(subscribe, () => snapshot, () => snapshot);
+  return useSyncExternalStore(
+    subscribe,
+    () => snapshot,
+    () => snapshot,
+  );
 }

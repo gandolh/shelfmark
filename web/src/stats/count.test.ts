@@ -4,12 +4,65 @@ import { computeStats, decadeOf, roomOf, top } from "./count";
 import { decadeFilter, shelfFilter } from "./links";
 
 const books = [
-  book({ authors: ["Mircea Cărtărescu"], language: "ro", shelf: "Study · B1", status: "read", publishedYear: 1996, acquiredOn: "2024-03-01", priceMinor: 5000, currency: "RON" }),
-  book({ authors: ["Mircea Cărtărescu"], language: "ro", shelf: "Study · B2", status: "unread", publishedYear: 1999, acquiredOn: "2024-08-10", priceMinor: 2500, currency: "RON" }),
-  book({ authors: ["Neil Gaiman", "Terry Pratchett"], language: "en", shelf: "Study · B1", status: "read", publishedYear: 1990, acquiredOn: "2025-01-05", priceMinor: 1200, currency: "EUR" }),
-  book({ authors: ["Terry Pratchett", "Terry Pratchett"], language: "en", shelf: "Bedroom", status: "reading", publishedYear: null, acquiredOn: "2024-12-31", priceMinor: 900, currency: "EUR" }),
-  book({ authors: [], language: null, shelf: null, status: "unread", publishedYear: 2005, acquiredOn: null, priceMinor: 700 }),
-  book({ authors: ["Wish Author"], language: "fr", shelf: "Study · B1", status: "unread", collection: "wishlist", publishedYear: 1850, acquiredOn: "2020-01-01", priceMinor: 100 }),
+  book({
+    authors: ["Mircea Cărtărescu"],
+    language: "ro",
+    shelf: "Study · B1",
+    status: "read",
+    publishedYear: 1996,
+    acquiredOn: "2024-03-01",
+    priceMinor: 5000,
+    currency: "RON",
+  }),
+  book({
+    authors: ["Mircea Cărtărescu"],
+    language: "ro",
+    shelf: "Study · B2",
+    status: "unread",
+    publishedYear: 1999,
+    acquiredOn: "2024-08-10",
+    priceMinor: 2500,
+    currency: "RON",
+  }),
+  book({
+    authors: ["Neil Gaiman", "Terry Pratchett"],
+    language: "en",
+    shelf: "Study · B1",
+    status: "read",
+    publishedYear: 1990,
+    acquiredOn: "2025-01-05",
+    priceMinor: 1200,
+    currency: "EUR",
+  }),
+  book({
+    authors: ["Terry Pratchett", "Terry Pratchett"],
+    language: "en",
+    shelf: "Bedroom",
+    status: "reading",
+    publishedYear: null,
+    acquiredOn: "2024-12-31",
+    priceMinor: 900,
+    currency: "EUR",
+  }),
+  book({
+    authors: [],
+    language: null,
+    shelf: null,
+    status: "unread",
+    publishedYear: 2005,
+    acquiredOn: null,
+    priceMinor: 700,
+  }),
+  book({
+    authors: ["Wish Author"],
+    language: "fr",
+    shelf: "Study · B1",
+    status: "unread",
+    collection: "wishlist",
+    publishedYear: 1850,
+    acquiredOn: "2020-01-01",
+    priceMinor: 100,
+  }),
 ];
 
 describe("computeStats", () => {
@@ -42,7 +95,14 @@ describe("computeStats", () => {
   it("groups shelves by room", () => {
     expect(stats.shelvesInUse).toBe(3);
     expect(stats.rooms).toEqual([
-      { room: "Study", count: 3, shelves: [{ key: "Study · B1", count: 2 }, { key: "Study · B2", count: 1 }] },
+      {
+        room: "Study",
+        count: 3,
+        shelves: [
+          { key: "Study · B1", count: 2 },
+          { key: "Study · B2", count: 1 },
+        ],
+      },
       { room: "Bedroom", count: 1, shelves: [] },
       { room: "", count: 1, shelves: [] },
     ]);
@@ -63,7 +123,13 @@ describe("computeStats", () => {
 
   it("adds money per year, never across currencies, and counts what it left out", () => {
     expect(stats.spending).toEqual([
-      { currency: "EUR", years: [{ year: "2025", totalMinor: 1200, books: 1 }, { year: "2024", totalMinor: 900, books: 1 }] },
+      {
+        currency: "EUR",
+        years: [
+          { year: "2025", totalMinor: 1200, books: 1 },
+          { year: "2024", totalMinor: 900, books: 1 },
+        ],
+      },
       { currency: "RON", years: [{ year: "2024", totalMinor: 7500, books: 2 }] },
     ]);
     expect(stats.unpriced).toBe(1);

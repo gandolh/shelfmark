@@ -93,7 +93,10 @@ describe("readOpenLibrary", () => {
   });
 
   it.each(["/languages/__proto__", "/languages/constructor"])("leaves the language empty for %s", (key) => {
-    const { data, details } = recorded("9780547928227") as { data: unknown; details: Record<string, { details: object }> };
+    const { data, details } = recorded("9780547928227") as {
+      data: unknown;
+      details: Record<string, { details: object }>;
+    };
     const entry = details["ISBN:9780547928227"]!;
     const changed = { "ISBN:9780547928227": { ...entry, details: { ...entry.details, languages: [{ key }] } } };
     const draft = readOpenLibrary("9780547928227", { data, details: changed });
@@ -147,7 +150,12 @@ describe("createOpenLibrarySource", () => {
     const messages = [];
     for (const answer of answers) {
       const source = createOpenLibrarySource({ fetch: fakeFetch(answer), queue: instantQueue() });
-      messages.push(await source.fetch("9780547928227").then(() => "resolved", (error: Error) => error.message));
+      messages.push(
+        await source.fetch("9780547928227").then(
+          () => "resolved",
+          (error: Error) => error.message,
+        ),
+      );
     }
     expect(messages).toEqual([
       "Open Library answered 503",

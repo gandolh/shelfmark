@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { clampPage, DEFAULT_PAGE_SIZE, isPageSize, pageCount, pageItems, pageRange, pageSlice, PAGE_SIZES, showsPager } from "./pagination";
+import {
+  clampPage,
+  DEFAULT_PAGE_SIZE,
+  isPageSize,
+  pageCount,
+  pageItems,
+  pageRange,
+  pageSlice,
+  PAGE_SIZES,
+  showsPager,
+} from "./pagination";
 
 const list = (n: number) => Array.from({ length: n }, (_, i) => i + 1);
 
@@ -49,7 +59,9 @@ describe("pageSlice", () => {
     expect(pageSlice(rows, 1, 50)).toEqual(list(50));
     expect(pageSlice(rows, 2, 50)[0]).toBe(51);
     expect(pageSlice(rows, 2, 50)).toHaveLength(50);
-    expect(pageSlice(rows, 3, 50)).toEqual([101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120]);
+    expect(pageSlice(rows, 3, 50)).toEqual([
+      101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120,
+    ]);
   });
 
   it("shows the last page for a page past the end", () => {

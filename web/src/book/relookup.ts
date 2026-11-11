@@ -7,15 +7,7 @@ import type { Book, BookPatch, Draft } from "@shelfmark/shared";
  */
 
 export type RelookupField =
-  | "title"
-  | "subtitle"
-  | "authors"
-  | "publisher"
-  | "publishedYear"
-  | "pages"
-  | "language"
-  | "description"
-  | "subjects";
+  "title" | "subtitle" | "authors" | "publisher" | "publishedYear" | "pages" | "language" | "description" | "subjects";
 
 export const RELOOKUP_LABELS: Record<RelookupField, string> = {
   title: "Title",

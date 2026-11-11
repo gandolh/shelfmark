@@ -36,16 +36,21 @@ const ENDS_ON_YEAR = /\.\s+-\s+.*,\s*\[?[12]\d{3}\]?-?\.?$/u;
 
 /** OCR text with the cedilla letters swapped, and the ISBN word and its digits as the list parser's pattern expects them. */
 export function tidyOcr(text: string): string {
-  return cip
-    .romanian(text)
-    .replace(/\r\n?/g, "\n")
-    // Specks read as marks at a line's end: "Eikon, 2026 |". Never a hyphen, which can end an area (". -").
-    .replace(/[ \t]+[|_=~—»«]+[ \t]*$/gmu, "")
-    .replace(ISBN_WORD, "ISBN ")
-    // O for 0 and l, I or | for 1 inside an ISBN's digits.
-    .replace(/(ISBN )([\dOIl| -]{10,24})/gu, (_, word: string, digits: string) => word + digits.replace(/O/g, "0").replace(/[Il|]/g, "1"))
-    // An ISBN broken over two lines: "ISBN 978-\n973-50-9138-5".
-    .replace(/(ISBN [\d -]*\d-)[ \t]*\n\s*(?=\d)/gu, "$1");
+  return (
+    cip
+      .romanian(text)
+      .replace(/\r\n?/g, "\n")
+      // Specks read as marks at a line's end: "Eikon, 2026 |". Never a hyphen, which can end an area (". -").
+      .replace(/[ \t]+[|_=~—»«]+[ \t]*$/gmu, "")
+      .replace(ISBN_WORD, "ISBN ")
+      // O for 0 and l, I or | for 1 inside an ISBN's digits.
+      .replace(
+        /(ISBN )([\dOIl| -]{10,24})/gu,
+        (_, word: string, digits: string) => word + digits.replace(/O/g, "0").replace(/[Il|]/g, "1"),
+      )
+      // An ISBN broken over two lines: "ISBN 978-\n973-50-9138-5".
+      .replace(/(ISBN [\d -]*\d-)[ \t]*\n\s*(?=\d)/gu, "$1")
+  );
 }
 
 /** The description's lines folded into one, as `cip.readDescription` reads it. */
@@ -147,7 +152,8 @@ export function readCipBlock(ocr: string): CipRead {
     description,
     isbns,
     fields: {
-      title: read.subtitle === null ? (withoutAuthorTail(read.title, read.authors, description) ?? read.title) : read.title,
+      title:
+        read.subtitle === null ? (withoutAuthorTail(read.title, read.authors, description) ?? read.title) : read.title,
       subtitle: withoutAuthorTail(read.subtitle, read.authors, description),
       authors: read.authors,
       publisher: read.publisher,

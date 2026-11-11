@@ -9,7 +9,13 @@ import { setSearchQuery, useSearchQuery } from "./search";
  * phone page that asks for it. `/` focuses it from anywhere but a field;
  * Escape clears it, then leaves it.
  */
-export function SearchField({ placement, placeholder = "Search" }: { placement: "bar" | "header"; placeholder?: string }) {
+export function SearchField({
+  placement,
+  placeholder = "Search",
+}: {
+  placement: "bar" | "header";
+  placeholder?: string;
+}) {
   const query = useSearchQuery();
   const route = useRoute();
   const input = useRef<HTMLInputElement>(null);
@@ -18,7 +24,8 @@ export function SearchField({ placement, placeholder = "Search" }: { placement: 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
-      if (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]")) return;
+      if (event.target instanceof HTMLElement && event.target.closest("input, textarea, select, [contenteditable]"))
+        return;
       event.preventDefault();
       input.current?.focus();
     };

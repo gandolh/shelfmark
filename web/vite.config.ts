@@ -41,7 +41,9 @@ function ocrAssets(): Plugin {
 
   // The worker without its source-map comment (the map isn't shipped), and its licence file beside it.
   const workerJs = Buffer.from(
-    read(resolve(dirname(tesseract), "dist/worker.min.js")).toString("utf8").replace(/\n\/\/# sourceMappingURL=\S+\s*$/, "\n"),
+    read(resolve(dirname(tesseract), "dist/worker.min.js"))
+      .toString("utf8")
+      .replace(/\n\/\/# sourceMappingURL=\S+\s*$/, "\n"),
   );
   const engine: [string, Buffer][] = [
     ["worker.min.js", workerJs],
@@ -67,12 +69,20 @@ function ocrAssets(): Plugin {
     bytes: {
       worker: size(engineDir, "worker.min.js"),
       cores: Object.fromEntries(
-        OCR_CORES.map((name) => [name, { js: size(engineDir, `tesseract-core-${name}.js`), wasm: size(engineDir, `tesseract-core-${name}.wasm`) }]),
+        OCR_CORES.map((name) => [
+          name,
+          { js: size(engineDir, `tesseract-core-${name}.js`), wasm: size(engineDir, `tesseract-core-${name}.wasm`) },
+        ]),
       ),
       ron: size(langDir, "ron.traineddata.gz"),
     },
   };
-  const TYPES: Record<string, string> = { js: "text/javascript", wasm: "application/wasm", gz: "application/gzip", txt: "text/plain" };
+  const TYPES: Record<string, string> = {
+    js: "text/javascript",
+    wasm: "application/wasm",
+    gz: "application/gzip",
+    txt: "text/plain",
+  };
 
   let base = "/";
   return {

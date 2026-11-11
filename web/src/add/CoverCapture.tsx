@@ -65,7 +65,10 @@ export function CoverCapture({
   };
 
   const picker = (label: string, look: string) => (
-    <label className={`button button--secondary button--compact button--pill add-cover__pick ${look}`} aria-disabled={disabled || working}>
+    <label
+      className={`button button--secondary button--compact button--pill add-cover__pick ${look}`}
+      aria-disabled={disabled || working}
+    >
       <input
         className="visually-hidden"
         type="file"

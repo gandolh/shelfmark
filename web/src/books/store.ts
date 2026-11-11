@@ -159,7 +159,9 @@ export function createBooksStore(source: BooksSource, hooks: BooksHooks = {}) {
       const hasCover = updatedAt !== null;
       apply((books) =>
         books.map((b) =>
-          b.id === id && (b.hasCover !== hasCover || b.coverUpdatedAt !== updatedAt) ? { ...b, hasCover, coverUpdatedAt: updatedAt } : b,
+          b.id === id && (b.hasCover !== hasCover || b.coverUpdatedAt !== updatedAt)
+            ? { ...b, hasCover, coverUpdatedAt: updatedAt }
+            : b,
         ),
       );
     },

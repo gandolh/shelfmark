@@ -158,7 +158,8 @@ function round(value: number): string {
  */
 export function readoutLines({ engine, label, settings, capabilities, decodeMs }: ReadoutInput): string[] {
   const granted: string[] = [];
-  if (settings.width !== undefined && settings.height !== undefined) granted.push(`${settings.width}×${settings.height}`);
+  if (settings.width !== undefined && settings.height !== undefined)
+    granted.push(`${settings.width}×${settings.height}`);
   if (settings.frameRate !== undefined) granted.push(`${round(settings.frameRate)} fps`);
   if (settings.zoom !== undefined) granted.push(`zoom ${round(settings.zoom)}`);
   if (settings.focusMode !== undefined) granted.push(`focus ${settings.focusMode}`);

@@ -65,7 +65,13 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
         )}
       </BaseMenu.Trigger>
       <BaseMenu.Portal>
-        <BaseMenu.Positioner className="menu-positioner" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
+        <BaseMenu.Positioner
+          className="menu-positioner"
+          side="bottom"
+          align={align}
+          sideOffset={GAP}
+          collisionPadding={MARGIN}
+        >
           <BaseMenu.Popup
             className="menu"
             aria-label={label}

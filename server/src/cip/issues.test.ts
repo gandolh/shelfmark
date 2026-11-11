@@ -13,7 +13,10 @@ describe("issueMonth", () => {
     ["https://bibnat.ro/wp-content/uploads/2025/10/CIP-martie_2025.pdf", "2025-03"],
     ["https://bibnat.ro/wp-content/uploads/2024/03/CIP_iulie-2023_site.pdf", "2023-07"],
     ["https://bibnat.ro/wp-content/uploads/2025/03/BIBLIOGR-CIP-SEP-2024.pdf", "2024-09"],
-    ["https://bibnat.ro/wp-content/uploads/2023/09/Bibliografia-cartilor-in-curs-de-aparitie-CIP-ianuarie-2019.pdf", "2019-01"],
+    [
+      "https://bibnat.ro/wp-content/uploads/2023/09/Bibliografia-cartilor-in-curs-de-aparitie-CIP-ianuarie-2019.pdf",
+      "2019-01",
+    ],
   ])("reads %s as %s", (url, month) => {
     expect(issueMonth(url)).toBe(month);
   });
@@ -35,13 +38,37 @@ describe("issueMonth", () => {
 describe("issuesIn", () => {
   it("keeps one issue per month, the later upload, newest month first", () => {
     expect(issuesIn(MEDIA)).toEqual([
-      { month: "2026-03", url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_martie-2026.pdf", uploaded: "2026-08-27T12:03:21" },
-      { month: "2026-02", url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_februarie-2026.pdf", uploaded: "2026-08-18T10:00:51" },
-      { month: "2026-01", url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_ianuarie-2026.pdf", uploaded: "2026-08-18T10:00:56" },
-      { month: "2025-03", url: "https://bibnat.ro/wp-content/uploads/2025/10/CIP-martie_2025.pdf", uploaded: "2025-10-27T10:15:54" },
+      {
+        month: "2026-03",
+        url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_martie-2026.pdf",
+        uploaded: "2026-08-27T12:03:21",
+      },
+      {
+        month: "2026-02",
+        url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_februarie-2026.pdf",
+        uploaded: "2026-08-18T10:00:51",
+      },
+      {
+        month: "2026-01",
+        url: "https://bibnat.ro/wp-content/uploads/2026/08/CIP_ianuarie-2026.pdf",
+        uploaded: "2026-08-18T10:00:56",
+      },
+      {
+        month: "2025-03",
+        url: "https://bibnat.ro/wp-content/uploads/2025/10/CIP-martie_2025.pdf",
+        uploaded: "2025-10-27T10:15:54",
+      },
       // Uploaded twice; the later one.
-      { month: "2024-09", url: "https://bibnat.ro/wp-content/uploads/2025/04/CIP-septembrie_2024.pdf", uploaded: "2025-04-03T10:56:57" },
-      { month: "2023-07", url: "https://bibnat.ro/wp-content/uploads/2024/03/CIP_iulie-2023_site.pdf", uploaded: "2024-03-19T12:59:29" },
+      {
+        month: "2024-09",
+        url: "https://bibnat.ro/wp-content/uploads/2025/04/CIP-septembrie_2024.pdf",
+        uploaded: "2025-04-03T10:56:57",
+      },
+      {
+        month: "2023-07",
+        url: "https://bibnat.ro/wp-content/uploads/2024/03/CIP_iulie-2023_site.pdf",
+        uploaded: "2024-03-19T12:59:29",
+      },
       {
         month: "2019-01",
         url: "https://bibnat.ro/wp-content/uploads/2023/09/Bibliografia-cartilor-in-curs-de-aparitie-CIP-ianuarie-2019.pdf",
@@ -57,7 +84,10 @@ describe("issuesIn", () => {
 
 describe("listIssues", () => {
   it("pages through the listing until a short page, naming the app", async () => {
-    const full = Array.from({ length: 100 }, (_, i) => ({ source_url: `https://bibnat.ro/wp-content/uploads/x/doc-${i}.pdf`, date: "2026-01-01" }));
+    const full = Array.from({ length: 100 }, (_, i) => ({
+      source_url: `https://bibnat.ro/wp-content/uploads/x/doc-${i}.pdf`,
+      date: "2026-01-01",
+    }));
     const fetch = fakeFetch((url) => (url.searchParams.get("page") === "1" ? json(full) : json(MEDIA)));
     const issues = await listIssues(fetch, createQueue(0));
     expect(issues).toHaveLength(7);
@@ -68,8 +98,11 @@ describe("listIssues", () => {
   });
 
   it("fails when the site does", async () => {
-    await expect(listIssues(fakeFetch(() => json({}, 503)), createQueue(0))).rejects.toThrow(
-      "The national library's site answered 503",
-    );
+    await expect(
+      listIssues(
+        fakeFetch(() => json({}, 503)),
+        createQueue(0),
+      ),
+    ).rejects.toThrow("The national library's site answered 503");
   });
 });

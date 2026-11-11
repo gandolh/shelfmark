@@ -21,7 +21,9 @@ describe("cipValues", () => {
       year: "2026",
       isbn: "9786303143477",
     });
-    expect(cipValues({ title: "Mineiul", subtitle: null, authors: ["A", "B"], publisher: null, year: null, isbn13: null })).toEqual({
+    expect(
+      cipValues({ title: "Mineiul", subtitle: null, authors: ["A", "B"], publisher: null, year: null, isbn13: null }),
+    ).toEqual({
       title: "Mineiul",
       author: "A & B",
     });

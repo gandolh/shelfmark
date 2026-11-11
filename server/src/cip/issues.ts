@@ -29,9 +29,31 @@ export interface Issue {
 
 const MONTHS: ReadonlyMap<string, number> = new Map(
   Object.entries({
-    ianuarie: 1, februarie: 2, martie: 3, aprilie: 4, mai: 5, iunie: 6, iulie: 7, august: 8, septembrie: 9,
-    octombrie: 10, noiembrie: 11, decembrie: 12, ian: 1, feb: 2, mar: 3, apr: 4, iun: 6, iul: 7, aug: 8,
-    sep: 9, sept: 9, oct: 10, noi: 11, nov: 11, dec: 12,
+    ianuarie: 1,
+    februarie: 2,
+    martie: 3,
+    aprilie: 4,
+    mai: 5,
+    iunie: 6,
+    iulie: 7,
+    august: 8,
+    septembrie: 9,
+    octombrie: 10,
+    noiembrie: 11,
+    decembrie: 12,
+    ian: 1,
+    feb: 2,
+    mar: 3,
+    apr: 4,
+    iun: 6,
+    iul: 7,
+    aug: 8,
+    sep: 9,
+    sept: 9,
+    oct: 10,
+    noi: 11,
+    nov: 11,
+    dec: 12,
   }),
 );
 
@@ -65,7 +87,12 @@ export function issuesIn(entries: readonly unknown[]): Issue[] {
 export async function listIssues(fetch: typeof globalThis.fetch, queue: Queue): Promise<Issue[]> {
   const entries: unknown[] = [];
   for (let page = 1; page <= MAX_PAGES; page++) {
-    const query = new URLSearchParams({ search: "CIP", per_page: String(PAGE_SIZE), page: String(page), _fields: "source_url,date" });
+    const query = new URLSearchParams({
+      search: "CIP",
+      per_page: String(PAGE_SIZE),
+      page: String(page),
+      _fields: "source_url,date",
+    });
     const answer = await queue.run(() =>
       getJson("The national library's site", `${MEDIA_API}?${query}`, {
         fetch,

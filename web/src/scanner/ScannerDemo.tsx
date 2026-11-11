@@ -77,8 +77,7 @@ export function ScannerDemo() {
       <h1 style={{ margin: 0 }}>Scanner demo</h1>
       <p style={{ margin: 0 }}>
         State <strong>{state}</strong> · engine <strong>{engine}</strong> · torch{" "}
-        <strong>{torchAvailable ? "available" : "not available"}</strong> · fallback asked{" "}
-        <strong>{fallbacks}</strong>×
+        <strong>{torchAvailable ? "available" : "not available"}</strong> · fallback asked <strong>{fallbacks}</strong>×
       </p>
       <div style={{ height: "55vh" }}>
         <CameraScanner

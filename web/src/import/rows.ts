@@ -49,7 +49,8 @@ export interface ImportRow {
   source: MetadataSource;
 }
 
-export type RowFlag = "in-library" | "in-file" | "invalid-isbn" | "needs-lookup" | "not-found" | "lookup-failed" | "empty";
+export type RowFlag =
+  "in-library" | "in-file" | "invalid-isbn" | "needs-lookup" | "not-found" | "lookup-failed" | "empty";
 
 const ISBN_COLUMN_LIMIT = 20;
 
@@ -155,7 +156,9 @@ export function buildRows(table: readonly (readonly string[])[], mapping: Mappin
  */
 export function flagRows(rows: readonly ImportRow[], books: readonly Book[], collection: Collection): RowFlag[][] {
   const known = new Set(
-    books.filter((b) => b.isbn13 !== null && (b.collection === "owned" || b.collection === collection)).map((b) => b.isbn13),
+    books
+      .filter((b) => b.isbn13 !== null && (b.collection === "owned" || b.collection === collection))
+      .map((b) => b.isbn13),
   );
   const seen = new Set<string>();
   return rows.map((row) => {
@@ -195,7 +198,9 @@ export function hasTitle(row: ImportRow): boolean {
 
 /** The rows to look up: ticked, no title, a valid ISBN, not asked yet. */
 export function lookupTargets(rows: readonly ImportRow[], ticked: ReadonlySet<number>): number[] {
-  return rows.flatMap((row, index) => (ticked.has(index) && row.title === "" && row.isbn13 !== null && row.lookup === "none" ? [index] : []));
+  return rows.flatMap((row, index) =>
+    ticked.has(index) && row.title === "" && row.isbn13 !== null && row.lookup === "none" ? [index] : [],
+  );
 }
 
 /** The row with a lookup's draft filled in, only where the file left a field empty. No title in the answer counts as not found. */
@@ -203,7 +208,12 @@ export function applyLookup(row: ImportRow, response: LookupResponse): ImportRow
   const draft = response.draft;
   if (draft === null || draft.title === null || draft.title.trim() === "") return { ...row, lookup: "not_found" };
   const fill = <K extends keyof RowDetails>(key: K, value: RowDetails[K] | null | undefined | []) => {
-    if (row.details[key] === undefined && value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)) {
+    if (
+      row.details[key] === undefined &&
+      value !== null &&
+      value !== undefined &&
+      !(Array.isArray(value) && value.length === 0)
+    ) {
       details[key] = value as RowDetails[K];
     }
   };

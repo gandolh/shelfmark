@@ -208,7 +208,10 @@ const someTags = names.pipe(z.array(z.string()).min(1, { message: "name at least
 export const bulkChangeSchema = z.discriminatedUnion("kind", [
   z.strictObject({
     kind: z.literal("shelf"),
-    shelf: z.preprocess((value) => (typeof value === "string" && value.trim() === "" ? null : value), shortText.nullable()),
+    shelf: z.preprocess(
+      (value) => (typeof value === "string" && value.trim() === "" ? null : value),
+      shortText.nullable(),
+    ),
   }),
   z.strictObject({ kind: z.literal("status"), status: statusSchema }),
   z.strictObject({ kind: z.literal("addTags"), tags: someTags }),

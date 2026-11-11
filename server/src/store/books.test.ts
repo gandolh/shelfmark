@@ -23,14 +23,16 @@ afterEach(() => {
 });
 
 function addCover(bookId: number): void {
-  db.prepare("INSERT INTO covers (book_id, mime, bytes, source, updated_at) VALUES (?, 'image/jpeg', ?, 'upload', ?)").run(
-    bookId,
-    Buffer.from([0xff, 0xd8, 0xff]),
-    "2026-10-14T09:00:00.000Z",
-  );
+  db.prepare(
+    "INSERT INTO covers (book_id, mime, bytes, source, updated_at) VALUES (?, 'image/jpeg', ?, 'upload', ?)",
+  ).run(bookId, Buffer.from([0xff, 0xd8, 0xff]), "2026-10-14T09:00:00.000Z");
 }
 
-const tagNames = () => db.prepare<[], { name: string }>("SELECT name FROM tags ORDER BY id").all().map((row) => row.name);
+const tagNames = () =>
+  db
+    .prepare<[], { name: string }>("SELECT name FROM tags ORDER BY id")
+    .all()
+    .map((row) => row.name);
 
 describe("create", () => {
   it("fills the defaults, derives the author sort and sets both times", () => {
@@ -110,7 +112,14 @@ describe("create", () => {
   });
 
   it("treats null like a missing field", () => {
-    const book = store.create({ title: "t", status: null, collection: null, signed: null, currency: null, authors: null });
+    const book = store.create({
+      title: "t",
+      status: null,
+      collection: null,
+      signed: null,
+      currency: null,
+      authors: null,
+    });
     expect(book).toMatchObject({ status: "unread", collection: "owned", signed: false, currency: "RON", authors: [] });
   });
 });
@@ -211,12 +220,15 @@ describe("patch", () => {
 
 describe("author sort", () => {
   it("is derived from the first author unless given", () => {
-    expect(store.create({ title: "t", authors: ["Mircea Cărtărescu", "Ion Creangă"] }).authorSort).toBe("Cărtărescu, Mircea");
+    expect(store.create({ title: "t", authors: ["Mircea Cărtărescu", "Ion Creangă"] }).authorSort).toBe(
+      "Cărtărescu, Mircea",
+    );
     expect(store.create({ title: "t", authors: ["Homer"] }).authorSort).toBe("Homer");
     expect(store.create({ title: "t" }).authorSort).toBeNull();
-    expect(store.create({ title: "t", authors: ["Gabriel García Márquez"], authorSort: "García Márquez, Gabriel" }).authorSort).toBe(
-      "García Márquez, Gabriel",
-    );
+    expect(
+      store.create({ title: "t", authors: ["Gabriel García Márquez"], authorSort: "García Márquez, Gabriel" })
+        .authorSort,
+    ).toBe("García Márquez, Gabriel");
   });
 
   it("follows new authors while it was derived", () => {
@@ -227,7 +239,11 @@ describe("author sort", () => {
   });
 
   it("keeps a sort key the owner set when the authors change", () => {
-    const book = store.create({ title: "t", authors: ["Gabriel García Márquez"], authorSort: "García Márquez, Gabriel" });
+    const book = store.create({
+      title: "t",
+      authors: ["Gabriel García Márquez"],
+      authorSort: "García Márquez, Gabriel",
+    });
     expect(store.patch(book.id, { authors: ["Gabriel García Márquez", "Edith Grossman"] })?.authorSort).toBe(
       "García Márquez, Gabriel",
     );
@@ -357,7 +373,13 @@ describe("bulk", () => {
     const others = [1, 2, 3, 4].map((n) => store.create({ title: `B${n}`, tags: n === 1 ? ["Poetry"] : [] }));
 
     const result = done(store.bulk(ids(tagged, ...others), { kind: "addTags", tags: ["signed", "SIGNED"] }));
-    expect(result.books.map((book) => book.tags)).toEqual([["Signed"], ["Poetry", "Signed"], ["Signed"], ["Signed"], ["Signed"]]);
+    expect(result.books.map((book) => book.tags)).toEqual([
+      ["Signed"],
+      ["Poetry", "Signed"],
+      ["Signed"],
+      ["Signed"],
+      ["Signed"],
+    ]);
     expect(tagNames()).toEqual(["Signed", "Poetry"]);
     expect(result.books[0]).toEqual(tagged); // had it already: untouched
     expect(result.books[1]?.updatedAt).not.toBe(others[0]?.updatedAt);
@@ -406,7 +428,9 @@ describe("bulk", () => {
   it("runs as one transaction: a failure part-way leaves every book as it was", () => {
     const a = store.create({ title: "A" });
     const b = store.create({ title: "B" });
-    db.exec(`CREATE TRIGGER refuse BEFORE UPDATE ON books WHEN NEW.id = ${b.id} BEGIN SELECT RAISE(ABORT, 'refused'); END`);
+    db.exec(
+      `CREATE TRIGGER refuse BEFORE UPDATE ON books WHEN NEW.id = ${b.id} BEGIN SELECT RAISE(ABORT, 'refused'); END`,
+    );
 
     expect(() => store.bulk(ids(a, b), { kind: "addTags", tags: ["Signed"] })).toThrow("refused");
     expect(store.get(a.id)).toEqual(a);

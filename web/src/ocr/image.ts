@@ -40,7 +40,11 @@ export function boxBetween(start: Point, end: Point): Box | null {
 }
 
 /** The box in the photo's own pixels, whole pixels, never empty; the whole photo when there is no box. */
-export function boxInPixels(box: Box | null, width: number, height: number): { x: number; y: number; width: number; height: number } {
+export function boxInPixels(
+  box: Box | null,
+  width: number,
+  height: number,
+): { x: number; y: number; width: number; height: number } {
   if (box === null) return { x: 0, y: 0, width, height };
   const x = Math.min(width - 1, Math.round(box.x * width));
   const y = Math.min(height - 1, Math.round(box.y * height));

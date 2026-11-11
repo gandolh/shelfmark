@@ -63,7 +63,9 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
         className="add-input book-chips__input"
         type="text"
         value={text}
-        onChange={(event) => (/[,;]/.test(event.target.value) ? commit(event.target.value) : setText(event.target.value))}
+        onChange={(event) =>
+          /[,;]/.test(event.target.value) ? commit(event.target.value) : setText(event.target.value)
+        }
         onKeyDown={onKeyDown}
         onBlur={() => commit(text)}
         list={`${id}-list`}

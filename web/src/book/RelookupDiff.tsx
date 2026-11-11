@@ -26,7 +26,10 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
   const draft = state.kind === "done" ? state.response.draft : null;
   const rows = useMemo(() => (draft ? diffDraft(book, draft) : []), [book, draft]);
   // Ticks belong to one answer: a new draft starts with nothing ticked.
-  const [choice, setChoice] = useState<{ draft: unknown; set: ReadonlySet<RelookupField> }>({ draft: null, set: new Set() });
+  const [choice, setChoice] = useState<{ draft: unknown; set: ReadonlySet<RelookupField> }>({
+    draft: null,
+    set: new Set(),
+  });
   const ticked = choice.draft === draft ? choice.set : NONE;
   const setTicked = (set: ReadonlySet<RelookupField>) => setChoice({ draft, set });
   const [saving, setSaving] = useState(false);
@@ -56,7 +59,11 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
   };
 
   return (
-    <section className="book-card book-lookup" aria-labelledby="book-lookup-title" aria-busy={state.kind === "loading" || undefined}>
+    <section
+      className="book-card book-lookup"
+      aria-labelledby="book-lookup-title"
+      aria-busy={state.kind === "loading" || undefined}
+    >
       <h2 className="book-card__title" id="book-lookup-title" tabIndex={-1} ref={heading}>
         What the sources say now
       </h2>
@@ -89,20 +96,29 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
         <>
           <p className="book-lookup__line">
             {sourceLine(draft.sources)}.{" "}
-            {rows.length === 0 ? "It matches what you have; there is nothing to take." : "Tick the fields to take; the rest stay as they are."}
+            {rows.length === 0
+              ? "It matches what you have; there is nothing to take."
+              : "Tick the fields to take; the rest stay as they are."}
           </p>
           {rows.length > 0 && (
             <ul className="book-diff">
               {rows.map((row) => (
                 <li key={row.field}>
                   <label className="book-diff__row">
-                    <input type="checkbox" checked={ticked.has(row.field)} onChange={() => toggle(row.field)} disabled={saving} />
+                    <input
+                      type="checkbox"
+                      checked={ticked.has(row.field)}
+                      onChange={() => toggle(row.field)}
+                      disabled={saving}
+                    />
                     <span className="book-diff__body">
                       <span className="book-diff__label">{row.label}</span>
                       <span className="book-diff__pair">
                         <span className="book-diff__side">
                           <span className="book-diff__who">Now</span>
-                          <span className="book-diff__text">{row.current || <span className="book-none">Empty</span>}</span>
+                          <span className="book-diff__text">
+                            {row.current || <span className="book-none">Empty</span>}
+                          </span>
                         </span>
                         <span className="book-diff__side">
                           <span className="book-diff__who">Sources</span>
@@ -118,8 +134,17 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
           {failure && <FailureLine>{failure}</FailureLine>}
           <div className="book-actions">
             {rows.length > 0 && (
-              <Button variant="primary" onClick={() => void apply()} aria-disabled={ticked.size === 0 || saving || undefined} disabled={ticked.size === 0 || saving}>
-                {saving ? "Saving…" : ticked.size === 0 ? "Take selected" : `Take ${ticked.size} ${ticked.size === 1 ? "field" : "fields"}`}
+              <Button
+                variant="primary"
+                onClick={() => void apply()}
+                aria-disabled={ticked.size === 0 || saving || undefined}
+                disabled={ticked.size === 0 || saving}
+              >
+                {saving
+                  ? "Saving…"
+                  : ticked.size === 0
+                    ? "Take selected"
+                    : `Take ${ticked.size} ${ticked.size === 1 ? "field" : "fields"}`}
               </Button>
             )}
             {rows.length > 1 && (

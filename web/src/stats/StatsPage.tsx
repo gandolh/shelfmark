@@ -15,7 +15,12 @@ import {
 } from "./links";
 import "./stats.css";
 
-const STATUS_NAMES: Record<string, string> = { unread: "Unread", reading: "Reading", read: "Read", abandoned: "Abandoned" };
+const STATUS_NAMES: Record<string, string> = {
+  unread: "Unread",
+  reading: "Reading",
+  read: "Read",
+  abandoned: "Abandoned",
+};
 
 function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
@@ -48,12 +53,7 @@ export function StatsPage() {
             <p className="stats__note">Wishlist: {stats.wishlist}</p>
 
             <Section title="Authors">
-              <List
-                rows={stats.authors}
-                label={(key) => key}
-                filterFor={authorFilter}
-                what="by"
-              />
+              <List rows={stats.authors} label={(key) => key} filterFor={authorFilter} what="by" />
             </Section>
             <Section title="Languages">
               <List
@@ -130,7 +130,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Count({ count, filter, label }: { count: number; filter: LibraryFilter | null; label: string }) {
   if (!filter) return <span className="stats__num">{count}</span>;
   return (
-    <button type="button" className="stats__count" aria-label={`${count} ${label}, show in Library`} onClick={() => openInLibrary(filter)}>
+    <button
+      type="button"
+      className="stats__count"
+      aria-label={`${count} ${label}, show in Library`}
+      onClick={() => openInLibrary(filter)}
+    >
       {count}
     </button>
   );
@@ -156,7 +161,11 @@ function List({
             <tr key={row.key}>
               <th scope="row">{label(row.key)}</th>
               <td>
-                <Count count={row.count} filter={filterFor(row.key)} label={`${what ? `${what} ` : ""}${label(row.key)}`} />
+                <Count
+                  count={row.count}
+                  filter={filterFor(row.key)}
+                  label={`${what ? `${what} ` : ""}${label(row.key)}`}
+                />
               </td>
             </tr>
           ))}
@@ -180,7 +189,11 @@ function Rooms({ rooms }: { rooms: readonly Room[] }) {
               <tr key={room.room}>
                 <th scope="row">{name}</th>
                 <td>
-                  <Count count={room.count} label={name} filter={shelfFilter(shelves ? shelves.map((s) => s.key) : [room.room])} />
+                  <Count
+                    count={room.count}
+                    label={name}
+                    filter={shelfFilter(shelves ? shelves.map((s) => s.key) : [room.room])}
+                  />
                 </td>
               </tr>,
               ...(shelves ?? []).map((shelf) => (

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_ORDER, DEFAULT_VISIBILITY, defaultPrefs, prefsKey, readPrefs, writePrefs, type PrefsStorage } from "./prefs";
+import {
+  DEFAULT_ORDER,
+  DEFAULT_VISIBILITY,
+  defaultPrefs,
+  prefsKey,
+  readPrefs,
+  writePrefs,
+  type PrefsStorage,
+} from "./prefs";
 import { DEFAULT_SORTING } from "./sort";
 
 function memoryStorage(initial: Record<string, string> = {}): PrefsStorage & { data: Record<string, string> } {
@@ -73,7 +81,11 @@ describe("readPrefs", () => {
   it("drops unknown columns, keeps the book first and visible, adds new columns at the end", () => {
     const storage = memoryStorage({
       [prefsKey("desktop")]: JSON.stringify({
-        sorting: [{ id: "gone", desc: true }, { id: "book", desc: false }, { id: "book", desc: true }],
+        sorting: [
+          { id: "gone", desc: true },
+          { id: "book", desc: false },
+          { id: "book", desc: true },
+        ],
         columnOrder: ["status", "gone", "book", "status", "shelf"],
         columnVisibility: { book: false, gone: true },
         columnSizing: { gone: 100, year: 5, book: 99999 },
@@ -111,7 +123,11 @@ describe("the page size", () => {
 
   it("reads as 10 from prefs stored before there were pages", () => {
     const storage = memoryStorage({
-      [prefsKey("desktop")]: JSON.stringify({ collection: "owned", view: "table", sorting: [{ id: "added", desc: true }] }),
+      [prefsKey("desktop")]: JSON.stringify({
+        collection: "owned",
+        view: "table",
+        sorting: [{ id: "added", desc: true }],
+      }),
     });
     expect(readPrefs(storage, "desktop").pageSize).toBe(10);
   });

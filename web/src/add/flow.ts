@@ -95,7 +95,14 @@ export type Step =
   | { kind: "owned"; id: number; lookup: LookupResponse }
   | { kind: "wishlisted"; id: number; lookup: LookupResponse; save: SaveState }
   /** `shelf`: the shelf chosen when the scan was queued (offline/queue.ts); left out, the page's default. */
-  | { kind: "found"; id: number; lookup: LookupResponse | null; proposal: Proposal; save: SaveState; shelf?: string | null }
+  | {
+      kind: "found";
+      id: number;
+      lookup: LookupResponse | null;
+      proposal: Proposal;
+      save: SaveState;
+      shelf?: string | null;
+    }
   | { kind: "queue"; id: number }
   | {
       kind: "form";
@@ -187,7 +194,15 @@ export function initialFlow(mode: Mode, carried?: Pick<FlowState, "added" | "las
 /** The step a mode rests in: a blank form By hand, nothing otherwise. */
 function restingStep(mode: Mode, id: number): Step {
   if (mode !== "manual") return { kind: "ready", id };
-  return { kind: "form", id, reason: "manual", lookup: null, initial: { ...EMPTY_FORM, shelf: undefined }, base: NO_BASE, save: IDLE };
+  return {
+    kind: "form",
+    id,
+    reason: "manual",
+    lookup: null,
+    initial: { ...EMPTY_FORM, shelf: undefined },
+    base: NO_BASE,
+    save: IDLE,
+  };
 }
 
 const NO_BASE: FormBase = { details: {}, cover: { kind: "none" } };
@@ -242,7 +257,10 @@ export function proposalFromDraft(draft: Draft & { title: string }): Proposal {
       metadataSource: draftMetadataSource(draft.sources),
     },
     origin: draft.sources,
-    cover: draft.coverCandidates.length > 0 ? { kind: "candidates", urls: draft.coverCandidates.map((c) => c.url) } : { kind: "none" },
+    cover:
+      draft.coverCandidates.length > 0
+        ? { kind: "candidates", urls: draft.coverCandidates.map((c) => c.url) }
+        : { kind: "none" },
   };
 }
 
@@ -281,7 +299,10 @@ export function proposalFromBook(book: Book, draft: Draft | null): Proposal {
 
 /** The copy saved last, of those a lookup found: the one "Open the book" opens. */
 export function newestCopy(owned: LookupResponse["owned"]): LookupResponse["owned"][number] | null {
-  return owned.reduce<LookupResponse["owned"][number] | null>((a, b) => (a === null || b.createdAt > a.createdAt ? b : a), null);
+  return owned.reduce<LookupResponse["owned"][number] | null>(
+    (a, b) => (a === null || b.createdAt > a.createdAt ? b : a),
+    null,
+  );
 }
 
 /**
@@ -301,7 +322,12 @@ export function copyProposal(lookup: LookupResponse, books: readonly Book[]): Pr
  * The create body for a confirmed proposal. On the wishlist there is no
  * shelf: the caller passes `null`, and `collection: "wishlist"` is sent.
  */
-export function bodyFromProposal(proposal: Proposal, shelf: string | null, status: Status, collection: Collection = "owned"): BookCreate {
+export function bodyFromProposal(
+  proposal: Proposal,
+  shelf: string | null,
+  status: Status,
+  collection: Collection = "owned",
+): BookCreate {
   return { ...proposal.details, shelf, status, ...(collection === "wishlist" ? { collection } : {}) };
 }
 
@@ -347,8 +373,15 @@ function initialFromDetails(details: Partial<Details>, extra: Partial<FormInitia
 
 /** The details a form keeps but doesn't show: everything but its own fields. */
 function hiddenDetails(details: Partial<Details>): Partial<Details> {
-  const { title: _title, subtitle: _subtitle, authors: _authors, publisher: _publisher, publishedYear: _year, isbn13: _isbn, ...rest } =
-    details;
+  const {
+    title: _title,
+    subtitle: _subtitle,
+    authors: _authors,
+    publisher: _publisher,
+    publishedYear: _year,
+    isbn13: _isbn,
+    ...rest
+  } = details;
   return rest;
 }
 
@@ -361,7 +394,13 @@ function answered(lookup: LookupResponse, id: number, shelf?: string | null): St
   if (lookup.wishlisted.length > 0) return { kind: "wishlisted", id, lookup, save: IDLE };
   const { draft } = lookup;
   if (draft !== null && draft.title) {
-    const found: Step = { kind: "found", id, lookup, proposal: proposalFromDraft({ ...draft, title: draft.title }), save: IDLE };
+    const found: Step = {
+      kind: "found",
+      id,
+      lookup,
+      proposal: proposalFromDraft({ ...draft, title: draft.title }),
+      save: IDLE,
+    };
     return shelf === undefined ? found : { ...found, shelf };
   }
   if (draft !== null) {
@@ -399,7 +438,12 @@ export function flowReducer(state: FlowState, event: FlowEvent): FlowState {
 function reduce(state: FlowState, event: FlowEvent): FlowState {
   const { step } = state;
   const id = state.next;
-  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({ ...state, ...extra, step: next, next: id + 1 });
+  const go = (next: Step, extra: Partial<FlowState> = {}): FlowState => ({
+    ...state,
+    ...extra,
+    step: next,
+    next: id + 1,
+  });
   const saving = isSaving(step);
 
   switch (event.type) {
@@ -556,7 +600,11 @@ function reduce(state: FlowState, event: FlowEvent): FlowState {
       return { ...state, step: { ...step, save: { saving: false, failure: event.failure } } };
 
     case "cover-failed":
-      return { ...state, notice: { id, kind: "cover-failed", bookId: event.book.id, title: event.book.title }, next: id + 1 };
+      return {
+        ...state,
+        notice: { id, kind: "cover-failed", bookId: event.book.id, title: event.book.title },
+        next: id + 1,
+      };
 
     case "dismiss-notice":
       if (state.notice?.id !== event.id) return state;

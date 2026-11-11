@@ -70,7 +70,9 @@ export function parseIssue(text: string): CipRecord[] {
       if (line.trim() === "") continue;
       if (indent(line) > depth - 3) break;
       // "Cluj-" at a line's end and "Napoca" on the next are one word.
-      description = /\p{L}-$/u.test(description.trimEnd()) ? description.trimEnd() + line.trim() : `${description} ${line}`;
+      description = /\p{L}-$/u.test(description.trimEnd())
+        ? description.trimEnd() + line.trim()
+        : `${description} ${line}`;
     }
     const read = readDescription(romanian(description));
     if (!read.title) return;

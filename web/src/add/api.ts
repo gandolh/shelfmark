@@ -31,7 +31,12 @@ export async function fetchCover(bookId: number, url: string, options: CallOptio
 
 /** `PUT /api/books/:id/cover`: store an image (JPEG, PNG or WebP, 2 MB at most; `resizeImage` makes one). */
 export async function uploadCover(bookId: number, image: Blob, options: CallOptions = {}): Promise<CoverInfo> {
-  const info = await apiRequest(`/api/books/${bookId}/cover`, { ...options, method: "PUT", body: image, schema: coverInfoSchema });
+  const info = await apiRequest(`/api/books/${bookId}/cover`, {
+    ...options,
+    method: "PUT",
+    body: image,
+    schema: coverInfoSchema,
+  });
   coverChanged(bookId, info);
   return info;
 }

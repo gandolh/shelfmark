@@ -20,7 +20,10 @@ const IDLE: LookupState = { kind: "idle" };
 
 export function useLookup(isbn13: string | null): BookLookup {
   // The answer is kept with the ISBN it was for: a changed ISBN makes it stale.
-  const [answer, setAnswer] = useState<{ isbn: string | null; state: LookupState }>({ isbn: null, state: { kind: "idle" } });
+  const [answer, setAnswer] = useState<{ isbn: string | null; state: LookupState }>({
+    isbn: null,
+    state: { kind: "idle" },
+  });
   const abort = useRef<AbortController | null>(null);
   const state: LookupState = answer.isbn === isbn13 ? answer.state : IDLE;
 

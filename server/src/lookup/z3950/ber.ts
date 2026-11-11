@@ -65,7 +65,8 @@ export function booleanContent(value: boolean): Buffer {
 /** "1.2.840.10003.3.1" → its content octets. */
 export function oidContent(oid: string): Buffer {
   const arcs = oid.split(".").map(Number);
-  if (arcs.length < 2 || arcs.some((arc) => !Number.isSafeInteger(arc) || arc < 0)) throw new RangeError(`not an OID: ${oid}`);
+  if (arcs.length < 2 || arcs.some((arc) => !Number.isSafeInteger(arc) || arc < 0))
+    throw new RangeError(`not an OID: ${oid}`);
   const out: number[] = [];
   for (const arc of [arcs[0]! * 40 + arcs[1]!, ...arcs.slice(2)]) {
     const sevens: number[] = [];
@@ -148,7 +149,7 @@ function decodeAt(buf: Buffer, offset: number, depth: number): { tlv: Tlv; end: 
   if (!isConstructed) return { tlv: { cls, constructed: false, tag, value }, end };
 
   const children: Tlv[] = [];
-  for (let child = at; child < end; ) {
+  for (let child = at; child < end;) {
     const decoded = decodeAt(buf.subarray(0, end), child, depth + 1);
     children.push(decoded.tlv);
     child = decoded.end;

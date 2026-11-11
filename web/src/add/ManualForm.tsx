@@ -211,7 +211,9 @@ export function ManualForm({
         )}
         <ShelfPicker value={values.shelf} onChange={(shelf) => set("shelf", shelf)} shelves={shelves} />
         <StatusPicker value={values.status} onChange={(status) => set("status", status)} />
-        {coverPrompt !== null && <CoverCapture photo={photo} onChange={setPhoto} prompt={coverPrompt} disabled={saving} />}
+        {coverPrompt !== null && (
+          <CoverCapture photo={photo} onChange={setPhoto} prompt={coverPrompt} disabled={saving} />
+        )}
       </fieldset>
       {failure && <FailureLine>{failure}</FailureLine>}
       <div className="add-form__submit">

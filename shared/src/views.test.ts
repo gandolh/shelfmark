@@ -34,7 +34,16 @@ describe("savedViewStateSchema", () => {
     ["an unknown column", { ...STATE, columns: ["loanedTo"] }],
     ["the book column among the columns", { ...STATE, columns: ["book", "year"] }],
     ["a column twice", { ...STATE, columns: ["year", "year"] }],
-    ["a sort key twice", { ...STATE, sorting: [{ id: "year", desc: true }, { id: "year", desc: false }] }],
+    [
+      "a sort key twice",
+      {
+        ...STATE,
+        sorting: [
+          { id: "year", desc: true },
+          { id: "year", desc: false },
+        ],
+      },
+    ],
     ["a filter on an unknown column", { ...STATE, filters: { loanedTo: { kind: "yesno", value: true } } }],
     ["an unknown filter kind", { ...STATE, filters: { year: { kind: "between", min: 1, max: 2 } } }],
     ["a filter with an extra key", { ...STATE, filters: { signed: { kind: "yesno", value: true, also: 1 } } }],

@@ -63,7 +63,9 @@ export type Drawable = ImageBitmap | HTMLImageElement;
  * rotation; `<img>` is the fallback (older Safari, HEIC). Also read by
  * ocr/image.ts for a photo of a CIP block.
  */
-export async function decode(file: Blob): Promise<{ image: Drawable; width: number; height: number; release: () => void }> {
+export async function decode(
+  file: Blob,
+): Promise<{ image: Drawable; width: number; height: number; release: () => void }> {
   if (typeof createImageBitmap === "function") {
     try {
       const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });

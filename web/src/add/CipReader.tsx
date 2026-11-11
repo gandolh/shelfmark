@@ -30,7 +30,14 @@ type Phase =
   /** The photo is kept, so "Try again" reads it again once the reader can load. */
   | { kind: "failed"; message: string; file: File; box: Box | null };
 
-const FIELD_NAMES: Record<FormField, string> = { title: "title", subtitle: "subtitle", author: "author", publisher: "publisher", year: "year", isbn: "ISBN" };
+const FIELD_NAMES: Record<FormField, string> = {
+  title: "title",
+  subtitle: "subtitle",
+  author: "author",
+  publisher: "publisher",
+  year: "year",
+  isbn: "ISBN",
+};
 
 const megabytes = (bytes: number) => `${(bytes / 1_000_000).toFixed(1)} MB`;
 
@@ -41,8 +48,10 @@ function listed(fields: readonly FormField[]): string {
 }
 
 function summary(result: CipRead, changed: readonly FormField[]): string {
-  if (!result.found) return "No “Descrierea CIP” heading in this photo. Try one closer to the block, or copy the text it read.";
-  if (result.fields.title === null) return "Found the CIP block, but no title in it. Fix the text below and fill again.";
+  if (!result.found)
+    return "No “Descrierea CIP” heading in this photo. Try one closer to the block, or copy the text it read.";
+  if (result.fields.title === null)
+    return "Found the CIP block, but no title in it. Fix the text below and fill again.";
   if (changed.length === 0) return "Read the CIP block. The fields it has were already filled.";
   const several = result.isbns.length > 1 ? " It lists several ISBNs: type the one on the back cover." : "";
   return `Filled the ${listed(changed)} from the CIP block. Check them before saving.${several}`;
@@ -54,7 +63,9 @@ function stageText(stage: OcrStage | null): string {
     case "download":
       return `Downloading the text reader: ${megabytes(stage.loaded)} of ${megabytes(stage.total)}.`;
     case "start":
-      return stage.downloading > 0 ? `Downloading the text reader (${megabytes(stage.downloading)})…` : "Starting the text reader…";
+      return stage.downloading > 0
+        ? `Downloading the text reader (${megabytes(stage.downloading)})…`
+        : "Starting the text reader…";
     case "read":
       return `Reading the text: ${Math.round(stage.progress * 100)}%.`;
   }
@@ -91,7 +102,12 @@ function CropPhoto({ src, box, onBox }: { src: string; box: Box | null; onBox: (
       {box && (
         <span
           className="add-cip__box"
-          style={{ left: `${box.x * 100}%`, top: `${box.y * 100}%`, width: `${box.width * 100}%`, height: `${box.height * 100}%` }}
+          style={{
+            left: `${box.x * 100}%`,
+            top: `${box.y * 100}%`,
+            width: `${box.width * 100}%`,
+            height: `${box.height * 100}%`,
+          }}
         />
       )}
     </div>
@@ -187,7 +203,14 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
       className={`button ${primary ? "button--secondary button--pill" : "button--quiet"} button--compact add-cip__pick`}
       aria-disabled={disabled}
     >
-      <input className="visually-hidden" type="file" accept="image/*" capture="environment" disabled={disabled} onChange={pick} />
+      <input
+        className="visually-hidden"
+        type="file"
+        accept="image/*"
+        capture="environment"
+        disabled={disabled}
+        onChange={pick}
+      />
       {label}
     </label>
   );
@@ -296,7 +319,13 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
       <div className="add-cip__actions">
         {phase.kind === "failed" ? (
           <>
-            <Button variant="secondary" size="compact" pill disabled={disabled} onClick={() => void read(phase.file, phase.box)}>
+            <Button
+              variant="secondary"
+              size="compact"
+              pill
+              disabled={disabled}
+              onClick={() => void read(phase.file, phase.box)}
+            >
               Try again
             </Button>
             {picker("Another photo")}

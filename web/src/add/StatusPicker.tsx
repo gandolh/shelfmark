@@ -26,7 +26,13 @@ export interface StatusPickerProps {
  * The status as chips, one always chosen: real radio buttons under the chip
  * look, so arrow keys move the choice and a screen reader hears a group.
  */
-export function StatusPicker({ value, onChange, options = ADD_STATUSES, label = "Status", disabled }: StatusPickerProps) {
+export function StatusPicker({
+  value,
+  onChange,
+  options = ADD_STATUSES,
+  label = "Status",
+  disabled,
+}: StatusPickerProps) {
   const name = useId();
   return (
     <fieldset className="add-choice" disabled={disabled}>

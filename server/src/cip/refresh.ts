@@ -60,11 +60,16 @@ export async function pdfToText(pdf: Buffer): Promise<string> {
   try {
     await writeFile(file, pdf);
     return await new Promise<string>((resolve, reject) => {
-      execFile("pdftotext", ["-layout", "-enc", "UTF-8", file, "-"], { maxBuffer: 64 * 1024 * 1024 }, (error, stdout) => {
-        if ((error as NodeJS.ErrnoException | null)?.code === "ENOENT") reject(new NoPdfToText());
-        else if (error) reject(new Error(`pdftotext failed: ${error.message}`, { cause: error }));
-        else resolve(stdout);
-      });
+      execFile(
+        "pdftotext",
+        ["-layout", "-enc", "UTF-8", file, "-"],
+        { maxBuffer: 64 * 1024 * 1024 },
+        (error, stdout) => {
+          if ((error as NodeJS.ErrnoException | null)?.code === "ENOENT") reject(new NoPdfToText());
+          else if (error) reject(new Error(`pdftotext failed: ${error.message}`, { cause: error }));
+          else resolve(stdout);
+        },
+      );
     });
   } finally {
     await rm(dir, { recursive: true, force: true });
@@ -75,7 +80,10 @@ export async function pdfToText(pdf: Buffer): Promise<string> {
 async function download(fetch: typeof globalThis.fetch, url: string): Promise<Buffer> {
   let response: Response;
   try {
-    response = await fetch(url, { headers: { "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS) });
+    response = await fetch(url, {
+      headers: { "User-Agent": USER_AGENT },
+      signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS),
+    });
   } catch (error) {
     throw new Error("the national library's site could not be reached", { cause: error });
   }

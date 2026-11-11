@@ -60,9 +60,30 @@ const AUTHORS = [
   ["Daniel Kahneman", "Kahneman, Daniel"],
   ["Yuval Noah Harari", "Harari, Yuval Noah"],
 ] as const;
-const WORDS = ["vară", "noapte", "țara", "orașul", "inocenții", "drumul", "pădurea", "șoapte", "lumina", "umbra", "casa", "marea"];
+const WORDS = [
+  "vară",
+  "noapte",
+  "țara",
+  "orașul",
+  "inocenții",
+  "drumul",
+  "pădurea",
+  "șoapte",
+  "lumina",
+  "umbra",
+  "casa",
+  "marea",
+];
 const PUBLISHERS = ["Polirom", "Humanitas", "Litera", "Vintage", "Penguin", "Nemira", "Art", "Curtea Veche"];
-const SHELVES = ["Living room · A1", "Living room · A2", "Living room · A3", "Bedroom", "Study · B1", "Study · B2", null];
+const SHELVES = [
+  "Living room · A1",
+  "Living room · A2",
+  "Living room · A3",
+  "Bedroom",
+  "Study · B1",
+  "Study · B2",
+  null,
+];
 const STATUSES = ["unread", "reading", "read", "abandoned"] as const;
 const TAGS = ["Romanian", "Gift", "Signed copy", "Poetry", "History", "Classics"];
 
@@ -91,7 +112,10 @@ export function syntheticLibrary(count = 3000): Book[] {
       shelf: pickOne(SHELVES),
       status: pickOne(STATUSES),
       tags: random() < 0.3 ? [pickOne(TAGS)] : [],
-      notes: random() < 0.4 ? `Notă: ${pickOne(WORDS)} ${pickOne(WORDS)} — cumpărată la ${pickOne(PUBLISHERS)}. `.repeat(4) : null,
+      notes:
+        random() < 0.4
+          ? `Notă: ${pickOne(WORDS)} ${pickOne(WORDS)} — cumpărată la ${pickOne(PUBLISHERS)}. `.repeat(4)
+          : null,
       priceMinor: random() < 0.5 ? Math.floor(random() * 15000) : null,
       createdAt: created,
       updatedAt: created,

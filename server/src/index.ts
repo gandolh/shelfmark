@@ -33,7 +33,11 @@ const app = await buildApp({ ...config, dataDir }, { logger: true });
 // The weekly CIP refresh, on its own connection to cip.db: lookups read the app's.
 if (config.cipRefresh) {
   const store = openCipStore(cipDatabasePath(dataDir));
-  const log = { info: (m: string) => app.log.info(m), warn: (m: string) => app.log.warn(m), error: (m: string) => app.log.error(m) };
+  const log = {
+    info: (m: string) => app.log.info(m),
+    warn: (m: string) => app.log.warn(m),
+    error: (m: string) => app.log.error(m),
+  };
   const job = startCipJob(() => refreshCip({ store, fetch: globalThis.fetch, log }), log);
   app.addHook("onClose", async () => {
     job.stop();

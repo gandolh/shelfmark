@@ -65,8 +65,12 @@ const SELECT = "SELECT id, name, state, position, created_at AS createdAt, updat
 export function createViewStore(db: Db, now: () => Date = () => new Date()): ViewStore {
   const selectAll = db.prepare<[], ViewRow>(`${SELECT} ORDER BY position, id`);
   const selectOne = db.prepare<[number], ViewRow>(`${SELECT} WHERE id = ?`);
-  const findByKey = db.prepare<[string], { id: number; name: string }>("SELECT id, name FROM saved_views WHERE name_key = ?");
-  const nextPosition = db.prepare<[], { next: number }>("SELECT COALESCE(MAX(position) + 1, 0) AS next FROM saved_views");
+  const findByKey = db.prepare<[string], { id: number; name: string }>(
+    "SELECT id, name FROM saved_views WHERE name_key = ?",
+  );
+  const nextPosition = db.prepare<[], { next: number }>(
+    "SELECT COALESCE(MAX(position) + 1, 0) AS next FROM saved_views",
+  );
   const insert = db.prepare<[string, string, string, number, string, string]>(
     "INSERT INTO saved_views (name, name_key, state, position, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
   );
@@ -75,7 +79,9 @@ export function createViewStore(db: Db, now: () => Date = () => new Date()): Vie
   const setPosition = db.prepare<[number, number]>("UPDATE saved_views SET position = ? WHERE id = ?");
   const touch = db.prepare<[string, number]>("UPDATE saved_views SET updated_at = ? WHERE id = ?");
   const deleteOne = db.prepare<[number]>("DELETE FROM saved_views WHERE id = ?");
-  const order = db.prepare<[], { id: number; position: number }>("SELECT id, position FROM saved_views ORDER BY position, id");
+  const order = db.prepare<[], { id: number; position: number }>(
+    "SELECT id, position FROM saved_views ORDER BY position, id",
+  );
 
   /** Throws when a view other than `except` has the name. */
   function claim(name: string, except?: number): string {

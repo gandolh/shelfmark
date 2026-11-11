@@ -109,7 +109,12 @@ interface RowNav {
   onToggle: (book: Book) => void;
 }
 
-const RowNavContext = createContext<RowNav>({ tabbable: 0, onFocus: () => {}, onKeyDown: () => {}, onToggle: () => {} });
+const RowNavContext = createContext<RowNav>({
+  tabbable: 0,
+  onFocus: () => {},
+  onKeyDown: () => {},
+  onToggle: () => {},
+});
 
 function Cell({ column, book, index }: { column: LibraryColumn; book: Book; index: number }) {
   if (column.id === BOOK_COLUMN_ID) return <BookCell book={book} index={index} />;
@@ -228,7 +233,18 @@ export interface BookTableProps {
   onToggleAll: () => void;
 }
 
-export function BookTable({ rows, total, pageStart, sorting, prefs, layout, selection, everything, onToggle, onToggleAll }: BookTableProps) {
+export function BookTable({
+  rows,
+  total,
+  pageStart,
+  sorting,
+  prefs,
+  layout,
+  selection,
+  everything,
+  onToggle,
+  onToggleAll,
+}: BookTableProps) {
   const desktop = layout === "desktop";
   const selectWidth = SELECT_WIDTH[layout];
 
@@ -244,7 +260,10 @@ export function BookTable({ rows, total, pageStart, sorting, prefs, layout, sele
     },
     // Whatever the table hands back goes through the same checks as stored prefs.
     onColumnOrderChange: (updater) =>
-      updatePrefs(layout, (p) => ({ ...p, columnOrder: normalizeOrder(resolve<string[]>(updater, [...p.columnOrder])) })),
+      updatePrefs(layout, (p) => ({
+        ...p,
+        columnOrder: normalizeOrder(resolve<string[]>(updater, [...p.columnOrder])),
+      })),
     onColumnVisibilityChange: (updater) =>
       updatePrefs(layout, (p) => ({
         ...p,
@@ -264,7 +283,9 @@ export function BookTable({ rows, total, pageStart, sorting, prefs, layout, sele
   // The select boxes first; the book column takes what the others leave; the rest keep their widths.
   const template = [
     `${selectWidth}px`,
-    ...headers.map((header) => (header.column.id === BOOK_COLUMN_ID ? `minmax(${header.getSize()}px, 1fr)` : `${header.getSize()}px`)),
+    ...headers.map((header) =>
+      header.column.id === BOOK_COLUMN_ID ? `minmax(${header.getSize()}px, 1fr)` : `${header.getSize()}px`,
+    ),
   ].join(" ");
 
   const root = useRef<HTMLDivElement>(null);
@@ -285,7 +306,9 @@ export function BookTable({ rows, total, pageStart, sorting, prefs, layout, sele
       const covered = Math.round(parseFloat(getComputedStyle(headBox).top) || 0) + headBox.offsetHeight;
       const overflows = rowsBox.scrollWidth > rowsBox.clientWidth + 1;
       setGeometry((old) =>
-        old.margin === margin && old.covered === covered && old.overflows === overflows ? old : { margin, covered, overflows },
+        old.margin === margin && old.covered === covered && old.overflows === overflows
+          ? old
+          : { margin, covered, overflows },
       );
     };
     const observer = new ResizeObserver(measure);
@@ -443,11 +466,7 @@ export function BookTable({ rows, total, pageStart, sorting, prefs, layout, sele
                 >
                   <SelectCell book={row.original} index={item.index} selected={selected} />
                   {row.getVisibleCells().map((cell) => (
-                    <div
-                      key={cell.id}
-                      role="cell"
-                      className={cellClass(columnById(cell.column.id as ColumnId))}
-                    >
+                    <div key={cell.id} role="cell" className={cellClass(columnById(cell.column.id as ColumnId))}>
                       <table.FlexRender cell={cell} />
                     </div>
                   ))}
@@ -467,7 +486,11 @@ export function BookTable({ rows, total, pageStart, sorting, prefs, layout, sele
 }
 
 function cellClass(column: LibraryColumn): string {
-  return ["library-table__cell", `library-table__cell--${column.id}`, column.align === "end" ? "library-table__cell--end" : null]
+  return [
+    "library-table__cell",
+    `library-table__cell--${column.id}`,
+    column.align === "end" ? "library-table__cell--end" : null,
+  ]
     .filter(Boolean)
     .join(" ");
 }

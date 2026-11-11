@@ -87,11 +87,18 @@ describe("prefsWithView", () => {
     expect(next.columnVisibility.book).toBe(true);
     expect(next.columnVisibility.publisher).toBe(false);
     expect(new Set(next.columnOrder).size).toBe(prefs.columnOrder.length);
-    expect(next).toMatchObject({ collection: "wishlist", view: "covers", sorting: [{ id: "book", desc: false }], columnSizing: { publisher: 200 } });
+    expect(next).toMatchObject({
+      collection: "wishlist",
+      view: "covers",
+      sorting: [{ id: "book", desc: false }],
+      columnSizing: { publisher: 200 },
+    });
   });
 
   it("sorts newest first when every sort key the view had is gone", () => {
-    expect(prefsWithView(desktop, { collection: "owned", filters: {}, sorting: [], columns: [] }).sorting).toEqual([{ id: "added", desc: true }]);
+    expect(prefsWithView(desktop, { collection: "owned", filters: {}, sorting: [], columns: [] }).sorting).toEqual([
+      { id: "added", desc: true },
+    ]);
   });
 });
 
@@ -100,14 +107,19 @@ describe("sameViewState", () => {
 
   it("matches its own state, whatever order the pick-list values were ticked in", () => {
     expect(sameViewState(state, throughServer(state))).toBe(true);
-    const reticked: SavedViewState = { ...state, filters: { ...state.filters, shelf: { kind: "pick", values: ["Living room · A2", "Living room · A1"] } } };
+    const reticked: SavedViewState = {
+      ...state,
+      filters: { ...state.filters, shelf: { kind: "pick", values: ["Living room · A2", "Living room · A1"] } },
+    };
     expect(sameViewState(state, reticked)).toBe(true);
   });
 
   it("tells a changed tab, filter, sort or column apart", () => {
     expect(sameViewState(state, { ...state, collection: "wishlist" })).toBe(false);
     expect(sameViewState(state, { ...state, filters: { status: { kind: "pick", values: ["unread"] } } })).toBe(false);
-    expect(sameViewState(state, { ...state, filters: { ...state.filters, signed: { kind: "yesno", value: true } } })).toBe(false);
+    expect(
+      sameViewState(state, { ...state, filters: { ...state.filters, signed: { kind: "yesno", value: true } } }),
+    ).toBe(false);
     expect(sameViewState(state, { ...state, sorting: [{ id: "added", desc: false }] })).toBe(false);
     expect(sameViewState(state, { ...state, columns: ["publisher", "year"] })).toBe(false);
     expect(sameViewState(state, { ...state, columns: ["publisher", "year"] }, { columns: false })).toBe(true);
@@ -120,7 +132,10 @@ describe("sameViewState", () => {
 
 describe("matchingView", () => {
   const state = currentViewState(desktop, UNREAD_LIVING_ROOM);
-  const views = [view(1, "Unread", currentViewState(desktop, { status: UNREAD_LIVING_ROOM.status })), view(2, "Unread, living room", state)];
+  const views = [
+    view(1, "Unread", currentViewState(desktop, { status: UNREAD_LIVING_ROOM.status })),
+    view(2, "Unread, living room", state),
+  ];
 
   it("finds the view the page is on; in the covers view the columns don't count", () => {
     expect(matchingView(views, state, "table")?.name).toBe("Unread, living room");

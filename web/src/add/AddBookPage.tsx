@@ -10,7 +10,13 @@ import { Page } from "../layout/Page";
 import { DESKTOP_QUERY, useIsDesktop } from "../layout/viewport";
 import { Button } from "../components/Button";
 import type { Zoom } from "../scanner/camera";
-import { CameraReadout, CameraScanner, type CameraInfo, type ScannerHandle, type ScannerState } from "../scanner/CameraScanner";
+import {
+  CameraReadout,
+  CameraScanner,
+  type CameraInfo,
+  type ScannerHandle,
+  type ScannerState,
+} from "../scanner/CameraScanner";
 import type { ScannedCode } from "../scanner/detector";
 import { attachCover, lookupIsbn } from "./api";
 import type { CoverPhoto } from "./CoverCapture";
@@ -35,7 +41,15 @@ import { createLookupMemo } from "./memo";
 import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
-import { announcement, lookupFailure, noOfflineCopy, queuedLine, saveFailure, sessionCount, waitingLine } from "./words";
+import {
+  announcement,
+  lookupFailure,
+  noOfflineCopy,
+  queuedLine,
+  saveFailure,
+  sessionCount,
+  waitingLine,
+} from "./words";
 import "./add.css";
 
 /**
@@ -160,7 +174,8 @@ export function AddBookPage() {
       return;
     }
     setPress(code === null ? "gave-up" : "idle");
-    if (code !== null) dispatch({ type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined });
+    if (code !== null)
+      dispatch({ type: "scanned", code, known: code.kind === "isbn" ? memo.get(code.isbn13) : undefined });
   };
   // A result's buttons bring the scan button back; focus, lost with the sheet, goes to it.
   useEffect(() => {
@@ -201,7 +216,11 @@ export function AddBookPage() {
     if (scan !== null) takeScan(scan);
     // Its ISBN is in the library now: the next lookup of it says so.
     if (book.isbn13 !== null) memo.forget(book.isbn13);
-    dispatch({ type: "saved", book: { id: book.id, title: book.title, shelf: book.shelf }, outcome: body.collection === "wishlist" ? "wishlist" : undefined });
+    dispatch({
+      type: "saved",
+      book: { id: book.id, title: book.title, shelf: book.shelf },
+      outcome: body.collection === "wishlist" ? "wishlist" : undefined,
+    });
     // Type ISBN: the cursor is back in the empty field, so a USB scanner goes
     // straight on to the next book. By hand: the fresh form takes it.
     isbnField.current?.reset();
@@ -235,8 +254,10 @@ export function AddBookPage() {
   };
 
   const on: SheetActions = {
-    saveProposal: (proposal, shelf, status, photo) => void save(bodyFromProposal(proposal, shelf, status), proposal.cover, photo),
-    saveToWishlist: (proposal, photo) => void save(bodyFromProposal(proposal, null, "unread", "wishlist"), proposal.cover, photo),
+    saveProposal: (proposal, shelf, status, photo) =>
+      void save(bodyFromProposal(proposal, shelf, status), proposal.cover, photo),
+    saveToWishlist: (proposal, photo) =>
+      void save(bodyFromProposal(proposal, null, "unread", "wishlist"), proposal.cover, photo),
     buy: (bookId, shelf) => void buy(bookId, shelf),
     saveForm: (fields, base, photo) => void save(bodyFromForm(fields, base), base.cover, photo),
     discard: () => {
@@ -251,7 +272,8 @@ export function AddBookPage() {
     typeIsbn: () => dispatch({ type: "type-isbn" }),
     byHand: () => dispatch({ type: "by-hand" }),
     retry: () => dispatch({ type: "retry" }),
-    lookLater: (isbn13, shelf) => void queueScan(isbn13, shelf).then((outcome) => dispatch({ type: "queued", isbn13, outcome })),
+    lookLater: (isbn13, shelf) =>
+      void queueScan(isbn13, shelf).then((outcome) => dispatch({ type: "queued", isbn13, outcome })),
     openQueued: (id) => {
       const item = queue.find((queued) => queued.id === id);
       if (item === undefined) return;

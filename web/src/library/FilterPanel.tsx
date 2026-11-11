@@ -146,7 +146,10 @@ export function FilterPanel({
                 // This button goes with the filter; focus stays in the panel, on the editor.
                 requestAnimationFrame(() => {
                   const root = body.current;
-                  (root?.querySelector<HTMLElement>("[data-autofocus]") ?? root?.querySelector<HTMLElement>(".library-panel__back"))?.focus();
+                  (
+                    root?.querySelector<HTMLElement>("[data-autofocus]") ??
+                    root?.querySelector<HTMLElement>(".library-panel__back")
+                  )?.focus();
                 });
               }}
             >
@@ -162,7 +165,9 @@ export function FilterPanel({
     <div ref={body} className="library-panel__content">
       <PanelHeader title={title} onDone={onClose} />
       <div className="library-panel__scroll">
-        {withSort && <SortSection columns={sortable} sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />}
+        {withSort && (
+          <SortSection columns={sortable} sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />
+        )}
         {onColumns && (
           <section className="library-panel__section" aria-label="Table">
             <h3 className="library-panel__label" aria-hidden="true">
@@ -387,7 +392,13 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
               onChange={(event) => toggle(option.value, event.target.checked)}
               data-autofocus={options.length <= 8 && index === 0 ? "" : undefined}
             />
-            <span className={option.value === NO_VALUE ? "library-option__label library-option__label--none" : "library-option__label"}>
+            <span
+              className={
+                option.value === NO_VALUE
+                  ? "library-option__label library-option__label--none"
+                  : "library-option__label"
+              }
+            >
               {option.label}
             </span>
             <span className="library-option__count tabular">{option.count}</span>
@@ -418,7 +429,12 @@ function fromField(column: LibraryColumn, text: string): number | string | null 
 
 function RangeEditor({ column, filter, books, onChange }: EditorProps) {
   const isDate = column.kind === "date";
-  const current = filter?.kind === "number" ? [filter.min, filter.max] : filter?.kind === "date" ? [filter.from, filter.to] : [null, null];
+  const current =
+    filter?.kind === "number"
+      ? [filter.min, filter.max]
+      : filter?.kind === "date"
+        ? [filter.from, filter.to]
+        : [null, null];
   // The fields' own text, so "59." or a half-typed year stays as typed.
   const [low, setLow] = useState(() => toField(column, current[0] ?? null));
   const [high, setHigh] = useState(() => toField(column, current[1] ?? null));
@@ -437,8 +453,15 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
   };
 
   const fieldProps = isDate
-    ? { type: "date", min: typeof range?.min === "string" ? range.min : undefined, max: typeof range?.max === "string" ? range.max : undefined }
-    : { type: "text", inputMode: column.kind === "number" && column.scale ? ("decimal" as const) : ("numeric" as const) };
+    ? {
+        type: "date",
+        min: typeof range?.min === "string" ? range.min : undefined,
+        max: typeof range?.max === "string" ? range.max : undefined,
+      }
+    : {
+        type: "text",
+        inputMode: column.kind === "number" && column.scale ? ("decimal" as const) : ("numeric" as const),
+      };
   const placeholder = (value: number | string | undefined) =>
     isDate || value === undefined ? undefined : toField(column, value);
 
@@ -482,7 +505,9 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
         </div>
       </div>
       <p className="library-panel__note">
-        {isDate ? "Both days included. Leave one empty for no limit." : "Both ends included. Leave one empty for no limit."}
+        {isDate
+          ? "Both days included. Leave one empty for no limit."
+          : "Both ends included. Leave one empty for no limit."}
       </p>
     </div>
   );

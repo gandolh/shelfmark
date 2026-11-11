@@ -20,7 +20,9 @@ export function startCipJob(run: () => Promise<unknown>, log: Log, firstDelayMs 
     if (running) return;
     running = true;
     run()
-      .catch((error: unknown) => log.error(`cip: refresh failed: ${error instanceof Error ? error.message : String(error)}`))
+      .catch((error: unknown) =>
+        log.error(`cip: refresh failed: ${error instanceof Error ? error.message : String(error)}`),
+      )
       .finally(() => {
         running = false;
       });

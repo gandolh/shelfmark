@@ -67,7 +67,10 @@ describe("createViewStore", () => {
     const unread = store.create({ name: "Unread", state: UNREAD });
     const living = store.create({ name: "Living room", state: LIVING_ROOM });
 
-    expect(store.patch(unread.id, { name: "unread" })).toMatchObject({ name: "unread", updatedAt: "2026-10-23T10:00:00.000Z" });
+    expect(store.patch(unread.id, { name: "unread" })).toMatchObject({
+      name: "unread",
+      updatedAt: "2026-10-23T10:00:00.000Z",
+    });
     expect(() => store.patch(living.id, { name: "Unread" })).toThrow(ViewNameTaken);
     expect(store.get(living.id)?.name).toBe("Living room");
   });

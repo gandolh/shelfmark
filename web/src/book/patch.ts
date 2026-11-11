@@ -148,7 +148,8 @@ export function buildPatch(book: Book, baseline: EditValues, values: EditValues)
   };
   const choice = <K extends "shelf" | "status" | "rating" | "format" | "condition" | "signed">(key: K) => {
     // Choices share their names and types with the book's fields.
-    if (touched(key) && (values[key] as unknown) !== (book[key] as unknown)) (patch as Record<string, unknown>)[key] = values[key];
+    if (touched(key) && (values[key] as unknown) !== (book[key] as unknown))
+      (patch as Record<string, unknown>)[key] = values[key];
   };
 
   if (touched("title")) {

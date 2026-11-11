@@ -189,7 +189,12 @@ export const FORMATS: readonly ImportFormat[] = [
   { id: "goodreads", name: "Goodreads", signature: ["exclusiveshelf"], aliases: GOODREADS },
   { id: "librarything", name: "LibraryThing", signature: ["primaryauthor"], aliases: LIBRARYTHING },
   { id: "libib", name: "Libib", signature: ["eanisbn13", "itemtype"], aliases: LIBIB },
-  { id: "shelfmark", name: "Shelfmark", signature: ["numberinseries", "detailsfrom", "acquiredfrom"], aliases: SHELFMARK },
+  {
+    id: "shelfmark",
+    name: "Shelfmark",
+    signature: ["numberinseries", "detailsfrom", "acquiredfrom"],
+    aliases: SHELFMARK,
+  },
 ];
 
 export interface Guess {
@@ -265,7 +270,10 @@ export function parsePrice(cell: string): number | undefined {
   if (!/\d/.test(text)) return undefined;
   const at = Math.max(text.lastIndexOf(","), text.lastIndexOf("."));
   const decimals = at < 0 ? 0 : text.length - at - 1;
-  const value = decimals >= 1 && decimals <= 2 ? `${text.slice(0, at).replace(/[.,]/g, "")}.${text.slice(at + 1)}` : text.replace(/[.,]/g, "");
+  const value =
+    decimals >= 1 && decimals <= 2
+      ? `${text.slice(0, at).replace(/[.,]/g, "")}.${text.slice(at + 1)}`
+      : text.replace(/[.,]/g, "");
   const minor = Math.round(Number(value) * 100);
   return Number.isFinite(minor) && minor >= 0 ? minor : undefined;
 }
@@ -304,7 +312,18 @@ export function parseSigned(cell: string): boolean | undefined {
   return text === "" ? undefined : false;
 }
 
-const LANGUAGE_CODES: Record<string, string> = { eng: "en", ron: "ro", rum: "ro", fre: "fr", fra: "fr", ger: "de", deu: "de", spa: "es", ita: "it", hun: "hu" };
+const LANGUAGE_CODES: Record<string, string> = {
+  eng: "en",
+  ron: "ro",
+  rum: "ro",
+  fre: "fr",
+  fra: "fr",
+  ger: "de",
+  deu: "de",
+  spa: "es",
+  ita: "it",
+  hun: "hu",
+};
 let languageByName: Map<string, string> | undefined;
 
 /** A two-letter code, a three-letter one, or an English name ("Romanian", as export writes it) to ISO 639-1. */

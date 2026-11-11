@@ -11,11 +11,23 @@ export interface LibraryFilter {
   filter: Filter;
 }
 
-export const authorFilter = (name: string): LibraryFilter => ({ column: "authors", filter: { kind: "text", op: "contains", text: name } });
-export const languageFilter = (code: string): LibraryFilter => ({ column: "language", filter: { kind: "pick", values: [code === "" ? NO_VALUE : code] } });
-export const statusFilter = (status: string): LibraryFilter => ({ column: "status", filter: { kind: "pick", values: [status] } });
+export const authorFilter = (name: string): LibraryFilter => ({
+  column: "authors",
+  filter: { kind: "text", op: "contains", text: name },
+});
+export const languageFilter = (code: string): LibraryFilter => ({
+  column: "language",
+  filter: { kind: "pick", values: [code === "" ? NO_VALUE : code] },
+});
+export const statusFilter = (status: string): LibraryFilter => ({
+  column: "status",
+  filter: { kind: "pick", values: [status] },
+});
 /** One or more shelves: a room is the list of its shelves. */
-export const shelfFilter = (shelves: readonly string[]): LibraryFilter => ({ column: "shelf", filter: { kind: "pick", values: shelves.map((s) => (s === "" ? NO_VALUE : s)) } });
+export const shelfFilter = (shelves: readonly string[]): LibraryFilter => ({
+  column: "shelf",
+  filter: { kind: "pick", values: shelves.map((s) => (s === "" ? NO_VALUE : s)) },
+});
 
 /** A decade as a range of `publishedYear`; no link for books with no year. */
 export function decadeFilter(key: string): LibraryFilter | null {

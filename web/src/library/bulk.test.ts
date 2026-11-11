@@ -40,16 +40,18 @@ describe("describeResult", () => {
     expect(describeResult({ kind: "shelf", shelf: "Bedroom · B1" }, { books: moved, deleted: [], skipped: [] })).toBe(
       "Moved 3 books to Bedroom · B1.",
     );
-    expect(describeResult({ kind: "shelf", shelf: "Bedroom · B1" }, { books: moved, deleted: [], skipped: [9, 10] })).toBe(
-      "Moved 3 books to Bedroom · B1. Left out 2 wishlist books: only owned books sit on shelves.",
-    );
+    expect(
+      describeResult({ kind: "shelf", shelf: "Bedroom · B1" }, { books: moved, deleted: [], skipped: [9, 10] }),
+    ).toBe("Moved 3 books to Bedroom · B1. Left out 2 wishlist books: only owned books sit on shelves.");
     expect(describeResult({ kind: "shelf", shelf: null }, { books: moved.slice(0, 1), deleted: [], skipped: [] })).toBe(
       "Took 1 book off its shelf.",
     );
   });
 
   it("names the status and the tags", () => {
-    expect(describeResult({ kind: "status", status: "read" }, { books: moved, deleted: [], skipped: [] })).toBe("Marked 3 books Read.");
+    expect(describeResult({ kind: "status", status: "read" }, { books: moved, deleted: [], skipped: [] })).toBe(
+      "Marked 3 books Read.",
+    );
     expect(describeResult({ kind: "addTags", tags: ["signed"] }, { books: moved, deleted: [], skipped: [] })).toBe(
       "Added “signed” to 3 books.",
     );

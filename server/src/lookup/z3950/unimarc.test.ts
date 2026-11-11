@@ -4,7 +4,9 @@ import { readAnswer } from "./protocol.js";
 import { clean, parseRecord, readUnimarc, recordFor } from "./unimarc.js";
 
 function recordsOf(name: FixtureName): Buffer[] {
-  const present = fixtureAnswers(name).map(readAnswer).find((answer) => answer.kind === "present");
+  const present = fixtureAnswers(name)
+    .map(readAnswer)
+    .find((answer) => answer.kind === "present");
   return present?.kind === "present" ? present.records : [];
 }
 

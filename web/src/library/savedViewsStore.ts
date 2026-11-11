@@ -52,7 +52,9 @@ const INITIAL: ViewsState = { views: [], status: "loading", error: null };
 
 /** By position, renumbered 0, 1, 2…, as the server keeps them. */
 function inOrder(views: readonly SavedView[]): SavedView[] {
-  return [...views].sort((a, b) => a.position - b.position || a.id - b.id).map((view, position) => (view.position === position ? view : { ...view, position }));
+  return [...views]
+    .sort((a, b) => a.position - b.position || a.id - b.id)
+    .map((view, position) => (view.position === position ? view : { ...view, position }));
 }
 
 export function createViewsStore(source: ViewsSource) {
@@ -89,7 +91,13 @@ export function createViewsStore(source: ViewsSource) {
   }
 
   const put = (view: SavedView) =>
-    set({ views: inOrder(state.views.some((v) => v.id === view.id) ? state.views.map((v) => (v.id === view.id ? view : v)) : [...state.views, view]) });
+    set({
+      views: inOrder(
+        state.views.some((v) => v.id === view.id)
+          ? state.views.map((v) => (v.id === view.id ? view : v))
+          : [...state.views, view],
+      ),
+    });
 
   return {
     getState: (): ViewsState => state,

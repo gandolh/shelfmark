@@ -57,7 +57,10 @@ describe("lookup contract", () => {
   });
 
   it("refuses a cover candidate that is not https", () => {
-    const http = { ...draft, coverCandidates: [{ url: "http://covers.openlibrary.org/b/id/1-L.jpg", source: "openlibrary" }] };
+    const http = {
+      ...draft,
+      coverCandidates: [{ url: "http://covers.openlibrary.org/b/id/1-L.jpg", source: "openlibrary" }],
+    };
     expect(draftSchema.safeParse(http).success).toBe(false);
   });
 

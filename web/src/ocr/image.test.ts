@@ -21,8 +21,18 @@ describe("boxInPixels", () => {
   });
 
   it("rounds to whole pixels and stays inside the photo", () => {
-    expect(boxInPixels({ x: 0.25, y: 0.5, width: 0.5, height: 0.25 }, 4032, 3024)).toEqual({ x: 1008, y: 1512, width: 2016, height: 756 });
-    expect(boxInPixels({ x: 0.9, y: 0.9, width: 0.2, height: 0.2 }, 100, 100)).toEqual({ x: 90, y: 90, width: 10, height: 10 });
+    expect(boxInPixels({ x: 0.25, y: 0.5, width: 0.5, height: 0.25 }, 4032, 3024)).toEqual({
+      x: 1008,
+      y: 1512,
+      width: 2016,
+      height: 756,
+    });
+    expect(boxInPixels({ x: 0.9, y: 0.9, width: 0.2, height: 0.2 }, 100, 100)).toEqual({
+      x: 90,
+      y: 90,
+      width: 10,
+      height: 10,
+    });
     expect(boxInPixels({ x: 1, y: 1, width: 0, height: 0 }, 100, 100)).toEqual({ x: 99, y: 99, width: 1, height: 1 });
   });
 });

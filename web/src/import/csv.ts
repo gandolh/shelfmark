@@ -14,7 +14,7 @@ export interface Decoded {
 const BOM = "﻿";
 
 /** Romanian text in windows-1250 has cedilla ş and ţ; the language wants the comma-below ș and ț. */
-const CEDILLA_TO_COMMA: Record<string, string> = { "ş": "ș", "Ş": "Ș", "ţ": "ț", "Ţ": "Ț" };
+const CEDILLA_TO_COMMA: Record<string, string> = { ş: "ș", Ş: "Ș", ţ: "ț", Ţ: "Ț" };
 
 function decodeAs(label: string, bytes: Uint8Array, fatal: boolean): string | null {
   try {
@@ -32,7 +32,8 @@ function decodeAs(label: string, bytes: Uint8Array, fatal: boolean): string | nu
  * byte order mark is dropped.
  */
 export function decodeCsv(bytes: Uint8Array): Decoded {
-  const utf16 = bytes[0] === 0xff && bytes[1] === 0xfe ? "utf-16le" : bytes[0] === 0xfe && bytes[1] === 0xff ? "utf-16be" : null;
+  const utf16 =
+    bytes[0] === 0xff && bytes[1] === 0xfe ? "utf-16le" : bytes[0] === 0xfe && bytes[1] === 0xff ? "utf-16be" : null;
   if (utf16) {
     const text = decodeAs(utf16, bytes, false);
     if (text !== null) return { text: text.replace(BOM, ""), encoding: "UTF-16" };
