@@ -731,7 +731,7 @@ The owner decided on 2026-11-09, for every web app: Base UI 1.9.0 pinned
 exactly, Tailwind v4 for the whole app, and the researched conventions
 enforced in each repo. Four briefs, in order:
 
-- [05 the house style and the quality harness](briefs/todo/05-the-house-style-harness.md);
+- [05 the house style and the quality harness](briefs/done/05-the-house-style-harness.md);
 - [06 Base UI by the conventions](briefs/todo/06-base-ui-by-the-conventions.md);
 - [07 the web app to Tailwind](briefs/todo/07-the-web-app-to-tailwind.md);
 - [08 the server in the code structure](briefs/todo/08-the-server-in-the-code-structure.md).
@@ -784,3 +784,7 @@ saved-view output schema in the views feature. Order: 05, 04, 06, 07, 09, with
 08 apart from 06 and 07. Brief 09, [a redesign with Hallmark, on the estate
 board](briefs/todo/09-a-redesign-with-hallmark-on-the-estate-board.md), covers
 Library, Add a book, Wishlist and the rest.
+
+## [2026-11-11] build | The house style and the quality harness
+
+House-style 1.0.0 vendored, Prettier at 120 (one reformat commit, bundle compare: 142 files changed, 5 differ in minified output, all JSX text split by `{" "}` or hex lowercased in `tokens.css`; fixtures untouched), the two tsconfig flags added to the base file (not extended, because of the Dockerfile), the house ESLint config (0 errors, 85 warnings: 80 `!` in tests, 5 `process.env` reads), knip and dependency-cruiser in `check:conventions`, the two checkers `--warn-only` (base-ui 23 findings, structure 31 errors and 11 warnings), `pretest`, `check:fast`, the root `CLAUDE.md` and `.claude/rules/`. Measured: `npm run check` 43 s, `check:fast` 7 s warm with one changed file. Before: ESLint untyped, 0 findings; after the typed house rules: 123 `!` (43 source, 80 test), 9 type assertions, 2 misused promises, 1 floating promise, 3 vitest, 1 console, all fixed except the 80 test `!` warnings.

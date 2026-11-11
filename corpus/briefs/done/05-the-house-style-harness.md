@@ -191,3 +191,20 @@ One commit per step, with `npm run typecheck`, `npm test`, `npm run lint` and `n
 - Brief 04 (Wishlist, with recommendations) adds files. If it lands first, the reformat covers them; if second, it is written formatted at 120.
 - Brief 06 adds nothing to the gate. Brief 07 adds `better-tailwindcss` and drops `check-base-ui`'s `--warn-only`. Brief 08 adds dependency-cruiser, drops `check-structure`'s `--warn-only`, makes `no-process-env` an error and the `exports` map goes.
 - The reformat lowercases `web/src/styles/tokens.css`'s hex, which brief 07 deletes anyway. `web/src/components/cover.test.ts:11` reads those lines with a case-insensitive regex, so it still passes.
+
+## Outcome (2026-11-11)
+
+Built as written, with these departures:
+
+- **tsconfig:** the two flags are in `tsconfig.base.json`, not extended from the vendored copy, because the Dockerfile copies only that file before `npx tsc -b server` (the Dockerfile is untouched). `npx tsc -b server` builds.
+- **Reformat acceptance:** `git diff -w` is not empty for a width change (lines rewrap): 142 files, 2791 insertions, 614 deletions. The bundle compare (esbuild minify, CSS and JSON compared parsed) differs in 5 files: four JSX text splits by `{" "}` (`ResultSheet.tsx`, `ImportPage.tsx`, `BulkDialogs.tsx`, `ScannerDemo.tsx`) and `tokens.css` (hex lowercased). Fixtures: no diff. Hash in `.git-blame-ignore-revs`.
+- **dependency-cruiser** is in `check:conventions` now. `no-circular` is a warning (7: five routes importing the context type from `app.ts`, and `add/flow.ts`, `words.ts`, `form.ts` among themselves); `?url` imports are excluded from the unresolvable check.
+- **Typed lint with `allowDefaultProject`** only for `server/scripts/*.ts`; the tool configs go untyped by the house.
+- **More `!` than counted:** 7 more in `server/scripts` and `web/vite.config.ts`, fixed too (50 in source). Fixes: `ApiError`, `ViewNameTaken`, the 9 type assertions (`eslint --fix`), `ImportPage` (`void look()`), `app.ts` (`void parseJson`, a typing artefact: the default parser is synchronous), `view.test.ts` (`annotate` for the timings), `detector.test.ts` (the two stored `.rejects` promises, and `toHaveBeenCalledExactlyOnceWith`), `block.test.ts` (title as a template literal). `no-redeclare` hit `demo-seed.mjs` (its `/* global */` comment removed).
+- **vitest:** the house sets `no-conditional-expect` off, so the two brief findings there do not exist.
+
+Counts. Lint after: 0 errors, 85 warnings (80 `!` in tests, 5 `process.env` in `index.ts`, `seed.ts`, `cip/cli.ts`). `check-base-ui` (warn-only): 23 (rule-3 10, rule-5 13). `check-structure` (warn-only): 31 errors and 11 warnings (rule-1 1, rule-3 5, rule-6 25, rule-11 11). knip: exit 0 with 71 unused exports and 37 unused types as warnings, `pdftotext` ignored. Timing: `npm run check` 43 s; `check:fast` 7 s warm with one changed file. A fresh `rm -rf shared/dist server/dist` then `npm test` passes (63 files, 743 tests).
+
+Pre-existing, not touched: `server/scripts/measure-lookup.ts:53` has a type error (its labels lack `cip`) that no tsconfig reaches.
+
+Owner steps: `git config blame.ignoreRevsFile .git-blame-ignore-revs`; deploy with `node cli.ts shelfmark deploy` from the vps-deploy checkout.

@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # Status
@@ -23,6 +23,8 @@ estate calls of 2026-11-09. The product calls are in
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
 ## By area
+
+- **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
 - **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app
   shell, the lookup and covers, the camera scanner, accounts and sign-in, the
