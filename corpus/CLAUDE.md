@@ -97,20 +97,7 @@ updated: <YYYY-MM-DD>
 - Code comments don't cite brief numbers ("brief 21", "(brief 05)"). Say what
   the code does and why; the history belongs in `log.md`.
 
-## Hard rules
+## Hard rules and brief-board
 
-- **No secrets.** Never write a password, API key or token into the corpus or
-  the repo. The Google Books key and seed values live in `.env` (gitignored);
-  name a secret by its file and key, never by its value.
-- **Placeholder contact.** The Open Library `User-Agent` needs a contact
-  address. Use `johndoe@example.com` until the owner's mail is live.
-- **No CI.** Don't add GitHub Actions, runners or other GitHub-specific
-  automation.
-- **No pushes.** Commit locally on `main`. The owner pushes.
-- **Deploys, git hooks and `npm link` are owner steps.** Write the exact
-  commands down and hand them over.
-
-## brief-board
-
-Brief progress goes on brief-board. Run `brief-board guide` before you
-start or resume a brief, and follow it.
+They apply outside the corpus too, so they live in the root
+[CLAUDE.md](../CLAUDE.md).
