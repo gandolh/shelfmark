@@ -17,7 +17,7 @@ import { activeFilters } from "./filters";
 import { LibraryMessage, LibrarySkeleton } from "./LibraryStates";
 import { Pager } from "./Pager";
 import { showsPager, type PageSize } from "./pagination";
-import { Panel } from "./Panel";
+import { Panel } from "./ui/Panel";
 import type { Layout, ViewMode } from "./prefs";
 import { useScrollMemory } from "./scroll";
 import { describeSort, type Sorting } from "./sort";
@@ -151,7 +151,7 @@ export function LibraryPage() {
   const toListTop = () => {
     const box = list.current;
     if (!box) return;
-    const covered = desktop ? (document.querySelector<HTMLElement>(".topbar")?.offsetHeight ?? 0) : 0;
+    const covered = desktop ? (document.querySelector<HTMLElement>("[data-topbar]")?.offsetHeight ?? 0) : 0;
     const target = Math.max(0, Math.round(box.getBoundingClientRect().top + window.scrollY - covered));
     if (window.scrollY > target) window.scrollTo(0, target);
   };
@@ -327,7 +327,6 @@ export function LibraryPage() {
 
       {panel && (
         <Panel
-          label={panel.kind === "filter" ? (desktop && mode === "table" ? "Filter" : "Filter and sort") : "Columns"}
           anchor={panel.anchor}
           fallback={filterButtonNow}
           desktop={desktop}

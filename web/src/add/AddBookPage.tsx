@@ -1,4 +1,3 @@
-import { Tabs } from "@base-ui/react/tabs";
 import type { Book, BookCreate, Collection } from "@shelfmark/shared";
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { createBook, patchBook, useBooks } from "../books/store";
@@ -38,6 +37,7 @@ import {
 import { BarcodeIcon, TorchIcon } from "./icons";
 import { IsbnField, type IsbnFieldHandle } from "./IsbnField";
 import { createLookupMemo } from "./memo";
+import { TabsPanel, TabsRoot } from "../components/ui/Tabs";
 import { ModeSwitch } from "./ModeSwitch";
 import { ResultSheet, type SheetActions } from "./ResultSheet";
 import { shelvesInUse } from "./shelves";
@@ -335,7 +335,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
       bleed
       caption={desktop ? status : undefined}
     >
-      <Tabs.Root
+      <TabsRoot
         value={mode}
         // The arrow keys switch as they move focus, which stays on the tabs; a click (or Enter) moves it into the new form.
         onValueChange={(next: Mode, details) => changeMode(next, !(details.event instanceof MouseEvent))}
@@ -354,7 +354,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             {status}
           </div>
         )}
-        <Tabs.Panel value={mode} className="add__panel">
+        <TabsPanel value={mode} className="add__panel">
           {mode === "scan" && (
             <div className="add-stage">
               <CameraScanner
@@ -431,8 +431,8 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "manual" && <div className="add-column">{sheet(false, focusOnEnter)}</div>}
-        </Tabs.Panel>
-      </Tabs.Root>
+        </TabsPanel>
+      </TabsRoot>
     </Page>
   );
 }

@@ -4,7 +4,7 @@ import { STATUS_LABELS } from "../add/StatusPicker";
 import { ApiError, isApiError } from "../api";
 import { bulkChangeBooks, refreshBooks } from "../books/store";
 import { Button } from "../components/Button";
-import { Menu, type MenuItem, type MenuSection } from "../components/Menu";
+import { Menu, type MenuItem, type MenuSection } from "../components/ui/Menu";
 import { bookCount, describeResult, shelfChoices, tagChoices } from "./bulk";
 import { AddTagsDialog, DeleteBooksDialog, RemoveTagsDialog, ShelfDialog } from "./BulkDialogs";
 import { summarizeSelection } from "./selection";

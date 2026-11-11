@@ -1,5 +1,5 @@
 import { useState, type MouseEvent } from "react";
-import { Menu } from "../components/Menu";
+import { Menu } from "../components/ui/Menu";
 import { pageCount, pageItems, pageRange, PAGE_SIZES, type PageSize } from "./pagination";
 
 export interface PagerProps {

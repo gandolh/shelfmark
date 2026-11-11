@@ -1,5 +1,4 @@
 import type { Book } from "@shelfmark/shared";
-import { Collapsible } from "@base-ui/react/collapsible";
 import { useState, type ChangeEvent } from "react";
 import { fetchCover, removeCover, uploadCover } from "../add/api";
 import { CoverCapture } from "../add/CoverCapture";
@@ -7,6 +6,7 @@ import { ImageReadError, resizeImage } from "../add/resize";
 import { saveFailure, SOURCE_NAMES } from "../add/words";
 import { Button } from "../components/Button";
 import { CoverImage } from "../components/CoverImage";
+import { CollapsiblePanel, CollapsibleRoot, CollapsibleTrigger } from "../components/ui/Collapsible";
 import type { BookLookup } from "./useLookup";
 
 /** What a failed cover call says; the cover is unchanged when this shows. */
@@ -52,15 +52,15 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
   const candidates = state.kind === "done" ? (state.response.draft?.coverCandidates ?? []) : [];
 
   return (
-    <Collapsible.Root open={open} onOpenChange={setOpen} render={<div className="book-coverpanel" />}>
-      <Collapsible.Trigger render={<Button variant="secondary" size="compact" pill block />}>
+    <CollapsibleRoot open={open} onOpenChange={setOpen} render={<div className="book-coverpanel" />}>
+      <CollapsibleTrigger render={<Button variant="secondary" size="compact" pill block />}>
         Change cover
-      </Collapsible.Trigger>
+      </CollapsibleTrigger>
       {/* aria-live outside the panel: a result is read out even after it closes. */}
       <p className="book-coverpanel__note" role="status">
         {message}
       </p>
-      <Collapsible.Panel className="book-card book-card--cover" aria-busy={busy || undefined}>
+      <CollapsiblePanel className="book-card book-card--cover" aria-busy={busy || undefined}>
         <CoverCapture
           photo={null}
           onChange={(photo) => photo && void act(() => uploadCover(book.id, photo.blob), "Cover replaced.")}
@@ -138,7 +138,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
             {problem}
           </p>
         )}
-      </Collapsible.Panel>
-    </Collapsible.Root>
+      </CollapsiblePanel>
+    </CollapsibleRoot>
   );
 }

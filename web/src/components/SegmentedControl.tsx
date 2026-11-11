@@ -1,5 +1,4 @@
-import { Toggle } from "@base-ui/react/toggle";
-import { ToggleGroup } from "@base-ui/react/toggle-group";
+import { Toggle, ToggleGroup } from "./ui/ToggleGroup";
 
 export interface SegmentedOption<T extends string> {
   value: T;
@@ -36,9 +35,9 @@ export function SegmentedControl<T extends string>({
     <ToggleGroup
       aria-label={label}
       className={["segmented", `segmented--${size}`, className].filter(Boolean).join(" ")}
-      value={[value]}
-      onValueChange={(pressed) => {
-        const next = options.find((option) => option.value === pressed[0]);
+      value={value}
+      onChoose={(pressed) => {
+        const next = options.find((option) => option.value === pressed);
         if (next && next.value !== value) onChange(next.value);
       }}
     >

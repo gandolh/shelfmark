@@ -14,7 +14,7 @@ export function TopBar({ current, exact }: { current: Place | null; exact: boole
   const mark = (place: Place) => (current === place ? (exact ? "page" : "true") : undefined);
 
   return (
-    <header className="topbar">
+    <header className="topbar" data-topbar>
       <Link to={LIBRARY} className="topbar__wordmark">
         Shelfmark
       </Link>

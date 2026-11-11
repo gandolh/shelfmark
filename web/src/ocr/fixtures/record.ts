@@ -15,7 +15,9 @@ import { fileURLToPath } from "node:url";
 import { createWorker } from "tesseract.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const langPath = dirname(createRequire(import.meta.url).resolve("@tesseract.js-data/ron/4.0.0_best_int/ron.traineddata.gz"));
+const langPath = dirname(
+  createRequire(import.meta.url).resolve("@tesseract.js-data/ron/4.0.0_best_int/ron.traineddata.gz"),
+);
 
 const worker = await createWorker("ron", 1, { langPath, cacheMethod: "none", gzip: true });
 await worker.setParameters({ thresholding_method: "2" });

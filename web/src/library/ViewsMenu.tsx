@@ -1,6 +1,6 @@
 import type { SavedView } from "@shelfmark/shared";
 import { useMemo, useState } from "react";
-import { Menu, type MenuSection } from "../components/Menu";
+import { Menu, type MenuSection } from "../components/ui/Menu";
 import { ChevronDownIcon, ViewsIcon } from "./icons";
 import type { Layout, ViewMode } from "./prefs";
 import {

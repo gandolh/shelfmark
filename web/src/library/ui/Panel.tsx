@@ -1,11 +1,9 @@
 import { Dialog } from "@base-ui/react/dialog";
 import { Popover } from "@base-ui/react/popover";
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
-import { BackIcon } from "../components/icons";
+import { BackIcon } from "../../components/icons";
 
 export interface PanelProps {
-  /** Names the panel for screen readers: "Filter", "Columns". */
-  label: string;
   /** The control that opened it: the desktop panel hangs under it, and focus goes back to it on close. */
   anchor: HTMLElement;
   /** Where focus goes when the anchor is gone by then (a chip whose filter was removed). */
@@ -22,10 +20,12 @@ const GAP = 8;
 const MARGIN = 8;
 
 /**
- * The desktop panel's close part. Base UI traps focus in a modal popover only
- * when it has one, so `PanelHeader`'s Done is it.
+ * Which part holds the panel: the desktop's popover or the phone's dialog.
+ * `PanelHeader` reads it for its `Title` (which names the panel for screen
+ * readers) and its Done. Base UI traps focus in a modal popover only when it
+ * has a close part, so on the desktop Done is `Popover.Close`.
  */
-const PanelClose = createContext(false);
+const PanelHost = createContext<"popover" | "dialog">("dialog");
 
 /** Whether a closing Esc was already used by a control inside (a step going back), so isn't the panel's. */
 function keptOpen(details: { reason: string; event: Event }): boolean {
@@ -34,14 +34,14 @@ function keptOpen(details: { reason: string; event: Event }): boolean {
 
 /**
  * The Filter and Columns panels, modal so focus stays inside and Escape
- * closes them. On the desktop a Base UI `Popover`: a white panel under its
+ * closes them, and each is named by its header's `Title`. On the desktop a Base UI `Popover`: a white panel under its
  * button with no dimming, where a click outside closes it and lands nowhere
  * else. On a phone a Base UI `Dialog`: a sheet over the bottom of the screen,
  * as design.md's floating sheet, over a dimmed page. Content changes apply as
- * they are made; Done only closes. Mounted means open. Built here for the
- * Library; a candidate for components/ when another page needs one.
+ * they are made; Done only closes. Mounted means open. Only the
+ * Library uses it, so it lives in the Library's own `ui/` folder.
  */
-export function Panel({ label, anchor, fallback, desktop, align = "start", onClose, children }: PanelProps) {
+export function Panel({ anchor, fallback, desktop, align = "start", onClose, children }: PanelProps) {
   const popupRef = useRef<HTMLDivElement>(null);
 
   // A chip that opened the panel goes when its filter does; the panel stays where it is.
@@ -81,12 +81,11 @@ export function Panel({ label, anchor, fallback, desktop, align = "start", onClo
           >
             <Popover.Popup
               ref={popupRef}
-              aria-label={label}
               className="library-panel library-panel--anchored"
               initialFocus={initialFocus}
               finalFocus={finalFocus}
             >
-              <PanelClose.Provider value>{frame}</PanelClose.Provider>
+              <PanelHost.Provider value="popover">{frame}</PanelHost.Provider>
             </Popover.Popup>
           </Popover.Positioner>
         </Popover.Portal>
@@ -99,12 +98,11 @@ export function Panel({ label, anchor, fallback, desktop, align = "start", onClo
         <Dialog.Backdrop className="library-panel-backdrop" />
         <Dialog.Popup
           ref={popupRef}
-          aria-label={label}
           className="library-panel library-panel--sheet"
           initialFocus={initialFocus}
           finalFocus={finalFocus}
         >
-          {frame}
+          <PanelHost.Provider value="dialog">{frame}</PanelHost.Provider>
         </Dialog.Popup>
       </Dialog.Portal>
     </Dialog.Root>
@@ -120,7 +118,7 @@ export interface PanelHeaderProps {
 
 /** The panel's top row: a way back (when there is one), the title, and Done. */
 export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
-  const closePart = useContext(PanelClose);
+  const host = useContext(PanelHost);
   const done = (
     <button type="button" className="button button--quiet button--compact library-panel__done" onClick={onDone}>
       Done
@@ -130,14 +128,18 @@ export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
     <div className="library-panel__head">
       <div className="library-panel__start">
         {back && (
-          <button type="button" className="library-panel__back" onClick={back.onClick}>
+          <button type="button" className="library-panel__back" data-panel-back onClick={back.onClick}>
             <BackIcon size={18} />
             {back.label}
           </button>
         )}
       </div>
-      <h2 className="library-panel__title">{title}</h2>
-      <div className="library-panel__end">{closePart ? <Popover.Close render={done} /> : done}</div>
+      {host === "popover" ? (
+        <Popover.Title className="library-panel__title">{title}</Popover.Title>
+      ) : (
+        <Dialog.Title className="library-panel__title">{title}</Dialog.Title>
+      )}
+      <div className="library-panel__end">{host === "popover" ? <Popover.Close render={done} /> : done}</div>
     </div>
   );
 }
@@ -153,7 +155,7 @@ export function useFocusOnChange(key: unknown, container: RefObject<HTMLElement 
     const root = container.current;
     const target =
       root?.querySelector<HTMLElement>("[data-autofocus]") ??
-      root?.querySelector<HTMLElement>(".library-panel__scroll :is(button, input, select):not(:disabled)") ??
+      root?.querySelector<HTMLElement>("[data-panel-scroll] :is(button, input, select):not(:disabled)") ??
       root?.querySelector<HTMLElement>("button");
     target?.focus();
   }, [key, container]);

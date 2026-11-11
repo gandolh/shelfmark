@@ -2,7 +2,7 @@ import type { Collection } from "@shelfmark/shared";
 import { useLayoutEffect, useRef } from "react";
 import { BOOK_COLUMN_ID, columnById, type ColumnId } from "./columns";
 import { MoveDownIcon, MoveUpIcon } from "./icons";
-import { PanelHeader } from "./Panel";
+import { PanelHeader } from "./ui/Panel";
 import { DEFAULT_ORDER, DEFAULT_VISIBILITY, type Layout } from "./prefs";
 import { collator } from "./sort";
 import { updatePrefs, useLibraryPrefs } from "./state";
@@ -106,7 +106,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
   return (
     <div className="library-panel__content">
       <PanelHeader title="Columns" back={back} onDone={onClose} />
-      <div ref={list} className="library-panel__scroll">
+      <div ref={list} className="library-panel__scroll" data-panel-scroll>
         <section className="library-panel__section" aria-label="Shown">
           <h3 className="library-panel__label" aria-hidden="true">
             Shown, in order

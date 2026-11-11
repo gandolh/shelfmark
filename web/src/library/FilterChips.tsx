@@ -27,7 +27,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
     const index = pendingFocus.current;
     if (index === null) return;
     pendingFocus.current = null;
-    const removes = root.current?.querySelectorAll<HTMLElement>(".library-chip__remove");
+    const removes = root.current?.querySelectorAll<HTMLElement>("[data-chip-remove]");
     const target = removes?.[Math.min(index, removes.length - 1)];
     (target ?? filterButton.current)?.focus();
   });
@@ -52,6 +52,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
               <button
                 type="button"
                 className="library-chip__remove"
+                data-chip-remove
                 aria-label={`Remove filter: ${text}`}
                 onClick={() => {
                   pendingFocus.current = index;

@@ -14,7 +14,7 @@ import {
   type TextOp,
 } from "./filters";
 import { ChevronDownIcon, ChevronIcon } from "./icons";
-import { PanelHeader, useFocusOnChange } from "./Panel";
+import { PanelHeader, useFocusOnChange } from "./ui/Panel";
 import { collator, directionLabel, firstSortDesc, type Sorting } from "./sort";
 import { setFilter } from "./state";
 import { columnsIn } from "./view";
@@ -124,7 +124,7 @@ export function FilterPanel({
     return (
       <div ref={body} className="library-panel__content">
         <PanelHeader title={column.label} back={{ label: "Filters", onClick: back }} onDone={onClose} />
-        <div className="library-panel__scroll">
+        <div className="library-panel__scroll" data-panel-scroll>
           <FilterEditor
             key={`${columnId}:${fresh}`}
             column={column}
@@ -148,7 +148,7 @@ export function FilterPanel({
                   const root = body.current;
                   (
                     root?.querySelector<HTMLElement>("[data-autofocus]") ??
-                    root?.querySelector<HTMLElement>(".library-panel__back")
+                    root?.querySelector<HTMLElement>("[data-panel-back]")
                   )?.focus();
                 });
               }}
@@ -164,7 +164,7 @@ export function FilterPanel({
   return (
     <div ref={body} className="library-panel__content">
       <PanelHeader title={title} onDone={onClose} />
-      <div className="library-panel__scroll">
+      <div className="library-panel__scroll" data-panel-scroll>
         {withSort && (
           <SortSection columns={sortable} sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />
         )}
