@@ -22,11 +22,11 @@ const NAME_MAX = 80;
 export function DialogFailure({ children }: { children: string }) {
   return (
     <p
-      className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+      className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
       role="alert"
     >
       <AlertIcon />
-      <span className="flex-1 min-w-0">{children}</span>
+      <span className="min-w-0 flex-1">{children}</span>
     </p>
   );
 }
@@ -98,7 +98,7 @@ export function NameDialog({
   return (
     <Dialog title={title} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-        {intro && <p className="text-ink-2 text-body leading-body">{intro}</p>}
+        {intro && <p className="text-body leading-body text-ink-2">{intro}</p>}
         <AuthField
           ref={input}
           label="Name"
@@ -161,7 +161,7 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
   return (
     <Dialog title={`Delete “${name}”?`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
       <div className="flex flex-col gap-4">
-        <p className="text-ink-2 text-body leading-body">
+        <p className="text-body leading-body text-ink-2">
           Only the saved view goes, on every device. Your books, and what the Library shows now, stay as they are.
         </p>
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}

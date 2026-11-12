@@ -101,12 +101,12 @@ export function IsbnField({
       >
         {label}
       </label>
-      <div className="relative [grid-area:box] min-w-0" data-invalid={problem !== null || undefined}>
+      <div className="relative min-w-0 [grid-area:box]" data-invalid={problem !== null || undefined}>
         <input
           ref={input}
           id={`${id}-input`}
           className={cn(
-            "tabular-nums w-full h-control-large pr-13 pl-4 rounded-field bg-field text-(length:--text-isbn) font-semibold tracking-[0.04em] appearance-none focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0]",
+            "h-control-large w-full appearance-none rounded-field bg-field pr-13 pl-4 text-(length:--text-isbn) font-semibold tracking-[0.04em] tabular-nums focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring",
             size === "regular" && "text-input-phone tracking-[0.02em]",
           )}
           type="text"
@@ -129,7 +129,7 @@ export function IsbnField({
         {wantsX && (
           <button
             type="button"
-            className="absolute top-[50%] right-1.5 w-9 h-9 rounded-control bg-surface text-ink text-row-title font-semibold [transform:translateY(-50%)] before:content-[''] before:absolute before:-inset-1 hover:bg-control"
+            className="absolute top-[50%] right-1.5 h-9 w-9 [transform:translateY(-50%)] rounded-control bg-surface text-row-title font-semibold text-ink before:absolute before:-inset-1 before:content-[''] hover:bg-control"
             aria-label="Type X, the last character of some ISBN-10s"
             onClick={() => {
               setValue((current) => `${current.trimEnd()}X`);
@@ -154,7 +154,7 @@ export function IsbnField({
         <p
           key="problem"
           id={describedBy}
-          className="[grid-area:note] flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [grid-area:note] [&_svg]:-mt-0.25 [&_svg]:flex-none"
           role="alert"
         >
           <AlertIcon size={16} />

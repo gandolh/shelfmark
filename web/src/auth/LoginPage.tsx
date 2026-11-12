@@ -74,24 +74,24 @@ export function LoginView({
 
   return (
     <main
-      className="grid min-h-[100dvh] pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone [place-items:start_center] bg-ground max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
+      className="grid min-h-[100dvh] [place-items:start_center] bg-ground pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
       aria-busy={pending || wardPending || undefined}
     >
-      <div className="flex flex-col gap-6 w-full max-w-95">
+      <div className="flex w-full max-w-95 flex-col gap-6">
         <header className="flex flex-col gap-1.5 px-1">
-          <h1 className="text-ink text-title font-bold tracking-title leading-tight max-md:text-title-phone">
+          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
             Shelfmark
           </h1>
-          <p className="text-muted text-body leading-tight">Sign in to your library.</p>
+          <p className="text-body leading-tight text-muted">Sign in to your library.</p>
         </header>
 
         {notice !== null && (
-          <p className="py-3 px-3.5 rounded-control bg-accent-tint-soft text-ink text-meta leading-tight" role="status">
+          <p className="rounded-control bg-accent-tint-soft px-3.5 py-3 text-meta leading-tight text-ink" role="status">
             {notice}
           </p>
         )}
 
-        <div className="flex flex-col gap-4.5 p-6 rounded-container bg-surface max-md:py-5 max-md:px-4">
+        <div className="flex flex-col gap-4.5 rounded-container bg-surface p-6 max-md:px-4 max-md:py-5">
           <form className="flex flex-col gap-4" onSubmit={submit} noValidate aria-label="Sign in">
             <AuthField
               ref={usernameRef}
@@ -126,11 +126,11 @@ export function LoginView({
             />
             {error !== null && (
               <p
-                className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+                className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
                 role="alert"
               >
                 <AlertIcon />
-                <span className="flex-1 min-w-0">{loginMessage(error)}</span>
+                <span className="min-w-0 flex-1">{loginMessage(error)}</span>
               </p>
             )}
             <Button type="submit" variant="primary" size="large" block className="mt-1" disabled={pending}>
@@ -141,7 +141,7 @@ export function LoginView({
           {wardEnabled && (
             <div className="flex flex-col gap-3">
               <p
-                className="flex items-center gap-3 text-muted text-small leading-none before:content-[''] before:flex-1 before:h-px before:bg-divider after:content-[''] after:flex-1 after:h-px after:bg-divider"
+                className="flex items-center gap-3 text-small leading-none text-muted before:h-px before:flex-1 before:bg-divider before:content-[''] after:h-px after:flex-1 after:bg-divider after:content-['']"
                 aria-hidden="true"
               >
                 or
@@ -151,15 +151,15 @@ export function LoginView({
               </Button>
               {wardError !== null && (
                 <p
-                  className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+                  className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
                   role="alert"
                 >
                   <AlertIcon />
-                  <span className="flex-1 min-w-0">{wardSignInMessage(wardError)}</span>
+                  <span className="min-w-0 flex-1">{wardSignInMessage(wardError)}</span>
                   <Button
                     variant="quiet"
                     size="compact"
-                    className="flex-none min-h-0 -mt-0.5 -mr-1 -mb-0.5 text-meta font-semibold"
+                    className="-mt-0.5 -mr-1 -mb-0.5 min-h-0 flex-none text-meta font-semibold"
                     onClick={onDismissWard}
                   >
                     Dismiss

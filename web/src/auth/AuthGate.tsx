@@ -64,20 +64,20 @@ export interface GateScreenProps {
 export function GateScreen({ state, onRetry }: GateScreenProps) {
   return (
     <main
-      className="grid min-h-[100dvh] pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone [place-items:start_center] bg-ground max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
+      className="grid min-h-[100dvh] [place-items:start_center] bg-ground pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
       aria-busy={state === "loading" || undefined}
     >
-      <div className="flex flex-col gap-6 w-full max-w-95">
+      <div className="flex w-full max-w-95 flex-col gap-6">
         <header className="flex flex-col gap-1.5 px-1">
-          <h1 className="text-ink text-title font-bold tracking-title leading-tight max-md:text-title-phone">
+          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
             Shelfmark
           </h1>
           {state === "loading" ? (
-            <p className="text-muted text-meta motion-safe:animate-fade-in motion-safe:[animation-delay:400ms] motion-safe:[animation-fill-mode:both]">
+            <p className="text-meta text-muted motion-safe:animate-fade-in motion-safe:[animation-delay:400ms] motion-safe:[animation-fill-mode:both]">
               Loading…
             </p>
           ) : (
-            <p className="text-muted text-body leading-tight" role="alert">
+            <p className="text-body leading-tight text-muted" role="alert">
               Shelfmark can't be reached. Check your connection, then try again.
             </p>
           )}

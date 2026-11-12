@@ -377,7 +377,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
         )}
         <TabsPanel value={mode} className="flex flex-[1_0_auto] flex-col">
           {mode === "scan" && (
-            <div className="relative flex-[1_0_auto] min-h-105 overflow-hidden isolate bg-ink after:content-[''] after:absolute after:inset-0 after:z-1 after:[background:radial-gradient(ellipse_at_50%_45%,transparent_55%,color-mix(in_srgb,var(--color-ink)_50%,transparent))] after:pointer-events-none md:flex-none md:h-[clamp(420px,calc(100dvh_-_260px),660px)] md:rounded-container">
+            <div className="relative isolate min-h-105 flex-[1_0_auto] overflow-hidden bg-camera after:pointer-events-none after:absolute after:inset-0 after:z-1 after:content-[''] after:[background:radial-gradient(ellipse_at_50%_45%,transparent_55%,color-mix(in_srgb,var(--color-camera)_50%,transparent))] md:h-[clamp(420px,calc(100dvh_-_260px),660px)] md:flex-none md:rounded-container">
               <CameraScanner
                 ref={scanner}
                 inStage
@@ -395,7 +395,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                 <div className="absolute top-[calc(var(--add-top-room)_-_32px)] right-3 z-2 flex flex-col gap-2 md:top-3">
                   {torchAvailable && (
                     <Toggle
-                      className="flex items-center justify-center w-touch h-touch rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press"
+                      className="flex h-touch w-touch items-center justify-center rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press"
                       pressed={torch}
                       onPressedChange={setTorch}
                       aria-label="Torch"
@@ -406,7 +406,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                   {zoomAvailable && (
                     <button
                       type="button"
-                      className="flex items-center justify-center w-touch h-touch rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out text-small font-semibold tabular-nums"
+                      className="flex h-touch w-touch items-center justify-center rounded-pill bg-ground/92 text-small font-semibold text-ink tabular-nums transition-[background-color,color] duration-(--duration-fast) ease-out"
                       aria-label={`Zoom ${zoom}×`}
                       onClick={() => setZoom((at) => (at === 2 ? 1 : 2))}
                     >
@@ -423,9 +423,9 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                 />
               )}
               {canPress && (
-                <div className="absolute right-3 bottom-3 left-3 z-2 flex flex-col items-center gap-2.5 max-w-110 mx-auto">
+                <div className="absolute right-3 bottom-3 left-3 z-2 mx-auto flex max-w-110 flex-col items-center gap-2.5">
                   <p
-                    className="text-small leading-tight text-center data-shown:py-1.25 data-shown:px-3 data-shown:rounded-pill data-shown:bg-ground/92 data-shown:text-ink-2"
+                    className="text-center text-small leading-tight data-shown:rounded-pill data-shown:bg-ground/92 data-shown:px-3 data-shown:py-1.25 data-shown:text-ink-2"
                     role="status"
                     data-shown={press === "gave-up" || undefined}
                   >
@@ -447,7 +447,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "isbn" && (
-            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:gap-5 md:max-w-150 md:p-0">
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-150 md:gap-5 md:p-0">
               <IsbnField
                 ref={isbnField}
                 onSubmit={on.submitIsbn}
@@ -461,7 +461,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "manual" && (
-            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:gap-5 md:max-w-150 md:p-0">
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-150 md:gap-5 md:p-0">
               {sheet(false, focusOnEnter)}
             </div>
           )}

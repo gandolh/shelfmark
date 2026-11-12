@@ -54,7 +54,7 @@ export function Dialog({
       }}
     >
       <BaseDialog.Portal>
-        <BaseDialog.Backdrop className="fixed inset-0 z-float bg-ink/32" />
+        <BaseDialog.Backdrop className="fixed inset-0 z-float bg-scrim" />
         <BaseDialog.Popup
           ref={popupRef}
           className={cn(POPUP, desktop ? CENTERED : SHEET)}

@@ -227,7 +227,7 @@ export function LibraryPage() {
     >
       {/* The phone's toolbar has no room for Views: it gets a row of its own (desktop: Toolbar). */}
       {ready && !desktop && view.counts.owned > 0 && (
-        <div className="flex items-baseline justify-between gap-3 mb-3.5 border-b border-hairline">
+        <div className="mb-3.5 flex items-baseline justify-between gap-3 border-b border-hairline">
           <ViewsMenu layout={layout} mode={mode} align="end" />
         </div>
       )}
@@ -237,7 +237,7 @@ export function LibraryPage() {
       </span>
       {/* It stays when the change took the books off the page (a status filter, say), so the owner sees why they went. */}
       {shownNotice?.visible && (
-        <p className="-mt-1 mb-3.5 text-ink-2 text-meta leading-body" aria-hidden="true">
+        <p className="-mt-1 mb-3.5 text-meta leading-body text-ink-2" aria-hidden="true">
           {shownNotice.text}
         </p>
       )}
@@ -277,7 +277,7 @@ export function LibraryPage() {
       ) : view.rows.length === 0 ? (
         <NoMatch query={view.query} filtered={activeFilters(view.filters).length > 0} />
       ) : (
-        <div ref={list} className="library-list">
+        <div ref={list}>
           {shownLine && (
             <SelectionBand
               line={shownLine}
@@ -394,7 +394,7 @@ function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBa
             onClear,
           ];
   return (
-    <div className="flex flex-wrap items-center justify-center gap-y-0 gap-x-1.5 mb-3 py-1 px-3.5 rounded-control bg-accent-tint-soft text-ink-2 text-meta text-center max-md:py-0 max-md:text-body">
+    <div className="mb-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0 rounded-control bg-accent-tint-soft px-3.5 py-1 text-center text-meta text-ink-2 max-md:py-0 max-md:text-body">
       <span className="empty:hidden max-md:pt-2.5" role="status">
         {text}
       </span>

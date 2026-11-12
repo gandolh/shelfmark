@@ -8,6 +8,7 @@ import { COVER_CACHE } from "../pwa/routes";
 import { LOGIN, pathFor } from "../router";
 import { openChangePassword } from "./ChangePassword";
 import { openChangeUsername } from "./ChangeUsername";
+import { openTheme } from "./ThemeDialog";
 
 /**
  * What the account menu (layout/AccountMenu.tsx) does. Each action resolves
@@ -55,6 +56,11 @@ export function useUsername(): string {
 /** Open the change-username dialog (account/ChangeUsername.tsx). */
 export async function changeUsername(): Promise<void> {
   openChangeUsername();
+}
+
+/** Open the theme dialog (account/ThemeDialog.tsx). */
+export async function chooseTheme(): Promise<void> {
+  openTheme();
 }
 
 /** Open the change-password dialog (account/ChangePassword.tsx). */

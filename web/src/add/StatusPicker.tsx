@@ -36,15 +36,15 @@ export function StatusPicker({
   const name = useId();
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
-      <div className="flex flex-wrap gap-2 mt-2">
+      <legend className="block text-label leading-tight font-semibold text-muted">{label}</legend>
+      <div className="mt-2 flex flex-wrap gap-2">
         {options.map((status) => (
           <label
             key={status}
-            className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 px-3.5 rounded-pill bg-control text-ink text-meta leading-tight cursor-pointer select-none transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control-hover aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:content-[''] max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0"
+            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-3.5 text-meta leading-tight text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
           >
             <input
-              className="absolute inset-0 w-full h-full opacity-0 [cursor:inherit]"
+              className="absolute inset-0 h-full w-full [cursor:inherit] opacity-0"
               type="radio"
               name={name}
               value={status}
@@ -52,7 +52,7 @@ export function StatusPicker({
               onChange={() => onChange(status)}
             />
             <span
-              className="inline-flex flex-col min-w-0 after:content-[attr(data-label)] after:h-0 after:overflow-hidden after:invisible after:font-semibold after:select-none after:pointer-events-none"
+              className="inline-flex min-w-0 flex-col after:pointer-events-none after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)] after:select-none"
               data-label={STATUS_LABELS[status]}
             >
               {STATUS_LABELS[status]}

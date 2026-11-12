@@ -1,4 +1,3 @@
-import { cn } from "../lib/cn";
 import { to10, type Book, type MetadataSource } from "@shelfmark/shared";
 import type { ReactNode } from "react";
 import { STATUS_LABELS } from "../add/StatusPicker";
@@ -38,7 +37,7 @@ export function languageName(code: string): string {
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-3 items-baseline py-2.75 border-t border-divider text-body first:border-t-0 [&_dt]:text-muted [&_dt]:text-meta max-md:[&_dt]:text-label max-md:[&_dt]:font-semibold [&_dd]:min-w-0 [&_dd]:text-ink [&_dd]:tabular-nums [&_dd]:wrap-anywhere max-md:grid-cols-[minmax(0,1fr)] max-md:gap-0.5">
+    <div className="grid grid-cols-[140px_minmax(0,1fr)] items-baseline gap-3 border-t border-divider py-2.75 text-body first:border-t-0 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-0.5 [&_dd]:min-w-0 [&_dd]:wrap-anywhere [&_dd]:text-ink [&_dd]:tabular-nums [&_dt]:text-meta [&_dt]:text-muted max-md:[&_dt]:text-label max-md:[&_dt]:font-semibold">
       <dt>{label}</dt>
       <dd>{children}</dd>
     </div>
@@ -53,15 +52,17 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
  */
 export function BookDetails({ book }: { book: Book }) {
   const isbn10 = book.isbn13 === null ? null : to10(book.isbn13);
-  const acquired = cn(
+  const acquired = [
     book.acquiredOn ? dayText(book.acquiredOn) : null,
     book.acquiredFrom ? `from ${book.acquiredFrom}` : null,
-  );
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <>
-      <section className="min-w-0 p-5 rounded-container bg-surface max-md:p-4" aria-labelledby="book-about-book">
-        <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-about-book">
+      <section className="min-w-0 rounded-container bg-surface p-5 max-md:p-4" aria-labelledby="book-about-book">
+        <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-book">
           About the book
         </h2>
         <dl className="flex flex-col">
@@ -86,21 +87,21 @@ export function BookDetails({ book }: { book: Book }) {
           )}
         </dl>
         {!book.publisher && book.publishedYear === null && book.pages === null && !book.description && (
-          <p className="text-muted text-meta">
+          <p className="text-meta text-muted">
             Nothing recorded about this book yet. Edit adds details; Re-run lookup finds them from the ISBN.
           </p>
         )}
       </section>
 
-      <section className="min-w-0 p-5 rounded-container bg-surface max-md:p-4" aria-labelledby="book-about-copy">
-        <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-about-copy">
+      <section className="min-w-0 rounded-container bg-surface p-5 max-md:p-4" aria-labelledby="book-about-copy">
+        <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-copy">
           About this copy
         </h2>
         <dl className="flex flex-col">
           {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
           <Fact label="Shelf">{book.shelf ?? <span className="text-muted">No shelf</span>}</Fact>
           <Fact label="Status">
-            <span className={book.status === "reading" ? "text-accent font-semibold" : undefined}>
+            <span className={book.status === "reading" ? "font-semibold text-accent" : undefined}>
               {STATUS_LABELS[book.status]}
             </span>
           </Fact>
@@ -121,11 +122,11 @@ export function BookDetails({ book }: { book: Book }) {
           {book.priceMinor !== null && <Fact label="Price">{priceLine(book.priceMinor, book.currency)}</Fact>}
           {book.tags.length > 0 && (
             <Fact label="Tags">
-              <ul className="flex flex-wrap gap-1.5 list-none">
+              <ul className="flex list-none flex-wrap gap-1.5">
                 {book.tags.map((tag) => (
                   <li
                     key={tag}
-                    className="inline-flex items-center min-h-7 px-3 rounded-pill bg-control text-ink text-meta"
+                    className="inline-flex min-h-7 items-center rounded-pill bg-control px-3 text-meta text-ink"
                   >
                     {tag}
                   </li>

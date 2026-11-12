@@ -62,6 +62,8 @@ same call the owner made for showcase); Calm, whose coloured tags get busy at
 library scale; Grid, which hides covers. Mock-ups and tokens:
 [design.md](design.md).
 
+_2026-11-12_, brief 07 (revisit of "light, no dark theme"): the owner's call of 2026-11-10 gives every app a Light / Dark / System switch. Light stays the choice on a first visit, even where the system prefers dark; the choice is kept on the device (`shelfmark.theme` in `localStorage`, as the Library's prefs are), so it is a `RadioGroup` in the account menu's Theme dialog (the base-ui skill's rule 16 over the brief's guarded `ToggleGroup`, which is for a picker that saves to the server). Every colour is `light-dark(light, dark)`; the dark set is a first pass for the redesign to refine, and the camera view stays dark in both. The "light" above is the first-visit default, not a ban.
+
 ## Two places only: Library and Add a book (three since 2026-11-10: Wishlist)
 _2026-10-14_. The owner asked for no Loans tab and no Settings tab unless it
 has content. The account items (password, Sign in with Ward, backup download,
@@ -160,6 +162,8 @@ Base UI owns focus, keys, placement and ARIA. It costs about 56 kB gzip on the
 main chunk. TanStack Table stays, since Base UI has no table, and native
 checkboxes, radios and selects stay native. Rejected: keeping the hand-built
 widgets, and shadcn, which brings Tailwind.
+
+_2026-11-12_, brief 07 (revisit): "styled by Shelfmark's own CSS and DESIGN.md's tokens" no longer holds. The owner's call of 2026-11-09 is that Base UI is styled with Tailwind 4, and the web app moved to it: one stylesheet, `web/src/styles/index.css`, holds the tokens as `@theme`, DESIGN.md's names in Tailwind's namespaces. shadcn stays rejected for its own reason: Base UI is used directly, behind Shelfmark's wrappers, without a styled kit on top. The first entry's text is kept above as written.
 
 _2026-11-11_, brief 06: the 2026-11-09 conventions (the base-ui skill) are
 built. Base UI is imported only under `ui/` folders, behind a `Dialog`, `Menu`,

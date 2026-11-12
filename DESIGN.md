@@ -244,12 +244,12 @@ Shelfmark is the familiar table app played straight, in its Covers variant: the 
 
 The density is that of a working tool. The desktop Library is a table of 94 px rows inside one white rounded container; the phone defaults to a three-column grid of covers. Because free databases miss most Romanian covers, many books wear the no-cover placeholder, a typographic cover on one of eight tints picked from the title, so a library with few real covers still reads as a shelf rather than a wall of grey boxes.
 
-The theme is light only. No dark theme exists or is planned; `color-scheme: light` is set at the root. The camera view is dark because it is a camera, not because the system has a dark mode.
+The theme is light on a first visit. A Light / Dark / System choice in the account menu (Theme) is kept on the device, in `localStorage`; `data-theme` on `<html>` holds it and sets `color-scheme`, and every colour is `light-dark(light, dark)` in `web/src/styles/index.css`. The dark set is the same roles on a dark ground (below). The camera view is dark in both themes because it is a camera, not because of the theme.
 
 The app icon carries the same world: books on a shelf in the accent on the ground, spines of different widths and heights, the last one leaning 15° on its neighbour, a ground-coloured label band low on three spines. No text, no gradients, the mark inside the maskable safe zone so one image serves both purposes.
 
 **Key Characteristics:**
-- Light only; the ground is a neutral off-white, containers are white.
+- Light on a first visit, with a dark set; in light the ground is a neutral off-white and containers are white.
 - One interactive colour, the teal accent; everything else is ink, greys, and white.
 - The cover is the only thing with a shadow, besides what floats (menus, sheets, dialogs).
 - Flat fills, no borders on controls, hairlines only on the bars and dividers in the table.
@@ -281,7 +281,7 @@ Eight background/ink pairs used only on the typographic placeholder cover: oxblo
 - **Muted** (muted): captions and counts, authors under a title, the Added column, statuses Unread and Abandoned, tab labels at rest, placeholders, hints.
 
 ### Derived colours (mixes of named tokens, never a new hue)
-Defined in `tokens.css` as aliases or `color-mix` of the table above; they are not separate colours and are not given hex values:
+Defined in `web/src/styles/index.css` as aliases or `color-mix` of the table above; they are not separate colours and are not given hex values:
 - **on-accent**: `var(--surface)`, text on the accent.
 - **bar**: `color-mix(in srgb, var(--surface) 40%, var(--ground))`, the phone tab bar's ground, a shade lighter than the page.
 - **control-hover**: `color-mix(in srgb, var(--control) 92%, var(--ink))`.
@@ -292,10 +292,24 @@ Defined in `tokens.css` as aliases or `color-mix` of the table above; they are n
 - **selection**: `var(--accent-tint)`.
 - **scrollbar-thumb**: `color-mix(in srgb, var(--muted) 40%, var(--ground))`.
 
-Feature stylesheets add a few local mixes of the same kind: the table's row hover `color-mix(in srgb, var(--surface) 55%, var(--ground))`, the dialog backdrop `color-mix(in srgb, var(--ink) 32%, transparent)`, the camera vignette's edge `color-mix(in srgb, var(--ink) 50%, transparent)`, and the placeholder's hinge line `color-mix(in srgb, var(--tint-ink) 24%, transparent)`.
+Feature stylesheets add a few local mixes of the same kind: the table's row hover `color-mix(in srgb, var(--surface) 55%, var(--ground))`, the dialog backdrop (`scrim`, ink at 32% in light, black at 60% in dark), the camera vignette's edge `color-mix(in srgb, var(--camera) 50%, transparent)`, and the placeholder's hinge line `currentColor` at 24%.
+
+### Dark set (2026-11-12)
+
+Derived from the same roles, checked by `web/src/styles/tokens.test.ts` (4.5:1 for text and icons, 3:1 for UI parts, in both sets). The camera view's `camera` and `camera-ink` are the same in both themes. A first pass; the redesign refines it.
+
+| Token | Dark |
+|---|---|
+| ground / surface | `#121214` / `#1c1c1f` |
+| control / field | `#2a2a2e` / `#26262a` |
+| hairline / divider | `#34343a` / `#2c2c31` |
+| ink / ink-2 / muted | `#ececee` / `#c4c4ca` / `#9a9aa2` |
+| accent / accent-press | `#5bb8d4` / `#8ad0e6` |
+| accent-tint / accent-tint-soft | `#1f3a44` / `#172a31` |
+| cover tints 1 to 8 (ground / ink) | `#9a3a44` `#fbf1ea`, `#8a6620` `#fff4dc`, `#3f6450` `#f1f4e6`, `#3a5273` `#eef3f9`, `#75509a` `#f6f0fa`, `#5a4f3c` `#f0e6d2`, `#4a5a3e` `#e9eedf`, `#3a3a3d` `#efd27a` |
 
 ### Named Rules
-**The Token-Only Rule.** Every colour comes from `tokens.css`. No stylesheet or script outside it writes a colour literal; a new need is met by a mix or alias of existing tokens, never a new hue.
+**The Token-Only Rule.** Every colour comes from the `@theme` block in `web/src/styles/index.css`. No component or script outside it writes a colour literal; a new need is met by a mix or alias of existing tokens, never a new hue.
 
 **The One Interactive Colour Rule.** The accent is the only colour that means "press this". Nothing decorative is teal, and nothing pressable is any other hue. The status "Reading" is the single non-control use, and it is semibold so it reads as state, not as a link.
 
@@ -422,7 +436,7 @@ State changes only, short, one curve: `cubic-bezier(0.22, 1, 0.36, 1)` at 120 ms
 ## Do's and Don'ts
 
 ### Do:
-- **Do** take every colour from `tokens.css`; meet a new need with a `color-mix` of existing tokens, never a new hue.
+- **Do** take every colour from the `@theme` tokens in `index.css` (`bg-ground`, `text-ink-2`); meet a new need with a `color-mix` of existing tokens, never a new hue.
 - **Do** keep the accent as the only interactive colour: primary actions, links, quiet text buttons, the current tab, the focus ring.
 - **Do** give every book a cover: the stored image, or the typographic placeholder on its title's tint.
 - **Do** keep the cover's shadow (`0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2)`) on the cover and the float shadow (`0 16px 40px rgba(27, 27, 29, 0.18)`) on menus, sheets and dialogs, and nothing else.
@@ -434,7 +448,7 @@ State changes only, short, one curve: `cubic-bezier(0.22, 1, 0.36, 1)` at 120 ms
 - **Do** use tabular figures for years, counts, ISBNs and dates.
 
 ### Don't:
-- **Don't** add a dark theme. The app is light only; the camera is dark because it is a camera.
+- **Don't** write a colour in a component or an arbitrary value (`bg-[#fff]`), and don't put `/NN` on a colour that is itself a mix. A dark colour is the dark half of a token's `light-dark()`.
 - **Don't** put a shadow on a card, the table, a button, a chip or the in-page result.
 - **Don't** introduce a second interactive hue, or a red for errors or deletion.
 - **Don't** use the eight cover tints anywhere but the placeholder cover.

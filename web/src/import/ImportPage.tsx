@@ -71,7 +71,7 @@ export function ImportPage() {
   const [step, setStep] = useState<Step>({ kind: "choose" });
   return (
     <Page title="Import a CSV" back={{ to: LIBRARY, label: "Library" }}>
-      <div className="flex flex-col gap-4 max-w-page">
+      <div className="flex max-w-page flex-col gap-4">
         {step.kind === "choose" && (
           <ChooseFile
             error={step.error}
@@ -125,9 +125,9 @@ function ChooseFile({
   };
 
   return (
-    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+    <section className="flex flex-col items-start gap-3 rounded-container bg-surface p-5">
       <h2 className="text-row-title font-semibold">Choose a CSV file</h2>
-      <p className="text-ink-2 text-meta leading-body">
+      <p className="text-meta leading-body text-ink-2">
         A Goodreads, Libib or LibraryThing export, a Shelfmark export, or a spreadsheet saved as CSV. A file with only a
         column of ISBNs works: the details can be looked up afterwards.
       </p>
@@ -148,7 +148,7 @@ function ChooseFile({
         Choose a file
       </Button>
       {error && (
-        <p className="text-ink text-meta font-semibold" role="alert">
+        <p className="text-meta font-semibold text-ink" role="alert">
           {error}
         </p>
       )}
@@ -172,13 +172,13 @@ function MapColumns({
   const usable = isUsable(mapping);
 
   return (
-    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+    <section className="flex flex-col items-start gap-3 rounded-container bg-surface p-5">
       <h2 className="text-row-title font-semibold">Match the columns</h2>
-      <p className="text-ink-2 text-meta leading-body">
+      <p className="text-meta leading-body text-ink-2">
         {file.format ? `This looks like a ${file.format.name} export.` : "This isn't an export Shelfmark knows."} Say
         what each column holds. One with a title or an ISBN is needed.
       </p>
-      <ul className="flex flex-col self-stretch list-none">
+      <ul className="flex list-none flex-col self-stretch">
         {header.map((name, column) => {
           const samples = file.table
             .slice(1, 4)
@@ -187,16 +187,16 @@ function MapColumns({
           return (
             <li
               key={column}
-              className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 py-2.5 border-t border-divider"
+              className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-t border-divider py-2.5"
             >
-              <div className="flex flex-col min-w-0 max-w-full">
+              <div className="flex max-w-full min-w-0 flex-col">
                 <span className="text-body font-semibold">{name || `Column ${column + 1}`}</span>
-                <span className="overflow-hidden max-w-105 text-muted text-small text-ellipsis whitespace-nowrap">
+                <span className="max-w-105 overflow-hidden text-small text-ellipsis whitespace-nowrap text-muted">
                   {samples.join(" · ") || "empty"}
                 </span>
               </div>
               <select
-                className="min-h-control px-2.5 bg-field rounded-control text-ink text-meta max-md:min-h-touch max-md:text-input-phone"
+                className="min-h-control rounded-control bg-field px-2.5 text-meta text-ink max-md:min-h-touch max-md:text-input-phone"
                 aria-label={`What column ${name || column + 1} holds`}
                 value={mapping[column] ?? ""}
                 onChange={(event) => {
@@ -215,7 +215,7 @@ function MapColumns({
           );
         })}
       </ul>
-      {!usable && <p className="text-ink text-meta font-semibold">Pick a Title or an ISBN column to go on.</p>}
+      {!usable && <p className="text-meta font-semibold text-ink">Pick a Title or an ISBN column to go on.</p>}
       <div className="flex flex-wrap items-center gap-3">
         <Button variant="primary" disabled={!usable} onClick={() => onContinue(mapping)}>
           Preview the rows
@@ -308,23 +308,23 @@ function Preview({
   };
 
   return (
-    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+    <section className="flex flex-col items-start gap-3 rounded-container bg-surface p-5">
       <h2 className="text-row-title font-semibold">
         {plural(rows.length, "row", "rows")} in {file.name}
       </h2>
-      <p className="text-ink-2 text-meta leading-body">
+      <p className="text-meta leading-body text-ink-2">
         {ENCODING_NOTE[file.encoding]}{" "}
         {file.format ? `Recognised as a ${file.format.name} export.` : "Columns matched by hand."}{" "}
         <button
           type="button"
-          className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+          className="cursor-pointer text-accent disabled:cursor-default disabled:text-muted hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline"
           onClick={onChangeColumns}
           disabled={busy}
         >
           Change columns
         </button>
       </p>
-      <p className="text-ink-2 text-meta leading-body">
+      <p className="text-meta leading-body text-ink-2">
         {plural(counts.duplicates, "row is", "rows are")} already in your library or repeated,{" "}
         {plural(counts.invalid, "has an", "have an")} invalid ISBN. Both are unticked.
       </p>
@@ -342,10 +342,10 @@ function Preview({
             setTouched(new Map());
           }}
         />
-        <span className="text-ink-2 text-meta leading-body">
+        <span className="text-meta leading-body text-ink-2">
           <button
             type="button"
-            className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+            className="cursor-pointer text-accent disabled:cursor-default disabled:text-muted hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline"
             onClick={() => setAll(true)}
             disabled={busy}
           >
@@ -354,7 +354,7 @@ function Preview({
           {" · "}
           <button
             type="button"
-            className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+            className="cursor-pointer text-accent disabled:cursor-default disabled:text-muted hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline"
             onClick={() => setAll(false)}
             disabled={busy}
           >
@@ -367,7 +367,7 @@ function Preview({
         <div className="flex flex-wrap items-center gap-3">
           {progress.kind === "looking" ? (
             <>
-              <p role="status" className="text-ink-2 text-meta leading-body">
+              <p role="status" className="text-meta leading-body text-ink-2">
                 Looking up {progress.done} of {progress.total}, one at a time.
               </p>
               <Button variant="secondary" onClick={() => stop.current?.abort()}>
@@ -376,7 +376,7 @@ function Preview({
             </>
           ) : (
             <>
-              <p className="text-ink-2 text-meta leading-body">
+              <p className="text-meta leading-body text-ink-2">
                 {plural(targets.length, "ticked row has", "ticked rows have")} an ISBN and no title. Looking them up
                 asks the book sources one request at a time, which takes a while for a long list.
               </p>
@@ -388,13 +388,13 @@ function Preview({
         </div>
       )}
       {lookupNote && (
-        <p role="status" className="text-ink-2 text-meta leading-body">
+        <p role="status" className="text-meta leading-body text-ink-2">
           {lookupNote}
         </p>
       )}
 
       <div className="self-stretch overflow-x-auto">
-        <table className="w-full border-collapse text-meta text-left [&_th]:py-1.5 [&_th]:px-2.5 [&_th]:text-muted [&_th]:text-label [&_th]:font-semibold [&_td]:py-2 [&_td]:px-2.5 [&_td]:border-t [&_td]:border-divider [&_td]:align-top [&_tbody_tr:not([data-ticked])_td:not(:first-child):not(:last-child)]:text-muted">
+        <table className="w-full border-collapse text-left text-meta [&_tbody_tr:not([data-ticked])_td:not(:first-child):not(:last-child)]:text-muted [&_td]:border-t [&_td]:border-divider [&_td]:px-2.5 [&_td]:py-2 [&_td]:align-top [&_th]:px-2.5 [&_th]:py-1.5 [&_th]:text-label [&_th]:font-semibold [&_th]:text-muted">
           <thead>
             <tr>
               <th scope="col">
@@ -415,7 +415,7 @@ function Preview({
                   <td>
                     <input
                       type="checkbox"
-                      className="w-4.5 h-4.5 accent-accent"
+                      className="h-4.5 w-4.5 accent-accent"
                       checked={ticked.has(index)}
                       disabled={busy}
                       aria-label={`Import line ${row.line}${row.title ? `, ${row.title}` : ""}`}
@@ -424,7 +424,7 @@ function Preview({
                   </td>
                   <td>{row.title || <span className="text-muted">none yet</span>}</td>
                   <td>{row.authors.join(", ")}</td>
-                  <td className="tabular-nums whitespace-nowrap">{row.isbn13 ?? row.isbnText}</td>
+                  <td className="whitespace-nowrap tabular-nums">{row.isbn13 ?? row.isbnText}</td>
                   <td>{collection === "wishlist" ? "" : (row.details.shelf ?? "")}</td>
                   <td>
                     {rowFlags.map((flag) => (
@@ -448,7 +448,7 @@ function Preview({
 
       <div className="flex flex-wrap items-center gap-3">
         {progress.kind === "saving" ? (
-          <p role="status" className="text-ink-2 text-meta leading-body">
+          <p role="status" className="text-meta leading-body text-ink-2">
             Saving {progress.done} of {progress.total}…
           </p>
         ) : (
@@ -461,11 +461,11 @@ function Preview({
         </Button>
       </div>
       {ticked.size > saveable.length && (
-        <p className="text-ink-2 text-meta leading-body">
+        <p className="text-meta leading-body text-ink-2">
           {plural(ticked.size - saveable.length, "ticked row has", "ticked rows have")} no title and will be left out.
         </p>
       )}
-      {!ready && <p className="text-ink-2 text-meta leading-body">Loading your library to check for duplicates…</p>}
+      {!ready && <p className="text-meta leading-body text-ink-2">Loading your library to check for duplicates…</p>}
     </section>
   );
 }
@@ -486,13 +486,13 @@ function Done({
   onAgain: () => void;
 }) {
   return (
-    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+    <section className="flex flex-col items-start gap-3 rounded-container bg-surface p-5">
       <h2 className="text-row-title font-semibold">
         {report.saved === 0
           ? "Nothing was saved"
           : `${plural(report.saved, "book", "books")} saved to ${collection === "owned" ? "Owned" : "the Wishlist"}`}
       </h2>
-      <ul className="text-ink-2 text-meta leading-body pl-5">
+      <ul className="pl-5 text-meta leading-body text-ink-2">
         <li>{plural(report.saved, "book", "books")} saved</li>
         <li>{plural(skippedDuplicates, "row", "rows")} skipped as duplicates</li>
         {leftOut > 0 && <li>{plural(leftOut, "row", "rows")} left out (unticked, invalid or without a title)</li>}

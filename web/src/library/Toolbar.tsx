@@ -50,7 +50,7 @@ export function Toolbar({
     count > 0 ? (
       <>
         <span
-          className="tabular-nums inline-flex items-center justify-center min-w-4.5 h-4.5 px-1.25 rounded-pill bg-accent text-on-accent text-tab font-semibold leading-none"
+          className="inline-flex h-4.5 min-w-4.5 items-center justify-center rounded-pill bg-accent px-1.25 text-tab leading-none font-semibold text-on-accent tabular-nums"
           aria-hidden="true"
         >
           {count}
@@ -72,7 +72,7 @@ export function Toolbar({
           value={mode}
           onChange={onModeChange}
         />
-        <span className="flex-none w-px h-5.5 mx-2 bg-hairline" aria-hidden="true" />
+        <span className="mx-2 h-5.5 w-px flex-none bg-hairline" aria-hidden="true" />
         <div className="flex items-center gap-0.5">
           <ViewsMenu layout="desktop" mode={mode} />
           <button

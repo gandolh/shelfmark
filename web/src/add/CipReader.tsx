@@ -90,7 +90,7 @@ function CropPhoto({ src, box, onBox }: { src: string; box: Box | null; onBox: (
   return (
     <div
       className={cn(
-        "relative self-center max-w-full touch-none select-none [cursor:crosshair] [&_img]:block [&_img]:max-w-full [&_img]:max-h-[46vh] [&_img]:rounded-field",
+        "relative max-w-full [cursor:crosshair] touch-none self-center select-none [&_img]:block [&_img]:max-h-[46vh] [&_img]:max-w-full [&_img]:rounded-field",
         box !== null && "overflow-hidden rounded-field",
       )}
       onPointerDown={(event) => {
@@ -106,7 +106,7 @@ function CropPhoto({ src, box, onBox }: { src: string; box: Box | null; onBox: (
       <img src={src} alt="The photo of the copyright page" draggable={false} />
       {box && (
         <span
-          className="absolute border-2 border-accent rounded-[2px] bg-accent/12 shadow-[0_0_0_9999px_color-mix(in_srgb,var(--color-ink)_35%,transparent)] pointer-events-none"
+          className="pointer-events-none absolute rounded-[2px] border-2 border-accent bg-accent/12 shadow-[0_0_0_9999px_color-mix(in_srgb,var(--color-camera)_35%,transparent)]"
           style={{
             left: `${box.x * 100}%`,
             top: `${box.y * 100}%`,
@@ -225,12 +225,12 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
 
   if (phase.kind === "photo") {
     return (
-      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
-        <p className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
+      <div className="flex flex-col items-stretch gap-2.5 rounded-menu p-3 [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] outline-divider [outline-style:solid]">
+        <p className="flex min-w-0 flex-1 flex-col gap-0.5 text-meta leading-tight text-ink-2" role="status">
           Drag a box around the CIP block, or read the whole photo.
         </p>
         <CropPhoto src={phase.preview} box={phase.box} onBox={(box) => setPhase({ ...phase, box })} />
-        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
+        <div className="flex flex-none flex-wrap items-center gap-x-2 gap-y-1">
           <Button variant="primary" size="compact" disabled={disabled} onClick={() => void read(phase.file, phase.box)}>
             {phase.box ? "Read the box" : "Read the photo"}
           </Button>
@@ -246,19 +246,19 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   if (phase.kind === "working") {
     const value = stageValue(phase.stage);
     return (
-      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
-        <p className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
+      <div className="flex flex-col items-stretch gap-2.5 rounded-menu p-3 [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] outline-divider [outline-style:solid]">
+        <p className="flex min-w-0 flex-1 flex-col gap-0.5 text-meta leading-tight text-ink-2" role="status">
           {stageText(phase.stage)}
         </p>
         {value === null ? (
           <div
-            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
+            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:content-[''] after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
             role="progressbar"
             aria-label="Reading the CIP block"
           />
         ) : (
           <div
-            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50 after:w-[calc(var(--value,0)_*_100%)] after:[animation:none] after:opacity-100 after:transition-[width] after:duration-[0.2s] after:ease-out"
+            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[calc(var(--value,0)_*_100%)] after:[animation:none] after:rounded-[inherit] after:bg-accent after:opacity-100 after:transition-[width] after:duration-[0.2s] after:ease-out after:content-[''] after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
             role="progressbar"
             aria-label="Reading the CIP block"
             aria-valuemin={0}
@@ -267,7 +267,7 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
             style={{ "--value": value } as CSSProperties}
           />
         )}
-        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
+        <div className="flex flex-none flex-wrap items-center gap-x-2 gap-y-1">
           <Button variant="quiet" size="compact" className="text-ink-2 hover:text-ink active:text-ink" onClick={cancel}>
             Cancel
           </Button>
@@ -279,11 +279,11 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   if (phase.kind === "read") {
     const { result, changed } = phase;
     return (
-      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
+      <div className="flex flex-col items-stretch gap-2.5 rounded-menu p-3 [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] outline-divider [outline-style:solid]">
         <p
           className={
             result.found
-              ? "flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight"
+              ? "flex min-w-0 flex-1 flex-col gap-0.5 text-meta leading-tight text-ink-2"
               : "flex min-w-0 flex-1 flex-row items-start gap-0.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
           }
           role="status"
@@ -292,12 +292,12 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
           {summary(result, changed)}
         </p>
         <details
-          className="text-meta open:[&>summary]:mb-2 [&>summary]:cursor-pointer [&>summary]:font-semibold [&>summary]:text-accent"
+          className="text-meta [&>summary]:cursor-pointer [&>summary]:font-semibold [&>summary]:text-accent open:[&>summary]:mb-2"
           open={!result.found || result.fields.title === null}
         >
           <summary>The text read from the photo</summary>
           <textarea
-            className="block w-full py-2.5 px-3 rounded-field bg-field text-ink text-input-phone leading-[1.4] resize-y"
+            className="block w-full resize-y rounded-field bg-field px-3 py-2.5 text-input-phone leading-[1.4] text-ink"
             value={text}
             onChange={(event) => setText(event.target.value)}
             rows={9}
@@ -310,7 +310,7 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
             </Button>
           ) : null}
         </details>
-        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
+        <div className="flex flex-none flex-wrap items-center gap-x-2 gap-y-1">
           {picker("Read another photo")}
           <Button variant="quiet" size="compact" className="text-ink-2 hover:text-ink active:text-ink" onClick={close}>
             Close
@@ -321,13 +321,13 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   }
 
   return (
-    <div className="flex items-center gap-3 pt-2.5 pr-2.5 pb-2.5 pl-3 rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]">
+    <div className="flex items-center gap-3 rounded-menu pt-2.5 pr-2.5 pb-2.5 pl-3 [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]">
       <span className="flex flex-none text-muted">
         <TextScanIcon size={22} />
       </span>
-      <div className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5 text-meta leading-tight text-ink-2" role="status">
         {phase.kind === "failed" ? (
-          <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
+          <p className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none">
             <AlertIcon size={16} />
             {phase.message}
           </p>
@@ -335,12 +335,12 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
           <p>Fill the fields from the CIP block on the copyright page.</p>
         )}
         {toDownload !== null && toDownload > 0 && (
-          <p className="text-muted text-small leading-tight">
+          <p className="text-small leading-tight text-muted">
             The first read downloads {megabytes(toDownload)}; later reads work offline.
           </p>
         )}
       </div>
-      <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
+      <div className="flex flex-none flex-wrap items-center gap-x-2 gap-y-1">
         {phase.kind === "failed" ? (
           <>
             <Button

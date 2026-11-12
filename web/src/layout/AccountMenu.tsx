@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../lib/cn";
+import { resolveTheme, THEMES, useTheme, type Theme } from "../theme/theme";
+import { useMediaQuery } from "./viewport";
 import {
   changePassword,
   changeUsername,
+  chooseTheme,
   downloadBackup,
   linkWard,
   signOut,
@@ -18,6 +21,12 @@ import { Menu, type MenuSection } from "../components/ui/Menu";
 import type { ExportFormat } from "../export/exportLibrary";
 import { IMPORT_CSV, STATS, navigate } from "../router";
 
+/** "Light", "Dark", or "System, dark now". */
+function themeDetail(theme: Theme, systemDark: boolean): string {
+  const label = THEMES.find((option) => option.value === theme)?.label ?? "Light";
+  return theme === "system" ? `${label}, ${resolveTheme(theme, systemDark)} now` : label;
+}
+
 const NOTICE_MS = 6000;
 
 /**
@@ -32,6 +41,9 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
   const ward = useWardLink();
   const { books, status } = useBooks();
   const username = useUsername();
+  const theme = useTheme();
+  // The page follows the system on its own (color-scheme); this keeps the menu's words in step with it.
+  const systemDark = useMediaQuery("(prefers-color-scheme: dark)");
   const [notice, setNotice] = useState("");
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   // A Ward link comes back to this page with its result; it shows here like an action's, then goes.
@@ -70,6 +82,7 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
       items: [
         { label: "Change username", detail: username, onSelect: run(changeUsername) },
         { label: "Change password", onSelect: run(changePassword) },
+        { label: "Theme", detail: themeDetail(theme, systemDark), onSelect: run(chooseTheme) },
         ...(ward.available
           ? [
               {

@@ -30,8 +30,8 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
   const noteId = `${id}-note`;
   const note = error ?? hint;
   return (
-    <div className={cn("flex flex-col gap-1.5 min-w-0", className)}>
-      <label className="block text-muted text-label font-semibold leading-tight" htmlFor={id}>
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
+      <label className="block text-label leading-tight font-semibold text-muted" htmlFor={id}>
         {label}
         {optional && <span className="ml-1.5 font-regular">optional</span>}
       </label>
@@ -39,21 +39,21 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
         {...input}
         ref={ref}
         id={id}
-        className="focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
+        className="h-10.5 w-full appearance-none rounded-field bg-field px-3 text-input-phone text-ink focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         aria-invalid={error !== undefined}
         aria-describedby={note ? noteId : undefined}
       />
       {error !== undefined ? (
         <p
           id={noteId}
-          className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
         >
           <AlertIcon size={16} />
           {error}
         </p>
       ) : (
         hint && (
-          <p id={noteId} className="text-muted text-small leading-tight">
+          <p id={noteId} className="text-small leading-tight text-muted">
             {hint}
           </p>
         )
@@ -66,7 +66,7 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
 export function FailureLine({ children }: { children: ReactNode }) {
   return (
     <p
-      className="flex items-start gap-1.5 text-ink font-semibold leading-tight [&_svg]:flex-none py-2.5 px-3 rounded-control bg-field text-meta"
+      className="flex items-start gap-1.5 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:flex-none"
       role="alert"
     >
       <AlertIcon size={18} />
@@ -178,7 +178,7 @@ export function ManualForm({
   return (
     <form className="flex flex-col gap-3.5" onSubmit={submit} noValidate aria-busy={saving || undefined}>
       {intro}
-      <fieldset className="min-w-0 flex flex-col gap-3.5" disabled={saving}>
+      <fieldset className="flex min-w-0 flex-col gap-3.5" disabled={saving}>
         <CipReader onRead={fillFromBlock} disabled={saving} />
         <TextField
           label="Title"
@@ -223,11 +223,11 @@ export function ManualForm({
         )}
       </fieldset>
       {failure && <FailureLine>{failure}</FailureLine>}
-      <div className="flex flex-col gap-3.5 in-data-[floating]:sticky in-data-[floating]:z-1 in-data-[floating]:-mx-4 in-data-[floating]:-mb-4 in-data-[floating]:border-t in-data-[floating]:border-hairline in-data-[floating]:bg-surface in-data-[floating]:px-4 in-data-[floating]:pt-3 in-data-[floating]:pb-4 in-data-[floating]:bottom-[-16px]">
+      <div className="flex flex-col gap-3.5 in-data-[floating]:sticky in-data-[floating]:bottom-[-16px] in-data-[floating]:z-1 in-data-[floating]:-mx-4 in-data-[floating]:-mb-4 in-data-[floating]:border-t in-data-[floating]:border-hairline in-data-[floating]:bg-surface in-data-[floating]:px-4 in-data-[floating]:pt-3 in-data-[floating]:pb-4">
         <Button type="submit" variant="primary" size="large" block aria-disabled={saving || undefined}>
           {saving ? "Saving…" : submitLabel}
         </Button>
-        {secondary && <div className="flex justify-center gap-3 -mt-1">{secondary}</div>}
+        {secondary && <div className="-mt-1 flex justify-center gap-3">{secondary}</div>}
       </div>
     </form>
   );

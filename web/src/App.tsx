@@ -1,5 +1,6 @@
 import { ChangePasswordDialog } from "./account/ChangePassword";
 import { ChangeUsernameDialog } from "./account/ChangeUsername";
+import { ThemeDialog } from "./account/ThemeDialog";
 import { AuthGate } from "./auth/AuthGate";
 import { ToastHost } from "./components/ui/Toast";
 import { AppShell } from "./layout/AppShell";
@@ -17,6 +18,7 @@ export function App() {
       <AuthGate>
         <AppShell />
         <ChangeUsernameDialog />
+        <ThemeDialog />
         <ChangePasswordDialog />
       </AuthGate>
       <OfflineNotice />

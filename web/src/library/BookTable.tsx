@@ -146,12 +146,12 @@ function BookCell({ book, index }: { book: Book; index: number }) {
   const nav = useContext(RowNavContext);
   const author = authorLine(book.authors);
   return (
-    <div className="flex items-center gap-3 min-w-0">
+    <div className="flex min-w-0 items-center gap-3">
       <CoverImage book={book} width={46} />
-      <div className="flex flex-col gap-0.5 min-w-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <Link
           to={bookRoute(book.id)}
-          className="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden text-ink text-row-title font-semibold leading-tight no-underline wrap-anywhere hover:text-ink focus-visible:outline-none"
+          className="[display:-webkit-box] overflow-hidden text-row-title leading-tight font-semibold wrap-anywhere text-ink no-underline [-webkit-box-orient:vertical] [-webkit-line-clamp:2] hover:text-ink focus-visible:outline-none"
           tabIndex={nav.tabbable === index ? 0 : -1}
           onFocus={() => nav.onFocus(index)}
           onKeyDown={(event) => nav.onKeyDown(event, index, "title")}
@@ -160,7 +160,7 @@ function BookCell({ book, index }: { book: Book; index: number }) {
           {book.title}
         </Link>
         {author && (
-          <span className="overflow-hidden text-muted text-meta text-ellipsis whitespace-nowrap">{author}</span>
+          <span className="overflow-hidden text-meta text-ellipsis whitespace-nowrap text-muted">{author}</span>
         )}
       </div>
     </div>
@@ -172,7 +172,7 @@ function SelectCell({ book, index, selected }: { book: Book; index: number; sele
   const nav = useContext(RowNavContext);
   return (
     <div role="cell" className={cn(CELL, "relative")}>
-      <label className="absolute inset-0 flex items-center pl-6 cursor-pointer [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent [&_input]:cursor-pointer max-md:pl-4 max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
+      <label className="absolute inset-0 flex cursor-pointer items-center pl-6 max-md:pl-4 [&_input]:h-4 [&_input]:w-4 [&_input]:flex-none [&_input]:cursor-pointer [&_input]:accent-accent max-md:[&_input]:h-4.5 max-md:[&_input]:w-4.5">
         <input
           type="checkbox"
           checked={selected}
@@ -201,7 +201,7 @@ function SelectAllCell({ rows, everything, selection, onToggle }: SelectAllCellP
       : `the ${rows.length.toLocaleString("en-GB")} books on this page`;
   return (
     <div role="columnheader" className={cn(CELL, "relative")}>
-      <label className="absolute inset-0 flex items-center pl-6 cursor-pointer [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent [&_input]:cursor-pointer max-md:pl-4 max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
+      <label className="absolute inset-0 flex cursor-pointer items-center pl-6 max-md:pl-4 [&_input]:h-4 [&_input]:w-4 [&_input]:flex-none [&_input]:cursor-pointer [&_input]:accent-accent max-md:[&_input]:h-4.5 max-md:[&_input]:w-4.5">
         <input
           ref={box}
           type="checkbox"
@@ -450,7 +450,7 @@ export function BookTable({
     <RowNavContext.Provider value={nav}>
       <div
         ref={root}
-        className="[--library-sticky-top:0px] [--library-row-hover:color-mix(in_srgb,var(--color-surface)_55%,var(--color-ground))] relative overflow-clip rounded-container bg-surface md:[--library-sticky-top:var(--spacing-topbar)]"
+        className="relative overflow-clip rounded-container bg-surface [--library-row-hover:color-mix(in_srgb,var(--color-surface)_55%,var(--color-ground))] [--library-sticky-top:0px] md:[--library-sticky-top:var(--spacing-topbar)]"
         role="table"
         aria-label="Books"
         aria-rowcount={total + 1}
@@ -481,7 +481,7 @@ export function BookTable({
         </div>
         <div
           ref={body}
-          className="overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="[scrollbar-width:none] overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden"
         >
           <div
             role="rowgroup"
@@ -566,7 +566,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
     >
       <button
         type="button"
-        className="inline-flex items-center gap-1 min-w-0 max-w-[calc(100%_+_12px)] -my-1 -mx-1.5 py-1 px-1.5 rounded-segment text-inherit whitespace-nowrap transition-[color] duration-(--duration-fast) ease-out hover:text-ink data-sorted:text-ink"
+        className="-mx-1.5 -my-1 inline-flex max-w-[calc(100%_+_12px)] min-w-0 items-center gap-1 rounded-segment px-1.5 py-1 whitespace-nowrap text-inherit transition-[color] duration-(--duration-fast) ease-out hover:text-ink data-sorted:text-ink"
         data-sorted={key ? "" : undefined}
         onClick={(event) => onSort(column.id, event.shiftKey)}
         onKeyDown={(event) => {
@@ -580,7 +580,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
         <span className="overflow-hidden text-ellipsis">{column.header}</span>
         {key && <SortIcon desc={key.desc} size={12} className="flex-none text-accent" />}
         {key && sorting.length > 1 && (
-          <span className="tabular-nums text-accent text-tab" aria-hidden="true">
+          <span className="text-tab text-accent tabular-nums" aria-hidden="true">
             {rank + 1}
           </span>
         )}
@@ -594,7 +594,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
         aria-valuemin={column.minSize}
         aria-valuemax={MAX_WIDTH}
         tabIndex={0}
-        className="absolute top-0 -right-1.5 bottom-0 z-1 w-3 cursor-col-resize touch-none after:content-[''] after:absolute after:top-2.5 after:bottom-2 after:left-1.25 after:w-0.5 after:rounded-pill after:bg-transparent after:transition-[background-color] after:duration-(--duration-fast) after:ease-out group-hover/head:after:bg-divider hover:after:bg-accent focus-visible:after:bg-accent data-resizing:after:bg-accent focus-visible:outline-none"
+        className="absolute top-0 -right-1.5 bottom-0 z-1 w-3 cursor-col-resize touch-none after:absolute after:top-2.5 after:bottom-2 after:left-1.25 after:w-0.5 after:rounded-pill after:bg-transparent after:transition-[background-color] after:duration-(--duration-fast) after:ease-out after:content-[''] group-hover/head:after:bg-divider hover:after:bg-accent focus-visible:outline-none focus-visible:after:bg-accent data-resizing:after:bg-accent"
         data-resizing={header.column.getIsResizing() ? "" : undefined}
         onMouseDown={resizeHandler}
         onTouchStart={resizeHandler}

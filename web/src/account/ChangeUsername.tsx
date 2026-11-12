@@ -143,11 +143,11 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
       />
       {blockFailure !== null && (
         <p
-          className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
           role="alert"
         >
           <AlertIcon />
-          <span className="flex-1 min-w-0">{blockFailure}</span>
+          <span className="min-w-0 flex-1">{blockFailure}</span>
         </p>
       )}
       <DialogActions desktop={desktop} onCancel={onCancel}>
@@ -168,11 +168,11 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
 function Done({ username, desktop, onClose }: { username: string; desktop: boolean; onClose: () => void }) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-ink-2 text-body leading-body" role="status">
+      <p className="text-body leading-body text-ink-2" role="status">
         You're now <strong>{username}</strong>. Sign in with that name from now on; you're still signed in everywhere.
         If your browser saved your password, it may still list it under the old name.
       </p>
-      <div className="flex justify-end items-center gap-3 mt-1.5">
+      <div className="mt-1.5 flex items-center justify-end gap-3">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>

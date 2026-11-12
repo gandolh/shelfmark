@@ -36,7 +36,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
   if (status === "loading") {
     return (
       <Page title="Book" back={BACK}>
-        <p className="text-muted text-meta" role="status">
+        <p className="text-meta text-muted" role="status">
           Opening the book…
         </p>
       </Page>
@@ -47,7 +47,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
       <Page title="Book" back={BACK}>
         <div className="flex flex-col items-start gap-2.5 pt-2" role="alert">
           <p className="text-row-title font-semibold">The library didn’t load</p>
-          <p className="text-muted text-small leading-tight">{error?.message ?? "Shelfmark can’t be reached."}</p>
+          <p className="text-small leading-tight text-muted">{error?.message ?? "Shelfmark can’t be reached."}</p>
           <Button variant="secondary" pill onClick={() => void refresh()}>
             Try again
           </Button>
@@ -59,7 +59,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
     <Page title="Not found" back={BACK}>
       <div className="flex flex-col items-start gap-2.5 pt-2">
         <p className="text-row-title font-semibold">This book isn’t in your library</p>
-        <p className="text-muted text-small leading-tight">It may have been deleted, or the link is wrong.</p>
+        <p className="text-small leading-tight text-muted">It may have been deleted, or the link is wrong.</p>
         <ButtonLink to={LIBRARY} variant="secondary" pill>
           Back to the Library
         </ButtonLink>
@@ -155,13 +155,13 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
 
   return (
     <Page title={book.title} caption={caption} toolbar={toolbar} back={BACK} book>
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 items-start md:grid-cols-[260px_minmax(0,720px)] md:gap-10 md:pt-1.5">
-        <div className="flex flex-col gap-3 w-[min(100%,168px)] mx-auto md:sticky md:top-[calc(var(--spacing-topbar)_+_24px)] md:w-full md:m-0 max-md:has-data-[cover-panel]:w-full max-md:has-data-[cover-panel]:[&>:first-child]:w-42 max-md:has-data-[cover-panel]:[&>:first-child]:self-center">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 md:grid-cols-[260px_minmax(0,720px)] md:gap-10 md:pt-1.5">
+        <div className="mx-auto flex w-[min(100%,168px)] flex-col gap-3 max-md:has-data-[cover-panel]:w-full md:sticky md:top-[calc(var(--spacing-topbar)_+_24px)] md:m-0 md:w-full max-md:has-data-[cover-panel]:[&>:first-child]:w-42 max-md:has-data-[cover-panel]:[&>:first-child]:self-center">
           <CoverImage book={book} width="100%" alt={`Cover of ${book.title}`} loading="eager" />
           <CoverPanel book={book} lookup={lookup} />
         </div>
-        <div className="flex flex-col gap-4 min-w-0">
-          <p className="text-ink text-meta font-semibold empty:hidden" role="status">
+        <div className="flex min-w-0 flex-col gap-4">
+          <p className="text-meta font-semibold text-ink empty:hidden" role="status">
             {notice}
           </p>
           {buying && !editing && book.collection === "wishlist" && (

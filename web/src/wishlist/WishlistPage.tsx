@@ -87,22 +87,22 @@ function Recommendations({ recs }: { recs: RecommendationsState }) {
   );
 
   return (
-    <section aria-labelledby="recs-heading" className="wishlist__recs">
+    <section aria-labelledby="recs-heading">
       <h2 id="recs-heading" className="mb-3 text-row-title font-semibold">
         Recommendations
       </h2>
-      <p className="mb-3 text-ink-2 text-meta leading-body">
+      <p className="mb-3 text-meta leading-body text-ink-2">
         Books you do not have, picked from your library. Nothing is sent anywhere unless you download your library and
         hand it to Claude yourself.
       </p>
       <ClaudePanel recs={recs} />
       {languages.length > 1 && (
-        <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Language">
+        <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Language">
           {[null, ...languages].map((code) => (
             <button
               key={code ?? "all"}
               type="button"
-              className="min-h-segment px-3.5 rounded-pill bg-control text-ink-2 text-small cursor-pointer aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold"
+              className="min-h-segment cursor-pointer rounded-pill bg-control px-3.5 text-small text-ink-2 aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press"
               aria-pressed={language === code}
               onClick={() => setLanguage(code)}
             >
@@ -112,15 +112,15 @@ function Recommendations({ recs }: { recs: RecommendationsState }) {
         </div>
       )}
       {recs.status === "error" ? (
-        <p className="mb-3 text-ink-2 text-meta leading-body" role="alert">
+        <p className="mb-3 text-meta leading-body text-ink-2" role="alert">
           {recs.error}
         </p>
       ) : recs.status === "ready" && shown.length === 0 ? (
-        <p className="mb-3 text-ink-2 text-meta leading-body">
+        <p className="mb-3 text-meta leading-body text-ink-2">
           No recommendations yet. Download your library, copy the prompt for Claude, then import its answer.
         </p>
       ) : (
-        <ul className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-y-4 gap-x-6 list-none max-md:grid-cols-[1fr]">
+        <ul className="grid list-none grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-x-6 gap-y-4 max-md:grid-cols-[1fr]">
           {shown.map((item) => (
             <Card key={item.key} item={item} recs={recs} />
           ))}
@@ -164,11 +164,11 @@ function Card({ item, recs }: { item: Recommendation; recs: RecommendationsState
       />
       <div className="min-w-0">
         <h3 className="text-body font-semibold">{item.title}</h3>
-        <p className="mt-0.5 mb-1.5 text-muted text-small">
+        <p className="mt-0.5 mb-1.5 text-small text-muted">
           {[authorLine(item.authors), facts].filter(Boolean).join(" · ")}
         </p>
         {item.reasons.map((reason) => (
-          <p key={reason} className="mb-2 text-ink-2 text-meta leading-body">
+          <p key={reason} className="mb-2 text-meta leading-body text-ink-2">
             {reason}
           </p>
         ))}
@@ -180,13 +180,13 @@ function Card({ item, recs }: { item: Recommendation; recs: RecommendationsState
             Not interested
           </Button>
           {item.openLibraryUrl && (
-            <a className="text-accent text-meta" href={item.openLibraryUrl} target="_blank" rel="noreferrer">
+            <a className="text-meta text-accent" href={item.openLibraryUrl} target="_blank" rel="noreferrer">
               Open Library
             </a>
           )}
         </div>
         {adding === "failed" && (
-          <p className="mb-3 text-ink-2 text-meta leading-body" role="alert">
+          <p className="mb-3 text-meta leading-body text-ink-2" role="alert">
             The book did not save. Try again.
           </p>
         )}
@@ -242,11 +242,11 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
       {open && (
         <Dialog title="Import from Claude" returnFocus={() => importButton.current} onClose={() => setOpen(false)}>
           <div className="flex flex-col gap-4">
-            <p className="mb-3 text-ink-2 text-meta leading-body">
+            <p className="mb-3 text-meta leading-body text-ink-2">
               Attach the downloaded file to Claude with the prompt, then paste its answer here, or choose a file. Each
               book is looked up in Open Library first; one it cannot find is never shown. The shape:
             </p>
-            <pre className="py-2.5 px-3 overflow-x-auto rounded-control bg-ground text-small">
+            <pre className="overflow-x-auto rounded-control bg-ground px-3 py-2.5 text-small">
               {IMPORT_SCHEMA_EXAMPLE}
             </pre>
             <label className="text-label font-semibold" htmlFor="import-json">
@@ -254,7 +254,7 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
             </label>
             <textarea
               id="import-json"
-              className="w-full py-2.5 px-3 border border-hairline rounded-field bg-surface text-ink text-meta"
+              className="w-full rounded-field border border-hairline bg-surface px-3 py-2.5 text-meta text-ink"
               rows={6}
               value={text}
               onChange={(event) => setText(event.target.value)}
@@ -285,7 +285,7 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
               />
             </DialogActions>
             {message && (
-              <p className="mb-3 text-ink-2 text-meta leading-body" role="alert">
+              <p className="mb-3 text-meta leading-body text-ink-2" role="alert">
                 {message}
               </p>
             )}
@@ -301,21 +301,21 @@ function ImportProgress({ job }: { job: RecommendationsState["job"] }) {
   if (job === null || job.state === "idle") return null;
   if (job.state === "running") {
     return (
-      <p className="mb-3 text-ink-2 text-meta leading-body" role="status">
+      <p className="mb-3 text-meta leading-body text-ink-2" role="status">
         Checking {job.checked} of {job.total} in Open Library…
       </p>
     );
   }
   return (
     <div role="status">
-      <p className="mb-3 text-ink-2 text-meta leading-body">
+      <p className="mb-3 text-meta leading-body text-ink-2">
         Added {job.added}
         {job.dropped > 0 ? `; left out ${job.dropped} you already have, wished for or dismissed` : ""}.
       </p>
       {job.notFound.length > 0 && (
         <>
-          <p className="mb-3 text-ink-2 text-meta leading-body">Not found in Open Library, so not shown:</p>
-          <ul className="pl-5 text-ink-2 text-meta">
+          <p className="mb-3 text-meta leading-body text-ink-2">Not found in Open Library, so not shown:</p>
+          <ul className="pl-5 text-meta text-ink-2">
             {job.notFound.map((pick) => (
               <li key={`${pick.title}|${pick.authors.join(",")}`}>
                 {pick.title}

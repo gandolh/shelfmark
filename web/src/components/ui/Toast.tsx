@@ -36,7 +36,7 @@ export function ToastHost() {
   return (
     <Toast.Provider toastManager={manager} limit={1}>
       <Toast.Portal>
-        <Toast.Viewport className="fixed inset-0 z-float pointer-events-none">
+        <Toast.Viewport className="pointer-events-none fixed inset-0 z-float">
           <ToastList />
         </Toast.Viewport>
       </Toast.Portal>
@@ -53,10 +53,10 @@ function ToastList() {
       className={cn(
         SHEET,
         // Over the tab bar on a phone, at the corner of the window on the desktop.
-        "bottom-[calc(var(--spacing-tabbar)+env(safe-area-inset-bottom)+12px)] pointer-events-auto flex-row items-center justify-between md:right-6 md:bottom-6 md:left-auto md:mx-0 md:w-90",
+        "pointer-events-auto bottom-[calc(var(--spacing-tabbar)+env(safe-area-inset-bottom)+12px)] flex-row items-center justify-between md:right-6 md:bottom-6 md:left-auto md:mx-0 md:w-90",
       )}
     >
-      <Toast.Title className="text-ink text-body font-semibold" />
+      <Toast.Title className="text-body font-semibold text-ink" />
       <Toast.Action render={<Button variant="primary" size="compact" />} />
     </Toast.Root>
   ));

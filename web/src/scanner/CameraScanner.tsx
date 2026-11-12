@@ -298,7 +298,7 @@ export function CameraScanner({
   return (
     <div
       className={cn(
-        "relative isolate h-full min-h-60 overflow-hidden bg-ink text-surface",
+        "relative isolate h-full min-h-60 overflow-hidden bg-camera text-camera-ink",
         inStage && "absolute inset-0 h-auto min-h-0",
       )}
       data-state={state}
@@ -319,7 +319,7 @@ export function CameraScanner({
         <div
           // The viewfinder: a rounded frame about the shape of a book's barcode. Paused, it fades.
           className={cn(
-            "pointer-events-none absolute top-1/2 left-1/2 aspect-[3/2] w-[min(78%,330px)] -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-surface transition-opacity duration-150 ease-out",
+            "pointer-events-none absolute top-1/2 left-1/2 aspect-[3/2] w-[min(78%,330px)] -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-camera-ink transition-opacity duration-150 ease-out",
             paused && "opacity-40",
             inStage && "top-[45%] aspect-[240/132] w-60 rounded-[14px] border-[3px]",
           )}
@@ -345,12 +345,12 @@ export function CameraScanner({
         >
           <p className="text-[17px] font-semibold">{message.title}</p>
           <p className="text-[15px]">{message.detail}</p>
-          <div className="flex flex-wrap justify-center gap-3 mt-3 [&_button]:min-h-11 [&_button]:px-5 [&_button]:rounded-[999px] [&_button]:text-[15px] [&_button]:font-semibold [&_button]:cursor-pointer">
+          <div className="mt-3 flex flex-wrap justify-center gap-3 [&_button]:min-h-11 [&_button]:cursor-pointer [&_button]:rounded-[999px] [&_button]:px-5 [&_button]:text-[15px] [&_button]:font-semibold">
             <button type="button" className="bg-accent text-on-accent active:bg-accent-press" onClick={onFallback}>
               Type the ISBN instead
             </button>
             {message.retry && (
-              <button type="button" className="border border-surface bg-transparent text-surface" onClick={retry}>
+              <button type="button" className="border border-camera-ink bg-transparent text-camera-ink" onClick={retry}>
                 Try again
               </button>
             )}

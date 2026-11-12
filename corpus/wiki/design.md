@@ -8,7 +8,7 @@ updated: 2026-11-11
 **The design system as built is [DESIGN.md](../../DESIGN.md)** at the repo
 root (with its sidecar `.impeccable/design.json`), written on 2026-10-15
 from the shipped UI; its tokens equal
-[tokens.css](../../web/src/styles/tokens.css). Build against DESIGN.md. This
+the `@theme` block of [index.css](../../web/src/styles/index.css). Build against DESIGN.md. This
 page keeps how the look was chosen, what the owner decided, and the finish
 review. Where the two disagree, DESIGN.md and the code win.
 
@@ -63,8 +63,9 @@ palette, type or marks.
 - **Elevation:** covers `0 6px 14px rgba(27,27,29,.22), 0 1px 2px
   rgba(27,27,29,.2)`; menus and the scan sheet `0 16px 40px
   rgba(27,27,29,.18)`. Nothing else casts a shadow.
-- **Theme:** light. The camera view is dark because it is a camera. No dark
-  theme is planned.
+- **Theme:** light on a first visit, with a Light / Dark / System choice since
+  2026-11-12 (see [decisions.md](decisions.md)). The camera view is dark in both
+  because it is a camera.
 
 ## Navigation
 

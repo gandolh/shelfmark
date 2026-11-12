@@ -39,7 +39,8 @@ lists `**/ui` as the places.
   Library's Table / Covers, the sort direction, the filter operators, Import's
   Save into): one Tab stop, the arrows move and choose, one always chosen
   (base-ui rule 16; nothing is saved to the server, so not a `ToggleGroup`). Styled
-  on `data-checked`.
+  on `data-checked`. The account menu's Theme dialog (Light, Dark, System, kept on
+  this device) is one too.
 - `Toggle`: the camera's torch button.
 - `Collapsible`: Change cover.
 - `Toast` (`web/src/components/ui/Toast.tsx`): the update prompt, `timeout: 0`, with

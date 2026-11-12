@@ -105,16 +105,16 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
   };
 
   return (
-    <div className="flex flex-[1_1_auto] flex-col min-h-0">
+    <div className="flex min-h-0 flex-[1_1_auto] flex-col">
       <PanelHeader title="Columns" back={back} onDone={onClose} />
       <div
         ref={list}
-        className="flex-[1_1_auto] min-h-0 pt-0.5 pr-1.5 pb-2.5 pl-1.5 overflow-y-auto [overscroll-behavior:contain]"
+        className="min-h-0 flex-[1_1_auto] overflow-y-auto [overscroll-behavior:contain] pt-0.5 pr-1.5 pb-2.5 pl-1.5"
         data-panel-scroll
       >
         <section className="[&+&]:mt-2.5" aria-label="Shown">
           <h3
-            className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight"
+            className="block pt-2 pr-2.5 pb-1 pl-2.5 text-label leading-tight font-semibold text-muted"
             aria-hidden="true"
           >
             Shown, in order
@@ -126,9 +126,9 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
               return (
                 <li
                   key={id}
-                  className="flex items-center gap-2 min-h-9 pr-1 pl-2.5 rounded-menu-item hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+                  className="flex min-h-9 items-center gap-2 rounded-menu-item pr-1 pl-2.5 hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
                 >
-                  <label className="[&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent flex flex-[1_1_auto] items-center gap-2.5 min-w-0 min-h-9 text-meta cursor-pointer [&:has(input:disabled)]:cursor-default max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
+                  <label className="flex min-h-9 min-w-0 flex-[1_1_auto] cursor-pointer items-center gap-2.5 text-meta max-md:min-h-touch max-md:text-body [&_input]:h-4 [&_input]:w-4 [&_input]:flex-none [&_input]:accent-accent max-md:[&_input]:h-4.5 max-md:[&_input]:w-4.5 [&:has(input:disabled)]:cursor-default">
                     <input
                       type="checkbox"
                       checked
@@ -140,12 +140,12 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
                     <span>{locked ? "Book (cover, title and author)" : column.label}</span>
                   </label>
                   {locked ? (
-                    <span className="pr-1.5 text-muted text-small whitespace-nowrap">Always first</span>
+                    <span className="pr-1.5 text-small whitespace-nowrap text-muted">Always first</span>
                   ) : (
                     <span className="flex gap-0.5">
                       <button
                         type="button"
-                        className="relative flex items-center justify-center w-7 h-7 rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:opacity-30 disabled:bg-none max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:w-9 max-md:h-9"
+                        className="relative flex h-7 w-7 items-center justify-center rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:bg-none disabled:opacity-30 max-md:h-9 max-md:w-9 max-md:before:absolute max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:content-['']"
                         aria-label={`Move ${column.label} up`}
                         disabled={index <= 1}
                         data-focus-key={`up:${id}`}
@@ -155,7 +155,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
                       </button>
                       <button
                         type="button"
-                        className="relative flex items-center justify-center w-7 h-7 rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:opacity-30 disabled:bg-none max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:w-9 max-md:h-9"
+                        className="relative flex h-7 w-7 items-center justify-center rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:bg-none disabled:opacity-30 max-md:h-9 max-md:w-9 max-md:before:absolute max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:content-['']"
                         aria-label={`Move ${column.label} down`}
                         disabled={index === shown.length - 1}
                         data-focus-key={`down:${id}`}
@@ -173,7 +173,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
         {hidden.length > 0 && (
           <section className="[&+&]:mt-2.5" aria-label="Hidden">
             <h3
-              className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight"
+              className="block pt-2 pr-2.5 pb-1 pl-2.5 text-label leading-tight font-semibold text-muted"
               aria-hidden="true"
             >
               Hidden
@@ -182,9 +182,9 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
               {hidden.map((column) => (
                 <li
                   key={column.id}
-                  className="flex items-center gap-2 min-h-9 pr-1 pl-2.5 rounded-menu-item hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+                  className="flex min-h-9 items-center gap-2 rounded-menu-item pr-1 pl-2.5 hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
                 >
-                  <label className="[&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent flex flex-[1_1_auto] items-center gap-2.5 min-w-0 min-h-9 text-meta cursor-pointer [&:has(input:disabled)]:cursor-default max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
+                  <label className="flex min-h-9 min-w-0 flex-[1_1_auto] cursor-pointer items-center gap-2.5 text-meta max-md:min-h-touch max-md:text-body [&_input]:h-4 [&_input]:w-4 [&_input]:flex-none [&_input]:accent-accent max-md:[&_input]:h-4.5 max-md:[&_input]:w-4.5 [&:has(input:disabled)]:cursor-default">
                     <input
                       type="checkbox"
                       checked={false}
@@ -199,7 +199,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
           </section>
         )}
       </div>
-      <div className="flex flex-none py-1 px-2.5 border-t border-divider">
+      <div className="flex flex-none border-t border-divider px-2.5 py-1">
         <button
           type="button"
           className={buttonClass({ variant: "quiet", size: "compact" })}

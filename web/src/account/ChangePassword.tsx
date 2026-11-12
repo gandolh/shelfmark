@@ -207,7 +207,7 @@ function PasswordForm(props: PasswordFormProps) {
 
   return (
     <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-      {intro && <p className="text-ink-2 text-body leading-body">{intro}</p>}
+      {intro && <p className="text-body leading-body text-ink-2">{intro}</p>}
       <input
         className="sr-only"
         type="text"
@@ -252,11 +252,11 @@ function PasswordForm(props: PasswordFormProps) {
       />
       {blockFailure !== null && (
         <p
-          className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
           role="alert"
         >
           <AlertIcon />
-          <span className="flex-1 min-w-0">{blockFailure}</span>
+          <span className="min-w-0 flex-1">{blockFailure}</span>
         </p>
       )}
       <DialogActions desktop={desktop} onCancel={onCancel}>
@@ -284,17 +284,17 @@ function ConfirmWithWard(props: {
   const { pending, failure, desktop, onConfirm, onCancel } = props;
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-ink-2 text-body leading-body">
+      <p className="text-body leading-body text-ink-2">
         You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then
         choose one here, so you can still sign in while Ward is down.
       </p>
       {failure !== null && (
         <p
-          className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          className="flex items-start gap-2 rounded-control bg-field px-3 py-2.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
           role="alert"
         >
           <AlertIcon />
-          <span className="flex-1 min-w-0">{accountMessage(failure)}</span>
+          <span className="min-w-0 flex-1">{accountMessage(failure)}</span>
         </p>
       )}
       <DialogActions desktop={desktop} onCancel={onCancel}>
@@ -316,10 +316,10 @@ function ConfirmWithWard(props: {
 function Done({ desktop, onClose }: { desktop: boolean; onClose: () => void }) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-ink-2 text-body leading-body" role="status">
+      <p className="text-body leading-body text-ink-2" role="status">
         You're still signed in here. Shelfmark signed you out everywhere else; use the new password there.
       </p>
-      <div className="flex justify-end items-center gap-3 mt-1.5">
+      <div className="mt-1.5 flex items-center justify-end gap-3">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>

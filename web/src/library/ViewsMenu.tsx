@@ -105,10 +105,10 @@ export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
             <ViewsIcon />
             {/* The name may be long: it is cut short with an ellipsis, and keeps its width while the open button turns semibold. */}
             <span
-              className="inline-grid grid-cols-[minmax(0,auto)] max-w-45 after:[grid-area:1_/_1] after:overflow-hidden after:text-ellipsis after:whitespace-nowrap after:content-[attr(data-label)] after:invisible after:font-semibold after:select-none after:pointer-events-none max-md:max-w-32"
+              className="inline-grid max-w-45 grid-cols-[minmax(0,auto)] after:pointer-events-none after:invisible after:overflow-hidden after:font-semibold after:text-ellipsis after:whitespace-nowrap after:content-[attr(data-label)] after:select-none after:[grid-area:1_/_1] max-md:max-w-32"
               data-label={text}
             >
-              <span className="[grid-area:1_/_1] overflow-hidden text-ellipsis whitespace-nowrap">{text}</span>
+              <span className="overflow-hidden text-ellipsis whitespace-nowrap [grid-area:1_/_1]">{text}</span>
             </span>
             <ChevronDownIcon size={14} />
           </>

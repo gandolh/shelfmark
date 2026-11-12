@@ -20,6 +20,7 @@ describe("cn", () => {
     expect(cn("z-bar", "z-float")).toBe("z-float");
     expect(cn("px-2", "p-0")).toBe("p-0");
     expect(cn("min-h-control", "min-h-0")).toBe("min-h-0");
+    expect(cn("md:max-w-page", "md:max-w-none")).toBe("md:max-w-none");
   });
 
   it("drops what is false", () => {

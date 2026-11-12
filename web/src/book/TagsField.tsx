@@ -41,18 +41,18 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
 
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
+      <legend className="block text-label leading-tight font-semibold text-muted">{label}</legend>
       {value.length > 0 && (
-        <ul className="flex flex-wrap gap-1.5 list-none">
+        <ul className="flex list-none flex-wrap gap-1.5">
           {value.map((entry) => (
             <li
               key={entry}
-              className="inline-flex items-center min-h-7 px-3 rounded-pill bg-control text-ink text-meta gap-0.5 pr-1"
+              className="inline-flex min-h-7 items-center gap-0.5 rounded-pill bg-control px-3 pr-1 text-meta text-ink"
             >
               {entry}
               <button
                 type="button"
-                className="relative flex items-center justify-center w-6 h-6 rounded-pill text-ink-2 before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-1.5 hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
+                className="relative flex h-6 w-6 items-center justify-center rounded-pill text-ink-2 before:absolute before:-inset-x-1.5 before:-inset-y-2.5 before:content-[''] hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
                 aria-label={`Remove ${entry} from ${label.toLowerCase()}`}
                 onClick={() => onChange(value.filter((v) => v !== entry))}
               >
@@ -63,7 +63,7 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
         </ul>
       )}
       <input
-        className="mt-2 focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
+        className="mt-2 h-10.5 w-full appearance-none rounded-field bg-field px-3 text-input-phone text-ink focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         type="text"
         value={text}
         onChange={(event) =>

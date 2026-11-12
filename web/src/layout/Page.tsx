@@ -84,7 +84,7 @@ export function Page({
         <header
           className={cn(
             "flex flex-col gap-2.5 max-md:px-gutter-phone max-md:pt-3.5 max-md:pb-3",
-            card && "rounded-container bg-surface md:px-6 md:py-5.5 max-md:mb-2.5 max-md:rounded-t-none",
+            card && "rounded-container bg-surface max-md:mb-2.5 max-md:rounded-t-none md:px-6 md:py-5.5",
           )}
         >
           {back && <BackLink to={back.to} label={back.label} />}

@@ -43,10 +43,10 @@ export function BuyIt({
 
   return (
     <section
-      className="min-w-0 p-5 rounded-container bg-surface max-md:p-4 flex flex-col gap-4"
+      className="flex min-w-0 flex-col gap-4 rounded-container bg-surface p-5 max-md:p-4"
       aria-labelledby="book-buy-title"
     >
-      <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-buy-title" ref={heading} tabIndex={-1}>
+      <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-buy-title" ref={heading} tabIndex={-1}>
         Where does “{book.title}” go?
       </h2>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={busy} />

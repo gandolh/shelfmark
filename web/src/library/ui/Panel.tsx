@@ -64,7 +64,7 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
   const initialFocus = () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true;
   // Back to what asked for it, or the fallback when that is gone.
   const finalFocus = () => (anchor.isConnected ? anchor : fallback?.()) ?? true;
-  const frame = <div className="flex flex-[1_1_auto] flex-col min-h-0">{children}</div>;
+  const frame = <div className="flex min-h-0 flex-[1_1_auto] flex-col">{children}</div>;
 
   if (desktop) {
     return (
@@ -82,7 +82,7 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
           >
             <Popover.Popup
               ref={popupRef}
-              className="flex flex-col overflow-hidden bg-surface shadow-float text-ink outline-none w-81 max-w-[calc(100vw_-_16px)] max-h-(--available-height) rounded-menu motion-safe:animate-panel-in"
+              className="flex max-h-(--available-height) w-81 max-w-[calc(100vw_-_16px)] flex-col overflow-hidden rounded-menu bg-surface text-ink shadow-float outline-none motion-safe:animate-panel-in"
               initialFocus={initialFocus}
               finalFocus={finalFocus}
             >
@@ -96,10 +96,10 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
   return (
     <Dialog.Root open onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-float bg-ink/32" />
+        <Dialog.Backdrop className="fixed inset-0 z-float bg-scrim" />
         <Dialog.Popup
           ref={popupRef}
-          className="flex flex-col overflow-hidden bg-surface shadow-float text-ink outline-none fixed top-auto right-2 bottom-[max(8px,env(safe-area-inset-bottom))] left-2 z-float w-auto max-h-[min(86dvh,680px)] rounded-sheet motion-safe:animate-sheet-in"
+          className="fixed top-auto right-2 bottom-[max(8px,env(safe-area-inset-bottom))] left-2 z-float flex max-h-[min(86dvh,680px)] w-auto flex-col overflow-hidden rounded-sheet bg-surface text-ink shadow-float outline-none motion-safe:animate-sheet-in"
           initialFocus={initialFocus}
           finalFocus={finalFocus}
         >
@@ -130,12 +130,12 @@ export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
     </button>
   );
   return (
-    <div className="grid flex-none grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 min-h-11.5 pt-1.5 pr-2 pb-0.5 pl-2">
-      <div className="justify-self-start min-w-0">
+    <div className="grid min-h-11.5 flex-none grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 pt-1.5 pr-2 pb-0.5 pl-2">
+      <div className="min-w-0 justify-self-start">
         {back && (
           <button
             type="button"
-            className="inline-flex items-center gap-0.5 min-h-control pr-2 rounded-control text-accent text-body hover:text-accent-press max-md:min-h-touch"
+            className="inline-flex min-h-control items-center gap-0.5 rounded-control pr-2 text-body text-accent hover:text-accent-press max-md:min-h-touch"
             data-panel-back
             onClick={back.onClick}
           >
@@ -145,11 +145,11 @@ export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
         )}
       </div>
       {host === "popover" ? (
-        <Popover.Title className="overflow-hidden text-body font-semibold text-center text-ellipsis whitespace-nowrap">
+        <Popover.Title className="overflow-hidden text-center text-body font-semibold text-ellipsis whitespace-nowrap">
           {title}
         </Popover.Title>
       ) : (
-        <Dialog.Title className="overflow-hidden text-body font-semibold text-center text-ellipsis whitespace-nowrap">
+        <Dialog.Title className="overflow-hidden text-center text-body font-semibold text-ellipsis whitespace-nowrap">
           {title}
         </Dialog.Title>
       )}

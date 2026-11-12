@@ -17,6 +17,8 @@ export default [
     console: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
     // ScannerDemo is loaded with lazy(import()), which reads `default`.
     defaultExports: ["web/src/scanner/ScannerDemo.tsx"],
+    // The Tailwind entry: the unknown-class, conflicting-class and class-order rules read its theme.
+    tailwind: { css: "web/src/styles/index.css", order: true },
     // data/ is the local database.
     ignores: ["data/**", "**/dev-dist/**"],
     // Files no tsconfig reaches; the tool configs and .mjs files are linted without types by the house.

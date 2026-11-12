@@ -60,15 +60,15 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
 
   return (
     <section
-      className="book-lookup min-w-0 p-5 rounded-container bg-surface max-md:p-4"
+      className="min-w-0 rounded-container bg-surface p-5 max-md:p-4"
       aria-labelledby="book-lookup-title"
       aria-busy={state.kind === "loading" || undefined}
     >
-      <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-lookup-title" tabIndex={-1} ref={heading}>
+      <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-lookup-title" tabIndex={-1} ref={heading}>
         What the sources say now
       </h2>
 
-      {state.kind === "loading" && <p className="mb-2 text-ink-2 text-body">Looking up {book.isbn13}…</p>}
+      {state.kind === "loading" && <p className="mb-2 text-body text-ink-2">Looking up {book.isbn13}…</p>}
       {state.kind === "failed" && (
         <>
           <FailureLine>{state.failure.message}</FailureLine>
@@ -84,7 +84,7 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
       )}
       {state.kind === "done" && !draft && (
         <>
-          <p className="mb-2 text-ink-2 text-body">{notFoundText(state.response.isbn13, state.response.tried)}</p>
+          <p className="mb-2 text-body text-ink-2">{notFoundText(state.response.isbn13, state.response.tried)}</p>
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="quiet" onClick={onClose}>
               Close
@@ -94,34 +94,34 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
       )}
       {state.kind === "done" && draft && (
         <>
-          <p className="mb-2 text-ink-2 text-body">
+          <p className="mb-2 text-body text-ink-2">
             {sourceLine(draft.sources)}.{" "}
             {rows.length === 0
               ? "It matches what you have; there is nothing to take."
               : "Tick the fields to take; the rest stay as they are."}
           </p>
           {rows.length > 0 && (
-            <ul className="flex flex-col mb-3 list-none [&_li]:border-t [&_li]:border-divider">
+            <ul className="mb-3 flex list-none flex-col [&_li]:border-t [&_li]:border-divider">
               {rows.map((row) => (
                 <li key={row.field}>
-                  <label className="flex items-start gap-3 min-h-touch py-3 cursor-pointer [&_input]:flex-none [&_input]:w-5 [&_input]:h-5 [&_input]:mt-0.5 [&_input]:accent-accent [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-[-2px] [&:has(input:focus-visible)]:rounded-control">
+                  <label className="flex min-h-touch cursor-pointer items-start gap-3 py-3 [&_input]:mt-0.5 [&_input]:h-5 [&_input]:w-5 [&_input]:flex-none [&_input]:accent-accent [&:has(input:focus-visible)]:rounded-control [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-offset-[-2px] [&:has(input:focus-visible)]:outline-focus-ring">
                     <input
                       type="checkbox"
                       checked={ticked.has(row.field)}
                       onChange={() => toggle(row.field)}
                       disabled={saving}
                     />
-                    <span className="flex flex-1 flex-col gap-1.5 min-w-0">
+                    <span className="flex min-w-0 flex-1 flex-col gap-1.5">
                       <span className="text-meta font-semibold">{row.label}</span>
                       <span className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-2">
-                        <span className="flex flex-col gap-px min-w-0">
-                          <span className="text-muted text-label font-semibold">Now</span>
+                        <span className="flex min-w-0 flex-col gap-px">
+                          <span className="text-label font-semibold text-muted">Now</span>
                           <span className="max-h-[9em] overflow-auto text-body wrap-anywhere whitespace-pre-line">
                             {row.current || <span className="text-muted">Empty</span>}
                           </span>
                         </span>
-                        <span className="flex flex-col gap-px min-w-0">
-                          <span className="text-muted text-label font-semibold">Sources</span>
+                        <span className="flex min-w-0 flex-col gap-px">
+                          <span className="text-label font-semibold text-muted">Sources</span>
                           <span className="max-h-[9em] overflow-auto text-body wrap-anywhere whitespace-pre-line">
                             {row.proposed}
                           </span>

@@ -67,9 +67,9 @@ export function CoverCapture({
     }
   };
 
-  const picker = (label: string, look: string) => (
+  const picker = (label: string) => (
     <label
-      className={buttonClass({ variant: "secondary", size: "compact", pill: true }, `add-cover__pick ${look}`)}
+      className={buttonClass({ variant: "secondary", size: "compact", pill: true })}
       aria-disabled={disabled || working}
     >
       <input
@@ -87,8 +87,8 @@ export function CoverCapture({
   return (
     <div
       className={cn(
-        "flex items-center gap-3 pt-2.5 pr-2.5 pb-2.5 pl-3 rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]",
-        photo ? "[outline-style:solid] outline-divider" : null,
+        "flex items-center gap-3 rounded-menu pt-2.5 pr-2.5 pb-2.5 pl-3 [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]",
+        photo ? "outline-divider [outline-style:solid]" : null,
         className,
       )}
     >
@@ -101,11 +101,11 @@ export function CoverCapture({
           <CameraIcon size={22} />
         </span>
       )}
-      <div className="flex-1 min-w-0 text-ink-2 text-meta leading-tight" role="status">
+      <div className="min-w-0 flex-1 text-meta leading-tight text-ink-2" role="status">
         {working ? (
           <p>Making the photo smaller…</p>
         ) : problem ? (
-          <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
+          <p className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none">
             <AlertIcon size={16} />
             {problem}
           </p>
@@ -118,7 +118,7 @@ export function CoverCapture({
       <div className="flex flex-none items-center gap-1">
         {photo ? (
           <>
-            {picker("Retake", "add-cover__retake")}
+            {picker("Retake")}
             <button
               type="button"
               className={buttonClass(
@@ -132,7 +132,7 @@ export function CoverCapture({
             </button>
           </>
         ) : (
-          picker("Photo", "")
+          picker("Photo")
         )}
       </div>
     </div>

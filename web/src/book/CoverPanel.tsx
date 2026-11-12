@@ -58,12 +58,12 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
         Change cover
       </CollapsibleTrigger>
       {/* aria-live outside the panel: a result is read out even after it closes. */}
-      <p className="text-ink text-small font-semibold text-center empty:hidden" role="status">
+      <p className="text-center text-small font-semibold text-ink empty:hidden" role="status">
         {message}
       </p>
       <CollapsiblePanel
         data-cover-panel
-        className="min-w-0 rounded-container bg-surface max-md:p-4 flex flex-col items-stretch gap-3 p-3 md:p-3.5"
+        className="flex min-w-0 flex-col items-stretch gap-3 rounded-container bg-surface p-3 max-md:p-4 md:p-3.5"
         aria-busy={busy || undefined}
       >
         <CoverCapture
@@ -84,29 +84,29 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
         </label>
 
         {book.isbn13 !== null && (
-          <div className="flex flex-col gap-2 items-start">
-            <h3 className="block text-muted text-label font-semibold leading-tight">From the lookup</h3>
+          <div className="flex flex-col items-start gap-2">
+            <h3 className="block text-label leading-tight font-semibold text-muted">From the lookup</h3>
             {state.kind === "idle" && (
               <Button variant="quiet" size="compact" onClick={lookup.run} disabled={busy}>
                 Look for covers
               </Button>
             )}
-            {state.kind === "loading" && <p className="text-muted text-small leading-tight">Looking for covers…</p>}
+            {state.kind === "loading" && <p className="text-small leading-tight text-muted">Looking for covers…</p>}
             {state.kind === "failed" && (
-              <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
+              <p className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none">
                 {state.failure.message}
               </p>
             )}
             {state.kind === "done" && candidates.length === 0 && (
-              <p className="text-muted text-small leading-tight">The sources have no cover for this ISBN.</p>
+              <p className="text-small leading-tight text-muted">The sources have no cover for this ISBN.</p>
             )}
             {candidates.length > 0 && (
-              <ul className="flex flex-wrap gap-3 list-none">
+              <ul className="flex list-none flex-wrap gap-3">
                 {candidates.map((candidate) => (
                   <li key={candidate.url}>
                     <button
                       type="button"
-                      className="block rounded-cover focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[3px] disabled:opacity-45"
+                      className="block rounded-cover focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-focus-ring disabled:opacity-45"
                       disabled={busy}
                       aria-label={`Use this cover from ${SOURCE_NAMES[candidate.source]}`}
                       onClick={() => void act(() => fetchCover(book.id, candidate.url), "Cover replaced.")}
@@ -123,7 +123,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
         {book.hasCover &&
           (confirmRemove ? (
             <div
-              className="flex flex-wrap items-center gap-2 text-ink text-meta"
+              className="flex flex-wrap items-center gap-2 text-meta text-ink"
               role="group"
               aria-label="Remove the cover"
             >
@@ -154,7 +154,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
           ))}
         {problem && (
           <p
-            className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+            className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
             role="alert"
           >
             {problem}

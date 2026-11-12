@@ -36,30 +36,30 @@ export function DeleteBook({ book, onDelete }: { book: Book; onDelete: () => Pro
 
   return (
     <section
-      className="flex flex-col items-start gap-2 mt-4 pt-6 border-t border-hairline"
+      className="mt-4 flex flex-col items-start gap-2 border-t border-hairline pt-6"
       aria-labelledby="book-delete-title"
     >
-      <h2 className="text-muted text-label font-semibold" id="book-delete-title">
+      <h2 className="text-label font-semibold text-muted" id="book-delete-title">
         Delete
       </h2>
       {!asking ? (
         <>
-          <p className="text-muted text-small leading-tight">Take this copy out of your library.</p>
+          <p className="text-small leading-tight text-muted">Take this copy out of your library.</p>
           <Button id="book-delete-open" variant="secondary" pill onClick={() => setAsking(true)}>
             Delete this book
           </Button>
         </>
       ) : (
-        <div className="flex flex-col gap-2 items-start" role="group" aria-labelledby="book-delete-q">
+        <div className="flex flex-col items-start gap-2" role="group" aria-labelledby="book-delete-q">
           <p
-            className="text-row-title font-semibold wrap-anywhere focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+            className="text-row-title font-semibold wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-2 focus-visible:outline-offset-[4px] focus-visible:outline-focus-ring"
             id="book-delete-q"
             tabIndex={-1}
             ref={heading}
           >
             Delete “{book.title}”?
           </p>
-          <p className="text-muted text-small leading-tight">
+          <p className="text-small leading-tight text-muted">
             It leaves your library with its cover and notes. This can’t be undone.
           </p>
           {failure && <FailureLine>{failure}</FailureLine>}

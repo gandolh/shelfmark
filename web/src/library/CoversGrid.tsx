@@ -237,7 +237,7 @@ export function CoversGrid({
             role="none"
             data-index={item.index}
             ref={virtualizer.measureElement}
-            className="absolute top-0 left-0 grid items-start w-full"
+            className="absolute top-0 left-0 grid w-full items-start"
             style={{
               transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)`,
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,

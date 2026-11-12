@@ -37,10 +37,10 @@ export function RatingField({
   const hint = useId();
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-muted text-label font-semibold leading-tight">Rating</legend>
+      <legend className="block text-label leading-tight font-semibold text-muted">Rating</legend>
       <ToggleGroup
         aria-label="Rating"
-        className="flex items-center gap-0.5 mt-1.5"
+        className="mt-1.5 flex items-center gap-0.5"
         aria-describedby={hint}
         value={value === null ? null : String(value)}
         onChoose={(next) => onChange(next === null ? null : Number(next))}
@@ -58,7 +58,7 @@ export function RatingField({
             <StarIcon on={value !== null && n <= value} />
           </Toggle>
         ))}
-        <span className="ml-2.5 text-ink-2 text-meta">{value === null ? "Not rated" : `${value} of 5`}</span>
+        <span className="ml-2.5 text-meta text-ink-2">{value === null ? "Not rated" : `${value} of 5`}</span>
       </ToggleGroup>
       <p className="mt-1.5 text-small leading-tight text-muted" id={hint}>
         Press the chosen star again to clear it.

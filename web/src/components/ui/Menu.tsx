@@ -60,7 +60,7 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
         {typeof trigger === "string" ? (
           // The open button's label turns semibold; keep its width from moving the row.
           <span
-            className="inline-flex flex-col items-center after:content-[attr(data-label)] after:h-0 after:overflow-hidden after:invisible after:font-semibold after:select-none after:pointer-events-none"
+            className="inline-flex flex-col items-center after:pointer-events-none after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)] after:select-none"
             data-label={trigger}
           >
             {trigger}
@@ -72,7 +72,7 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
       <BaseMenu.Portal>
         <BaseMenu.Positioner className="z-float" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
           <BaseMenu.Popup
-            className="flex flex-col min-w-56 max-w-[calc(100vw_-_16px)] p-1.5 rounded-menu bg-surface shadow-float text-ink outline-none motion-safe:animate-panel-in"
+            className="flex max-w-[calc(100vw_-_16px)] min-w-56 flex-col rounded-menu bg-surface p-1.5 text-ink shadow-float outline-none motion-safe:animate-panel-in"
             aria-label={label}
             finalFocus={() => {
               const item = chosen.current;
@@ -88,19 +88,19 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                 {section.label ? (
                   <BaseMenu.GroupLabel
                     className={cn(
-                      "pt-1.5 pr-2.5 pb-0.5 pl-2.5 text-muted text-label font-semibold",
+                      "pt-1.5 pr-2.5 pb-0.5 pl-2.5 text-label font-semibold text-muted",
                       sectionIndex > 0 && "pt-2.5",
                     )}
                   >
                     {section.label}
                   </BaseMenu.GroupLabel>
                 ) : sectionIndex > 0 ? (
-                  <BaseMenu.Separator className="h-px my-1.25 mx-1 bg-divider" />
+                  <BaseMenu.Separator className="mx-1 my-1.25 h-px bg-divider" />
                 ) : null}
                 {section.items.map((item) => (
                   <BaseMenu.Item
                     key={item.label}
-                    className="flex items-center justify-between gap-5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta text-left cursor-default select-none data-highlighted:bg-accent-tint-soft focus-visible:outline-offset-[-2px] data-disabled:text-muted data-disabled:bg-none max-md:min-h-touch max-md:text-body"
+                    className="flex min-h-9 cursor-default items-center justify-between gap-5 rounded-menu-item px-2.5 text-left text-meta text-ink select-none focus-visible:outline-offset-[-2px] data-disabled:bg-none data-disabled:text-muted data-highlighted:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
                     disabled={item.disabled}
                     onClick={() => {
                       chosen.current = item;
@@ -108,7 +108,7 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                   >
                     <span className="flex-none">{item.label}</span>
                     {item.detail && (
-                      <span className="min-w-0 max-w-[20em] overflow-hidden text-muted text-small text-ellipsis whitespace-nowrap">
+                      <span className="max-w-[20em] min-w-0 overflow-hidden text-small text-ellipsis whitespace-nowrap text-muted">
                         {item.detail}
                       </span>
                     )}

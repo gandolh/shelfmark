@@ -45,22 +45,22 @@ function OptionalChoice<T extends string>({
   const entries = [[null, "Not set"], ...Object.entries<string>(options)] as [T | null, string][];
   return (
     <fieldset className="min-w-0">
-      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
-      <div className="flex flex-wrap gap-2 mt-2">
+      <legend className="block text-label leading-tight font-semibold text-muted">{label}</legend>
+      <div className="mt-2 flex flex-wrap gap-2">
         {entries.map(([key, text]) => (
           <label
             key={key ?? "none"}
-            className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 px-3.5 rounded-pill bg-control text-ink text-meta leading-tight cursor-pointer select-none transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control-hover aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:content-[''] max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0"
+            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-3.5 text-meta leading-tight text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
           >
             <input
-              className="absolute inset-0 w-full h-full opacity-0 [cursor:inherit]"
+              className="absolute inset-0 h-full w-full [cursor:inherit] opacity-0"
               type="radio"
               name={name}
               checked={key === value}
               onChange={() => onChange(key)}
             />
             <span
-              className="inline-flex flex-col min-w-0 after:content-[attr(data-label)] after:h-0 after:overflow-hidden after:invisible after:font-semibold after:select-none after:pointer-events-none"
+              className="inline-flex min-w-0 flex-col after:pointer-events-none after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)] after:select-none"
               data-label={text}
             >
               {text}
@@ -84,25 +84,25 @@ function AreaField({
 >) {
   const id = useId();
   return (
-    <div className="flex flex-col gap-1.5 min-w-0">
-      <label className="block text-muted text-label font-semibold leading-tight" htmlFor={id}>
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <label className="block text-label leading-tight font-semibold text-muted" htmlFor={id}>
         {label}
         <span className="ml-1.5 font-regular">optional</span>
       </label>
       <textarea
         {...area}
         id={id}
-        className="h-auto min-h-24 py-2.5 px-3 leading-body resize-y focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
+        className="h-10.5 h-auto min-h-24 w-full resize-y appearance-none rounded-field bg-field px-3 px-3 py-2.5 text-input-phone leading-body text-ink focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         rows={4}
         aria-invalid={error !== undefined}
       />
       {error ? (
-        <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
+        <p className="flex items-start gap-1.5 text-small leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none">
           <AlertIcon size={16} />
           {error}
         </p>
       ) : (
-        hint && <p className="text-muted text-small leading-tight">{hint}</p>
+        hint && <p className="text-small leading-tight text-muted">{hint}</p>
       )}
     </div>
   );
@@ -267,7 +267,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           options={CONDITION_LABELS}
           onChange={(next) => set("condition", next)}
         />
-        <label className="flex items-center gap-2.5 min-h-touch text-body cursor-pointer [&_input]:w-5 [&_input]:h-5 [&_input]:accent-accent [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-2 [&:has(input:focus-visible)]:rounded-control">
+        <label className="flex min-h-touch cursor-pointer items-center gap-2.5 text-body [&_input]:h-5 [&_input]:w-5 [&_input]:accent-accent [&:has(input:focus-visible)]:rounded-control [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-offset-2 [&:has(input:focus-visible)]:outline-focus-ring">
           <input type="checkbox" checked={values.signed} onChange={(event) => set("signed", event.target.checked)} />
           Signed by the author
         </label>
@@ -299,7 +299,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
       </fieldset>
 
       {failure && <FailureLine>{failure}</FailureLine>}
-      <div className="sticky bottom-0 z-1 flex gap-2.5 py-3 border-t border-hairline bg-ground max-md:bottom-[calc(var(--spacing-tabbar)_-_10px_+_max(10px,env(safe-area-inset-bottom)))] max-md:mx-[calc(var(--spacing-gutter-phone)_*_-1)] max-md:px-gutter-phone">
+      <div className="sticky bottom-0 z-1 flex gap-2.5 border-t border-hairline bg-ground py-3 max-md:bottom-[calc(var(--spacing-tabbar)_-_10px_+_max(10px,env(safe-area-inset-bottom)))] max-md:mx-[calc(var(--spacing-gutter-phone)_*_-1)] max-md:px-gutter-phone">
         <Button
           type="submit"
           variant="primary"

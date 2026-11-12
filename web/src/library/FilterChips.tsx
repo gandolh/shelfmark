@@ -36,18 +36,18 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
   if (active.length === 0) return null;
 
   return (
-    <div ref={root} className="flex flex-wrap items-center gap-2 mb-4">
-      <ul className="flex flex-wrap gap-2 list-none" role="list" aria-label="Filters on">
+    <div ref={root} className="mb-4 flex flex-wrap items-center gap-2">
+      <ul className="flex list-none flex-wrap gap-2" role="list" aria-label="Filters on">
         {active.map(([column, filter], index) => {
           const text = describeFilter(column, filter);
           return (
             <li
               key={column.id}
-              className="inline-flex items-center min-w-0 max-w-full min-h-segment-small rounded-pill bg-accent-tint text-accent-press text-small leading-tight"
+              className="inline-flex min-h-segment-small max-w-full min-w-0 items-center rounded-pill bg-accent-tint text-small leading-tight text-accent-press"
             >
               <button
                 type="button"
-                className="relative text-inherit flex items-center min-w-0 max-w-85 min-h-segment-small pr-1 pl-3 rounded-[var(--radius-pill)_0_0_var(--radius-pill)] font-semibold text-left max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0"
+                className="relative flex min-h-segment-small max-w-85 min-w-0 items-center rounded-[var(--radius-pill)_0_0_var(--radius-pill)] pr-1 pl-3 text-left font-semibold text-inherit max-md:before:absolute max-md:before:inset-x-0 max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:content-['']"
                 aria-haspopup="dialog"
                 onClick={(event) => onEdit(column.id, event.currentTarget)}
               >
@@ -55,7 +55,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
               </button>
               <button
                 type="button"
-                className="relative text-inherit flex flex-none items-center justify-center w-6 h-6 mr-0.75 rounded-pill transition-[background-color] duration-(--duration-fast) ease-out hover:bg-[color-mix(in_srgb,var(--color-accent)_16%,var(--color-accent-tint))] max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)]"
+                className="relative mr-0.75 flex h-6 w-6 flex-none items-center justify-center rounded-pill text-inherit transition-[background-color] duration-(--duration-fast) ease-out hover:bg-accent-tint-hover max-md:before:absolute max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:content-['']"
                 data-chip-remove
                 aria-label={`Remove filter: ${text}`}
                 onClick={() => {

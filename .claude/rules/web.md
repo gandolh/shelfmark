@@ -11,7 +11,9 @@ paths:
 - Base UI sits under the menus, panels, dialog and switches
   ([corpus/wiki/decisions.md](../../corpus/wiki/decisions.md)). Native
   checkboxes, radios and selects stay native.
-- Light only until the app gains a Light / Dark / System switch.
+- Styling is Tailwind 4 in `web/src/styles/index.css`: colours, sizes, radii and shadows only from its `@theme`
+  tokens, no arbitrary colours (`bg-[#fff]`), no `/NN` on a colour that is itself a mix. Light is the default and
+  the switch has three choices (Light, Dark, System); a dark colour is the dark half of a token's `light-dark()`.
 - Every call to the server goes through `web/src/api.ts`, with the shared
   schemas from `@shelfmark/shared`.
 - UI copy uses the words of [corpus/wiki/glossary.md](../../corpus/wiki/glossary.md).
@@ -22,4 +24,4 @@ paths:
   `lazy(import())`, and the tool configs).
 - `web/vendor/ward/` is generated. Never edit it.
 - `npm run check:conventions` runs `check-base-ui` over this folder,
-  `--warn-only` until the Base UI and Tailwind work lands.
+  strict.

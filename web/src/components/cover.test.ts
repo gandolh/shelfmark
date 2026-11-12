@@ -5,16 +5,23 @@ import { authorLine, COVER_TINT_COUNT, coverTint, tintKey } from "./cover";
 // The stylesheet the app ships. (A `?raw` import is empty: Vitest leaves CSS unprocessed.)
 const tokens = readFileSync(new URL("../styles/index.css", import.meta.url), "utf8");
 
-/** `--color-cover-3-bg: #33503E;` → { 3: { bg: "#33503E" } }. */
-function coverTokens(): Map<number, { bg?: string; ink?: string }> {
-  const tints = new Map<number, { bg?: string; ink?: string }>();
-  for (const match of tokens.matchAll(/--color-cover-(\d+)-(bg|ink):\s*(#[0-9a-f]{6})\s*;/gi)) {
-    const [, n = "", part, value = ""] = match;
+/** `--color-cover-3-bg: light-dark(#33503E, #3f6450);` → { 3: { bg: { light, dark } } }. */
+function coverTokens(): Map<number, { bg?: Pair; ink?: Pair }> {
+  const tints = new Map<number, { bg?: Pair; ink?: Pair }>();
+  for (const match of tokens.matchAll(
+    /--color-cover-(\d+)-(bg|ink):\s*light-dark\((#[0-9a-f]{6}),\s*(#[0-9a-f]{6})\)\s*;/gi,
+  )) {
+    const [, n = "", part, light = "", dark = ""] = match;
     const tint = tints.get(Number(n)) ?? {};
-    tint[part as "bg" | "ink"] = value;
+    tint[part as "bg" | "ink"] = { light, dark };
     tints.set(Number(n), tint);
   }
   return tints;
+}
+
+interface Pair {
+  light: string;
+  dark: string;
 }
 
 /** WCAG 2 relative luminance and contrast ratio. */
@@ -79,8 +86,11 @@ describe("the tints in index.css", () => {
   });
 
   it("gives every tint's text at least 4.5:1", () => {
-    for (const [n, { bg = "", ink = "" }] of coverTokens()) {
-      expect(contrast(bg, ink), `tint ${n}: ${ink} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    for (const [n, { bg, ink }] of coverTokens()) {
+      for (const theme of ["light", "dark"] as const) {
+        const [on, under] = [ink?.[theme] ?? "", bg?.[theme] ?? ""];
+        expect(contrast(under, on), `tint ${n}, ${theme}: ${on} on ${under}`).toBeGreaterThanOrEqual(4.5);
+      }
     }
   });
 });

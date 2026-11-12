@@ -42,11 +42,11 @@ export function StatsPage() {
 
   return (
     <Page title="Stats" caption="Owned books only" back={{ to: LIBRARY, label: "Library" }}>
-      <div className="flex flex-col gap-5 max-w-page">
+      <div className="flex max-w-page flex-col gap-5">
         {status === "loading" && books.length === 0 ? (
-          <p className="text-muted text-meta">Loading your books…</p>
+          <p className="text-meta text-muted">Loading your books…</p>
         ) : stats.owned === 0 ? (
-          <p className="text-muted text-meta">No owned books yet. Add one and its counts show here.</p>
+          <p className="text-meta text-muted">No owned books yet. Add one and its counts show here.</p>
         ) : (
           <>
             <dl className="flex flex-wrap gap-3">
@@ -54,7 +54,7 @@ export function StatsPage() {
               <Total label="Authors" value={stats.distinctAuthors} />
               <Total label="Shelves in use" value={stats.shelvesInUse} />
             </dl>
-            <p className="text-muted text-meta">
+            <p className="text-meta text-muted">
               <Link to={WISHLIST}>Wishlist: {stats.wishlist}</Link>
             </p>
 
@@ -83,19 +83,19 @@ export function StatsPage() {
             </Section>
             <Section title="Spent per year">
               {stats.spending.length === 0 ? (
-                <p className="text-muted text-meta">No book has both a price and an acquired date yet.</p>
+                <p className="text-meta text-muted">No book has both a price and an acquired date yet.</p>
               ) : (
                 stats.spending.map((money) => (
                   <table key={money.currency} className={TABLE}>
-                    <caption className="pt-2.5 pr-4 pl-4 bg-surface text-muted text-label font-semibold text-left">
+                    <caption className="bg-surface pt-2.5 pr-4 pl-4 text-left text-label font-semibold text-muted">
                       {money.currency}
                     </caption>
                     <tbody>
                       {money.years.map((row) => (
                         <tr key={row.year}>
                           <th scope="row">{row.year}</th>
-                          <td className="text-muted text-meta">{plural(row.books, "book", "books")}</td>
-                          <td className="stats__num">{formatPrice(row.totalMinor, money.currency)}</td>
+                          <td className="text-meta text-muted">{plural(row.books, "book", "books")}</td>
+                          <td>{formatPrice(row.totalMinor, money.currency)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -103,7 +103,7 @@ export function StatsPage() {
                 ))
               )}
               {stats.unpriced > 0 && (
-                <p className="text-muted text-meta">
+                <p className="text-meta text-muted">
                   {plural(stats.unpriced, "book has", "books have")} no price or no acquired date, so{" "}
                   {stats.unpriced === 1 ? "it isn't" : "they aren't"} counted here.
                 </p>
@@ -118,7 +118,7 @@ export function StatsPage() {
 
 function Total({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex-[1_1_140px] py-4 px-5 bg-surface rounded-container [&_dt]:text-muted [&_dt]:text-label [&_dt]:font-semibold [&_dd]:mt-1 [&_dd]:text-title-phone [&_dd]:font-bold [&_dd]:tabular-nums">
+    <div className="flex-[1_1_140px] rounded-container bg-surface px-5 py-4 [&_dd]:mt-1 [&_dd]:text-title-phone [&_dd]:font-bold [&_dd]:tabular-nums [&_dt]:text-label [&_dt]:font-semibold [&_dt]:text-muted">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>
@@ -136,11 +136,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 /** A count that opens the Library on its books; plain text when there is no filter for it. */
 function Count({ count, filter, label }: { count: number; filter: LibraryFilter | null; label: string }) {
-  if (!filter) return <span className="stats__num">{count}</span>;
+  if (!filter) return <span>{count}</span>;
   return (
     <button
       type="button"
-      className="min-w-11 min-h-11 -my-3 px-1 text-accent tabular-nums cursor-pointer hover:text-accent-press hover:underline"
+      className="-my-3 min-h-11 min-w-11 cursor-pointer px-1 text-accent tabular-nums hover:text-accent-press hover:underline"
       aria-label={`${count} ${label}, show in Library`}
       onClick={() => openInLibrary(filter)}
     >
@@ -179,7 +179,7 @@ function List({
           ))}
         </tbody>
       </table>
-      {more > 0 && <p className="text-muted text-meta">and {more} more</p>}
+      {more > 0 && <p className="text-meta text-muted">and {more} more</p>}
     </>
   );
 }
@@ -216,7 +216,7 @@ function Rooms({ rooms }: { rooms: readonly Room[] }) {
           })}
         </tbody>
       </table>
-      {more > 0 && <p className="text-muted text-meta">and {more} more</p>}
+      {more > 0 && <p className="text-meta text-muted">and {more} more</p>}
     </>
   );
 }

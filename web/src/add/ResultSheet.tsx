@@ -175,7 +175,7 @@ export function ResultSheet({
     </Sheet>
   ) : (
     <section
-      className="flex flex-col gap-3.5 p-4 rounded-container bg-surface motion-safe:animate-dialog-in md:gap-4 md:p-5"
+      className="flex flex-col gap-3.5 rounded-container bg-surface p-4 motion-safe:animate-dialog-in md:gap-4 md:p-5"
       aria-labelledby={headingId}
     >
       {content}
@@ -203,8 +203,8 @@ function useHeadingFocus(takeFocus: boolean) {
 function Head({ cover, children }: { cover: ReactNode; children: ReactNode }) {
   return (
     <div className="flex items-start gap-3.5">
-      <div className="flex-none w-15">{cover}</div>
-      <div className="flex flex-col gap-0.5 min-w-0">{children}</div>
+      <div className="w-15 flex-none">{cover}</div>
+      <div className="flex min-w-0 flex-col gap-0.5">{children}</div>
     </div>
   );
 }
@@ -231,25 +231,25 @@ function Looking({ isbn13, headingId, takeFocus, on }: Shared & { isbn13: string
 
   return (
     <>
-      <Head cover={<span className="block w-15 aspect-[2/3] rounded-cover bg-control" />}>
+      <Head cover={<span className="block aspect-[2/3] w-15 rounded-cover bg-control" />}>
         <h2
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="tabular-nums text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere tabular-nums focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {isbn13}
         </h2>
-        <p className="text-muted text-meta tabular-nums" role="status">
+        <p className="text-meta text-muted tabular-nums" role="status">
           {slow ? "Still looking. Open Library can take a few seconds." : "Looking it up in Open Library…"}
         </p>
       </Head>
       <div
-        className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
+        className="relative h-0.75 overflow-hidden rounded-pill bg-control after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:content-[''] after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
         role="progressbar"
         aria-label={`Looking up ${isbn13}`}
       />
-      <div className="flex justify-center gap-3 -mt-1">
+      <div className="-mt-1 flex justify-center gap-3">
         <Leave onClick={on.discard}>Cancel</Leave>
       </div>
     </>
@@ -295,16 +295,16 @@ function Found({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {details.title}
           {details.subtitle && (
-            <span className="block mt-0.5 text-ink-2 text-body font-regular tracking-[0]">{details.subtitle}</span>
+            <span className="mt-0.5 block text-body font-regular tracking-[0] text-ink-2">{details.subtitle}</span>
           )}
         </h2>
-        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
-        {meta && <p className="text-muted text-meta tabular-nums">{meta}</p>}
-        <p className="mt-0.5 text-muted text-small">{sourceLine(proposal.origin)}</p>
+        {byline && <p className="mt-0.5 text-body text-ink-2">{byline}</p>}
+        {meta && <p className="text-meta text-muted tabular-nums">{meta}</p>}
+        <p className="mt-0.5 text-small text-muted">{sourceLine(proposal.origin)}</p>
       </Head>
       {proposal.cover.kind === "none" && <CoverCapture photo={photo} onChange={setPhoto} disabled={save.saving} />}
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
@@ -334,7 +334,7 @@ function Found({
           Add to wishlist
         </Button>
       )}
-      <div className="flex gap-3 -mt-1 justify-between">
+      <div className="-mt-1 flex justify-between gap-3">
         <Leave onClick={on.discard} disabled={save.saving}>
           {proposal.origin === "copy" ? words.discard : "Not this book"}
         </Leave>
@@ -371,7 +371,7 @@ function Owned({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
-        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
+        <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           <CheckIcon size={15} />
           Already in your library
         </p>
@@ -379,12 +379,12 @@ function Owned({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
-        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
-        <p className="text-muted text-meta tabular-nums">{ownedLine(owned, now)}</p>
+        {byline && <p className="mt-0.5 text-body text-ink-2">{byline}</p>}
+        <p className="text-meta text-muted tabular-nums">{ownedLine(owned, now)}</p>
       </Head>
       <Button variant="primary" size="large" block onClick={on.discard}>
         {words.next}
@@ -433,7 +433,7 @@ function Wishlisted({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
-        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
+        <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           <CheckIcon size={15} />
           On your wishlist
         </p>
@@ -441,11 +441,11 @@ function Wishlisted({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
-        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
+        {byline && <p className="mt-0.5 text-body text-ink-2">{byline}</p>}
       </Head>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
       {save.failure && <FailureLine>{save.failure.message}</FailureLine>}
@@ -494,7 +494,7 @@ function Offline({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} width={60} loading="eager" />}>
-        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
+        <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           {answer.kind === "absent" ? <AlertIcon size={15} /> : <CheckIcon size={15} />}
           {offlineStatus(answer)}
         </p>
@@ -502,18 +502,18 @@ function Offline({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
-        <p className="text-muted text-meta tabular-nums">{offlineNote(answer)}</p>
-        {answer.kind === "absent" && <p className="text-muted text-meta tabular-nums">Adding it needs the network.</p>}
+        <p className="text-meta text-muted tabular-nums">{offlineNote(answer)}</p>
+        {answer.kind === "absent" && <p className="text-meta text-muted tabular-nums">Adding it needs the network.</p>}
       </Head>
       {answer.kind === "absent" && <LookLater isbn13={isbn13} {...later} on={on} />}
       <Button variant="primary" size="large" block onClick={on.discard}>
         {words.next}
       </Button>
-      <div className="flex justify-center gap-3 -mt-1">
+      <div className="-mt-1 flex justify-center gap-3">
         <Button variant="quiet" onClick={on.retry}>
           Try again online
         </Button>
@@ -534,7 +534,7 @@ interface LookLaterProps {
 /** Offline, a book to add: queue its ISBN (and a shelf) to be looked up once the network is back. */
 function LookLater({ isbn13, shelves, defaultShelf, waiting, on }: LookLaterProps) {
   const [shelf, setShelf] = useState(defaultShelf);
-  if (waiting) return <p className="text-muted text-meta tabular-nums">Already waiting to be looked up.</p>;
+  if (waiting) return <p className="text-meta text-muted tabular-nums">Already waiting to be looked up.</p>;
   return (
     <>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} />
@@ -552,20 +552,20 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
   return (
     <>
       <div className="flex items-start gap-3">
-        <span className="flex flex-none items-center justify-center w-10 h-10 rounded-pill bg-control text-ink-2">
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-pill bg-control text-ink-2">
           <BarcodeIcon size={22} />
         </span>
-        <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex min-w-0 flex-col gap-0.5">
           <h2
             ref={heading}
             id={headingId}
             tabIndex={-1}
-            className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+            className="text-(length:--text-sheet-heading) leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
           >
             This barcode isn't an ISBN
           </h2>
           <p className="mt-0.5 text-body text-ink-2">
-            It reads <span className="tabular-nums text-ink-2 font-semibold wrap-anywhere">{code}</span>, a shop's
+            It reads <span className="font-semibold wrap-anywhere text-ink-2 tabular-nums">{code}</span>, a shop's
             sticker or another code. The ISBN is printed near the barcode or on the copyright page.
           </p>
         </div>
@@ -578,7 +578,7 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
           Add by hand
         </Button>
       </div>
-      <div className="flex justify-center gap-3 -mt-1">
+      <div className="-mt-1 flex justify-center gap-3">
         <Leave onClick={on.discard}>{words.discard}</Leave>
       </div>
     </>
@@ -589,20 +589,20 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
 function Typing({ code, headingId, takeFocus, on }: Shared & { code: string }) {
   return (
     <>
-      <div className="flex flex-col gap-0.5 min-w-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <h2
           id={headingId}
-          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+          className="text-(length:--text-sheet-heading) leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           Type the ISBN
         </h2>
-        <p className="text-muted text-meta tabular-nums">
-          The code read was <span className="tabular-nums text-ink-2 font-semibold wrap-anywhere">{code}</span>. The
+        <p className="text-meta text-muted tabular-nums">
+          The code read was <span className="font-semibold wrap-anywhere text-ink-2 tabular-nums">{code}</span>. The
           ISBN is printed near the barcode or on the copyright page.
         </p>
       </div>
       <IsbnField size="regular" onSubmit={on.submitIsbn} keepFocus={false} autoFocus={takeFocus} hint={null} />
-      <div className="flex gap-3 -mt-1 justify-between">
+      <div className="-mt-1 flex justify-between gap-3">
         <Leave onClick={on.discard}>Back to scanning</Leave>
         <Button variant="quiet" onClick={on.byHand}>
           Add by hand
@@ -626,15 +626,15 @@ function Failed({
   return (
     <>
       <div className="flex items-start gap-3">
-        <span className="flex flex-none items-center justify-center w-10 h-10 rounded-pill bg-control text-ink-2">
+        <span className="flex h-10 w-10 flex-none items-center justify-center rounded-pill bg-control text-ink-2">
           <AlertIcon size={22} />
         </span>
-        <div className="flex flex-col gap-0.5 min-w-0">
+        <div className="flex min-w-0 flex-col gap-0.5">
           <h2
             ref={heading}
             id={headingId}
             tabIndex={-1}
-            className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+            className="text-(length:--text-sheet-heading) leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
           >
             The lookup didn't work
           </h2>
@@ -645,7 +645,7 @@ function Failed({
       <Button variant="primary" size="large" block onClick={on.retry}>
         Try again
       </Button>
-      <div className="flex gap-3 -mt-1 justify-between">
+      <div className="-mt-1 flex justify-between gap-3">
         <Leave onClick={on.discard}>{words.discard}</Leave>
         <Button variant="quiet" onClick={on.byHand}>
           Add by hand
@@ -662,26 +662,26 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
-      <div className="flex flex-col gap-0.5 min-w-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <h2
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+          className="text-(length:--text-sheet-heading) leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {waitingLine(queue)}
         </h2>
-        <p className="text-muted text-meta tabular-nums">
+        <p className="text-meta text-muted tabular-nums">
           Looked up one at a time while you're online. Each answer is yours to confirm.
         </p>
       </div>
       {queue.length > 0 && (
-        <ul className="flex flex-col list-none">
+        <ul className="flex list-none flex-col">
           {queue.map((item) => (
-            <li key={item.id} className="flex items-center gap-2 py-2.5 border-t border-hairline">
-              <div className="flex flex-1 flex-col min-w-0">
-                <span className="add-queue__isbn tabular-nums">{item.isbn13}</span>
-                <span className="text-muted text-meta tabular-nums">
+            <li key={item.id} className="flex items-center gap-2 border-t border-hairline py-2.5">
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="tabular-nums">{item.isbn13}</span>
+                <span className="text-meta text-muted tabular-nums">
                   {queueItemLine(item)}
                   {item.shelf !== null && ` · ${item.shelf}`}
                 </span>
@@ -705,7 +705,7 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
           ))}
         </ul>
       )}
-      <div className="flex justify-center gap-3 -mt-1">
+      <div className="-mt-1 flex justify-center gap-3">
         <Leave onClick={on.discard}>Close</Leave>
       </div>
     </>
@@ -734,14 +734,14 @@ function FormIntro({
     );
   if (reason === "edit") {
     return (
-      <div className="flex flex-col gap-0.5 min-w-0">
+      <div className="flex min-w-0 flex-col gap-0.5">
         <h2
           id={headingId}
-          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+          className="text-(length:--text-sheet-heading) leading-[1.2] font-semibold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           Edit details
         </h2>
-        {lookup?.draft && <p className="mt-0.5 text-muted text-small">{sourceLine(lookup.draft.sources)}</p>}
+        {lookup?.draft && <p className="mt-0.5 text-small text-muted">{sourceLine(lookup.draft.sources)}</p>}
       </div>
     );
   }
@@ -793,7 +793,7 @@ function FormIntro({
   }
 
   return (
-    <div className="flex flex-col items-start gap-1 text-ink text-body [&_strong]:font-semibold">
+    <div className="flex flex-col items-start gap-1 text-body text-ink [&_strong]:font-semibold">
       <h2 id={headingId} className="sr-only">
         Add it by hand
       </h2>

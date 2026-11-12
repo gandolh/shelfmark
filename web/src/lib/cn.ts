@@ -40,6 +40,8 @@ const twMerge = extendTailwindMerge({
         "gutter-desktop",
         "gutter-phone",
       ],
+      // `max-w-page`: the page column's width, so `max-w-none` replaces it.
+      container: ["page"],
       radius: ["cover", "segment", "menu-item", "control", "field", "track", "menu", "container", "sheet", "pill"],
       shadow: ["cover", "float"],
     },
