@@ -110,7 +110,7 @@ export const migrations: readonly string[] = [
   // appends. `key` is the work's Open Library key, else the title key.
   // `recommendation_dismissals` keeps a "Not interested" for good, by work
   // key and by title key (one row each, `kind` says which). `catalog_query_cache`
-  // keeps each catalog answer by its URL for 30 days (recommend/cache.ts).
+  // keeps each catalog answer by its URL for 30 days (features/recommendations/cache.ts).
   `
   CREATE TABLE recommendations (
     key           TEXT PRIMARY KEY,

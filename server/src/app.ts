@@ -15,8 +15,8 @@ import {
   type CipStore,
   type Connect,
 } from "./features/lookup/index.js";
+import { recommendationRoutes } from "./features/recommendations/index.js";
 import { viewRoutes } from "./features/views/index.js";
-import { recommendationRoutes } from "./routes/recommendations.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
 export interface FeatureContext {

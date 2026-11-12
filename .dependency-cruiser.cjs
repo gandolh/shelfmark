@@ -3,10 +3,23 @@
 module.exports = {
   extends: "./vendor/house-style/.dependency-cruiser.cjs",
   forbidden: [
-    // A warning for now (2026-11-11): the route files import their context type from app.ts, which
-    // imports them back, and add/flow.ts, words.ts and form.ts import each other. When each feature has
-    // its own options type and the add flow's shared types sit in a module of their own, this goes.
-    { name: "no-circular", severity: "warn" },
+    // The server and shared have no cycle left: the house rule stands there (2026-11-12). The web app keeps
+    // two, add/flow.ts with words.ts and form.ts, which import each other; a warning until the add flow's
+    // shared types sit in a module of their own.
+    {
+      name: "no-circular",
+      severity: "error",
+      comment: "A cycle makes load order matter and leaves no layer that can be read on its own.",
+      from: { path: "^(server|shared)/" },
+      to: { circular: true },
+    },
+    {
+      name: "no-circular-web",
+      severity: "warn",
+      comment: "The web app's add flow, until its shared types move out.",
+      from: { path: "^web/" },
+      to: { circular: true },
+    },
   ],
   options: {
     // Vite's `?url` suffix asks for a file's address; the bundler resolves it, dependency-cruiser can't.

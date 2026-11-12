@@ -1,4 +1,4 @@
-import type { Db } from "../db/open.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * `catalog_query_cache` (migration 4): each catalog answer by its URL, kept
