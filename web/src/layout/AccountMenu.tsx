@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { cn } from "../lib/cn";
 import {
   changePassword,
   changeUsername,
@@ -16,7 +17,6 @@ import { AccountIcon } from "../components/icons";
 import { Menu, type MenuSection } from "../components/ui/Menu";
 import type { ExportFormat } from "../export/exportLibrary";
 import { IMPORT_CSV, STATS, navigate } from "../router";
-import "../account/account.css";
 
 const NOTICE_MS = 6000;
 
@@ -95,21 +95,34 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
   ];
 
   return (
-    <div className={`account account--${placement}`}>
+    <div className="relative flex flex-none">
       <Menu
         label="Account"
         triggerLabel="Account"
-        triggerClassName="account__button"
+        triggerClassName={cn(
+          "group/account flex items-center justify-center rounded-pill text-ink-2",
+          placement === "bar" ? "size-control" : "-mr-1.5 size-touch",
+        )}
         align="end"
         trigger={
-          <span className="account__disc">
+          <span
+            className={cn(
+              "flex items-center justify-center rounded-pill bg-control transition-[background-color,color] duration-(--duration-fast) ease-out group-hover/account:bg-control-hover group-aria-expanded/account:bg-accent-tint group-aria-expanded/account:text-accent-press",
+              placement === "bar" ? "size-full" : "size-8",
+            )}
+          >
             <AccountIcon size={17} />
           </span>
         }
         sections={sections}
       />
       <p
-        className={failed ? "account__notice account__notice--error" : "account__notice"}
+        className={cn(
+          "absolute top-[calc(100%+8px)] right-0 z-float w-max max-w-[min(300px,calc(100vw-32px))] text-meta leading-tight text-ink",
+          "data-shown:rounded-menu data-shown:bg-surface data-shown:px-3 data-shown:py-2.5 data-shown:shadow-float data-shown:motion-safe:animate-panel-in",
+          failed &&
+            "data-shown:flex data-shown:items-start data-shown:gap-2 data-shown:font-semibold [&_svg]:mt-[-1px] [&_svg]:flex-none",
+        )}
         role="status"
         data-shown={shown !== "" || undefined}
       >

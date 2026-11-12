@@ -15,8 +15,14 @@ export function TopBar({ current, exact }: { current: Place | null; exact: boole
   const mark = (place: Place) => (current === place ? (exact ? "page" : "true") : undefined);
 
   return (
-    <header className="topbar" data-topbar>
-      <Link to={LIBRARY} className="topbar__wordmark">
+    <header
+      className="sticky top-0 z-bar grid h-topbar grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-4 border-b border-hairline bg-ground px-gutter-desktop"
+      data-topbar
+    >
+      <Link
+        to={LIBRARY}
+        className="justify-self-start rounded-control text-wordmark font-semibold tracking-wordmark text-ink no-underline hover:text-ink"
+      >
         Shelfmark
       </Link>
       <nav aria-label="Main" className={segmentedTrack("nav")}>
@@ -30,7 +36,7 @@ export function TopBar({ current, exact }: { current: Place | null; exact: boole
           Wishlist
         </Link>
       </nav>
-      <div className="topbar__end">
+      <div className="flex min-w-0 items-center justify-end gap-2.5">
         <SearchField placement="bar" />
         <AccountMenu placement="bar" />
       </div>

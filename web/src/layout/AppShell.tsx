@@ -67,12 +67,15 @@ export function AppShell() {
   const Page = PAGES[route.name] as PageComponent<RouteName> | null;
 
   return (
-    <div className={desktop ? "shell shell--desktop" : "shell shell--phone"}>
-      <a className="skip-link" href="#main">
+    <div className="flex min-h-dvh flex-col max-md:pt-[env(safe-area-inset-top)] max-md:leading-phone">
+      <a
+        className="fixed top-3 left-3 z-[calc(var(--z-index-float)+1)] -translate-y-[calc(100%+24px)] rounded-control bg-surface px-3.5 py-2.5 font-semibold no-underline focus-visible:translate-y-0 focus-visible:shadow-float"
+        href="#main"
+      >
         Skip to content
       </a>
       {desktop && <TopBar current={place} exact={exact} />}
-      <main id="main" className="shell__main" tabIndex={-1}>
+      <main id="main" className="flex flex-[1_0_auto] flex-col focus:outline-none" tabIndex={-1}>
         <Suspense fallback={null}>{Page && <Page key={pathFor(route)} params={route.params} />}</Suspense>
       </main>
       {!desktop && <TabBar current={place} exact={exact} />}

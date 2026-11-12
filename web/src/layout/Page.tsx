@@ -7,6 +7,9 @@ import { AccountMenu } from "./AccountMenu";
 import { SearchField } from "./SearchField";
 import { useIsDesktop } from "./viewport";
 
+const HEADROW = "flex flex-wrap items-end justify-between gap-4 max-md:flex-nowrap max-md:items-center";
+const TOOLBAR = "flex flex-wrap items-center gap-2 max-md:justify-between";
+
 export interface PageProps {
   /** The page's `<h1>` and the window's title: 34 px on the desktop, the large 32 px title on a phone. */
   title: string;
@@ -58,27 +61,37 @@ export function Page({
   }, [title]);
 
   const heading = (
-    <div className="page__heading">
-      <h1 className="page__title">{title}</h1>
-      {caption && <p className="page__caption">{caption}</p>}
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <h1 className="text-title leading-[1.15] font-bold tracking-title max-md:text-title-phone">{title}</h1>
+      {caption && <p className="text-muted tabular-nums">{caption}</p>}
     </div>
   );
 
   return (
-    <div className={cn("page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null)}>
+    <div
+      className={cn(
+        "flex flex-[1_0_auto] flex-col md:mx-auto md:w-full md:max-w-page md:gap-4.5 md:px-gutter-desktop md:pt-9 md:pb-12",
+        wide && "md:max-w-none",
+      )}
+    >
       {hidden ? (
         <h1 className="sr-only">{title}</h1>
       ) : (
-        <header className="page__header">
+        <header
+          className={cn(
+            "flex flex-col gap-2.5 max-md:px-gutter-phone max-md:pt-3.5 max-md:pb-3",
+            card && "rounded-container bg-surface md:px-6 md:py-5.5 max-md:mb-2.5 max-md:rounded-t-none",
+          )}
+        >
           {back && <BackLink to={back.to} label={back.label} />}
           {desktop ? (
-            <div className="page__headrow">
+            <div className={HEADROW}>
               {heading}
-              {toolbar && <div className="page__toolbar">{toolbar}</div>}
+              {toolbar && <div className={TOOLBAR}>{toolbar}</div>}
             </div>
           ) : (
             <>
-              <div className="page__headrow">
+              <div className={HEADROW}>
                 {heading}
                 <AccountMenu placement="header" />
               </div>
@@ -88,12 +101,19 @@ export function Page({
                   placeholder={typeof search === "object" ? search.placeholder : "Search"}
                 />
               )}
-              {toolbar && <div className="page__toolbar">{toolbar}</div>}
+              {toolbar && <div className={TOOLBAR}>{toolbar}</div>}
             </>
           )}
         </header>
       )}
-      <div className="page__body">{children}</div>
+      <div
+        className={cn(
+          "max-md:px-gutter-phone max-md:pt-1 max-md:pb-6",
+          hidden && "flex flex-[1_0_auto] flex-col max-md:p-0",
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -107,7 +127,11 @@ function BackLink({ to, label }: { to: Route; label: string }) {
     goBack(to);
   };
   return (
-    <Link to={to} className="page__back" onClick={onClick}>
+    <Link
+      to={to}
+      className="-ml-1.5 inline-flex min-h-8 items-center gap-0.5 self-start rounded-control pr-1.5 text-body no-underline max-md:-mt-1.5 max-md:-mb-1 max-md:min-h-touch"
+      onClick={onClick}
+    >
       <BackIcon size={18} />
       {label}
     </Link>

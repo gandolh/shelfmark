@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from "react";
+import { cn } from "../lib/cn";
 import { ClearIcon, SearchIcon } from "../components/icons";
 import { LIBRARY, navigate, useRoute } from "../router";
 import { setSearchQuery, useSearchQuery } from "./search";
@@ -39,15 +40,24 @@ export function SearchField({
   };
 
   return (
-    <div className={`search search--${placement}`} role="search">
-      <label htmlFor={id} className="search__icon">
+    <div
+      className={cn(
+        "flex min-w-0 items-center gap-2 rounded-field bg-field px-2.5 text-muted focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-focus-ring",
+        placement === "bar" ? "min-h-control flex-[0_1_240px]" : "min-h-10",
+      )}
+      role="search"
+    >
+      <label htmlFor={id} className="flex flex-none cursor-text">
         <SearchIcon size={placement === "bar" ? 15 : 16} />
         <span className="sr-only">Search books</span>
       </label>
       <input
         ref={input}
         id={id}
-        className="search__input"
+        className={cn(
+          "h-control min-w-0 flex-1 appearance-none bg-transparent text-meta text-ink focus-visible:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
+          placement === "header" && "h-10 text-input-phone",
+        )}
         type="search"
         enterKeyHint="search"
         autoComplete="off"
@@ -66,7 +76,7 @@ export function SearchField({
       {query !== "" && (
         <button
           type="button"
-          className="search__clear"
+          className="relative flex size-4.5 flex-none items-center justify-center rounded-pill bg-muted text-field before:absolute before:-inset-3.25 before:content-[''] hover:bg-ink-2"
           aria-label="Clear search"
           onClick={() => {
             change("");

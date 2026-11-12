@@ -3,7 +3,7 @@
  * ISBN field, the by-hand form and its chips. Colours, radii and shadows come
  * from tokens.css; the two sizes the shared scale doesn't have are named here.
  * The shell picks phone or desktop in script (`.shell--desktop` from 768 px),
- * so these rules follow its classes like shell.css does.
+ * so these rules follow its classes.
  */
 
 .add {

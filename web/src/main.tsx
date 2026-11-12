@@ -4,7 +4,6 @@ import { createRoot } from "react-dom/client";
 // The one stylesheet (Tailwind and the tokens), then the sheets not yet moved.
 import "./styles/index.css";
 import "./styles/tokens.css";
-import "./styles/shell.css";
 
 import { App } from "./App";
 import { armFeedback } from "./scanner/feedback";
