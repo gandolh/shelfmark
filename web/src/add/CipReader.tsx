@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { buttonClass } from "../components/Button";
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type PointerEvent } from "react";
 import { Button } from "../components/Button";
@@ -88,7 +89,10 @@ function CropPhoto({ src, box, onBox }: { src: string; box: Box | null; onBox: (
   };
   return (
     <div
-      className="add-cip__photo"
+      className={cn(
+        "relative self-center max-w-full touch-none select-none [cursor:crosshair] [&_img]:block [&_img]:max-w-full [&_img]:max-h-[46vh] [&_img]:rounded-field",
+        box !== null && "overflow-hidden rounded-field",
+      )}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
         start.current = at(event);
@@ -102,7 +106,7 @@ function CropPhoto({ src, box, onBox }: { src: string; box: Box | null; onBox: (
       <img src={src} alt="The photo of the copyright page" draggable={false} />
       {box && (
         <span
-          className="add-cip__box"
+          className="absolute border-2 border-accent rounded-[2px] bg-accent/12 shadow-[0_0_0_9999px_color-mix(in_srgb,var(--color-ink)_35%,transparent)] pointer-events-none"
           style={{
             left: `${box.x * 100}%`,
             top: `${box.y * 100}%`,
@@ -203,7 +207,7 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
     <label
       className={buttonClass(
         { variant: primary ? "secondary" : "quiet", size: "compact", pill: primary },
-        "add-cip__pick",
+        "cursor-pointer has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2",
       )}
       aria-disabled={disabled}
     >
@@ -221,17 +225,17 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
 
   if (phase.kind === "photo") {
     return (
-      <div className="add-cip add-cip--open">
-        <p className="add-cip__text" role="status">
+      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
+        <p className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
           Drag a box around the CIP block, or read the whole photo.
         </p>
         <CropPhoto src={phase.preview} box={phase.box} onBox={(box) => setPhase({ ...phase, box })} />
-        <div className="add-cip__actions">
+        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
           <Button variant="primary" size="compact" disabled={disabled} onClick={() => void read(phase.file, phase.box)}>
             {phase.box ? "Read the box" : "Read the photo"}
           </Button>
           {picker("Retake")}
-          <Button variant="quiet" size="compact" className="add-quiet-neutral" onClick={close}>
+          <Button variant="quiet" size="compact" className="text-ink-2 hover:text-ink active:text-ink" onClick={close}>
             Cancel
           </Button>
         </div>
@@ -242,15 +246,19 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   if (phase.kind === "working") {
     const value = stageValue(phase.stage);
     return (
-      <div className="add-cip add-cip--open">
-        <p className="add-cip__text" role="status">
+      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
+        <p className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
           {stageText(phase.stage)}
         </p>
         {value === null ? (
-          <div className="add-progress" role="progressbar" aria-label="Reading the CIP block" />
+          <div
+            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
+            role="progressbar"
+            aria-label="Reading the CIP block"
+          />
         ) : (
           <div
-            className="add-progress add-progress--value"
+            className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50 after:w-[calc(var(--value,0)_*_100%)] after:[animation:none] after:opacity-100 after:transition-[width] after:duration-[0.2s] after:ease-out"
             role="progressbar"
             aria-label="Reading the CIP block"
             aria-valuemin={0}
@@ -259,8 +267,8 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
             style={{ "--value": value } as CSSProperties}
           />
         )}
-        <div className="add-cip__actions">
-          <Button variant="quiet" size="compact" className="add-quiet-neutral" onClick={cancel}>
+        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
+          <Button variant="quiet" size="compact" className="text-ink-2 hover:text-ink active:text-ink" onClick={cancel}>
             Cancel
           </Button>
         </div>
@@ -271,15 +279,25 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   if (phase.kind === "read") {
     const { result, changed } = phase;
     return (
-      <div className="add-cip add-cip--open">
-        <p className={result.found ? "add-cip__text" : "add-cip__text add-error"} role="status">
+      <div className="flex rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px] flex-col items-stretch gap-2.5 p-3 [outline-style:solid] outline-divider">
+        <p
+          className={
+            result.found
+              ? "flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight"
+              : "flex min-w-0 flex-1 flex-row items-start gap-0.5 text-meta leading-tight font-semibold text-ink [&_svg]:-mt-0.25 [&_svg]:flex-none"
+          }
+          role="status"
+        >
           {!result.found && <AlertIcon size={16} />}
           {summary(result, changed)}
         </p>
-        <details className="add-cip__raw" open={!result.found || result.fields.title === null}>
+        <details
+          className="text-meta open:[&>summary]:mb-2 [&>summary]:cursor-pointer [&>summary]:font-semibold [&>summary]:text-accent"
+          open={!result.found || result.fields.title === null}
+        >
           <summary>The text read from the photo</summary>
           <textarea
-            className="add-cip__ocr"
+            className="block w-full py-2.5 px-3 rounded-field bg-field text-ink text-input-phone leading-[1.4] resize-y"
             value={text}
             onChange={(event) => setText(event.target.value)}
             rows={9}
@@ -287,14 +305,14 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
             aria-label="The text read from the photo"
           />
           {result.found || /descrierea\s+cip/i.test(text) ? (
-            <Button variant="secondary" size="compact" pill disabled={disabled} onClick={fillAgain}>
+            <Button variant="secondary" size="compact" pill className="mt-2" disabled={disabled} onClick={fillAgain}>
               Fill from this text
             </Button>
           ) : null}
         </details>
-        <div className="add-cip__actions">
+        <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
           {picker("Read another photo")}
-          <Button variant="quiet" size="compact" className="add-quiet-neutral" onClick={close}>
+          <Button variant="quiet" size="compact" className="text-ink-2 hover:text-ink active:text-ink" onClick={close}>
             Close
           </Button>
         </div>
@@ -303,13 +321,13 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
   }
 
   return (
-    <div className="add-cip">
-      <span className="add-cip__icon">
+    <div className="flex items-center gap-3 pt-2.5 pr-2.5 pb-2.5 pl-3 rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]">
+      <span className="flex flex-none text-muted">
         <TextScanIcon size={22} />
       </span>
-      <div className="add-cip__text" role="status">
+      <div className="flex flex-1 flex-col gap-0.5 min-w-0 text-ink-2 text-meta leading-tight" role="status">
         {phase.kind === "failed" ? (
-          <p className="add-error">
+          <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
             <AlertIcon size={16} />
             {phase.message}
           </p>
@@ -317,10 +335,12 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
           <p>Fill the fields from the CIP block on the copyright page.</p>
         )}
         {toDownload !== null && toDownload > 0 && (
-          <p className="add-hint">The first read downloads {megabytes(toDownload)}; later reads work offline.</p>
+          <p className="text-muted text-small leading-tight">
+            The first read downloads {megabytes(toDownload)}; later reads work offline.
+          </p>
         )}
       </div>
-      <div className="add-cip__actions">
+      <div className="flex flex-none flex-wrap items-center gap-y-1 gap-x-2">
         {phase.kind === "failed" ? (
           <>
             <Button

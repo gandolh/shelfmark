@@ -166,11 +166,18 @@ export function ResultSheet({
   }
 
   return floating ? (
-    <Sheet className="add-sheet" aria-labelledby={headingId}>
+    <Sheet
+      className="max-h-[calc(100%-var(--add-top-room)-12px)] md:max-h-[calc(100%-24px)]"
+      data-floating
+      aria-labelledby={headingId}
+    >
       {content}
     </Sheet>
   ) : (
-    <section className="add-result" aria-labelledby={headingId}>
+    <section
+      className="flex flex-col gap-3.5 p-4 rounded-container bg-surface motion-safe:animate-dialog-in md:gap-4 md:p-5"
+      aria-labelledby={headingId}
+    >
       {content}
     </section>
   );
@@ -195,9 +202,9 @@ function useHeadingFocus(takeFocus: boolean) {
 /** The row every result opens with: the cover, then what the book is. */
 function Head({ cover, children }: { cover: ReactNode; children: ReactNode }) {
   return (
-    <div className="add-head">
-      <div className="add-head__cover">{cover}</div>
-      <div className="add-head__text">{children}</div>
+    <div className="flex items-start gap-3.5">
+      <div className="flex-none w-15">{cover}</div>
+      <div className="flex flex-col gap-0.5 min-w-0">{children}</div>
     </div>
   );
 }
@@ -205,7 +212,7 @@ function Head({ cover, children }: { cover: ReactNode; children: ReactNode }) {
 /** A plain-ink way out, apart from the primary action. */
 function Leave({ children, onClick, disabled }: { children: ReactNode; onClick: () => void; disabled?: boolean }) {
   return (
-    <Button variant="quiet" className="add-quiet-neutral" onClick={onClick} disabled={disabled}>
+    <Button variant="quiet" className="text-ink-2 hover:text-ink active:text-ink" onClick={onClick} disabled={disabled}>
       {children}
     </Button>
   );
@@ -224,16 +231,25 @@ function Looking({ isbn13, headingId, takeFocus, on }: Shared & { isbn13: string
 
   return (
     <>
-      <Head cover={<span className="add-head__blank" />}>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title tabular-nums">
+      <Head cover={<span className="block w-15 aspect-[2/3] rounded-cover bg-control" />}>
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="tabular-nums text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+        >
           {isbn13}
         </h2>
-        <p className="add-meta" role="status">
+        <p className="text-muted text-meta tabular-nums" role="status">
           {slow ? "Still looking. Open Library can take a few seconds." : "Looking it up in Open Library…"}
         </p>
       </Head>
-      <div className="add-progress" role="progressbar" aria-label={`Looking up ${isbn13}`} />
-      <div className="add-actions">
+      <div
+        className="relative h-0.75 overflow-hidden rounded-pill bg-control after:content-[''] after:absolute after:top-0 after:right-auto after:bottom-0 after:left-0 after:w-[35%] after:rounded-[inherit] after:bg-accent after:motion-safe:animate-progress motion-reduce:after:w-full motion-reduce:after:[animation:none] motion-reduce:after:opacity-50"
+        role="progressbar"
+        aria-label={`Looking up ${isbn13}`}
+      />
+      <div className="flex justify-center gap-3 -mt-1">
         <Leave onClick={on.discard}>Cancel</Leave>
       </div>
     </>
@@ -275,13 +291,20 @@ function Found({
   return (
     <>
       <Head cover={<CoverImage book={cover.book} src={cover.src} width={60} loading="eager" />}>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+        >
           {details.title}
-          {details.subtitle && <span className="add-title__sub">{details.subtitle}</span>}
+          {details.subtitle && (
+            <span className="block mt-0.5 text-ink-2 text-body font-regular tracking-[0]">{details.subtitle}</span>
+          )}
         </h2>
-        {byline && <p className="add-byline">{byline}</p>}
-        {meta && <p className="add-meta">{meta}</p>}
-        <p className="add-source">{sourceLine(proposal.origin)}</p>
+        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
+        {meta && <p className="text-muted text-meta tabular-nums">{meta}</p>}
+        <p className="mt-0.5 text-muted text-small">{sourceLine(proposal.origin)}</p>
       </Head>
       {proposal.cover.kind === "none" && <CoverCapture photo={photo} onChange={setPhoto} disabled={save.saving} />}
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
@@ -311,7 +334,7 @@ function Found({
           Add to wishlist
         </Button>
       )}
-      <div className="add-actions add-actions--split">
+      <div className="flex gap-3 -mt-1 justify-between">
         <Leave onClick={on.discard} disabled={save.saving}>
           {proposal.origin === "copy" ? words.discard : "Not this book"}
         </Leave>
@@ -348,20 +371,25 @@ function Owned({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
-        <p className="add-status">
+        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
           <CheckIcon size={15} />
           Already in your library
         </p>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+        >
           {title}
         </h2>
-        {byline && <p className="add-byline">{byline}</p>}
-        <p className="add-meta">{ownedLine(owned, now)}</p>
+        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
+        <p className="text-muted text-meta tabular-nums">{ownedLine(owned, now)}</p>
       </Head>
       <Button variant="primary" size="large" block onClick={on.discard}>
         {words.next}
       </Button>
-      <div className="add-pair">
+      <div className="grid grid-cols-[1fr_1fr] gap-2.5">
         <Button variant="secondary" pill block onClick={on.anotherCopy}>
           Add another copy
         </Button>
@@ -405,14 +433,19 @@ function Wishlisted({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
-        <p className="add-status">
+        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
           <CheckIcon size={15} />
           On your wishlist
         </p>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+        >
           {title}
         </h2>
-        {byline && <p className="add-byline">{byline}</p>}
+        {byline && <p className="mt-0.5 text-ink-2 text-body">{byline}</p>}
       </Head>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={save.saving} />
       {save.failure && <FailureLine>{save.failure.message}</FailureLine>}
@@ -427,7 +460,7 @@ function Wishlisted({
       >
         {save.saving ? "Saving…" : "I bought it"}
       </Button>
-      <div className="add-pair">
+      <div className="grid grid-cols-[1fr_1fr] gap-2.5">
         <Button variant="secondary" pill block onClick={on.discard} disabled={save.saving}>
           {words.next}
         </Button>
@@ -461,21 +494,26 @@ function Offline({
   return (
     <>
       <Head cover={<CoverImage book={coverBook} width={60} loading="eager" />}>
-        <p className="add-status">
+        <p className="inline-flex items-center gap-1.25 text-accent text-small font-semibold">
           {answer.kind === "absent" ? <AlertIcon size={15} /> : <CheckIcon size={15} />}
           {offlineStatus(answer)}
         </p>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title">
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="text-(length:--text-result-title) font-bold tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+        >
           {title}
         </h2>
-        <p className="add-meta">{offlineNote(answer)}</p>
-        {answer.kind === "absent" && <p className="add-meta">Adding it needs the network.</p>}
+        <p className="text-muted text-meta tabular-nums">{offlineNote(answer)}</p>
+        {answer.kind === "absent" && <p className="text-muted text-meta tabular-nums">Adding it needs the network.</p>}
       </Head>
       {answer.kind === "absent" && <LookLater isbn13={isbn13} {...later} on={on} />}
       <Button variant="primary" size="large" block onClick={on.discard}>
         {words.next}
       </Button>
-      <div className="add-actions">
+      <div className="flex justify-center gap-3 -mt-1">
         <Button variant="quiet" onClick={on.retry}>
           Try again online
         </Button>
@@ -496,7 +534,7 @@ interface LookLaterProps {
 /** Offline, a book to add: queue its ISBN (and a shelf) to be looked up once the network is back. */
 function LookLater({ isbn13, shelves, defaultShelf, waiting, on }: LookLaterProps) {
   const [shelf, setShelf] = useState(defaultShelf);
-  if (waiting) return <p className="add-meta">Already waiting to be looked up.</p>;
+  if (waiting) return <p className="text-muted text-meta tabular-nums">Already waiting to be looked up.</p>;
   return (
     <>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} />
@@ -513,21 +551,26 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
-      <div className="add-lead">
-        <span className="add-lead__icon">
+      <div className="flex items-start gap-3">
+        <span className="flex flex-none items-center justify-center w-10 h-10 rounded-pill bg-control text-ink-2">
           <BarcodeIcon size={22} />
         </span>
-        <div className="add-head__text">
-          <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title add-title--small">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <h2
+            ref={heading}
+            id={headingId}
+            tabIndex={-1}
+            className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+          >
             This barcode isn't an ISBN
           </h2>
-          <p className="add-meta">
-            It reads <span className="add-code tabular-nums">{code}</span>, a shop's sticker or another code. The ISBN
-            is printed near the barcode or on the copyright page.
+          <p className="mt-0.5 text-body text-ink-2">
+            It reads <span className="tabular-nums text-ink-2 font-semibold wrap-anywhere">{code}</span>, a shop's
+            sticker or another code. The ISBN is printed near the barcode or on the copyright page.
           </p>
         </div>
       </div>
-      <div className="add-pair">
+      <div className="grid grid-cols-[1fr_1fr] gap-2.5">
         <Button variant="secondary" pill block onClick={on.typeIsbn}>
           Type the ISBN
         </Button>
@@ -535,7 +578,7 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
           Add by hand
         </Button>
       </div>
-      <div className="add-actions">
+      <div className="flex justify-center gap-3 -mt-1">
         <Leave onClick={on.discard}>{words.discard}</Leave>
       </div>
     </>
@@ -546,17 +589,20 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
 function Typing({ code, headingId, takeFocus, on }: Shared & { code: string }) {
   return (
     <>
-      <div className="add-head__text">
-        <h2 id={headingId} className="add-title add-title--small">
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <h2
+          id={headingId}
+          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+        >
           Type the ISBN
         </h2>
-        <p className="add-meta">
-          The code read was <span className="add-code tabular-nums">{code}</span>. The ISBN is printed near the barcode
-          or on the copyright page.
+        <p className="text-muted text-meta tabular-nums">
+          The code read was <span className="tabular-nums text-ink-2 font-semibold wrap-anywhere">{code}</span>. The
+          ISBN is printed near the barcode or on the copyright page.
         </p>
       </div>
       <IsbnField size="regular" onSubmit={on.submitIsbn} keepFocus={false} autoFocus={takeFocus} hint={null} />
-      <div className="add-actions add-actions--split">
+      <div className="flex gap-3 -mt-1 justify-between">
         <Leave onClick={on.discard}>Back to scanning</Leave>
         <Button variant="quiet" onClick={on.byHand}>
           Add by hand
@@ -579,22 +625,27 @@ function Failed({
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
-      <div className="add-lead">
-        <span className="add-lead__icon">
+      <div className="flex items-start gap-3">
+        <span className="flex flex-none items-center justify-center w-10 h-10 rounded-pill bg-control text-ink-2">
           <AlertIcon size={22} />
         </span>
-        <div className="add-head__text">
-          <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title add-title--small">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <h2
+            ref={heading}
+            id={headingId}
+            tabIndex={-1}
+            className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+          >
             The lookup didn't work
           </h2>
-          <p className="add-meta">{message}</p>
+          <p className="mt-0.5 text-body text-ink-2">{message}</p>
         </div>
       </div>
       {later !== null && <LookLater {...later} on={on} />}
       <Button variant="primary" size="large" block onClick={on.retry}>
         Try again
       </Button>
-      <div className="add-actions add-actions--split">
+      <div className="flex gap-3 -mt-1 justify-between">
         <Leave onClick={on.discard}>{words.discard}</Leave>
         <Button variant="quiet" onClick={on.byHand}>
           Add by hand
@@ -611,19 +662,26 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
   const heading = useHeadingFocus(takeFocus);
   return (
     <>
-      <div className="add-head__text">
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title add-title--small">
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <h2
+          ref={heading}
+          id={headingId}
+          tabIndex={-1}
+          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+        >
           {waitingLine(queue)}
         </h2>
-        <p className="add-meta">Looked up one at a time while you're online. Each answer is yours to confirm.</p>
+        <p className="text-muted text-meta tabular-nums">
+          Looked up one at a time while you're online. Each answer is yours to confirm.
+        </p>
       </div>
       {queue.length > 0 && (
-        <ul className="add-queue">
+        <ul className="flex flex-col list-none">
           {queue.map((item) => (
-            <li key={item.id} className="add-queue__item">
-              <div className="add-queue__text">
+            <li key={item.id} className="flex items-center gap-2 py-2.5 border-t border-hairline">
+              <div className="flex flex-1 flex-col min-w-0">
                 <span className="add-queue__isbn tabular-nums">{item.isbn13}</span>
-                <span className="add-meta">
+                <span className="text-muted text-meta tabular-nums">
                   {queueItemLine(item)}
                   {item.shelf !== null && ` · ${item.shelf}`}
                 </span>
@@ -647,7 +705,7 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
           ))}
         </ul>
       )}
-      <div className="add-actions">
+      <div className="flex justify-center gap-3 -mt-1">
         <Leave onClick={on.discard}>Close</Leave>
       </div>
     </>
@@ -676,11 +734,14 @@ function FormIntro({
     );
   if (reason === "edit") {
     return (
-      <div className="add-head__text">
-        <h2 id={headingId} className="add-title add-title--small">
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <h2
+          id={headingId}
+          className="tracking-[-0.01em] leading-[1.2] wrap-anywhere focus-visible:outline-offset-[4px] focus-visible:rounded-[2px] text-(length:--text-sheet-heading) font-semibold"
+        >
           Edit details
         </h2>
-        {lookup?.draft && <p className="add-source">{sourceLine(lookup.draft.sources)}</p>}
+        {lookup?.draft && <p className="mt-0.5 text-muted text-small">{sourceLine(lookup.draft.sources)}</p>}
       </div>
     );
   }
@@ -732,13 +793,13 @@ function FormIntro({
   }
 
   return (
-    <div className="add-notice">
+    <div className="flex flex-col items-start gap-1 text-ink text-body [&_strong]:font-semibold">
       <h2 id={headingId} className="sr-only">
         Add it by hand
       </h2>
       <p>{notice}</p>
       {uncertain && (
-        <Button variant="quiet" className="add-notice__retry" onClick={onRetry}>
+        <Button variant="quiet" className="-ml-1" onClick={onRetry}>
           Look it up again
         </Button>
       )}

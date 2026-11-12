@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import type { Book, BookCreate, Collection } from "@shelfmark/shared";
 import { useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from "react";
 import { createBook, patchBook, useBooks } from "../books/store";
@@ -51,7 +52,6 @@ import {
   sessionCount,
   waitingLine,
 } from "./words";
-import "./add.css";
 
 /**
  * What outlives one visit to the page, for as long as the app is open: the
@@ -301,10 +301,20 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
   };
 
   const switcher = <ModeSwitch overCamera={!desktop && mode === "scan"} disabled={isSaving(step)} />;
-  const sessionLine = added > 0 || notice !== null ? <SessionStatus added={added} notice={notice} /> : null;
+  const sessionLine =
+    added > 0 || notice !== null ? (
+      <SessionStatus added={added} notice={notice} desktop={desktop} overCamera={mode === "scan"} />
+    ) : null;
   const waiting =
     queue.length > 0 && step.kind === "ready" ? (
-      <button type="button" className="add-waiting" onClick={() => dispatch({ type: "show-queue" })}>
+      <button
+        type="button"
+        className={cn(
+          "cursor-pointer rounded-pill border border-hairline bg-surface px-3 py-1.25 text-small leading-tight text-ink-2",
+          desktop ? "ml-2" : "bg-ground/92",
+        )}
+        onClick={() => dispatch({ type: "show-queue" })}
+      >
         {waitingLine(queue)}
       </button>
     ) : null;
@@ -340,7 +350,14 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
         value={mode}
         // The arrow keys switch as they move focus, which stays on the tabs; a click (or Enter) moves it into the new form.
         onValueChange={(next: Mode, details) => changeMode(next, !(details.event instanceof MouseEvent))}
-        render={<div className={`add add--${mode}`} />}
+        render={
+          <div
+            className={cn(
+              "relative flex flex-[1_0_auto] flex-col [--add-top-room:96px] [--text-isbn:22px] [--text-result-title:20px] [--text-sheet-heading:17px]",
+              "md:gap-5 md:[--add-top-room:0px]",
+            )}
+          />
+        }
       >
         {/* Scan moves focus into each result; Type ISBN keeps it in the field, so results are read out from here. */}
         <p className="sr-only" role="status">
@@ -348,19 +365,22 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
         </p>
         {desktop ? (
           // Desktop: the switch heads the content column, over the field or the camera it changes.
-          <div className="add-modes-row">{switcher}</div>
+          <div className="flex">{switcher}</div>
         ) : (
-          <div className="add-top" data-over-camera={mode === "scan" || undefined}>
+          <div
+            className="flex flex-col items-center gap-2 px-gutter-phone pt-4 pb-3 data-over-camera:pointer-events-none data-over-camera:absolute data-over-camera:inset-x-0 data-over-camera:top-0 data-over-camera:bottom-auto data-over-camera:z-[calc(var(--z-index-bar)+1)] data-over-camera:[&>*]:pointer-events-auto"
+            data-over-camera={mode === "scan" || undefined}
+          >
             {switcher}
             {status}
           </div>
         )}
-        <TabsPanel value={mode} className="add__panel">
+        <TabsPanel value={mode} className="flex flex-[1_0_auto] flex-col">
           {mode === "scan" && (
-            <div className="add-stage">
+            <div className="relative flex-[1_0_auto] min-h-105 overflow-hidden isolate bg-ink after:content-[''] after:absolute after:inset-0 after:z-1 after:[background:radial-gradient(ellipse_at_50%_45%,transparent_55%,color-mix(in_srgb,var(--color-ink)_50%,transparent))] after:pointer-events-none md:flex-none md:h-[clamp(420px,calc(100dvh_-_260px),660px)] md:rounded-container">
               <CameraScanner
                 ref={scanner}
-                className="add-camera"
+                inStage
                 paused={scannerPaused(state)}
                 torch={torch}
                 zoom={zoom}
@@ -372,10 +392,10 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                 onDecode={readout ? setDecodeMs : undefined}
               />
               {(torchAvailable || zoomAvailable) && (
-                <div className="add-controls">
+                <div className="absolute top-[calc(var(--add-top-room)_-_32px)] right-3 z-2 flex flex-col gap-2 md:top-3">
                   {torchAvailable && (
                     <Toggle
-                      className="add-control add-torch"
+                      className="flex items-center justify-center w-touch h-touch rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press"
                       pressed={torch}
                       onPressedChange={setTorch}
                       aria-label="Torch"
@@ -386,7 +406,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                   {zoomAvailable && (
                     <button
                       type="button"
-                      className="add-control add-zoom"
+                      className="flex items-center justify-center w-touch h-touch rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out text-small font-semibold tabular-nums"
                       aria-label={`Zoom ${zoom}×`}
                       onClick={() => setZoom((at) => (at === 2 ? 1 : 2))}
                     >
@@ -395,10 +415,20 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                   )}
                 </div>
               )}
-              {readout && <CameraReadout className="add-readout" camera={camera} decodeMs={decodeMs} />}
+              {readout && (
+                <CameraReadout
+                  className="absolute top-(--add-top-room) left-3 z-2 max-w-[min(330px,calc(100%_-_24px_-_var(--spacing-touch)_-_12px))] md:top-3"
+                  camera={camera}
+                  decodeMs={decodeMs}
+                />
+              )}
               {canPress && (
-                <div className="add-press">
-                  <p className="add-press__note" role="status" data-shown={press === "gave-up" || undefined}>
+                <div className="absolute right-3 bottom-3 left-3 z-2 flex flex-col items-center gap-2.5 max-w-110 mx-auto">
+                  <p
+                    className="text-small leading-tight text-center data-shown:py-1.25 data-shown:px-3 data-shown:rounded-pill data-shown:bg-ground/92 data-shown:text-ink-2"
+                    role="status"
+                    data-shown={press === "gave-up" || undefined}
+                  >
                     {press === "gave-up" ? "Nothing read for a minute. Tap “Scan the barcode” to try again." : ""}
                   </p>
                   <Button
@@ -417,7 +447,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "isbn" && (
-            <div className="add-column">
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:gap-5 md:max-w-150 md:p-0">
               <IsbnField
                 ref={isbnField}
                 onSubmit={on.submitIsbn}
@@ -425,12 +455,16 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                 busy={step.kind === "looking"}
                 autoFocus={focusOnEnter}
               />
-              <div ref={result} className="add-column__result">
+              <div ref={result} className="empty:hidden">
                 {sheet(false, false)}
               </div>
             </div>
           )}
-          {mode === "manual" && <div className="add-column">{sheet(false, focusOnEnter)}</div>}
+          {mode === "manual" && (
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:gap-5 md:max-w-150 md:p-0">
+              {sheet(false, focusOnEnter)}
+            </div>
+          )}
         </TabsPanel>
       </TabsRoot>
     </Page>
@@ -447,24 +481,45 @@ function savedLine(title: string, outcome: SavedOutcome | undefined): string {
  * The session counter, and for a few seconds after a save what was saved.
  * Screen readers hear the same from the page's live region.
  */
-function SessionStatus({ added, notice }: { added: number; notice: Notice | null }) {
+function SessionStatus({
+  added,
+  notice,
+  desktop,
+  overCamera,
+}: {
+  added: number;
+  notice: Notice | null;
+  /** The desktop shows it as the page's caption, in the caption's size; the phone's is smaller. */
+  desktop: boolean;
+  /** Over the camera, what was just saved sits on a pill. */
+  overCamera: boolean;
+}) {
   const count = added > 0 ? sessionCount(added) : "";
   let text: ReactNode = count;
   if (notice?.kind === "saved") {
     text = (
       <>
         <CheckIcon size={14} />
-        <span className="add-sessionLine_title">{savedLine(notice.title, notice.outcome)}</span>
-        <span className="add-sessionLine_count">· {count}</span>
+        <span>{savedLine(notice.title, notice.outcome)}</span>
+        <span>· {count}</span>
       </>
     );
   } else if (notice?.kind === "queued") {
-    text = <span className="add-sessionLine_title">{queuedLine(notice)}</span>;
+    text = <span>{queuedLine(notice)}</span>;
   } else if (notice?.kind === "cover-failed") {
-    text = <span className="add-sessionLine_title">“{notice.title}” is saved; its cover didn't download.</span>;
+    text = <span>“{notice.title}” is saved; its cover didn't download.</span>;
   }
   return (
-    <span className="add-session" data-shown={text !== "" || undefined}>
+    <span
+      className={cn(
+        "inline-flex max-w-full min-w-0 items-center gap-1.25 leading-tight tabular-nums [&_svg]:flex-none [&_svg]:text-accent",
+        desktop ? "text-[length:inherit]" : "text-small text-muted",
+        !desktop &&
+          overCamera &&
+          "data-shown:rounded-pill data-shown:bg-ground/92 data-shown:px-3 data-shown:py-1.25 data-shown:text-ink-2",
+      )}
+      data-shown={text !== "" || undefined}
+    >
       {text}
     </span>
   );

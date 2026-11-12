@@ -47,7 +47,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
       <Page title="Book" back={BACK}>
         <div className="flex flex-col items-start gap-2.5 pt-2" role="alert">
           <p className="text-row-title font-semibold">The library didn’t load</p>
-          <p className="add-hint">{error?.message ?? "Shelfmark can’t be reached."}</p>
+          <p className="text-muted text-small leading-tight">{error?.message ?? "Shelfmark can’t be reached."}</p>
           <Button variant="secondary" pill onClick={() => void refresh()}>
             Try again
           </Button>
@@ -59,7 +59,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
     <Page title="Not found" back={BACK}>
       <div className="flex flex-col items-start gap-2.5 pt-2">
         <p className="text-row-title font-semibold">This book isn’t in your library</p>
-        <p className="add-hint">It may have been deleted, or the link is wrong.</p>
+        <p className="text-muted text-small leading-tight">It may have been deleted, or the link is wrong.</p>
         <ButtonLink to={LIBRARY} variant="secondary" pill>
           Back to the Library
         </ButtonLink>

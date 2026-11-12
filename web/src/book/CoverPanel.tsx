@@ -85,16 +85,20 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
 
         {book.isbn13 !== null && (
           <div className="flex flex-col gap-2 items-start">
-            <h3 className="add-label">From the lookup</h3>
+            <h3 className="block text-muted text-label font-semibold leading-tight">From the lookup</h3>
             {state.kind === "idle" && (
               <Button variant="quiet" size="compact" onClick={lookup.run} disabled={busy}>
                 Look for covers
               </Button>
             )}
-            {state.kind === "loading" && <p className="add-hint">Looking for covers…</p>}
-            {state.kind === "failed" && <p className="add-error">{state.failure.message}</p>}
+            {state.kind === "loading" && <p className="text-muted text-small leading-tight">Looking for covers…</p>}
+            {state.kind === "failed" && (
+              <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
+                {state.failure.message}
+              </p>
+            )}
             {state.kind === "done" && candidates.length === 0 && (
-              <p className="add-hint">The sources have no cover for this ISBN.</p>
+              <p className="text-muted text-small leading-tight">The sources have no cover for this ISBN.</p>
             )}
             {candidates.length > 0 && (
               <ul className="flex flex-wrap gap-3 list-none">
@@ -141,7 +145,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
             <Button
               variant="quiet"
               size="compact"
-              className="add-quiet-neutral"
+              className="text-ink-2 hover:text-ink active:text-ink"
               disabled={busy}
               onClick={() => setConfirmRemove(true)}
             >
@@ -149,7 +153,10 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
             </Button>
           ))}
         {problem && (
-          <p className="add-error" role="alert">
+          <p
+            className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+            role="alert"
+          >
             {problem}
           </p>
         )}

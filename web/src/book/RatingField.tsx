@@ -36,8 +36,8 @@ export function RatingField({
 }) {
   const hint = useId();
   return (
-    <fieldset className="add-choice" disabled={disabled}>
-      <legend className="add-label">Rating</legend>
+    <fieldset className="min-w-0" disabled={disabled}>
+      <legend className="block text-muted text-label font-semibold leading-tight">Rating</legend>
       <ToggleGroup
         aria-label="Rating"
         className="flex items-center gap-0.5 mt-1.5"
@@ -60,7 +60,7 @@ export function RatingField({
         ))}
         <span className="ml-2.5 text-ink-2 text-meta">{value === null ? "Not rated" : `${value} of 5`}</span>
       </ToggleGroup>
-      <p className="add-hint" id={hint}>
+      <p className="mt-1.5 text-small leading-tight text-muted" id={hint}>
         Press the chosen star again to clear it.
       </p>
     </fieldset>

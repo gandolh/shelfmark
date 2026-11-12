@@ -44,7 +44,7 @@ export function DeleteBook({ book, onDelete }: { book: Book; onDelete: () => Pro
       </h2>
       {!asking ? (
         <>
-          <p className="add-hint">Take this copy out of your library.</p>
+          <p className="text-muted text-small leading-tight">Take this copy out of your library.</p>
           <Button id="book-delete-open" variant="secondary" pill onClick={() => setAsking(true)}>
             Delete this book
           </Button>
@@ -59,7 +59,9 @@ export function DeleteBook({ book, onDelete }: { book: Book; onDelete: () => Pro
           >
             Delete “{book.title}”?
           </p>
-          <p className="add-hint">It leaves your library with its cover and notes. This can’t be undone.</p>
+          <p className="text-muted text-small leading-tight">
+            It leaves your library with its cover and notes. This can’t be undone.
+          </p>
           {failure && <FailureLine>{failure}</FailureLine>}
           <div className="flex flex-wrap items-center gap-2">
             <Button variant="secondary" pill disabled={busy} onClick={() => void confirm()}>

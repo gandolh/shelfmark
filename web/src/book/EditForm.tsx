@@ -11,7 +11,6 @@ import { CONDITION_LABELS, FORMAT_LABELS } from "./BookDetails";
 import { buildPatch, firstError, valuesOf, type EditErrors, type EditField, type EditValues } from "./patch";
 import { RatingField } from "./RatingField";
 import { TagsField } from "./TagsField";
-import "../add/add.css";
 
 type TextKey =
   | "title"
@@ -45,19 +44,25 @@ function OptionalChoice<T extends string>({
   const name = useId();
   const entries = [[null, "Not set"], ...Object.entries<string>(options)] as [T | null, string][];
   return (
-    <fieldset className="add-choice">
-      <legend className="add-label">{label}</legend>
-      <div className="add-chips">
+    <fieldset className="min-w-0">
+      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
+      <div className="flex flex-wrap gap-2 mt-2">
         {entries.map(([key, text]) => (
-          <label key={key ?? "none"} className="add-chip">
+          <label
+            key={key ?? "none"}
+            className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 px-3.5 rounded-pill bg-control text-ink text-meta leading-tight cursor-pointer select-none transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control-hover aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:content-[''] max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0"
+          >
             <input
-              className="add-chip__input"
+              className="absolute inset-0 w-full h-full opacity-0 [cursor:inherit]"
               type="radio"
               name={name}
               checked={key === value}
               onChange={() => onChange(key)}
             />
-            <span className="add-chip__label" data-label={text}>
+            <span
+              className="inline-flex flex-col min-w-0 after:content-[attr(data-label)] after:h-0 after:overflow-hidden after:invisible after:font-semibold after:select-none after:pointer-events-none"
+              data-label={text}
+            >
               {text}
             </span>
           </label>
@@ -79,25 +84,25 @@ function AreaField({
 >) {
   const id = useId();
   return (
-    <div className="add-field">
-      <label className="add-label" htmlFor={id}>
+    <div className="flex flex-col gap-1.5 min-w-0">
+      <label className="block text-muted text-label font-semibold leading-tight" htmlFor={id}>
         {label}
-        <span className="add-label__optional">optional</span>
+        <span className="ml-1.5 font-regular">optional</span>
       </label>
       <textarea
         {...area}
         id={id}
-        className="add-input h-auto min-h-24 py-2.5 px-3 leading-body resize-y"
+        className="h-auto min-h-24 py-2.5 px-3 leading-body resize-y focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         rows={4}
         aria-invalid={error !== undefined}
       />
       {error ? (
-        <p className="add-error">
+        <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
           <AlertIcon size={16} />
           {error}
         </p>
       ) : (
-        hint && <p className="add-hint">{hint}</p>
+        hint && <p className="text-muted text-small leading-tight">{hint}</p>
       )}
     </div>
   );
@@ -186,7 +191,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           autoCapitalize="words"
           hint="Several authors: put & between them."
         />
-        <div className="add-form__pair">
+        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2.5">
           <TextField label="Publisher" optional {...text("publisher")} autoCapitalize="words" />
           <TextField
             label="Year"
@@ -194,7 +199,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
             {...text("publishedYear")}
             inputMode="numeric"
             maxLength={4}
-            className="add-field--year"
+            className="tabular-nums"
           />
         </div>
         <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-2.5">
@@ -204,7 +209,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
             {...text("pages")}
             inputMode="numeric"
             maxLength={6}
-            className="add-field--year"
+            className="tabular-nums"
           />
           <TextField
             label="Language"
@@ -224,7 +229,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           label="ISBN"
           optional
           {...text("isbn13")}
-          className="add-field--isbn"
+          className="md:max-w-70"
           inputMode="numeric"
           autoCorrect="off"
           autoCapitalize="characters"
@@ -274,7 +279,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           label={`Price in lei${book.currency === "RON" ? "" : ` (${book.currency})`}`}
           optional
           {...text("price")}
-          className="add-field--year"
+          className="tabular-nums"
           inputMode="decimal"
           hint="Two decimals, such as 49.90."
         />

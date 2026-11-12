@@ -85,21 +85,27 @@ export function CoverCapture({
   );
 
   return (
-    <div className={cn("add-cover", photo ? "add-cover--taken" : null, className)}>
+    <div
+      className={cn(
+        "flex items-center gap-3 pt-2.5 pr-2.5 pb-2.5 pl-3 rounded-menu [outline:1.5px_dashed_color-mix(in_srgb,var(--color-muted)_55%,transparent)] outline-offset-[-1.5px]",
+        photo ? "[outline-style:solid] outline-divider" : null,
+        className,
+      )}
+    >
       {photo ? (
-        <span className={cn(COVER_CLASS, "add-cover__thumb")}>
+        <span className={cn(COVER_CLASS, "[--cover-width:36px]")}>
           <img className="size-full object-cover" src={photo.preview} alt="" />
         </span>
       ) : (
-        <span className="add-cover__icon">
+        <span className="flex flex-none text-muted">
           <CameraIcon size={22} />
         </span>
       )}
-      <div className="add-cover__text" role="status">
+      <div className="flex-1 min-w-0 text-ink-2 text-meta leading-tight" role="status">
         {working ? (
           <p>Making the photo smaller…</p>
         ) : problem ? (
-          <p className="add-error">
+          <p className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25">
             <AlertIcon size={16} />
             {problem}
           </p>
@@ -109,13 +115,16 @@ export function CoverCapture({
           <p>{prompt}</p>
         )}
       </div>
-      <div className="add-cover__actions">
+      <div className="flex flex-none items-center gap-1">
         {photo ? (
           <>
             {picker("Retake", "add-cover__retake")}
             <button
               type="button"
-              className={buttonClass({ variant: "quiet", size: "compact" }, "add-quiet-neutral")}
+              className={buttonClass(
+                { variant: "quiet", size: "compact" },
+                "text-ink-2 hover:text-ink active:text-ink",
+              )}
               disabled={disabled}
               onClick={() => onChange(null)}
             >

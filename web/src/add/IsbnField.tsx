@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { clean, parseIsbn } from "@shelfmark/shared";
 import { useId, useImperativeHandle, useRef, useState, type FormEvent, type ReactNode, type Ref } from "react";
 import { Button } from "../components/Button";
@@ -85,15 +86,29 @@ export function IsbnField({
   const describedBy = `${id}-note`;
 
   return (
-    <form className={`add-isbn add-isbn--${size}`} onSubmit={submit} noValidate>
-      <label className="add-label" htmlFor={`${id}-input`}>
+    <form
+      className={cn(
+        "grid grid-cols-[minmax(0,1fr)_auto] gap-x-2.5 gap-y-1.5 [grid-template-areas:'label_label'_'box_submit'_'note_note']",
+        size === "large" &&
+          "max-md:grid-cols-[minmax(0,1fr)] max-md:[grid-template-areas:'label'_'box'_'note'_'submit']",
+      )}
+      onSubmit={submit}
+      noValidate
+    >
+      <label
+        className="block text-label leading-tight font-semibold text-muted [grid-area:label]"
+        htmlFor={`${id}-input`}
+      >
         {label}
       </label>
-      <div className="add-isbn__box" data-invalid={problem !== null || undefined}>
+      <div className="relative [grid-area:box] min-w-0" data-invalid={problem !== null || undefined}>
         <input
           ref={input}
           id={`${id}-input`}
-          className="add-isbn__input tabular-nums"
+          className={cn(
+            "tabular-nums w-full h-control-large pr-13 pl-4 rounded-field bg-field text-(length:--text-isbn) font-semibold tracking-[0.04em] appearance-none focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0]",
+            size === "regular" && "text-input-phone tracking-[0.02em]",
+          )}
           type="text"
           inputMode="numeric"
           enterKeyHint="search"
@@ -114,7 +129,7 @@ export function IsbnField({
         {wantsX && (
           <button
             type="button"
-            className="add-isbn__x"
+            className="absolute top-[50%] right-1.5 w-9 h-9 rounded-control bg-surface text-ink text-row-title font-semibold [transform:translateY(-50%)] before:content-[''] before:absolute before:-inset-1 hover:bg-control"
             aria-label="Type X, the last character of some ISBN-10s"
             onClick={() => {
               setValue((current) => `${current.trimEnd()}X`);
@@ -129,20 +144,25 @@ export function IsbnField({
         type="submit"
         variant="primary"
         size="large"
-        className="add-isbn__submit"
+        className={cn("[grid-area:submit]", size === "large" && "max-md:mt-1.5")}
         aria-disabled={busy || undefined}
       >
         {submitLabel}
       </Button>
       {problem ? (
         // A new element each time, so the alert is announced as it appears.
-        <p key="problem" id={describedBy} className="add-error" role="alert">
+        <p
+          key="problem"
+          id={describedBy}
+          className="[grid-area:note] flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          role="alert"
+        >
           <AlertIcon size={16} />
           {problem}
         </p>
       ) : (
         hint && (
-          <p key="hint" id={describedBy} className="add-hint">
+          <p key="hint" id={describedBy} className="text-small leading-tight text-muted [grid-area:note]">
             {hint}
           </p>
         )

@@ -30,27 +30,30 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
   const noteId = `${id}-note`;
   const note = error ?? hint;
   return (
-    <div className={cn("add-field", className)}>
-      <label className="add-label" htmlFor={id}>
+    <div className={cn("flex flex-col gap-1.5 min-w-0", className)}>
+      <label className="block text-muted text-label font-semibold leading-tight" htmlFor={id}>
         {label}
-        {optional && <span className="add-label__optional">optional</span>}
+        {optional && <span className="ml-1.5 font-regular">optional</span>}
       </label>
       <input
         {...input}
         ref={ref}
         id={id}
-        className="add-input"
+        className="focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         aria-invalid={error !== undefined}
         aria-describedby={note ? noteId : undefined}
       />
       {error !== undefined ? (
-        <p id={noteId} className="add-error">
+        <p
+          id={noteId}
+          className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+        >
           <AlertIcon size={16} />
           {error}
         </p>
       ) : (
         hint && (
-          <p id={noteId} className="add-hint">
+          <p id={noteId} className="text-muted text-small leading-tight">
             {hint}
           </p>
         )
@@ -62,7 +65,10 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
 /** A failure under a sheet's fields, beside its primary action: "Not saved: …". */
 export function FailureLine({ children }: { children: ReactNode }) {
   return (
-    <p className="add-error add-error--block" role="alert">
+    <p
+      className="flex items-start gap-1.5 text-ink font-semibold leading-tight [&_svg]:flex-none py-2.5 px-3 rounded-control bg-field text-meta"
+      role="alert"
+    >
       <AlertIcon size={18} />
       {children}
     </p>
@@ -170,9 +176,9 @@ export function ManualForm({
   };
 
   return (
-    <form className="add-form" onSubmit={submit} noValidate aria-busy={saving || undefined}>
+    <form className="flex flex-col gap-3.5" onSubmit={submit} noValidate aria-busy={saving || undefined}>
       {intro}
-      <fieldset className="add-form__fields" disabled={saving}>
+      <fieldset className="min-w-0 flex flex-col gap-3.5" disabled={saving}>
         <CipReader onRead={fillFromBlock} disabled={saving} />
         <TextField
           label="Title"
@@ -184,13 +190,13 @@ export function ManualForm({
         />
         <TextField label="Subtitle" optional {...text("subtitle")} autoCapitalize="sentences" autoComplete="off" />
         <TextField label="Author" optional {...text("author")} autoCapitalize="words" autoComplete="off" />
-        <div className="add-form__pair">
+        <div className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-2.5">
           <TextField label="Publisher" optional {...text("publisher")} autoCapitalize="words" autoComplete="off" />
           <TextField
             label="Year"
             optional
             {...text("year")}
-            className="add-field--year"
+            className="tabular-nums"
             inputMode="numeric"
             maxLength={4}
             autoComplete="off"
@@ -201,7 +207,7 @@ export function ManualForm({
             label="ISBN"
             optional
             {...text("isbn")}
-            className="add-field--isbn"
+            className="md:max-w-70"
             inputMode="numeric"
             autoComplete="off"
             autoCorrect="off"
@@ -217,11 +223,11 @@ export function ManualForm({
         )}
       </fieldset>
       {failure && <FailureLine>{failure}</FailureLine>}
-      <div className="add-form__submit">
+      <div className="flex flex-col gap-3.5 in-data-[floating]:sticky in-data-[floating]:z-1 in-data-[floating]:-mx-4 in-data-[floating]:-mb-4 in-data-[floating]:border-t in-data-[floating]:border-hairline in-data-[floating]:bg-surface in-data-[floating]:px-4 in-data-[floating]:pt-3 in-data-[floating]:pb-4 in-data-[floating]:bottom-[-16px]">
         <Button type="submit" variant="primary" size="large" block aria-disabled={saving || undefined}>
           {saving ? "Saving…" : submitLabel}
         </Button>
-        {secondary && <div className="add-actions">{secondary}</div>}
+        {secondary && <div className="flex justify-center gap-3 -mt-1">{secondary}</div>}
       </div>
     </form>
   );

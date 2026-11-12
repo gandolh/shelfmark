@@ -65,12 +65,12 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
   };
 
   return (
-    <fieldset className="add-choice" disabled={disabled}>
-      <legend className="add-label">{label}</legend>
-      <div className="add-chips">
+    <fieldset className="min-w-0" disabled={disabled}>
+      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
+      <div className="flex flex-wrap gap-2 mt-2">
         <ToggleGroup
           aria-label={label}
-          className="add-chips__group"
+          className="contents"
           value={writing ? null : value}
           onChoose={(next) => {
             close();
@@ -78,17 +78,24 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
           }}
         >
           {chips.map((shelf) => (
-            <Toggle key={shelf} value={shelf} className="add-chip">
-              <span className="add-chip__label" data-label={shelf}>
+            <Toggle
+              key={shelf}
+              value={shelf}
+              className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 px-3.5 rounded-pill bg-control text-ink text-meta leading-tight cursor-pointer select-none transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control-hover aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:content-[''] max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0"
+            >
+              <span
+                className="inline-flex flex-col min-w-0 after:content-[attr(data-label)] after:h-0 after:overflow-hidden after:invisible after:font-semibold after:select-none after:pointer-events-none"
+                data-label={shelf}
+              >
                 {shelf}
               </span>
             </Toggle>
           ))}
         </ToggleGroup>
         {writing ? (
-          <span className="add-chip add-chip--field">
+          <span className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 rounded-pill text-ink text-meta leading-tight select-none transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0 w-[min(100%,260px)] bg-field cursor-text hover:bg-field max-md:before:content-[none] max-md:min-h-touch">
             <input
-              className="add-chip__text"
+              className="focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] w-full h-9 px-3.5 rounded-[inherit] bg-transparent text-ink text-input-phone appearance-none max-md:min-h-touch"
               type="text"
               value={text}
               onChange={(event) => type(event.target.value)}
@@ -113,14 +120,18 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
             </datalist>
           </span>
         ) : (
-          <button type="button" className="add-chip add-chip--new" onClick={open}>
+          <button
+            type="button"
+            className="relative inline-flex items-center gap-1.5 min-h-9 max-w-full in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 px-3.5 rounded-pill text-meta leading-tight cursor-pointer select-none transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press aria-pressed:font-semibold has-checked:bg-accent-tint has-checked:text-accent-press has-checked:font-semibold has-focus-visible:outline-2 has-focus-visible:outline-focus-ring has-focus-visible:outline-offset-2 max-md:text-body max-md:before:content-[''] max-md:before:absolute max-md:before:-inset-y-1 max-md:before:inset-x-0 pl-2.75 shadow-none [outline:1px_dashed_var(--color-muted)] outline-offset-[-1px] bg-transparent text-ink-2 hover:bg-control focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2"
+            onClick={open}
+          >
             <PlusIcon size={16} />
             {more ? "Other shelf" : "New shelf"}
           </button>
         )}
       </div>
       {writing && (
-        <p className="add-hint" id={`${id}-hint`}>
+        <p className="mt-1.5 text-small leading-tight text-muted" id={`${id}-hint`}>
           Room, then shelf: Living room · A2. A dash works too.
         </p>
       )}

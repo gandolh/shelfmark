@@ -40,8 +40,8 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
   const unused = suggestions.filter((s) => !value.some((v) => v.toLowerCase() === s.toLowerCase()));
 
   return (
-    <fieldset className="add-choice" disabled={disabled}>
-      <legend className="add-label">{label}</legend>
+    <fieldset className="min-w-0" disabled={disabled}>
+      <legend className="block text-muted text-label font-semibold leading-tight">{label}</legend>
       {value.length > 0 && (
         <ul className="flex flex-wrap gap-1.5 list-none">
           {value.map((entry) => (
@@ -63,7 +63,7 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
         </ul>
       )}
       <input
-        className="add-input mt-2"
+        className="mt-2 focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[0] aria-invalid:outline-[1.5px] aria-invalid:outline-ink-2 aria-invalid:outline-offset-[-1.5px] focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-focus-ring focus-visible:aria-invalid:outline-offset-[0] w-full h-10.5 px-3 rounded-field bg-field text-ink text-input-phone appearance-none data-filled:bg-accent-tint-soft data-filled:shadow-[inset_0_0_0_1.5px_var(--color-accent)] max-md:h-touch"
         type="text"
         value={text}
         onChange={(event) =>
@@ -82,7 +82,7 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
           <option key={s} value={s} />
         ))}
       </datalist>
-      {hint && <p className="add-hint">{hint}</p>}
+      {hint && <p className="mt-1.5 text-small leading-tight text-muted">{hint}</p>}
     </fieldset>
   );
 }

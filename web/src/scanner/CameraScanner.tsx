@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import {
   useEffect,
   useEffectEvent,
@@ -22,7 +23,6 @@ import {
 } from "./camera";
 import { getEngine, readCode, type Engine, type EngineChoice, type Reading, type ScannedCode } from "./detector";
 import { armFeedback, signalScan } from "./feedback";
-import "./CameraScanner.css";
 
 /**
  * What the scanner is doing. `asking` covers the permission prompt and the
@@ -73,7 +73,8 @@ export interface CameraScannerProps {
   onCamera?: (camera: CameraInfo | null) => void;
   /** For the readout: each decode's time in ms, while a press reads. Not measured without it. */
   onDecode?: (ms: number) => void;
-  className?: string;
+  /** Placed in Add a book's stage: it fills the stage and draws the smaller, thicker viewfinder under the top controls. */
+  inStage?: boolean;
 }
 
 function subscribeVisibility(onChange: () => void): () => void {
@@ -130,7 +131,7 @@ export function CameraScanner({
   onZoomAvailable,
   onCamera,
   onDecode,
-  className,
+  inStage = false,
 }: CameraScannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const visible = useSyncExternalStore(subscribeVisibility, pageVisible, () => true);
@@ -296,27 +297,60 @@ export function CameraScanner({
   const message = state === "scanning" ? null : MESSAGES[state];
   return (
     <div
-      className={className === undefined ? "scanner" : `scanner ${className}`}
+      className={cn(
+        "relative isolate h-full min-h-60 overflow-hidden bg-ink text-surface",
+        inStage && "absolute inset-0 h-auto min-h-0",
+      )}
       data-state={state}
       data-paused={paused || undefined}
       role="group"
       aria-label="Barcode scanner"
     >
-      <video ref={videoRef} className="scanner-video" playsInline muted autoPlay aria-hidden="true" />
+      <video
+        ref={videoRef}
+        // Until the stream runs the video is a black box; the message stands alone.
+        className={cn("absolute inset-0 size-full object-cover", state !== "scanning" && "opacity-0")}
+        playsInline
+        muted
+        autoPlay
+        aria-hidden="true"
+      />
       {message === null ? (
-        <div className="scanner-frame" aria-hidden="true">
-          {hits > 0 && <span key={hits} className="scanner-hit" />}
+        <div
+          // The viewfinder: a rounded frame about the shape of a book's barcode. Paused, it fades.
+          className={cn(
+            "pointer-events-none absolute top-1/2 left-1/2 aspect-[3/2] w-[min(78%,330px)] -translate-x-1/2 -translate-y-1/2 rounded-[16px] border-2 border-surface transition-opacity duration-150 ease-out",
+            paused && "opacity-40",
+            inStage && "top-[45%] aspect-[240/132] w-60 rounded-[14px] border-[3px]",
+          )}
+          aria-hidden="true"
+        >
+          {hits > 0 && (
+            <span
+              key={hits}
+              className={cn(
+                "absolute inset-0 rounded-[14px] bg-accent-tint opacity-0 motion-safe:animate-hit",
+                inStage && "rounded-[11px]",
+              )}
+            />
+          )}
         </div>
       ) : (
-        <div className="scanner-message" role="status">
-          <p className="scanner-message-title">{message.title}</p>
-          <p className="scanner-message-detail">{message.detail}</p>
-          <div className="scanner-actions">
-            <button type="button" className="scanner-fallback" onClick={onFallback}>
+        <div
+          className={cn(
+            "absolute inset-0 flex flex-col items-center justify-center gap-2 p-6 text-center [&_p]:max-w-105",
+            inStage && "pt-(--add-top-room)",
+          )}
+          role="status"
+        >
+          <p className="text-[17px] font-semibold">{message.title}</p>
+          <p className="text-[15px]">{message.detail}</p>
+          <div className="flex flex-wrap justify-center gap-3 mt-3 [&_button]:min-h-11 [&_button]:px-5 [&_button]:rounded-[999px] [&_button]:text-[15px] [&_button]:font-semibold [&_button]:cursor-pointer">
+            <button type="button" className="bg-accent text-on-accent active:bg-accent-press" onClick={onFallback}>
               Type the ISBN instead
             </button>
             {message.retry && (
-              <button type="button" className="scanner-retry" onClick={retry}>
+              <button type="button" className="border border-surface bg-transparent text-surface" onClick={retry}>
                 Try again
               </button>
             )}
@@ -359,7 +393,12 @@ export function CameraReadout({
     decodeMs,
   });
   return (
-    <div className={className === undefined ? "scanner-readout" : `scanner-readout ${className}`}>
+    <div
+      className={cn(
+        "pointer-events-none flex flex-col gap-px rounded-control bg-ground/92 px-2.25 py-1.5 text-tab leading-tight wrap-anywhere text-ink-2 tabular-nums",
+        className,
+      )}
+    >
       {/* Four lines, always in the same order. */}
       {lines.map((line, index) => (
         <span key={index}>{line}</span>
