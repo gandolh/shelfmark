@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode, Ref } from "react";
+import { cn } from "../lib/cn";
 import { Link, type LinkProps } from "./Link";
 
 /**
@@ -26,17 +27,49 @@ interface ButtonLook {
   block?: boolean;
 }
 
-function buttonClass({ variant = "secondary", size = "regular", pill, block }: ButtonLook, extra?: string): string {
-  return [
-    "button",
-    `button--${variant}`,
-    `button--${size}`,
-    pill || variant === "primary" ? "button--pill" : null,
-    block ? "button--block" : null,
+const BASE = [
+  "relative inline-flex min-h-control flex-none items-center justify-center gap-1.5 rounded-control px-3",
+  "text-center text-meta leading-tight font-regular whitespace-nowrap text-ink no-underline select-none",
+  "transition-[background-color,color] duration-(--duration-fast) ease-out",
+  "disabled:pointer-events-none disabled:opacity-45 aria-disabled:pointer-events-none aria-disabled:opacity-45",
+  "[&_svg]:flex-none",
+].join(" ");
+
+const VARIANT: Record<ButtonVariant, string> = {
+  primary:
+    "bg-accent px-4 font-semibold text-on-accent hover:bg-accent-press hover:text-on-accent active:bg-accent-press active:text-on-accent",
+  secondary:
+    "bg-control text-ink hover:bg-control-hover hover:text-ink active:bg-control-press aria-expanded:bg-accent-tint aria-expanded:font-semibold aria-expanded:text-accent-press",
+  quiet: "px-1 text-body text-accent hover:text-accent-press active:text-accent-press",
+};
+
+// A compact button keeps its 34 px look and gets a 44 px target on a phone.
+const SIZE: Record<ButtonSize, string> = {
+  regular: "max-md:min-h-touch max-md:px-4.5 max-md:text-body",
+  compact:
+    "max-md:before:absolute max-md:before:inset-x-0 max-md:before:inset-y-[calc((var(--spacing-control)-var(--spacing-touch))/2)] max-md:before:content-['']",
+  large: "min-h-control-large px-6 text-action-large font-semibold",
+};
+
+/** The classes of a button, for a control that is not a `Button` (a Base UI trigger). `variant: null` is no variant. */
+export function buttonClass(
+  {
+    variant = "secondary",
+    size = "regular",
+    pill,
+    block,
+  }: Omit<ButtonLook, "variant"> & { variant?: ButtonVariant | null },
+  extra?: string,
+): string {
+  return cn(
+    BASE,
+    (pill || variant === "primary") && "rounded-pill",
+    block && "flex w-full flex-[1_1_auto]",
+    variant && VARIANT[variant],
+    SIZE[size],
+    variant === "quiet" && size === "regular" && "max-md:px-1",
     extra,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  );
 }
 
 export interface ButtonProps extends ButtonLook, ButtonHTMLAttributes<HTMLButtonElement> {

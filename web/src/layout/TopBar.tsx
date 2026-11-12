@@ -1,4 +1,5 @@
 import { Link } from "../components/Link";
+import { segmentedItem, segmentedTrack } from "../components/segmented";
 import { ADD_BOOK, LIBRARY, WISHLIST, type Place } from "../router";
 import { AccountMenu } from "./AccountMenu";
 import { SearchField } from "./SearchField";
@@ -18,14 +19,14 @@ export function TopBar({ current, exact }: { current: Place | null; exact: boole
       <Link to={LIBRARY} className="topbar__wordmark">
         Shelfmark
       </Link>
-      <nav aria-label="Main" className="segmented segmented--nav">
-        <Link to={LIBRARY} className="segmented__item" aria-current={mark("library")} data-label="Library">
+      <nav aria-label="Main" className={segmentedTrack("nav")}>
+        <Link to={LIBRARY} className={segmentedItem("nav")} aria-current={mark("library")} data-label="Library">
           Library
         </Link>
-        <Link to={ADD_BOOK} className="segmented__item" aria-current={mark("add")} data-label="Add a book">
+        <Link to={ADD_BOOK} className={segmentedItem("nav")} aria-current={mark("add")} data-label="Add a book">
           Add a book
         </Link>
-        <Link to={WISHLIST} className="segmented__item" aria-current={mark("wishlist")} data-label="Wishlist">
+        <Link to={WISHLIST} className={segmentedItem("nav")} aria-current={mark("wishlist")} data-label="Wishlist">
           Wishlist
         </Link>
       </nav>

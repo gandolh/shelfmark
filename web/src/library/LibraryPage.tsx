@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { Book } from "@shelfmark/shared";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useBooks } from "../books/store";
@@ -400,7 +401,7 @@ function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBa
       </span>
       <button
         type="button"
-        className="button button--quiet button--regular library-selectline__action"
+        className={buttonClass({ variant: "quiet", size: "regular" }, "library-selectline__action")}
         onClick={onClick}
       >
         {action}

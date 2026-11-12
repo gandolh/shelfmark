@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { useId, useState, type FormEvent, type InputHTMLAttributes, type ReactNode, type Ref } from "react";
 import { Button } from "../components/Button";
 import type { CipFields } from "../ocr/block";
@@ -29,7 +30,7 @@ export function TextField({ label, optional, error, hint, ref, className, ...inp
   const noteId = `${id}-note`;
   const note = error ?? hint;
   return (
-    <div className={["add-field", className].filter(Boolean).join(" ")}>
+    <div className={cn("add-field", className)}>
       <label className="add-label" htmlFor={id}>
         {label}
         {optional && <span className="add-label__optional">optional</span>}

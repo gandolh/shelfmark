@@ -1,4 +1,5 @@
 import { Radio, RadioGroup } from "./ui/RadioGroup";
+import { segmentedItem, segmentedTrack } from "./segmented";
 
 export interface SegmentedOption<T extends string> {
   value: T;
@@ -34,14 +35,14 @@ export function SegmentedControl<T extends string>({
   return (
     <RadioGroup<T>
       aria-label={label}
-      className={["segmented", `segmented--${size}`, className].filter(Boolean).join(" ")}
+      className={segmentedTrack(size, className)}
       value={value}
       onChoose={(next) => {
         if (next !== value) onChange(next);
       }}
     >
       {options.map((option) => (
-        <Radio key={option.value} value={option.value} className="segmented__item" data-label={option.label}>
+        <Radio key={option.value} value={option.value} className={segmentedItem(size)} data-label={option.label}>
           {option.label}
         </Radio>
       ))}

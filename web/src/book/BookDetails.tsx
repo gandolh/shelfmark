@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { to10, type Book, type MetadataSource } from "@shelfmark/shared";
 import type { ReactNode } from "react";
 import { STATUS_LABELS } from "../add/StatusPicker";
@@ -52,12 +53,10 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
  */
 export function BookDetails({ book }: { book: Book }) {
   const isbn10 = book.isbn13 === null ? null : to10(book.isbn13);
-  const acquired = [
+  const acquired = cn(
     book.acquiredOn ? dayText(book.acquiredOn) : null,
     book.acquiredFrom ? `from ${book.acquiredFrom}` : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  );
 
   return (
     <>

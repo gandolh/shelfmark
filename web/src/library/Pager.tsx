@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import { useState, type MouseEvent } from "react";
 import { Menu } from "../components/ui/Menu";
 import { pageCount, pageItems, pageRange, PAGE_SIZES, type PageSize } from "./pagination";
@@ -56,7 +57,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
   const step = (label: "Previous" | "Next", next: number, blocked: boolean) => (
     <button
       type="button"
-      className="button button--secondary button--regular"
+      className={buttonClass({ variant: "secondary", size: "regular" })}
       aria-disabled={blocked ? "true" : undefined}
       onClick={turn(next)}
     >
@@ -68,7 +69,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
     <Menu
       label="Books per page"
       trigger={`${pageSize} per page`}
-      triggerClassName={desktop ? undefined : "button button--quiet button--regular menu-trigger"}
+      triggerClassName={desktop ? undefined : buttonClass({ variant: "quiet", size: "regular" })}
       align={desktop ? "end" : "start"}
       sections={[
         {

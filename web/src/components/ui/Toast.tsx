@@ -1,3 +1,5 @@
+import { cn } from "../../lib/cn";
+import { SHEET } from "../Sheet";
 import { Toast } from "@base-ui/react/toast";
 import { Button } from "../Button";
 
@@ -45,7 +47,7 @@ export function ToastHost() {
 function ToastList() {
   const { toasts } = Toast.useToastManager();
   return toasts.map((toast) => (
-    <Toast.Root key={toast.id} toast={toast} className="sheet update-prompt__sheet">
+    <Toast.Root key={toast.id} toast={toast} className={cn(SHEET, "update-prompt__sheet")}>
       <Toast.Title className="update-prompt__text" />
       <Toast.Action render={<Button variant="primary" size="compact" />} />
     </Toast.Root>

@@ -1,4 +1,9 @@
+import { cn } from "../lib/cn";
 import type { HTMLAttributes, ReactNode } from "react";
+
+/** The floating card over the stage: the scan result, the update prompt. */
+export const SHEET =
+  "absolute right-3 bottom-3 left-3 z-bar mx-auto flex max-h-[calc(100%-24px)] max-w-110 flex-col gap-3.5 overflow-y-auto rounded-sheet bg-surface p-4 text-ink shadow-float motion-safe:animate-sheet-in";
 
 export interface SheetProps extends HTMLAttributes<HTMLElement> {
   /** Names the sheet for screen readers ("Already in your library"), unless `aria-labelledby` points at its heading. */
@@ -14,7 +19,7 @@ export interface SheetProps extends HTMLAttributes<HTMLElement> {
  */
 export function Sheet({ label, className, children, ...rest }: SheetProps) {
   return (
-    <section aria-label={label} {...rest} className={["sheet", className].filter(Boolean).join(" ")}>
+    <section aria-label={label} {...rest} className={cn(SHEET, className)}>
       {children}
     </section>
   );

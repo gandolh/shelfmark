@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { RefObject } from "react";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { activeFilters } from "./filters";
@@ -74,7 +75,7 @@ export function Toolbar({
           <button
             ref={filterButton}
             type="button"
-            className="button button--regular library-tool"
+            className={buttonClass({ variant: null, size: "regular" }, "library-tool")}
             aria-haspopup="dialog"
             aria-expanded={open === "filter"}
             onClick={onFilter}
@@ -87,7 +88,7 @@ export function Toolbar({
             <button
               ref={columnsButton}
               type="button"
-              className="button button--regular library-tool"
+              className={buttonClass({ variant: null, size: "regular" }, "library-tool")}
               aria-haspopup="dialog"
               aria-expanded={open === "columns"}
               onClick={onColumns}
@@ -118,7 +119,7 @@ export function Toolbar({
       <button
         ref={filterButton}
         type="button"
-        className="button button--regular library-tool library-tool--end"
+        className={buttonClass({ variant: null, size: "regular" }, "library-tool library-tool--end")}
         aria-haspopup="dialog"
         aria-expanded={open !== null}
         onClick={onFilter}

@@ -1,3 +1,5 @@
+import { cn } from "../lib/cn";
+import { segmentedItem, segmentedTrack } from "../components/segmented";
 import { Tab, TabsList } from "../components/ui/Tabs";
 import type { Mode } from "./flow";
 
@@ -24,16 +26,13 @@ export interface ModeSwitchProps {
  */
 export function ModeSwitch({ overCamera, disabled }: ModeSwitchProps) {
   return (
-    <TabsList
-      aria-label="How to add the book"
-      className={["segmented", "add-modes", overCamera ? "add-modes--over-camera" : null].filter(Boolean).join(" ")}
-    >
+    <TabsList aria-label="How to add the book" className={cn(segmentedTrack(), overCamera && "bg-ground/92")}>
       {MODES.map((mode) => (
         <Tab
           key={mode.value}
           value={mode.value}
           disabled={disabled}
-          className="segmented__item"
+          className={cn(segmentedItem(), overCamera && "hover:bg-surface/60")}
           data-label={mode.label}
         >
           {mode.label}

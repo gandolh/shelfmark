@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { Book } from "@shelfmark/shared";
 import { useState, type ChangeEvent } from "react";
 import { fetchCover, removeCover, uploadCover } from "../add/api";
@@ -67,7 +68,10 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
           prompt="Take a photo of the front."
           disabled={busy}
         />
-        <label className="button button--secondary button--compact button--pill book-filepick" aria-disabled={busy}>
+        <label
+          className={buttonClass({ variant: "secondary", size: "compact", pill: true }, "book-filepick")}
+          aria-disabled={busy}
+        >
           <input className="sr-only" type="file" accept="image/*" disabled={busy} onChange={chooseFile} />
           Choose a file
         </label>

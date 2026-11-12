@@ -7,6 +7,18 @@
 
 export const COVER_TINT_COUNT = 8;
 
+/** The classes of each tint (index 0 is tint 1): its ground and its text. Written out so Tailwind sees them. */
+export const TINT_CLASS: readonly string[] = [
+  "bg-cover-1-bg text-cover-1-ink",
+  "bg-cover-2-bg text-cover-2-ink",
+  "bg-cover-3-bg text-cover-3-ink",
+  "bg-cover-4-bg text-cover-4-ink",
+  "bg-cover-5-bg text-cover-5-ink",
+  "bg-cover-6-bg text-cover-6-ink",
+  "bg-cover-7-bg text-cover-7-ink",
+  "bg-cover-8-bg text-cover-8-ink",
+];
+
 /**
  * The title as the tint sees it: trimmed, spaces collapsed, lower case, and
  * without diacritics, so "Inocenţii" (cedilla) and "Inocenții" (comma) are

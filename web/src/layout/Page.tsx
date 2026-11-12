@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { useEffect, type MouseEvent, type ReactNode } from "react";
 import { BackIcon } from "../components/icons";
 import { Link } from "../components/Link";
@@ -64,11 +65,7 @@ export function Page({
   );
 
   return (
-    <div
-      className={["page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null]
-        .filter(Boolean)
-        .join(" ")}
-    >
+    <div className={cn("page", hidden ? "page--bleed" : null, wide ? "page--wide" : null, card ? "page--card" : null)}>
       {hidden ? (
         <h1 className="sr-only">{title}</h1>
       ) : (

@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { Book, Collection } from "@shelfmark/shared";
 import { useId, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { SegmentedControl } from "../components/SegmentedControl";
@@ -139,7 +140,7 @@ export function FilterPanel({
           <div className="library-panel__foot">
             <button
               type="button"
-              className="button button--quiet button--compact"
+              className={buttonClass({ variant: "quiet", size: "compact" })}
               onClick={() => {
                 setFilter(columnId, null);
                 setFresh((n) => n + 1);

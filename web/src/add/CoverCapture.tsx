@@ -1,3 +1,6 @@
+import { buttonClass } from "../components/Button";
+import { COVER_CLASS } from "../components/CoverImage";
+import { cn } from "../lib/cn";
 import { useState, type ChangeEvent, type ReactNode } from "react";
 import { AlertIcon, CameraIcon } from "./icons";
 import { ImageReadError, resizeImage } from "./resize";
@@ -66,7 +69,7 @@ export function CoverCapture({
 
   const picker = (label: string, look: string) => (
     <label
-      className={`button button--secondary button--compact button--pill add-cover__pick ${look}`}
+      className={buttonClass({ variant: "secondary", size: "compact", pill: true }, `add-cover__pick ${look}`)}
       aria-disabled={disabled || working}
     >
       <input
@@ -82,10 +85,10 @@ export function CoverCapture({
   );
 
   return (
-    <div className={["add-cover", photo ? "add-cover--taken" : null, className].filter(Boolean).join(" ")}>
+    <div className={cn("add-cover", photo ? "add-cover--taken" : null, className)}>
       {photo ? (
-        <span className="cover cover--image add-cover__thumb">
-          <img className="cover__img" src={photo.preview} alt="" />
+        <span className={cn(COVER_CLASS, "add-cover__thumb")}>
+          <img className="size-full object-cover" src={photo.preview} alt="" />
         </span>
       ) : (
         <span className="add-cover__icon">
@@ -112,7 +115,7 @@ export function CoverCapture({
             {picker("Retake", "add-cover__retake")}
             <button
               type="button"
-              className="button button--quiet button--compact add-quiet-neutral"
+              className={buttonClass({ variant: "quiet", size: "compact" }, "add-quiet-neutral")}
               disabled={disabled}
               onClick={() => onChange(null)}
             >

@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import { useEffect, useRef, useState, type ChangeEvent, type CSSProperties, type PointerEvent } from "react";
 import { Button } from "../components/Button";
 import { readCipBlock, type CipFields, type CipRead } from "../ocr/block";
@@ -200,7 +201,10 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
 
   const picker = (label: string, primary = false) => (
     <label
-      className={`button ${primary ? "button--secondary button--pill" : "button--quiet"} button--compact add-cip__pick`}
+      className={buttonClass(
+        { variant: primary ? "secondary" : "quiet", size: "compact", pill: primary },
+        "add-cip__pick",
+      )}
       aria-disabled={disabled}
     >
       <input

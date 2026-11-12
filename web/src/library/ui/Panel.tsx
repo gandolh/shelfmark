@@ -1,3 +1,4 @@
+import { buttonClass } from "../../components/Button";
 import { Dialog } from "@base-ui/react/dialog";
 import { Popover } from "@base-ui/react/popover";
 import { createContext, useContext, useEffect, useMemo, useRef, type ReactNode, type RefObject } from "react";
@@ -120,7 +121,11 @@ export interface PanelHeaderProps {
 export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
   const host = useContext(PanelHost);
   const done = (
-    <button type="button" className="button button--quiet button--compact library-panel__done" onClick={onDone}>
+    <button
+      type="button"
+      className={buttonClass({ variant: "quiet", size: "compact" }, "library-panel__done")}
+      onClick={onDone}
+    >
       Done
     </button>
   );

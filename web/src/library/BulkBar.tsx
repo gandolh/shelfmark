@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import { STATUSES, type Book, type BulkChange } from "@shelfmark/shared";
 import { useMemo, useState } from "react";
 import { STATUS_LABELS } from "../add/StatusPicker";
@@ -152,7 +153,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
             label={`Change ${bookCount(summary.count)}`}
             sections={sections}
             trigger="Actions"
-            triggerClassName="button button--quiet button--regular menu-trigger"
+            triggerClassName={buttonClass({ variant: "quiet", size: "regular" })}
             align="end"
           />
           {clear}

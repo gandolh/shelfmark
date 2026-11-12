@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { Collection } from "@shelfmark/shared";
 import { useLayoutEffect, useRef } from "react";
 import { BOOK_COLUMN_ID, columnById, type ColumnId } from "./columns";
@@ -183,7 +184,12 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
         )}
       </div>
       <div className="library-panel__foot">
-        <button type="button" className="button button--quiet button--compact" onClick={reset} data-focus-key="reset">
+        <button
+          type="button"
+          className={buttonClass({ variant: "quiet", size: "compact" })}
+          onClick={reset}
+          data-focus-key="reset"
+        >
           Reset columns
         </button>
       </div>

@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import type { SavedView } from "@shelfmark/shared";
 import { useMemo, useState } from "react";
 import { Menu, type MenuSection } from "../components/ui/Menu";
@@ -110,7 +111,7 @@ export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
           </>
         }
         triggerLabel={matched ? `Views, ${matched.name}` : undefined}
-        triggerClassName="button button--regular menu-trigger library-views library-tool"
+        triggerClassName={buttonClass({ variant: null, size: "regular" }, "library-views library-tool")}
         align={align}
       />
       {failed && (

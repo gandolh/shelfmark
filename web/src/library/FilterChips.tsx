@@ -1,3 +1,4 @@
+import { buttonClass } from "../components/Button";
 import { useLayoutEffect, useRef, type RefObject } from "react";
 import { ClearIcon } from "../components/icons";
 import type { ColumnId } from "./columns";
@@ -67,7 +68,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
       </ul>
       <button
         type="button"
-        className="button button--quiet button--compact library-chips__clear"
+        className={buttonClass({ variant: "quiet", size: "compact" }, "library-chips__clear")}
         onClick={() => {
           pendingFocus.current = 0;
           clearFilters();

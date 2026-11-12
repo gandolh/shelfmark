@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import type { Book } from "@shelfmark/shared";
 import {
   columnOrderingFeature,
@@ -486,13 +487,11 @@ export function BookTable({
 }
 
 function cellClass(column: LibraryColumn): string {
-  return [
+  return cn(
     "library-table__cell",
     `library-table__cell--${column.id}`,
     column.align === "end" ? "library-table__cell--end" : null,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  );
 }
 
 // --- Headers ------------------------------------------------------------------------------
