@@ -97,8 +97,8 @@ export function NameDialog({
 
   return (
     <Dialog title={title} returnFocus={returnFocus} onClose={onClose} pending={pending}>
-      <form className="library-dialog__form" onSubmit={submit} noValidate>
-        {intro && <p className="library-dialog__text">{intro}</p>}
+      <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
+        {intro && <p className="text-ink-2 text-body leading-body">{intro}</p>}
         <AuthField
           ref={input}
           label="Name"
@@ -160,8 +160,8 @@ export function DeleteViewDialog({ name, desktop, returnFocus, onConfirm, onClos
 
   return (
     <Dialog title={`Delete “${name}”?`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
-      <div className="library-dialog__form">
-        <p className="library-dialog__text">
+      <div className="flex flex-col gap-4">
+        <p className="text-ink-2 text-body leading-body">
           Only the saved view goes, on every device. Your books, and what the Library shows now, stay as they are.
         </p>
         {failure !== null && <DialogFailure>{failure}</DialogFailure>}

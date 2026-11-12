@@ -90,9 +90,9 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
 
   return (
     <Dialog title={`Move ${bookCount(owned)} to a shelf`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
-      <form className="library-dialog__form" onSubmit={submit} noValidate>
+      <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
         {wishlist > 0 && (
-          <p className="library-dialog__text">
+          <p className="text-ink-2 text-body leading-body">
             {wishlist === 1
               ? "1 selected book is on the wishlist and stays"
               : `${wishlist} selected books are on the wishlist and stay`}{" "}
@@ -212,7 +212,7 @@ export function AddTagsDialog({ count, suggestions, desktop, returnFocus, onClos
 
   return (
     <Dialog title={`Add tags to ${bookCount(count)}`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
-      <form className="library-dialog__form" onSubmit={submit} noValidate>
+      <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
         <AuthField
           ref={input}
           label="Tags"
@@ -292,7 +292,7 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
       onClose={onClose}
       pending={pending}
     >
-      <form className="library-dialog__form" onSubmit={submit} noValidate>
+      <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
         <fieldset className="library-options" aria-describedby={fieldError ? `${id}-error` : undefined}>
           <legend className="sr-only">Tags</legend>
           {tags.map((tag, index) => (
@@ -356,13 +356,13 @@ export function DeleteBooksDialog({
   const { pending, failure, save } = useSave(onClose, "The books weren't deleted. Try again.");
   return (
     <Dialog title={`Delete ${bookCount(count)}?`} returnFocus={returnFocus} onClose={onClose} pending={pending}>
-      <div className="library-dialog__form">
-        <p className="library-dialog__text">
+      <div className="flex flex-col gap-4">
+        <p className="text-ink-2 text-body leading-body">
           {count === 1 ? "It leaves" : "They leave"} your library with{" "}
           {count === 1 ? "its cover and notes" : "their covers and notes"}, on every device. There is no undo.
         </p>
         {everyPage && (
-          <p className="library-dialog__text">
+          <p className="text-ink-2 text-body leading-body">
             That is every book in this list, on every page, not only the page on show.
           </p>
         )}

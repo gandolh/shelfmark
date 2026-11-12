@@ -240,7 +240,7 @@ function ClaudePanel({ recs }: { recs: RecommendationsState }) {
       </div>
       {open && (
         <Dialog title="Import from Claude" returnFocus={() => importButton.current} onClose={() => setOpen(false)}>
-          <div className="library-dialog__form">
+          <div className="flex flex-col gap-4">
             <p className="wishlist__text">
               Attach the downloaded file to Claude with the prompt, then paste its answer here, or choose a file. Each
               book is looked up in Open Library first; one it cannot find is never shown. The shape:

@@ -206,8 +206,8 @@ function PasswordForm(props: PasswordFormProps) {
   const blockFailure = failure !== null && !wrongCurrent ? accountMessage(failure) : null;
 
   return (
-    <form className="library-dialog__form" onSubmit={submit} noValidate>
-      {intro && <p className="library-dialog__text">{intro}</p>}
+    <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
+      {intro && <p className="text-ink-2 text-body leading-body">{intro}</p>}
       <input
         className="sr-only"
         type="text"
@@ -283,8 +283,8 @@ function ConfirmWithWard(props: {
 }) {
   const { pending, failure, desktop, onConfirm, onCancel } = props;
   return (
-    <div className="library-dialog__form">
-      <p className="library-dialog__text">
+    <div className="flex flex-col gap-4">
+      <p className="text-ink-2 text-body leading-body">
         You sign in with Ward, and Shelfmark has no password for you yet. Confirm it's you with your Ward password, then
         choose one here, so you can still sign in while Ward is down.
       </p>
@@ -315,11 +315,11 @@ function ConfirmWithWard(props: {
 
 function Done({ desktop, onClose }: { desktop: boolean; onClose: () => void }) {
   return (
-    <div className="library-dialog__form">
-      <p className="library-dialog__text" role="status">
+    <div className="flex flex-col gap-4">
+      <p className="text-ink-2 text-body leading-body" role="status">
         You're still signed in here. Shelfmark signed you out everywhere else; use the new password there.
       </p>
-      <div className="library-dialog__actions">
+      <div className="flex justify-end items-center gap-3 mt-1.5">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>

@@ -1,3 +1,4 @@
+import { cn } from "../../lib/cn";
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { useRef, type ReactNode } from "react";
 import { useIsDesktop } from "../../layout/viewport";
@@ -26,6 +27,14 @@ export interface DialogProps {
   children: ReactNode;
 }
 
+// A white floating panel with the menus' shadow over a dimmed page: in the middle of the window on the desktop,
+// the floating sheet over the bottom on a phone.
+const POPUP = "z-float flex flex-col overflow-hidden bg-surface text-ink shadow-float outline-none";
+const CENTERED =
+  "fixed inset-0 m-auto mt-[max(24px,16vh)] h-fit max-h-[calc(100dvh-48px)] w-100 max-w-[calc(100vw-32px)] rounded-sheet motion-safe:animate-dialog-in";
+const SHEET =
+  "fixed inset-x-2 top-auto bottom-[max(8px,env(safe-area-inset-bottom))] max-h-[min(90dvh,680px)] w-auto rounded-sheet motion-safe:animate-sheet-in";
+
 export function Dialog({
   title,
   onClose,
@@ -45,10 +54,10 @@ export function Dialog({
       }}
     >
       <BaseDialog.Portal>
-        <BaseDialog.Backdrop className="library-dialog-backdrop" />
+        <BaseDialog.Backdrop className="fixed inset-0 z-float bg-ink/32" />
         <BaseDialog.Popup
           ref={popupRef}
-          className={desktop ? "library-dialog library-dialog--centered" : "library-dialog library-dialog--sheet"}
+          className={cn(POPUP, desktop ? CENTERED : SHEET)}
           initialFocus={() => {
             const popup = popupRef.current;
             return popup ? (pickInitialFocus((selector) => popup.querySelector<HTMLElement>(selector)) ?? true) : true;
@@ -58,8 +67,17 @@ export function Dialog({
             return target?.isConnected ? target : true;
           }}
         >
-          <div className="library-dialog__frame">
-            <BaseDialog.Title className="library-dialog__title">{title}</BaseDialog.Title>
+          <div
+            className={cn(
+              "flex min-h-0 flex-col gap-4.5 overflow-y-auto overscroll-contain",
+              desktop ? "pt-5.5 pr-6 pb-6 pl-6" : "px-4 pt-5 pb-4",
+            )}
+          >
+            <BaseDialog.Title
+              className={cn("text-body leading-tight font-semibold wrap-anywhere text-ink", !desktop && "text-center")}
+            >
+              {title}
+            </BaseDialog.Title>
             {children}
           </div>
         </BaseDialog.Popup>
@@ -81,7 +99,10 @@ export function DialogActions({
   children?: ReactNode;
 }) {
   return (
-    <div className="library-dialog__actions" data-dialog-actions>
+    <div
+      className={cn("mt-1.5 flex items-center justify-end gap-3", !desktop && "flex-col-reverse items-stretch gap-1")}
+      data-dialog-actions
+    >
       <Button variant="quiet" size={desktop ? "regular" : "large"} block={!desktop} onClick={onCancel}>
         {cancel}
       </Button>

@@ -117,7 +117,7 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
   const blockFailure = failure !== null && !aboutName ? accountMessage(failure) : null;
 
   return (
-    <form className="library-dialog__form" onSubmit={submit} noValidate>
+    <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
       <AuthField
         ref={fieldRef}
         label="Username"
@@ -167,12 +167,12 @@ function UsernameForm({ current, pending, failure, desktop, onSubmit, onEdit, on
 
 function Done({ username, desktop, onClose }: { username: string; desktop: boolean; onClose: () => void }) {
   return (
-    <div className="library-dialog__form">
-      <p className="library-dialog__text" role="status">
+    <div className="flex flex-col gap-4">
+      <p className="text-ink-2 text-body leading-body" role="status">
         You're now <strong>{username}</strong>. Sign in with that name from now on; you're still signed in everywhere.
         If your browser saved your password, it may still list it under the old name.
       </p>
-      <div className="library-dialog__actions">
+      <div className="flex justify-end items-center gap-3 mt-1.5">
         <Button variant="primary" size={desktop ? "regular" : "large"} block={!desktop} autoFocus onClick={onClose}>
           Done
         </Button>
