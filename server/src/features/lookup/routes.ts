@@ -1,5 +1,5 @@
-import { lookupRequestSchema, parseIsbn, type LookupResponse, type ParseIsbnResult } from "@shelfmark/shared";
-import type { FastifyPluginAsync } from "fastify";
+import { lookupRequestSchema, lookupResponseSchema, parseIsbn, type ParseIsbnResult } from "@shelfmark/shared";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import type { Config } from "../../config.js";
 import type { Db } from "../../db/open.js";
 import { ApiError } from "../../lib/api-error.js";
@@ -39,7 +39,7 @@ export interface LookupRoutesOptions {
  * the app, so every lookup and every batch shares them: the library catalogs'
  * pause between requests holds across lookups.
  */
-export const lookupRoutes: FastifyPluginAsync<LookupRoutesOptions> = async (
+export const lookupRoutes: FastifyPluginAsyncZod<LookupRoutesOptions> = async (
   app,
   { config, db, books, fetch, connect, cip },
 ) => {
@@ -59,21 +59,26 @@ export const lookupRoutes: FastifyPluginAsync<LookupRoutesOptions> = async (
     },
   });
 
-  app.post("/api/lookup", async (request): Promise<LookupResponse> => {
-    const parsed = parseIsbn(lookupRequestSchema.parse(request.body).isbn);
-    if (!parsed.ok) throw new ApiError("validation", `isbn: ${REASONS[parsed.reason]}`);
-    const { isbn13 } = parsed;
+  app.post(
+    "/api/lookup",
+    { schema: { body: lookupRequestSchema, response: { 200: lookupResponseSchema } } },
+    async (request) => {
+      const { isbn } = request.body;
+      const parsed = parseIsbn(isbn);
+      if (!parsed.ok) throw new ApiError("validation", `isbn: ${REASONS[parsed.reason]}`);
+      const { isbn13 } = parsed;
 
-    const copies = books.findByIsbn(isbn13);
-    const { draft, tried } = await lookup.lookup(isbn13);
-    return {
-      isbn13,
-      draft,
-      tried,
-      owned: copies
-        .filter((book) => book.collection === "owned")
-        .map(({ id, shelf, createdAt }) => ({ id, shelf, createdAt })),
-      wishlisted: copies.filter((book) => book.collection === "wishlist").map(({ id }) => ({ id })),
-    };
-  });
+      const copies = books.findByIsbn(isbn13);
+      const { draft, tried } = await lookup.lookup(isbn13);
+      return {
+        isbn13,
+        draft,
+        tried,
+        owned: copies
+          .filter((book) => book.collection === "owned")
+          .map(({ id, shelf, createdAt }) => ({ id, shelf, createdAt })),
+        wishlisted: copies.filter((book) => book.collection === "wishlist").map(({ id }) => ({ id })),
+      };
+    },
+  );
 };
