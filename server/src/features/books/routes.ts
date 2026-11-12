@@ -1,17 +1,16 @@
 import {
+  bookBulkResultSchema,
   bookBulkSchema,
   bookCreateSchema,
+  bookListSchema,
   bookPatchSchema,
-  type BookBulkResult,
-  type BookList,
+  bookSchema,
 } from "@shelfmark/shared";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
+import { z } from "zod";
 import { ApiError } from "../../lib/api-error.js";
+import { idParamsSchema } from "../../lib/id-params.js";
 import type { BookStore } from "./store.js";
-
-interface IdParams {
-  Params: { id: string };
-}
 
 const noSuchBook = () => new ApiError("not_found", "There is no such book.");
 
@@ -35,41 +34,53 @@ export interface BookRoutesOptions {
 
 /**
  * The book routes. A list answers `{ books }`; one book answers the
- * book itself. Bodies are parsed with the shared schemas, so a bad one is a
+ * book itself. Bodies are declared with the shared schemas, so a bad one is a
  * 400 `validation` naming the field. `POST /api/books/bulk` makes
  * one change to many books in one transaction and answers `BookBulkResult`.
  */
-export const bookRoutes: FastifyPluginAsync<BookRoutesOptions> = async (app, { books }) => {
-  app.get("/api/books", (): BookList => ({ books: books.list() }));
+export const bookRoutes: FastifyPluginAsyncZod<BookRoutesOptions> = async (app, { books }) => {
+  app.get("/api/books", { schema: { response: { 200: bookListSchema } } }, () => ({ books: books.list() }));
 
-  app.get<IdParams>("/api/books/:id", (request) => {
+  app.get("/api/books/:id", { schema: { params: idParamsSchema, response: { 200: bookSchema } } }, (request) => {
     const book = books.get(bookId(request.params.id));
     if (!book) throw noSuchBook();
     return book;
   });
 
-  app.post("/api/books", (request, reply) => {
-    const input = bookCreateSchema.parse(request.body);
+  app.post("/api/books", { schema: { body: bookCreateSchema, response: { 201: bookSchema } } }, (request, reply) => {
     reply.code(201);
-    return books.create(input);
+    return books.create(request.body);
   });
 
-  app.post("/api/books/bulk", (request): BookBulkResult => {
-    const { ids, change } = bookBulkSchema.parse(request.body);
-    const outcome = books.bulk(ids, change);
-    if ("unknown" in outcome) throw noSuchBooks(outcome.unknown);
-    return outcome.done;
-  });
+  app.post(
+    "/api/books/bulk",
+    { schema: { body: bookBulkSchema, response: { 200: bookBulkResultSchema } } },
+    (request) => {
+      const { ids, change } = request.body;
+      const outcome = books.bulk(ids, change);
+      if ("unknown" in outcome) throw noSuchBooks(outcome.unknown);
+      return outcome.done;
+    },
+  );
 
-  app.patch<IdParams>("/api/books/:id", (request) => {
-    const id = bookId(request.params.id);
-    const book = books.patch(id, bookPatchSchema.parse(request.body));
-    if (!book) throw noSuchBook();
-    return book;
-  });
+  app.patch(
+    "/api/books/:id",
+    { schema: { params: idParamsSchema, body: bookPatchSchema, response: { 200: bookSchema } } },
+    (request) => {
+      const id = bookId(request.params.id);
+      const book = books.patch(id, request.body);
+      if (!book) throw noSuchBook();
+      return book;
+    },
+  );
 
-  app.delete<IdParams>("/api/books/:id", (request, reply) => {
-    if (!books.remove(bookId(request.params.id))) throw noSuchBook();
-    return reply.code(204).send();
-  });
+  app.delete(
+    "/api/books/:id",
+    { schema: { params: idParamsSchema, response: { 204: z.null() } } },
+    (request, reply) => {
+      if (!books.remove(bookId(request.params.id))) throw noSuchBook();
+      reply.code(204);
+      return null;
+    },
+  );
 };
