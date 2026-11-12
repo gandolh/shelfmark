@@ -166,3 +166,15 @@ One commit per step; after each, `npm run check` and `npm run build` pass.
 - Brief 06's moved and new wrappers (`Dialog`, `ConfirmDialog`, `Toast`, `ToggleGroup`, `Tabs`, `Panel`) are styled here like any other part.
 - Brief 04 (Wishlist) runs first, so the Library's collection tabs are already gone and the Wishlist's stylesheet is one more to move. The redesign (09) comes after this brief and re-tunes both themes.
 - Brief 08 does not touch `web/`. Both change `package-lock.json`, so do not run them together.
+
+## Outcome (2026-11-12)
+
+Built. All 13 stylesheets are gone; `web/src/styles/index.css` is the only one (`@theme` with the 86 mapped tokens plus `scrim`, `camera`, `camera-ink` and `accent-tint-hover`, seven `--animate-*`, the page's defaults in `@layer base`; built layer order `properties theme base components utilities`). `cn()` has the type-scale, weight, tracking, leading, spacing, radius, shadow, z and `max-w-page` names. `buttonClass()` (Button.tsx) and `segmented.ts` are the one place for those looks. `check-base-ui` is strict at 0; the house `better-tailwindcss` rules (unknown, deprecated, order) are errors. The todo (Table / Covers as a `RadioGroup`) was done first, and every `SegmentedControl` is a `RadioGroup`.
+
+Sizes (before, then now): CSS 76,478 bytes (13,267 gzip), then 83,755 (15,585); the main JS 822.25 kB (258.10 gzip), then 902.83 kB (280.16 gzip), of which tailwind-merge and clsx are about 9 kB gzip and the long class strings the rest.
+
+Light screenshots at 1280, 390, 768 and 767 differ from before in no visible layout or colour. Left as differences: the account menu has the new Theme item; `hover:` does not stick after a tap; the 767 px blocks are `max-md:`. One real drift was caught and fixed: Tailwind's preflight drops a `dl`'s margin (book page).
+
+Theme: first visit is light under a dark system; Dark persists across a reload with the attribute set before the first paint; System follows an emulated `prefers-color-scheme` both ways, live; blocked `localStorage` leaves light. `tokens.test.ts` checks every text and icon pair at 4.5:1 and parts at 3:1 over both sets.
+
+Deviations: (1) the theme picker is a `RadioGroup` in an account-menu Theme dialog, not the guarded `ToggleGroup` (the base-ui skill's rule 16 wins); a `RadioGroup` cannot sit inside a menu. (2) Colours are `light-dark(light, dark)` tokens with `color-scheme` set from `data-theme` in the same stylesheet (the skill), not variables overridden under `:root[data-theme="dark"]`. (3) The stylesheets were converted with a script, so a class used across files was converted everywhere in its stylesheet's commit; the dark set and the lint landed in one commit with the lint. (4) The key is `shelfmark.theme`; `theme-color` and the manifest keep the light hex.
