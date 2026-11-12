@@ -1,6 +1,7 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { fakeFetch, fixture, hang, json, recordedInternet } from "../../testing/fakeFetch.js";
-import { createOpenLibrarySource, languageOf, readOpenLibrary, USER_AGENT } from "./openlibrary.js";
+import { APP_VERSION, createOpenLibrarySource, languageOf, readOpenLibrary, USER_AGENT } from "./openlibrary.js";
 import { createQueue, type Clock } from "./queue.js";
 
 // The fixtures are Open Library's real answers, recorded on 2026-10-15.
@@ -168,5 +169,18 @@ describe("createOpenLibrarySource", () => {
     const fetch = fakeFetch((_url, init) => hang(init));
     const source = createOpenLibrarySource({ fetch, queue: instantQueue(), timeoutMs: 20 });
     await expect(source.fetch("9780547928227")).rejects.toThrow("Open Library did not answer within 0.02 s");
+  });
+});
+
+// `appVersion()` reads server/package.json by a path from this folder and falls back to "0.0.0" when it can't:
+// a file that moves a folder deeper would send "Shelfmark/0.0.0" to every catalog and nothing would fail.
+describe("APP_VERSION", () => {
+  it("is the server's own version, not the fallback", () => {
+    const { version } = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")) as {
+      version: string;
+    };
+    expect(version).not.toBe("0.0.0");
+    expect(APP_VERSION).toBe(version);
+    expect(USER_AGENT).toContain(`Shelfmark/${version} `);
   });
 });

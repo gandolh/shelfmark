@@ -28,7 +28,7 @@ const CONTACT = "johndoe@example.com";
 
 function appVersion(): string {
   try {
-    const pkg = JSON.parse(readFileSync(new URL("../../package.json", import.meta.url), "utf8")) as {
+    const pkg = JSON.parse(readFileSync(new URL("../../../package.json", import.meta.url), "utf8")) as {
       version?: unknown;
     };
     return typeof pkg.version === "string" ? pkg.version : "0.0.0";
