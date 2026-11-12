@@ -42,6 +42,10 @@ estate calls of 2026-11-09. The product calls are in
 - **Widgets** (2026-10-23; by the conventions 2026-11-11). Base UI under the
   menus, panels, dialogs, tabs, toggles and the update prompt, imported only
   under `ui/` folders; built, not deployed ([overlays.md](overlays.md)).
+- **Tailwind and the theme** (2026-11-12). The web app is on Tailwind 4: one stylesheet,
+  `web/src/styles/index.css`, holds the tokens as `@theme`; no other CSS file. A Light / Dark /
+  System choice (account menu, Theme) is kept on the device; light on a first visit. The dark set
+  is a first pass for the redesign. Built, not deployed.
 - **v1.x** (2026-10-23). Wishlist, offline "do I own this?", the offline scan
   queue, bulk edit from the table, saved views, CSV import, stats, a CIP
   block read from a photo ([cip-photo.md](cip-photo.md)), a subtitle field on

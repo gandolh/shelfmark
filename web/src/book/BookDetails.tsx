@@ -65,7 +65,7 @@ export function BookDetails({ book }: { book: Book }) {
         <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-book">
           About the book
         </h2>
-        <dl className="flex flex-col">
+        <dl className="my-3.75 flex flex-col">
           {book.publisher && <Fact label="Publisher">{book.publisher}</Fact>}
           {book.publishedYear !== null && <Fact label="Year">{book.publishedYear}</Fact>}
           {book.pages !== null && <Fact label="Pages">{book.pages}</Fact>}
@@ -97,7 +97,7 @@ export function BookDetails({ book }: { book: Book }) {
         <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-copy">
           About this copy
         </h2>
-        <dl className="flex flex-col">
+        <dl className="my-3.75 flex flex-col">
           {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
           <Fact label="Shelf">{book.shelf ?? <span className="text-muted">No shelf</span>}</Fact>
           <Fact label="Status">
