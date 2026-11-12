@@ -383,7 +383,7 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
         />
       )}
       <fieldset className="library-options">
-        <legend className="visually-hidden">{column.label}</legend>
+        <legend className="sr-only">{column.label}</legend>
         {shown.map((option, index) => (
           <label key={option.value || NO_VALUE} className="library-option">
             <input
@@ -401,7 +401,7 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
             >
               {option.label}
             </span>
-            <span className="library-option__count tabular">{option.count}</span>
+            <span className="library-option__count tabular-nums">{option.count}</span>
           </label>
         ))}
         {shown.length === 0 && <p className="library-panel__note">Nothing called “{find.trim()}”.</p>}
@@ -474,7 +474,7 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
           </label>
           <input
             id={lowId}
-            className="library-field tabular"
+            className="library-field tabular-nums"
             autoComplete="off"
             placeholder={placeholder(range?.min)}
             value={low}
@@ -492,7 +492,7 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
           </label>
           <input
             id={highId}
-            className="library-field tabular"
+            className="library-field tabular-nums"
             autoComplete="off"
             placeholder={placeholder(range?.max)}
             value={high}

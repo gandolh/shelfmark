@@ -114,7 +114,7 @@ export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
         align={align}
       />
       {failed && (
-        <span role="alert" className="visually-hidden">
+        <span role="alert" className="sr-only">
           The view wasn't updated. Try again.
         </span>
       )}

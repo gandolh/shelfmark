@@ -84,7 +84,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
   );
 
   const live = (
-    <span className="visually-hidden" role="status">
+    <span className="sr-only" role="status">
       {said}
     </span>
   );
@@ -95,7 +95,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
         {pages > 1 && (
           <div className="library-pager__steps">
             {step("Previous", page - 1, page <= 1)}
-            <p className="library-pager__where tabular">
+            <p className="library-pager__where tabular-nums">
               Page {number(page)} of {number(pages)}
             </p>
             {step("Next", page + 1, page >= pages)}
@@ -109,7 +109,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
 
   return (
     <nav className="library-pager library-pager--desktop" aria-label="Pages">
-      <p className="library-pager__range tabular">
+      <p className="library-pager__range tabular-nums">
         {number(first)}–{number(last)} of {number(total)}
       </p>
       <div className="library-pager__end">
@@ -126,7 +126,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
                   <button
                     key={item}
                     type="button"
-                    className="library-pager__page tabular"
+                    className="library-pager__page tabular-nums"
                     aria-current={item === page ? "page" : undefined}
                     aria-label={`Page ${number(item)}`}
                     onClick={turn(item)}

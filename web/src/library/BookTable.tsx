@@ -537,11 +537,11 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
         <span className="library-table__label">{column.header}</span>
         {key && <SortIcon desc={key.desc} size={12} className="library-table__arrow" />}
         {key && sorting.length > 1 && (
-          <span className="library-table__rank tabular" aria-hidden="true">
+          <span className="library-table__rank tabular-nums" aria-hidden="true">
             {rank + 1}
           </span>
         )}
-        {sortedText && <span className="visually-hidden">{sortedText}</span>}
+        {sortedText && <span className="sr-only">{sortedText}</span>}
       </button>
       <div
         role="separator"

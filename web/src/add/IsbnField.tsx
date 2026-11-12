@@ -93,7 +93,7 @@ export function IsbnField({
         <input
           ref={input}
           id={`${id}-input`}
-          className="add-isbn__input tabular"
+          className="add-isbn__input tabular-nums"
           type="text"
           inputMode="numeric"
           enterKeyHint="search"

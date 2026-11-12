@@ -232,7 +232,7 @@ export function LibraryPage() {
         </div>
       )}
       {/* Said for every change; shown under the bar for the ones that leave it up. */}
-      <span className="visually-hidden" role="status">
+      <span className="sr-only" role="status">
         {shownNotice?.text ?? ""}
       </span>
       {/* It stays when the change took the books off the page (a status filter, say), so the owner sees why they went. */}

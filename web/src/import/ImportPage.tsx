@@ -133,7 +133,7 @@ function ChooseFile({
       </p>
       <input
         ref={input}
-        className="visually-hidden"
+        className="sr-only"
         type="file"
         accept=".csv,.txt,text/csv,text/plain"
         aria-label="CSV file"
@@ -378,7 +378,7 @@ function Preview({
           <thead>
             <tr>
               <th scope="col">
-                <span className="visually-hidden">Import</span>
+                <span className="sr-only">Import</span>
               </th>
               <th scope="col">Title</th>
               <th scope="col">Author</th>

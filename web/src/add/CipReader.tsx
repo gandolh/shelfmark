@@ -204,7 +204,7 @@ export function CipReader({ onRead, disabled }: CipReaderProps) {
       aria-disabled={disabled}
     >
       <input
-        className="visually-hidden"
+        className="sr-only"
         type="file"
         accept="image/*"
         capture="environment"

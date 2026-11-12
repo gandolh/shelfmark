@@ -70,7 +70,7 @@ export function Page({
         .join(" ")}
     >
       {hidden ? (
-        <h1 className="visually-hidden">{title}</h1>
+        <h1 className="sr-only">{title}</h1>
       ) : (
         <header className="page__header">
           {back && <BackLink to={back.to} label={back.label} />}

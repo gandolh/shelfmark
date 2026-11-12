@@ -209,7 +209,7 @@ function PasswordForm(props: PasswordFormProps) {
     <form className="library-dialog__form" onSubmit={submit} noValidate>
       {intro && <p className="library-dialog__text">{intro}</p>}
       <input
-        className="visually-hidden"
+        className="sr-only"
         type="text"
         name="username"
         autoComplete="username"

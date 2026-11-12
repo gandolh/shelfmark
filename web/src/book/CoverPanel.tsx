@@ -68,7 +68,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
           disabled={busy}
         />
         <label className="button button--secondary button--compact button--pill book-filepick" aria-disabled={busy}>
-          <input className="visually-hidden" type="file" accept="image/*" disabled={busy} onChange={chooseFile} />
+          <input className="sr-only" type="file" accept="image/*" disabled={busy} onChange={chooseFile} />
           Choose a file
         </label>
 

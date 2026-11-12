@@ -103,7 +103,7 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
           className="library-options"
           aria-describedby={fieldError && choice !== NEW_SHELF ? `${id}-error` : undefined}
         >
-          <legend className="visually-hidden">Shelf</legend>
+          <legend className="sr-only">Shelf</legend>
           {shelves.map((shelf, index) => (
             <label key={shelf.name} className="library-option">
               <input
@@ -115,10 +115,10 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
               />
               <span className="library-option__label">{shelf.name}</span>
               {/* Heard as "Bedroom · B1, 5 books", not "Bedroom · B1 5". */}
-              <span className="library-option__count tabular">
-                <span className="visually-hidden">, </span>
+              <span className="library-option__count tabular-nums">
+                <span className="sr-only">, </span>
                 {shelf.count}
-                <span className="visually-hidden"> {shelf.count === 1 ? "book" : "books"}</span>
+                <span className="sr-only"> {shelf.count === 1 ? "book" : "books"}</span>
               </span>
             </label>
           ))}
@@ -290,7 +290,7 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
     >
       <form className="library-dialog__form" onSubmit={submit} noValidate>
         <fieldset className="library-options" aria-describedby={fieldError ? `${id}-error` : undefined}>
-          <legend className="visually-hidden">Tags</legend>
+          <legend className="sr-only">Tags</legend>
           {tags.map((tag, index) => (
             <label key={tag.name} className="library-option">
               <input
@@ -300,8 +300,8 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
                 data-autofocus={index === 0 ? "" : undefined}
               />
               <span className="library-option__label">{tag.name}</span>
-              <span className="library-option__count tabular">
-                <span className="visually-hidden">, on </span>
+              <span className="library-option__count tabular-nums">
+                <span className="sr-only">, on </span>
                 {tag.count === count ? "all" : `${tag.count} of ${count}`}
               </span>
             </label>

@@ -343,7 +343,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
         render={<div className={`add add--${mode}`} />}
       >
         {/* Scan moves focus into each result; Type ISBN keeps it in the field, so results are read out from here. */}
-        <p className="visually-hidden" role="status">
+        <p className="sr-only" role="status">
           {announcement(state, mode !== "scan")}
         </p>
         {desktop ? (

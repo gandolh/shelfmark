@@ -70,7 +70,7 @@ export function CoverCapture({
       aria-disabled={disabled || working}
     >
       <input
-        className="visually-hidden"
+        className="sr-only"
         type="file"
         accept="image/*"
         capture="environment"

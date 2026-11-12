@@ -97,7 +97,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
 
   const count = (
     <p className="library-bulk__count">
-      <span className="tabular">{summary.count.toLocaleString("en-GB")}</span> selected
+      <span className="tabular-nums">{summary.count.toLocaleString("en-GB")}</span> selected
     </p>
   );
 

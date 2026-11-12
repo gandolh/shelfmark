@@ -48,10 +48,10 @@ export function Toolbar({
   const badge =
     count > 0 ? (
       <>
-        <span className="library-count tabular" aria-hidden="true">
+        <span className="library-count tabular-nums" aria-hidden="true">
           {count}
         </span>
-        <span className="visually-hidden">, {count === 1 ? "1 filter" : `${count} filters`} on</span>
+        <span className="sr-only">, {count === 1 ? "1 filter" : `${count} filters`} on</span>
       </>
     ) : null;
 

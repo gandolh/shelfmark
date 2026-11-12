@@ -225,7 +225,7 @@ function Looking({ isbn13, headingId, takeFocus, on }: Shared & { isbn13: string
   return (
     <>
       <Head cover={<span className="add-head__blank" />}>
-        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title tabular">
+        <h2 ref={heading} id={headingId} tabIndex={-1} className="add-title tabular-nums">
           {isbn13}
         </h2>
         <p className="add-meta" role="status">
@@ -522,8 +522,8 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
             This barcode isn't an ISBN
           </h2>
           <p className="add-meta">
-            It reads <span className="tabular add-code">{code}</span>, a shop's sticker or another code. The ISBN is
-            printed near the barcode or on the copyright page.
+            It reads <span className="add-code tabular-nums">{code}</span>, a shop's sticker or another code. The ISBN
+            is printed near the barcode or on the copyright page.
           </p>
         </div>
       </div>
@@ -551,8 +551,8 @@ function Typing({ code, headingId, takeFocus, on }: Shared & { code: string }) {
           Type the ISBN
         </h2>
         <p className="add-meta">
-          The code read was <span className="tabular add-code">{code}</span>. The ISBN is printed near the barcode or on
-          the copyright page.
+          The code read was <span className="add-code tabular-nums">{code}</span>. The ISBN is printed near the barcode
+          or on the copyright page.
         </p>
       </div>
       <IsbnField size="regular" onSubmit={on.submitIsbn} keepFocus={false} autoFocus={takeFocus} hint={null} />
@@ -622,7 +622,7 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
           {queue.map((item) => (
             <li key={item.id} className="add-queue__item">
               <div className="add-queue__text">
-                <span className="add-queue__isbn tabular">{item.isbn13}</span>
+                <span className="add-queue__isbn tabular-nums">{item.isbn13}</span>
                 <span className="add-meta">
                   {queueItemLine(item)}
                   {item.shelf !== null && ` · ${item.shelf}`}
@@ -670,7 +670,7 @@ function FormIntro({
   const { reason, lookup } = step;
   if (reason === "manual")
     return (
-      <h2 id={headingId} className="visually-hidden">
+      <h2 id={headingId} className="sr-only">
         Add a book by hand
       </h2>
     );
@@ -691,7 +691,7 @@ function FormIntro({
     case "not-found": {
       const wording = notFoundWording(lookup?.tried ?? []);
       uncertain = wording.uncertain;
-      const isbn = <strong className="tabular">{lookup?.isbn13}</strong>;
+      const isbn = <strong className="tabular-nums">{lookup?.isbn13}</strong>;
       notice = (
         <>
           {wording.searchedIn ? (
@@ -718,7 +718,7 @@ function FormIntro({
     case "barcode":
       notice = (
         <>
-          The barcode <strong className="tabular">{step.base.details.barcode}</strong> is kept with the book.{" "}
+          The barcode <strong className="tabular-nums">{step.base.details.barcode}</strong> is kept with the book.{" "}
           {REST_CAN_WAIT}
         </>
       );
@@ -733,7 +733,7 @@ function FormIntro({
 
   return (
     <div className="add-notice">
-      <h2 id={headingId} className="visually-hidden">
+      <h2 id={headingId} className="sr-only">
         Add it by hand
       </h2>
       <p>{notice}</p>

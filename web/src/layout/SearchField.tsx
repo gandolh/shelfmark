@@ -42,7 +42,7 @@ export function SearchField({
     <div className={`search search--${placement}`} role="search">
       <label htmlFor={id} className="search__icon">
         <SearchIcon size={placement === "bar" ? 15 : 16} />
-        <span className="visually-hidden">Search books</span>
+        <span className="sr-only">Search books</span>
       </label>
       <input
         ref={input}
