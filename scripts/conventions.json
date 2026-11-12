@@ -3,5 +3,14 @@
   "web": ["web/src"],
   "server": ["server/src"],
   "shared": ["shared/src"],
-  "ui": ["**/ui"]
+  "ui": ["**/ui"],
+  "exceptions": [
+    {
+      "check": "structure",
+      "rule": 6,
+      "path": "server/src/features/backup/routes.ts",
+      "match": "GET /api/backup declares no schema",
+      "reason": "Streams the database as a file: a binary reply has no response schema, and the route takes no input (Q53)."
+    }
+  ]
 }

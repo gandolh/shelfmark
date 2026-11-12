@@ -3,7 +3,7 @@ import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
 import type { Db } from "../../db/open.js";
 import { ApiError } from "../../lib/api-error.js";
 
@@ -24,7 +24,7 @@ export interface BackupRoutesOptions {
  * snapshot while the app keeps running, into a temporary file that is
  * streamed and then removed, however the download ends.
  */
-export const backupRoutes: FastifyPluginAsync<BackupRoutesOptions> = async (app, { db }) => {
+export const backupRoutes: FastifyPluginAsyncZod<BackupRoutesOptions> = async (app, { db }) => {
   app.get("/api/backup", async (_request, reply) => {
     const dir = await mkdtemp(join(tmpdir(), "shelfmark-backup-"));
     const file = join(dir, "backup.db");
