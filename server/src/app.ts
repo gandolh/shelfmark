@@ -1,7 +1,7 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import { createWardClient, wardAuth } from "../vendor/ward/ward-auth.js";
-import { OWNER_ROLE, openAccounts } from "./auth/accounts.js";
-import { registerOriginGuard } from "./auth/guard.js";
+import { OWNER_ROLE, openAccounts } from "./plugins/auth/accounts.js";
+import { registerOriginGuard } from "./plugins/auth/guard.js";
 import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
 import { registerErrorHandling } from "./errors.js";
@@ -48,7 +48,7 @@ export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
  * local accounts in this database and serves `/auth/*`: login, logout, the
  * session, the password, and "Sign in with Ward" when `config.ward` is set.
  * Its `onRequest` hook refuses every other route without a live session
- * (`401 { error: "unauthorized" }`); `auth/guard.ts` then refuses a write
+ * (`401 { error: "unauthorized" }`); `plugins/auth/guard.ts` then refuses a write
  * from another origin. Both are root hooks, so this feature goes first.
  */
 const signIn: Feature = async (app, { config, db, fetch }) => {

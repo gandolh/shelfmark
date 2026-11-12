@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest } from "fastify";
-import { sendError } from "../errors.js";
+import { sendError } from "../../errors.js";
 
 /**
  * Shelfmark's half of the guard. The vendored `wardAuth` plugin (`app.ts`,

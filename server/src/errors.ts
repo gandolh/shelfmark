@@ -10,7 +10,7 @@ import { z } from "zod";
  */
 export const ERROR_STATUS = {
   validation: 400,
-  /** A browser sent a change from a page on another origin (`auth/guard.ts`). */
+  /** A browser sent a change from a page on another origin (`plugins/auth/guard.ts`). */
   forbidden: 403,
   not_found: 404,
   /** The change clashes with what is stored: a saved view's name another view has (`routes/views.ts`). */
