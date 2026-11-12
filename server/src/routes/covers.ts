@@ -9,7 +9,7 @@ import {
 } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { ApiError, errorBody } from "../errors.js";
+import { ApiError, errorBody } from "../lib/api-error.js";
 import { USER_AGENT } from "../lookup/openlibrary.js";
 import { createCoverStore } from "../store/covers.js";
 

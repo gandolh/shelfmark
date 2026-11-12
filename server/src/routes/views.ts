@@ -1,7 +1,7 @@
 import { savedViewCreateSchema, savedViewPatchSchema, type SavedViewList } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import { createViewStore, ViewNameTaken } from "../store/views.js";
 
 interface IdParams {

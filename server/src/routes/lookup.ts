@@ -1,7 +1,7 @@
 import { lookupRequestSchema, parseIsbn, type LookupResponse, type ParseIsbnResult } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 import { createLookupCache } from "../lookup/cache.js";
 import { createCipSource } from "../lookup/cip.js";
 import { createGoogleBooksSource } from "../lookup/googlebooks.js";

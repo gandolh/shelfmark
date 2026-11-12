@@ -1,10 +1,9 @@
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
-import { createWardClient, wardAuth } from "../vendor/ward/ward-auth.js";
-import { OWNER_ROLE, openAccounts } from "./plugins/auth/accounts.js";
-import { registerOriginGuard } from "./plugins/auth/guard.js";
-import { AUTH_ROUTE_PREFIX, type Config } from "./config.js";
+import type { Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
-import { registerErrorHandling } from "./errors.js";
+import { auth } from "./plugins/auth/index.js";
+import { errors } from "./plugins/errors.js";
+import { jsonBodyParser } from "./plugins/json-body.js";
 import { cipDatabasePath, openCipStore, type CipStore } from "./cip/store.js";
 import { netConnection, type Connect } from "./lookup/z3950/client.js";
 import { backupRoutes } from "./routes/backup.js";
@@ -30,80 +29,18 @@ export interface FeatureContext {
   cip: CipStore;
 }
 
-/** The session cookie's name. Unique in the estate: every app shares one origin. */
-export const SESSION_COOKIE = "shelfmark_session";
-
-/**
- * Where the auth plugin's routes sit as Fastify sees them (`/auth`). The proxy
- * strips the API prefix, so the browser reaches them at `/shelfmark-api/auth/...`,
- * and the Ward callback at `/shelfmark-api/auth/ward/callback`.
- */
-export { AUTH_ROUTE_PREFIX };
-
-/** The only routes with no session, as `"METHOD /pattern"`. The plugin adds its own public `/auth/*` routes. */
-export const PUBLIC_ROUTES: readonly string[] = ["GET /api/health"];
-
-/**
- * Accounts and the guard. The vendored `wardAuth` plugin keeps the
- * local accounts in this database and serves `/auth/*`: login, logout, the
- * session, the password, and "Sign in with Ward" when `config.ward` is set.
- * Its `onRequest` hook refuses every other route without a live session
- * (`401 { error: "unauthorized" }`); `plugins/auth/guard.ts` then refuses a write
- * from another origin. Both are root hooks, so this feature goes first.
- */
-const signIn: Feature = async (app, { config, db, fetch }) => {
-  const accounts = openAccounts(db);
-  // Checks the settings and imports the key now; talks to Ward only on first use, so the app starts while Ward is down.
-  const ward = config.ward && (await createWardClient({ ...config.ward, fetch }));
-  if (ward === undefined) {
-    app.log.info("WARD_OIDC_ISSUER is not set: local accounts only, no Sign in with Ward.");
-  } else if (new URL(ward.redirectUri).origin !== config.publicOrigin) {
-    // Only Sign in with Ward breaks (its cookie lands on the other origin), so this warns rather than refusing to start.
-    app.log.warn(
-      `WARD_OIDC_REDIRECT_URI is not on PUBLIC_ORIGIN (${config.publicOrigin}): Sign in with Ward will not work.`,
-    );
-  }
-
-  await app.register(wardAuth, {
-    accounts,
-    cookieName: SESSION_COOKIE,
-    // The API prefix as the browser sees it: every request that needs the session is under it, cover images included.
-    cookiePath: config.apiPrefix,
-    publicOrigin: config.publicOrigin,
-    routePrefix: AUTH_ROUTE_PREFIX,
-    publicRoutes: PUBLIC_ROUTES,
-    // From the config (AUTH_TRUSTED_PROXIES), so the plugin never reads the environment itself.
-    trustedProxies: config.trustedProxies,
-    ...(ward && {
-      ward: {
-        client: ward,
-        // Browser paths. There is no settings page: the account menu is on every page, so a link comes back to the Library.
-        loginPath: `${config.webBase}login`,
-        settingsPath: config.webBase,
-        afterSignInPath: config.webBase,
-        roleFor: () => OWNER_ROLE,
-      },
-    }),
-  });
-  registerOriginGuard(app, { publicOrigin: config.publicOrigin, authRoutePrefix: AUTH_ROUTE_PREFIX });
-};
-
 /**
  * A feature sets itself up on the root app. Usually that is registering its
  * route plugin with the context, which keeps the plugin's hooks to itself:
- * `(app, ctx) => app.register(bookRoutes, ctx)`. A root guard (the
- * `wardAuth` plugin) registers on `app` directly and goes first, because Fastify
- * copies root hooks into a plugin's context when the plugin is created.
+ * `(app, ctx) => app.register(bookRoutes, ctx)`.
  */
 export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike<unknown>;
 
 /**
- * Every feature, set up in this order. A later brief adds its entry here and
- * nowhere else in this file. `signIn` stays first: a route set up before it
- * would have no guard.
+ * Every feature, set up in this order, after the plugins (`buildApp`). A later
+ * brief adds its entry here and nowhere else in this file.
  */
 const FEATURES: Feature[] = [
-  signIn,
   (app, ctx) => app.register(bookRoutes, ctx),
   (app, ctx) => app.register(lookupRoutes, ctx),
   (app, ctx) => app.register(coverRoutes, ctx),
@@ -132,7 +69,7 @@ export interface BuildAppOptions {
 /**
  * The app, not listening, with `<dataDir>/shelfmark.db` open and migrated (the
  * accounts' tables too). Closing the app closes the database. Every route but
- * `GET /api/health` needs a session (`signIn` above).
+ * `GET /api/health` needs a session (`plugins/auth`).
  */
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({ ...options.server, logger: options.logger ?? false });
@@ -144,30 +81,23 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
     cip.close();
   });
 
-  // A request with `Content-Type: application/json` and no body (a client that
-  // sets the header on every call, DELETE included) is a body of `undefined`,
-  // not a 400. Anything else goes to Fastify's own parser, which keeps its
-  // prototype-poisoning checks and its 400 for bad JSON.
-  const parseJson = app.getDefaultJsonParser("error", "error");
-  app.removeContentTypeParser("application/json");
-  app.addContentTypeParser("application/json", { parseAs: "string" }, (request, body, done) => {
-    if (body === "") {
-      done(null, undefined);
-      return;
-    }
-    // The type says the parser may also be async; the default one is synchronous and calls `done`.
-    void parseJson(request, body as string, done);
-  });
-
-  registerErrorHandling(app);
+  // 1. The app's own plugins, `fastify-plugin` wrapped so they reach everything after them. Errors
+  // go first, so every plugin and feature inherits the one handler.
+  await app.register(errors);
+  await app.register(jsonBodyParser);
+  // Accounts and the guard: `wardAuth`'s `onRequest` hook refuses every route set up after it
+  // without a session, so this goes before every feature.
+  const fetch = options.fetch ?? globalThis.fetch;
+  await app.register(auth, { config, db, fetch });
 
   app.get("/api/health", async () => ({ ok: true }));
 
+  // 2. The features.
   const ctx: FeatureContext = {
     config,
     db,
     books: createBookStore(db),
-    fetch: options.fetch ?? globalThis.fetch,
+    fetch,
     connect: options.connect ?? netConnection,
     cip,
   };

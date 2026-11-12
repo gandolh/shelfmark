@@ -5,7 +5,7 @@ import { join } from "node:path";
 import Database from "better-sqlite3";
 import type { FastifyPluginAsync } from "fastify";
 import type { FeatureContext } from "../app.js";
-import { ApiError } from "../errors.js";
+import { ApiError } from "../lib/api-error.js";
 
 /** `shelfmark-2026-10-15.db`, the server's local day. */
 export function backupFileName(now: Date = new Date()): string {
