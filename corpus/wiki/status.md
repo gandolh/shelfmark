@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # Status
@@ -25,6 +25,8 @@ estate calls of 2026-11-09. The product calls are in
 ## By area
 
 - **Wishlist and recommendations** (2026-11-11, brief 04). Wishlist is the third place; Library holds owned books only; the Claude import path, the dedup and the three tables are built on local `main`, not deployed. The spike of TasteDive and an embedding ranker is not run: it needs the owner's real library and verdict ([recommendations.md](recommendations.md), [todo](../todos/recommendations-spike.md)).
+
+- **The server in feature folders** (2026-11-12, brief 08). `server.ts` / `app.ts` / `config.ts`, `plugins/` and `features/<name>/`, a response schema on every route but the two byte routes, `check-structure` strict; built on local `main`, not pushed and not deployed. Owner steps: the deploy and the container checks in [the brief](../briefs/done/08-the-server-in-the-code-structure.md).
 
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 

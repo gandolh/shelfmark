@@ -1,6 +1,6 @@
 ---
 summary: Where a scanned book's title, authors, cover and other details come from. Open Library and Google Books (with the owner's free key) compared, their limits, the hit rates measured on 2026-10-14 (Romanian ISBNs found 12-20% of the time vs 92% for English; every free keyless catalog worse still), why the national library's CIP catalog can't be used, three Romanian library catalogs over Z39.50 measured on 2026-10-17 (33/40 for 2012-2015 books, a year's lag for new ones), the national bibliography PDFs, the lookup flow and cache as shipped on 2026-10-15 (two Open Library calls per found ISBN), how covers are downloaded (the host allowlist, Open Library's archive.org redirects) and stored, the measurement script, and the fallbacks for Romanian books.
-updated: 2026-11-02
+updated: 2026-11-12
 ---
 
 # Metadata lookup

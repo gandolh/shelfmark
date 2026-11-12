@@ -1,6 +1,6 @@
 ---
 summary: The SQLite schema as shipped on 2026-10-15 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
-updated: 2026-11-02
+updated: 2026-11-12
 ---
 
 # Data model

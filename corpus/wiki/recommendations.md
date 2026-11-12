@@ -1,6 +1,6 @@
 ---
 summary: How the Wishlist page's recommendations work and what is still open. A recommendation is a book in no collection, never one that is owned, wished for or dismissed; the dedup rules (ISBN, work key, title key, dismissal), the Claude import (download the library, copy the prompt, paste the JSON, each pick checked in Open Library), the three tables, the API, and the spike of a free service and an embedding ranker that the owner still has to judge. Read before touching recommend/ or the Wishlist page.
-updated: 2026-11-11
+updated: 2026-11-12
 ---
 
 # Recommendations

@@ -1,6 +1,6 @@
 ---
 summary: How Shelfmark is put together, as built on 2026-10-14 and 2026-10-15. Three npm workspaces copied from Satchel's layout (shared, server, web), what each owns, the request paths, where data lives, phone testing over HTTPS in dev, and the deploy shape on the shared VPS.
-updated: 2026-11-02
+updated: 2026-11-12
 ---
 
 # Architecture
@@ -15,10 +15,15 @@ npm workspaces, the Satchel layout (`satchel`), Node 24, exact versions
 
 - `shared`: zod schemas for every route, the book field definitions, ISBN
   parsing and validation (ISBN-10 ↔ 13, check digits). Used by both sides.
-- `server`: Fastify + better-sqlite3. Owns the store (the only module that
-  runs SQL, apart from the vendored auth library), the lookup queue and cache
-  ([metadata-lookup.md](metadata-lookup.md)), covers (BLOBs in SQLite), backup, and the
-  `/api/*` and `/auth/*` routes.
+- `server`: Fastify + better-sqlite3, in feature folders
+  (`server/src/features/`: health, books, lookup with the CIP index, covers,
+  backup, views, recommendations), with the error, JSON body and sign-in
+  plugins in `server/src/plugins/`. Each feature owns its SQL in its
+  `store.ts` (apart from the vendored auth library); the lookup queue and cache
+  are in [metadata-lookup.md](metadata-lookup.md), covers are BLOBs in SQLite.
+  `server.ts` listens, `app.ts` builds, `config.ts` reads the environment; every
+  route declares zod schemas through the type provider. Why:
+  [decisions.md](decisions.md), "The server in feature folders".
 - `web`: Vite + React PWA (vite-plugin-pwa, Workbox). The library table
   ([library-table.md](library-table.md)), the scanner
   ([scanning.md](scanning.md)), the book page, export
