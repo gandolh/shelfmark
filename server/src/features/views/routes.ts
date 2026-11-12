@@ -1,8 +1,8 @@
 import { savedViewCreateSchema, savedViewPatchSchema, type SavedViewList } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
-import type { FeatureContext } from "../app.js";
-import { ApiError } from "../lib/api-error.js";
-import { createViewStore, ViewNameTaken } from "../store/views.js";
+import type { Db } from "../../db/open.js";
+import { ApiError } from "../../lib/api-error.js";
+import { createViewStore, ViewNameTaken } from "./store.js";
 
 interface IdParams {
   Params: { id: string };
@@ -20,13 +20,18 @@ function viewId(raw: string): number {
 /** A name another view has: `409 conflict`, with the store's message. */
 const nameTaken = (error: ViewNameTaken) => new ApiError("conflict", error.message);
 
+/** What the saved-view routes take from the app. */
+export interface ViewRoutesOptions {
+  db: Db;
+}
+
 /**
  * The saved views. A list answers `{ views }` by position; one
  * view answers the view. Bodies are parsed with the shared schemas, so a bad
  * state is a 400 `validation` naming the field; a name another view has is a
  * 409 `conflict`.
  */
-export const viewRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db }) => {
+export const viewRoutes: FastifyPluginAsync<ViewRoutesOptions> = async (app, { db }) => {
   const views = createViewStore(db);
 
   app.get("/api/views", (): SavedViewList => ({ views: views.list() }));

@@ -1,5 +1,5 @@
 import { readSavedViewState, type SavedView, type SavedViewCreate, type SavedViewPatch } from "@shelfmark/shared";
-import type { Db } from "../db/open.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * The saved views store: the only module that runs SQL on

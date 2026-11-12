@@ -1,7 +1,7 @@
 import type { SavedViewState } from "@shelfmark/shared";
 import { afterEach, describe, expect, it } from "vitest";
-import { openDb, type Db } from "../db/open.js";
-import { createViewStore, viewNameKey, ViewNameTaken } from "./views.js";
+import { openDb, type Db } from "../../db/open.js";
+import { createViewStore, viewNameKey, ViewNameTaken } from "./store.js";
 
 const opened: Db[] = [];
 afterEach(() => {

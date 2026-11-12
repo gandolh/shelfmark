@@ -6,8 +6,8 @@ import {
   type BookList,
 } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
-import type { FeatureContext } from "../app.js";
-import { ApiError } from "../lib/api-error.js";
+import { ApiError } from "../../lib/api-error.js";
+import type { BookStore } from "./store.js";
 
 interface IdParams {
   Params: { id: string };
@@ -28,13 +28,18 @@ function noSuchBooks(ids: readonly number[]): ApiError {
   return new ApiError("validation", `ids: ${named}, so nothing was changed.`);
 }
 
+/** What the book routes take from the app. */
+export interface BookRoutesOptions {
+  books: BookStore;
+}
+
 /**
  * The book routes. A list answers `{ books }`; one book answers the
  * book itself. Bodies are parsed with the shared schemas, so a bad one is a
  * 400 `validation` naming the field. `POST /api/books/bulk` makes
  * one change to many books in one transaction and answers `BookBulkResult`.
  */
-export const bookRoutes: FastifyPluginAsync<FeatureContext> = async (app, { books }) => {
+export const bookRoutes: FastifyPluginAsync<BookRoutesOptions> = async (app, { books }) => {
   app.get("/api/books", (): BookList => ({ books: books.list() }));
 
   app.get<IdParams>("/api/books/:id", (request) => {

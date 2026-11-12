@@ -6,13 +6,12 @@ import { errors } from "./plugins/errors.js";
 import { jsonBodyParser } from "./plugins/json-body.js";
 import { cipDatabasePath, openCipStore, type CipStore } from "./cip/store.js";
 import { netConnection, type Connect } from "./lookup/z3950/client.js";
-import { backupRoutes } from "./routes/backup.js";
-import { bookRoutes } from "./routes/books.js";
-import { coverRoutes } from "./routes/covers.js";
+import { backupRoutes } from "./features/backup/index.js";
+import { bookRoutes, createBookStore, type BookStore } from "./features/books/index.js";
+import { coverRoutes } from "./features/covers/index.js";
+import { viewRoutes } from "./features/views/index.js";
 import { lookupRoutes } from "./routes/lookup.js";
 import { recommendationRoutes } from "./routes/recommendations.js";
-import { viewRoutes } from "./routes/views.js";
-import { createBookStore, type BookStore } from "./store/books.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */
 export interface FeatureContext {

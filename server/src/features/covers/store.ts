@@ -1,5 +1,5 @@
 import type { CoverInfo, CoverMime, CoverSource } from "@shelfmark/shared";
-import type { Db } from "../db/open.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * The covers store: the only module that runs SQL on `covers`. One image per

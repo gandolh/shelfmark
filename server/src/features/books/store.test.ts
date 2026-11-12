@@ -1,9 +1,9 @@
 import { bookSchema, type BulkChange } from "@shelfmark/shared";
 import Database from "better-sqlite3";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { migrate } from "../db/migrations.js";
-import { openDb, type Db } from "../db/open.js";
-import { createBookStore, type BookStore } from "./books.js";
+import { migrate } from "../../db/migrations.js";
+import { openDb, type Db } from "../../db/open.js";
+import { createBookStore, type BookStore } from "./store.js";
 
 let db: Db;
 let store: BookStore;

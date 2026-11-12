@@ -4,13 +4,18 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import Database from "better-sqlite3";
 import type { FastifyPluginAsync } from "fastify";
-import type { FeatureContext } from "../app.js";
-import { ApiError } from "../lib/api-error.js";
+import type { Db } from "../../db/open.js";
+import { ApiError } from "../../lib/api-error.js";
 
 /** `shelfmark-2026-10-15.db`, the server's local day. */
 export function backupFileName(now: Date = new Date()): string {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `shelfmark-${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}.db`;
+}
+
+/** What the backup route takes from the app. */
+export interface BackupRoutesOptions {
+  db: Db;
 }
 
 /**
@@ -19,7 +24,7 @@ export function backupFileName(now: Date = new Date()): string {
  * snapshot while the app keeps running, into a temporary file that is
  * streamed and then removed, however the download ends.
  */
-export const backupRoutes: FastifyPluginAsync<FeatureContext> = async (app, { db }) => {
+export const backupRoutes: FastifyPluginAsync<BackupRoutesOptions> = async (app, { db }) => {
   app.get("/api/backup", async (_request, reply) => {
     const dir = await mkdtemp(join(tmpdir(), "shelfmark-backup-"));
     const file = join(dir, "backup.db");

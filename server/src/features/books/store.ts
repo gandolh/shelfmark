@@ -8,7 +8,7 @@ import {
   type BulkChange,
   type Collection,
 } from "@shelfmark/shared";
-import type { Db } from "../db/open.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * The books store: the only module that runs SQL on `books`, `tags` and

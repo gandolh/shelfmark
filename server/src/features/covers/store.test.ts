@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { openDb, type Db } from "../db/open.js";
-import { imageBytes } from "../testing/fakeFetch.js";
-import { createBookStore, type BookStore } from "./books.js";
-import { createCoverStore, type CoverStore } from "./covers.js";
+import { openDb, type Db } from "../../db/open.js";
+import { imageBytes } from "../../testing/fakeFetch.js";
+import { createBookStore, type BookStore } from "../books/index.js";
+import { createCoverStore, type CoverStore } from "./store.js";
 
 let db: Db;
 let books: BookStore;
