@@ -1,6 +1,4 @@
-import { isAbsolute, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { ConfigError, loadConfig } from "../config.js";
+import { ConfigError, loadConfig, loadEnvFile, resolveDataDir } from "../config.js";
 import { refreshCip } from "./refresh.js";
 import { cipDatabasePath, openCipStore } from "./store.js";
 
@@ -16,25 +14,17 @@ import { cipDatabasePath, openCipStore } from "./store.js";
  * server's own job runs only fetches the same issues twice.
  */
 
-// src/cip and dist/cip sit at the same depth, so this resolves the same from both.
-const REPO_ROOT = fileURLToPath(new URL("../../../", import.meta.url));
-
 const [command, ...months] = process.argv.slice(2);
 if (command !== "refresh" || months.some((month) => !/^20\d{2}-[01]\d$/.test(month))) {
   console.error("Usage: node server/dist/cip/cli.js refresh [YYYY-MM ...]");
   process.exit(2);
 }
 
-try {
-  process.loadEnvFile(`${REPO_ROOT}.env`);
-} catch (err) {
-  if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
-}
+loadEnvFile();
 
 let dataDir: string;
 try {
-  const config = loadConfig(process.env);
-  dataDir = isAbsolute(config.dataDir) ? config.dataDir : resolve(REPO_ROOT, config.dataDir);
+  dataDir = resolveDataDir(loadConfig().dataDir);
 } catch (err) {
   if (!(err instanceof ConfigError)) throw err;
   console.error(`The CIP refresh cannot start:\n${err.message}`);

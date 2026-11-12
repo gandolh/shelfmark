@@ -26,7 +26,7 @@ export interface FeatureContext {
   fetch: typeof globalThis.fetch;
   /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake (`startTestApp`). */
   connect: Connect;
-  /** The CIP index, `<dataDir>/cip.db`, closed with the app. Its weekly refresh is index.ts's. */
+  /** The CIP index, `<dataDir>/cip.db`, closed with the app. Its weekly refresh is `server.ts`'s. */
   cip: CipStore;
 }
 
@@ -112,9 +112,17 @@ const FEATURES: Feature[] = [
   (app, ctx) => app.register(recommendationRoutes, ctx),
 ];
 
+/** Fastify's options that belong to the process. `server.ts` sets them; a test leaves them out. */
+export type ServerOptions = Pick<
+  FastifyServerOptions,
+  "trustProxy" | "connectionTimeout" | "requestTimeout" | "keepAliveTimeout"
+>;
+
 export interface BuildAppOptions {
-  /** Fastify's logger option. Default off; `index.ts` turns it on. */
+  /** Fastify's logger option. Default off; `server.ts` turns it on. */
   logger?: FastifyServerOptions["logger"];
+  /** The process's options: `trustProxy` and the timeouts. */
+  server?: ServerOptions;
   /** What `FeatureContext.fetch` is. Default the global `fetch`. */
   fetch?: typeof globalThis.fetch;
   /** What `FeatureContext.connect` is. Default a real TCP connection. */
@@ -127,7 +135,7 @@ export interface BuildAppOptions {
  * `GET /api/health` needs a session (`signIn` above).
  */
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
-  const app = Fastify({ logger: options.logger ?? false });
+  const app = Fastify({ ...options.server, logger: options.logger ?? false });
 
   const db = openDb(databasePath(config.dataDir));
   const cip = openCipStore(cipDatabasePath(config.dataDir));

@@ -16,7 +16,7 @@
     "dev": "tsc -b shared && concurrently --names server,web --kill-others-on-fail \"npm run dev -w @shelfmark/server\" \"npm run dev -w @shelfmark/web\"",
     "dev:https": "tsc -b shared && concurrently --names server,web --kill-others-on-fail \"npm run dev -w @shelfmark/server\" \"SHELFMARK_HTTPS=1 npm run dev -w @shelfmark/web\"",
     "build": "tsc -b && npm run build -w @shelfmark/web",
-    "start": "node server/dist/index.js",
+    "start": "node server/dist/server.js",
     "pretest": "tsc -b shared",
     "test": "vitest run",
     "typecheck": "tsc -b && tsc -p web --noEmit",

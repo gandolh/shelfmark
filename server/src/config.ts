@@ -1,7 +1,15 @@
+import { isAbsolute, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import { parseTrustedProxies, wardClientOptionsFromEnv, type WardClientOptions } from "../vendor/ward/ward-auth.js";
 
-/** Where the auth plugin's routes sit as Fastify sees them (`app.ts`); the browser reaches them under the API prefix. */
+/** The repo root. `src/` (tsx in dev) and `dist/` (built) sit at the same depth, so this resolves the same from both. */
+const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
+
+/** The data folder when `DATA_DIR` is unset. */
+const DEFAULT_DATA_DIR = "./data";
+
+/** Where the auth plugin's routes sit as Fastify sees them (`plugins/auth/index.ts`); the browser reaches them under the API prefix. */
 export const AUTH_ROUTE_PREFIX = "/auth";
 
 /** The Ward callback, under the API prefix: `WARD_OIDC_REDIRECT_URI` is the origin, the prefix, then this. */
@@ -11,7 +19,7 @@ export const WARD_CALLBACK_PATH = `${AUTH_ROUTE_PREFIX}/ward/callback`;
 export interface Config {
   host: string;
   port: number;
-  /** As given. `index.ts` resolves a relative path against the repo root. */
+  /** As given. `server.ts` resolves a relative path against the repo root (`resolveDataDir`). */
   dataDir: string;
   /** The app's own origin as the browser sees it, bare. Default is the Vite dev server. */
   publicOrigin: string;
@@ -21,7 +29,7 @@ export interface Config {
   webBase: string;
   /** Optional: lookups skip Google Books when unset. */
   googleBooksApiKey: string | undefined;
-  /** `CIP_REFRESH`: whether the server refreshes the CIP index weekly (cip/job.ts). Default on; `off` stops it. */
+  /** `CIP_REFRESH`: whether the server refreshes the CIP index weekly (`features/lookup/cip/job.ts`). Default on; `off` stops it. */
   cipRefresh: boolean;
   /**
    * "Sign in with Ward": the five `WARD_OIDC_*` settings, or `undefined` when
@@ -56,7 +64,7 @@ const envSchema = z.object({
   PORT: optional(
     z.coerce.number<string>().int().min(1).max(65535, { message: "PORT must be a port number (1-65535)." }),
   ).transform((value) => value ?? 8808),
-  DATA_DIR: optional(z.string()).transform((value) => value ?? "./data"),
+  DATA_DIR: optional(z.string()).transform((value) => value ?? DEFAULT_DATA_DIR),
   PUBLIC_ORIGIN: optional(
     z.string().refine((value) => URL.canParse(value) && new URL(value).origin === value, {
       message: "PUBLIC_ORIGIN must be a bare origin such as https://example.com: no path and no trailing slash.",
@@ -151,5 +159,49 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     cipRefresh: values.CIP_REFRESH,
     ward,
     trustedProxies: proxies,
+  };
+}
+
+/**
+ * Loads the repo's `.env` into `process.env` (a variable already set wins) and
+ * returns its path, or `undefined` when there is no such file. Call it before
+ * `loadConfig()` in a process entry: the server, the seed and the CIP refresh.
+ * The root comes from this file's own location, so a file that moves can't
+ * quietly stop reading it.
+ */
+export function loadEnvFile(): string | undefined {
+  const path = `${REPO_ROOT}.env`;
+  try {
+    process.loadEnvFile(path);
+    return path;
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
+    return undefined;
+  }
+}
+
+/**
+ * The data folder as an absolute path: `npm run dev` runs the server from
+ * `server/`, so a relative `DATA_DIR` means the repo root's. One rule for the
+ * server, the seed and the CIP refresh; `buildApp` opens `<dataDir>/shelfmark.db` there.
+ */
+export function resolveDataDir(configured: string): string {
+  return isAbsolute(configured) ? configured : resolve(REPO_ROOT, configured);
+}
+
+/** What the seed command reads from the environment. An unset name or password is empty, for the command to ask for. */
+export interface SeedConfig {
+  username: string;
+  password: string;
+  /** `DATA_DIR`, resolved as the server resolves it. */
+  dataDir: string;
+}
+
+/** `SEED_USERNAME` (trimmed), `SEED_PASSWORD` (as typed, spaces and all) and `DATA_DIR`. */
+export function loadSeedConfig(env: NodeJS.ProcessEnv = process.env): SeedConfig {
+  return {
+    username: env.SEED_USERNAME?.trim() ?? "",
+    password: env.SEED_PASSWORD ?? "",
+    dataDir: resolveDataDir(env.DATA_DIR || DEFAULT_DATA_DIR),
   };
 }

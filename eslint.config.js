@@ -14,7 +14,7 @@ export default [
     // capture helper and the OCR fixture recorder.
     scripts: ["server/scripts", "docs/images", "web/src/ocr/fixtures"],
     // Allowed to print: the server entry, the seed and the CIP refresh talk to the person running them.
-    console: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
+    console: ["server/src/server.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
     // ScannerDemo is loaded with lazy(import()), which reads `default`.
     defaultExports: ["web/src/scanner/ScannerDemo.tsx"],
     // The Tailwind entry: the unknown-class, conflicting-class and class-order rules read its theme.
@@ -26,11 +26,4 @@ export default [
     // add/flow.test.ts asserts through the expectStep helper.
     assertFunctionNames: ["expect", "expectTypeOf", "expectStep"],
   }),
-  {
-    // A warning for now (2026-11-11): these files still read the environment themselves. When the
-    // server takes its settings from config.ts, this block goes and the rule is an error again.
-    name: "shelfmark/process-env-warns",
-    files: ["server/src/index.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
-    rules: { "n/no-process-env": "warn" },
-  },
 ];

@@ -21,20 +21,14 @@
  */
 import { readFileSync } from "node:fs";
 import { basename } from "node:path";
-import { fileURLToPath } from "node:url";
 import { parseIsbn, type LookupSource } from "@shelfmark/shared";
+import { loadEnvFile } from "../src/config.js";
 import { createGoogleBooksSource } from "../src/lookup/googlebooks.js";
 import { createLibrarySource, LIBRARY_ORDER } from "../src/lookup/libraries.js";
 import type { LookupSourceClient, SourceDraft } from "../src/lookup/merge.js";
 import { createOpenLibrarySource } from "../src/lookup/openlibrary.js";
 
-const REPO_ROOT = fileURLToPath(new URL("../../", import.meta.url));
-
-try {
-  process.loadEnvFile(`${REPO_ROOT}.env`);
-} catch (err) {
-  if ((err as NodeJS.ErrnoException).code !== "ENOENT") throw err;
-}
+loadEnvFile();
 
 const args = process.argv.slice(2);
 const askGoogle = args.includes("--google");
