@@ -3,19 +3,18 @@ import {
   COVER_MAX_BYTES,
   COVER_MIME_TYPES,
   coverFetchRequestSchema,
-  type CoverInfo,
+  coverInfoSchema,
   type CoverMime,
 } from "@shelfmark/shared";
-import type { FastifyPluginAsync } from "fastify";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
+import { z } from "zod";
 import type { Db } from "../../db/open.js";
 import { ApiError, errorBody } from "../../lib/api-error.js";
+import { idParamsSchema } from "../../lib/id-params.js";
 import type { BookStore } from "../books/index.js";
+import { errorBodySchema } from "./schemas.js";
 import { downloadCover, sniffImage } from "./service.js";
 import { createCoverStore } from "./store.js";
-
-interface IdParams {
-  Params: { id: string };
-}
 
 const noSuchBook = () => new ApiError("not_found", "There is no such book.");
 const noCover = () => new ApiError("not_found", "This book has no cover.");
@@ -56,7 +55,7 @@ export interface CoverRoutesOptions {
  * bytes with an `ETag` and a day of private caching, so a client adds
  * `?v=<Book.coverUpdatedAt>` to the image URL (ignored here).
  */
-export const coverRoutes: FastifyPluginAsync<CoverRoutesOptions> = async (app, { db, books, fetch }) => {
+export const coverRoutes: FastifyPluginAsyncZod<CoverRoutesOptions> = async (app, { db, books, fetch }) => {
   const covers = createCoverStore(db);
 
   // Scoped to this plugin: any body that isn't JSON arrives as raw bytes (2 MB
@@ -67,7 +66,8 @@ export const coverRoutes: FastifyPluginAsync<CoverRoutesOptions> = async (app, {
     done(null, body);
   });
 
-  app.get<IdParams>("/api/books/:id/cover", (request, reply) => {
+  // The image bytes, with caching headers: binary, so no response schema (it declares its params only).
+  app.get("/api/books/:id/cover", { schema: { params: idParamsSchema } }, (request, reply) => {
     const id = bookId(request.params.id);
     const cover = covers.get(id);
     if (!cover) throw books.get(id) ? noCover() : noSuchBook();
@@ -80,35 +80,47 @@ export const coverRoutes: FastifyPluginAsync<CoverRoutesOptions> = async (app, {
     return reply.type(cover.mime).send(cover.bytes);
   });
 
-  app.put<IdParams>("/api/books/:id/cover", (request, reply): CoverInfo | typeof reply => {
-    const id = bookId(request.params.id);
-    const declared = (request.headers["content-type"] ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
-    if (!isCoverMime(declared) || !Buffer.isBuffer(request.body)) {
-      return reply
-        .code(415)
-        .send(errorBody("validation", `A cover is sent as the raw image: ${COVER_MIME_TYPES.join(", ")}.`));
-    }
-    if (!books.get(id)) throw noSuchBook();
-    const mime = sniffImage(request.body);
-    if (!mime) throw new ApiError("validation", "The body is not a JPEG, PNG or WebP image.");
-    // The bytes decide the stored type: a PNG sent as image/jpeg is served as a PNG.
-    return covers.put(id, { mime, bytes: request.body, source: "upload" });
-  });
+  // The body is the raw image, read by the `*` parser above, so it has no body schema.
+  app.put(
+    "/api/books/:id/cover",
+    { schema: { params: idParamsSchema, response: { 200: coverInfoSchema, 415: errorBodySchema } } },
+    (request, reply) => {
+      const id = bookId(request.params.id);
+      const declared = (request.headers["content-type"] ?? "").split(";")[0]?.trim().toLowerCase() ?? "";
+      if (!isCoverMime(declared) || !Buffer.isBuffer(request.body)) {
+        reply.code(415);
+        return errorBody("validation", `A cover is sent as the raw image: ${COVER_MIME_TYPES.join(", ")}.`);
+      }
+      if (!books.get(id)) throw noSuchBook();
+      const mime = sniffImage(request.body);
+      if (!mime) throw new ApiError("validation", "The body is not a JPEG, PNG or WebP image.");
+      // The bytes decide the stored type: a PNG sent as image/jpeg is served as a PNG.
+      return covers.put(id, { mime, bytes: request.body, source: "upload" });
+    },
+  );
 
-  app.post<IdParams>("/api/books/:id/cover/fetch", async (request): Promise<CoverInfo> => {
-    const id = bookId(request.params.id);
-    const { url } = coverFetchRequestSchema.parse(request.body);
-    if (!books.get(id)) throw noSuchBook();
-    const cover = await downloadCover(url, { fetch });
-    // Again: the book may have been deleted during the download (up to 10 s),
-    // and the insert would then fail its foreign key as a 500.
-    if (!books.get(id)) throw noSuchBook();
-    return covers.put(id, cover);
-  });
+  app.post(
+    "/api/books/:id/cover/fetch",
+    { schema: { params: idParamsSchema, body: coverFetchRequestSchema, response: { 200: coverInfoSchema } } },
+    async (request) => {
+      const id = bookId(request.params.id);
+      if (!books.get(id)) throw noSuchBook();
+      const cover = await downloadCover(request.body.url, { fetch });
+      // Again: the book may have been deleted during the download (up to 10 s),
+      // and the insert would then fail its foreign key as a 500.
+      if (!books.get(id)) throw noSuchBook();
+      return covers.put(id, cover);
+    },
+  );
 
-  app.delete<IdParams>("/api/books/:id/cover", (request, reply) => {
-    const id = bookId(request.params.id);
-    if (!covers.remove(id)) throw books.get(id) ? noCover() : noSuchBook();
-    return reply.code(204).send();
-  });
+  app.delete(
+    "/api/books/:id/cover",
+    { schema: { params: idParamsSchema, response: { 204: z.null() } } },
+    (request, reply) => {
+      const id = bookId(request.params.id);
+      if (!covers.remove(id)) throw books.get(id) ? noCover() : noSuchBook();
+      reply.code(204);
+      return null;
+    },
+  );
 };
