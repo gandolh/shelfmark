@@ -1,3 +1,4 @@
+import { serializerCompiler, validatorCompiler } from "@fastify/type-provider-zod";
 import Fastify, { type FastifyInstance, type FastifyServerOptions } from "fastify";
 import type { Config } from "./config.js";
 import { databasePath, openDb, type Db } from "./db/open.js";
@@ -7,6 +8,7 @@ import { jsonBodyParser } from "./plugins/json-body.js";
 import { backupRoutes } from "./features/backup/index.js";
 import { bookRoutes, createBookStore, type BookStore } from "./features/books/index.js";
 import { coverRoutes } from "./features/covers/index.js";
+import { healthRoutes } from "./features/health/index.js";
 import {
   cipDatabasePath,
   lookupRoutes,
@@ -45,6 +47,7 @@ export type Feature = (app: FastifyInstance, ctx: FeatureContext) => PromiseLike
  * brief adds its entry here and nowhere else in this file.
  */
 const FEATURES: Feature[] = [
+  (app) => app.register(healthRoutes),
   (app, ctx) => app.register(bookRoutes, ctx),
   (app, ctx) => app.register(lookupRoutes, ctx),
   (app, ctx) => app.register(coverRoutes, ctx),
@@ -89,12 +92,13 @@ export async function buildApp(config: Config, options: BuildAppOptions = {}): P
   // go first, so every plugin and feature inherits the one handler.
   await app.register(errors);
   await app.register(jsonBodyParser);
+  // Zod checks every request and encodes every reply, in every plugin registered below.
+  app.setValidatorCompiler(validatorCompiler);
+  app.setSerializerCompiler(serializerCompiler);
   // Accounts and the guard: `wardAuth`'s `onRequest` hook refuses every route set up after it
   // without a session, so this goes before every feature.
   const fetch = options.fetch ?? globalThis.fetch;
   await app.register(auth, { config, db, fetch });
-
-  app.get("/api/health", async () => ({ ok: true }));
 
   // 2. The features.
   const ctx: FeatureContext = {
