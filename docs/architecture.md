@@ -84,6 +84,6 @@ sorts, filters and searches them in the browser.
 - [corpus/wiki/decisions.md](../corpus/wiki/decisions.md): what was decided
   and what was rejected
 - Code: [shared/src/isbn.ts](../shared/src/isbn.ts),
-  [server/src/lookup/](../server/src/lookup/),
-  [server/src/routes/](../server/src/routes/),
+  [server/src/features/lookup/](../server/src/features/lookup/),
+  [server/src/features/](../server/src/features/),
   [web/src/add/](../web/src/add/), [web/src/library/](../web/src/library/)

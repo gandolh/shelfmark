@@ -90,7 +90,7 @@ export const migrations: readonly string[] = [
   // 3: saved views, the Library's filters, sort, columns and tab
   // under a name. `state` is the shared SavedViewState as JSON, checked by
   // the shared schema on the way in and read leniently on the way out
-  // (store/views.ts). `name_key` is the name folded to lower case in JS, as
+  // (features/views/store.ts). `name_key` is the name folded to lower case in JS, as
   // tags' is, so "Unread" and "unread" can't be two views. `position` is the
   // view's place in the Views menu, 0 first, kept dense by the store.
   `

@@ -122,7 +122,7 @@ npm run build       # tsc for shared and server, then the web app
   is empty, so Google was skipped after the other sources missed.
 - **A Romanian book from the last year isn't found.** The CIP index may be
   empty: the server fills it a minute after it starts, then weekly. Run
-  `npx tsx server/src/cip/cli.ts refresh` to fill it by hand, or
+  `npx tsx server/src/features/lookup/cip/cli.ts refresh` to fill it by hand, or
   `... refresh 2026-01 2026-02` for some months only.
 - **A library "didn't answer".** The library catalogs are reached over TCP
   port 9991. A network that blocks it makes every library lookup an error;

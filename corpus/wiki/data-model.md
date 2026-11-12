@@ -10,7 +10,7 @@ Shipped on 2026-10-15 on 2026-10-14 as migration 1 in
 copy** is the owner's decision ([decisions.md](decisions.md)); the rest came
 from the 2026-10-14 research. Column names follow [glossary.md](glossary.md).
 The API's `Book` ([book.ts](../../shared/src/book.ts)) is a row in camelCase
-plus `tags`, `hasCover` and `coverUpdatedAt`; [books.ts](../../server/src/store/books.ts) is the
+plus `tags`, `hasCover` and `coverUpdatedAt`; [features/books/store.ts](../../server/src/features/books/store.ts) is the
 only module that runs SQL on `books`, `tags` and `book_tags`.
 
 ## `books`: one row per copy (owned or wished)
@@ -64,7 +64,7 @@ but doubles the join and the edit UI for a case that hardly happens.
   `position` INTEGER ≥ 0; `created_at`, `updated_at`. One row per named view
   of the Library ([library-table.md](library-table.md)). `name_key` exists for
   the same reason as tags': the name in NFC, trimmed and lower-cased in JS
-  (`viewNameKey` in [views.ts](../../server/src/store/views.ts)), because a
+  (`viewNameKey` in [features/views/store.ts](../../server/src/features/views/store.ts)), because a
   `UNIQUE ... COLLATE NOCASE` on `name` would fold ASCII only and let "Știință"
   and "știință" be two views. A clash is a `409`. `state` is the shared
   `SavedViewState` ([views.ts](../../shared/src/views.ts): tab, filters, sort,

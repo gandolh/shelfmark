@@ -5,9 +5,9 @@ import { cipDatabasePath, openCipStore } from "./store.js";
 /**
  * The CIP refresh by hand, the same one the server's weekly job runs:
  *
- *     node server/dist/cip/cli.js refresh                (in the container)
- *     npx tsx server/src/cip/cli.ts refresh              (from a checkout)
- *     npx tsx server/src/cip/cli.ts refresh 2026-01 2026-02
+ *     node server/dist/features/lookup/cip/cli.js refresh                (in the container)
+ *     npx tsx server/src/features/lookup/cip/cli.ts refresh              (from a checkout)
+ *     npx tsx server/src/features/lookup/cip/cli.ts refresh 2026-01 2026-02
  *
  * With months, only those issues are fetched, again if need be.
  * It reads `.env` and DATA_DIR as the server does. Running it while the
@@ -16,7 +16,7 @@ import { cipDatabasePath, openCipStore } from "./store.js";
 
 const [command, ...months] = process.argv.slice(2);
 if (command !== "refresh" || months.some((month) => !/^20\d{2}-[01]\d$/.test(month))) {
-  console.error("Usage: node server/dist/cip/cli.js refresh [YYYY-MM ...]");
+  console.error("Usage: node server/dist/features/lookup/cip/cli.js refresh [YYYY-MM ...]");
   process.exit(2);
 }
 

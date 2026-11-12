@@ -27,9 +27,9 @@ export interface FeatureContext {
   db: Db;
   /** Books go through this store, never through another module's SQL. */
   books: BookStore;
-  /** Every outbound request: the lookup's sources, cover downloads and Ward. Tests pass a fake (`startTestApp`). */
+  /** Every outbound request: the lookup's sources, cover downloads and Ward. Tests pass a fake. */
   fetch: typeof globalThis.fetch;
-  /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake (`startTestApp`). */
+  /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake. */
   connect: Connect;
   /** The CIP index, `<dataDir>/cip.db`, closed with the app. Its weekly refresh is `server.ts`'s. */
   cip: CipStore;

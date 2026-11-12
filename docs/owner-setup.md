@@ -205,7 +205,7 @@ Two checks after the first deploy with the Romanian catalogs and the CIP index. 
    and takes about 15 minutes. Watch it from `/srv/shelfmark-api` with
    `docker compose -f infrastructure/docker-compose.yml logs -f shelfmark-api | grep cip:`. Expect one line per issue
    ("cip: imported 2026-08, 2,9xx records"). To run it by hand:
-   `docker compose -f infrastructure/docker-compose.yml exec shelfmark-api node server/dist/cip/cli.js refresh`.
+   `docker compose -f infrastructure/docker-compose.yml exec shelfmark-api node server/dist/features/lookup/cip/cli.js refresh`.
 
 ## Owner checks waiting from earlier briefs
 

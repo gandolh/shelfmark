@@ -114,13 +114,13 @@ were cut off at 1 MiB. The 2012-2015 sample above came from 49 of them
 
 1. The browser sends the ISBN to `POST /api/lookup`, unless the page has its
    answer from this visit ([memo.ts](../../web/src/add/memo.ts)); the server does the work
-   ([routes/lookup.ts](../../server/src/routes/lookup.ts)). This keeps the
+   ([features/lookup/routes.ts](../../server/src/features/lookup/routes.ts)). This keeps the
    Google key out of the browser and lets one queue per source respect the
-   rate limits ([queue.ts](../../server/src/lookup/queue.ts)): one request at
+   rate limits ([queue.ts](../../server/src/features/lookup/queue.ts)): one request at
    a time, starts at least 400 ms apart for Open Library and 200 ms for Google.
 2. The server checks the lookup cache, `lookup_cache`: the raw answer per ISBN
    and source, with its outcome and fetch date
-   ([cache.ts](../../server/src/lookup/cache.ts)). A found answer is reused
+   ([cache.ts](../../server/src/features/lookup/cache.ts)). A found answer is reused
    forever, a not-found one for 7 days; an error is never stored. A hit costs
    no request, even for Google after its key is gone. A request for an ISBN
    whose lookup is running waits for it (2026-10-17), so no source is asked twice.
@@ -129,12 +129,12 @@ were cut off at 1 MiB. The 2012-2015 sample above came from 49 of them
    asked only while no answer so far has a title, so Google isn't asked for a
    missing cover; without a key it is reported `skipped_no_key`. Merge field
    by field: the first non-empty value wins, in that order; cover candidates
-   come in the same order ([merge.ts](../../server/src/lookup/merge.ts)). An
+   come in the same order ([merge.ts](../../server/src/features/lookup/merge.ts)). An
    Open Library lookup counts as an error unless both its calls succeed, so a
    half answer is never cached. A library lookup is one Z39.50 exchange (Init,
    Search, Present) with a 10 s deadline; a 978 ISBN is asked together with
-   its ISBN-10 ([libraries.ts](../../server/src/lookup/libraries.ts),
-   [z3950/](../../server/src/lookup/z3950/client.ts)). Each library has its
+   its ISBN-10 ([libraries.ts](../../server/src/features/lookup/libraries.ts),
+   [z3950/](../../server/src/features/lookup/z3950/client.ts)). Each library has its
    own queue with a random 5-10 s pause after each request ends.
 4. Return a draft the user confirms or edits before saving, with `tried` (each
    source asked and how it did) and the copies already saved with that ISBN.
@@ -155,7 +155,7 @@ ISBN costs two Open Library calls, so 300 found books take about four minutes,
 
 Download the chosen cover once, on the server, from an allowlist of cover hosts
 (the SSRF guard), and store it in the `covers` table; serve it from our API
-([routes/covers.ts](../../server/src/routes/covers.ts)). The allowlist is
+([features/covers/routes.ts](../../server/src/features/covers/routes.ts)). The allowlist is
 `covers.openlibrary.org`, `books.google.com` and
 `books.googleusercontent.com`, https on the default port only, checked again
 at every redirect, 2 MB and 10 s at most. Open Library's covers live at the
@@ -191,12 +191,12 @@ old, and the CIP index covers the newest ones.
 
 The CIP index as built (2026-10-17): `<dataDir>/cip.db`, kept out of
 shelfmark.db so the backup stays small. The server refreshes it a minute
-after it starts, then weekly ([job.ts](../../server/src/cip/job.ts)); the
+after it starts, then weekly ([job.ts](../../server/src/features/lookup/cip/job.ts)); the
 refresh lists the issues through the site's WordPress media API, downloads the
 missing ones newest first at the libraries' pace, and runs `pdftotext -layout`
-([refresh.ts](../../server/src/cip/refresh.ts)). An issue that parses to under
+([refresh.ts](../../server/src/features/lookup/cip/refresh.ts)). An issue that parses to under
 1,000 records isn't stored, so a changed layout can't quietly empty it.
-`CIP_REFRESH=off` turns the job off; `node server/dist/cip/cli.js refresh
+`CIP_REFRESH=off` turns the job off; `node server/dist/features/lookup/cip/cli.js refresh
 [YYYY-MM ...]` runs it by hand. The lookup reads the index directly, with no
 lookup cache.
 
