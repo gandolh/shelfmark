@@ -27,8 +27,9 @@ API and SQLite. Read [corpus/index.md](corpus/index.md) first.
   there and not in an extended file.
 - `vendor/house-style/`, `server/vendor/` and `web/vendor/` are generated
   copies. Never edit them; `npm run house-style:sync` refreshes the first.
-- `check:conventions` runs the two house checkers `--warn-only`: their
-  findings are the Base UI, Tailwind and server structure work still to do.
+- `check:conventions` runs knip, dependency-cruiser and the two house
+  checkers, all strict; the one accepted finding is the backup stream, in
+  `scripts/conventions.json`.
 
 ## Hard rules
 
