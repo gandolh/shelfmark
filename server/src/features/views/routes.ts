@@ -1,12 +1,11 @@
-import { savedViewCreateSchema, savedViewPatchSchema, type SavedViewList } from "@shelfmark/shared";
-import type { FastifyPluginAsync } from "fastify";
+import { savedViewCreateSchema, savedViewPatchSchema } from "@shelfmark/shared";
+import type { FastifyPluginAsyncZod } from "@fastify/type-provider-zod";
+import { z } from "zod";
 import type { Db } from "../../db/open.js";
 import { ApiError } from "../../lib/api-error.js";
+import { idParamsSchema } from "../../lib/id-params.js";
+import { savedViewListOutputSchema, savedViewOutputSchema } from "./schemas.js";
 import { createViewStore, ViewNameTaken } from "./store.js";
-
-interface IdParams {
-  Params: { id: string };
-}
 
 const noSuchView = () => new ApiError("not_found", "There is no such view.");
 
@@ -27,41 +26,55 @@ export interface ViewRoutesOptions {
 
 /**
  * The saved views. A list answers `{ views }` by position; one
- * view answers the view. Bodies are parsed with the shared schemas, so a bad
+ * view answers the view. Bodies are declared with the shared schemas, so a bad
  * state is a 400 `validation` naming the field; a name another view has is a
  * 409 `conflict`.
  */
-export const viewRoutes: FastifyPluginAsync<ViewRoutesOptions> = async (app, { db }) => {
+export const viewRoutes: FastifyPluginAsyncZod<ViewRoutesOptions> = async (app, { db }) => {
   const views = createViewStore(db);
 
-  app.get("/api/views", (): SavedViewList => ({ views: views.list() }));
+  app.get("/api/views", { schema: { response: { 200: savedViewListOutputSchema } } }, () => ({
+    views: views.list(),
+  }));
 
-  app.post("/api/views", (request, reply) => {
-    const input = savedViewCreateSchema.parse(request.body);
-    try {
-      const view = views.create(input);
-      return reply.code(201).send(view);
-    } catch (error) {
-      if (error instanceof ViewNameTaken) throw nameTaken(error);
-      throw error;
-    }
-  });
+  app.post(
+    "/api/views",
+    { schema: { body: savedViewCreateSchema, response: { 201: savedViewOutputSchema } } },
+    (request, reply) => {
+      try {
+        const view = views.create(request.body);
+        reply.code(201);
+        return view;
+      } catch (error) {
+        if (error instanceof ViewNameTaken) throw nameTaken(error);
+        throw error;
+      }
+    },
+  );
 
-  app.patch<IdParams>("/api/views/:id", (request, reply) => {
-    const id = viewId(request.params.id);
-    const change = savedViewPatchSchema.parse(request.body);
-    try {
-      const view = views.patch(id, change);
-      if (!view) throw noSuchView();
-      return reply.send(view);
-    } catch (error) {
-      if (error instanceof ViewNameTaken) throw nameTaken(error);
-      throw error;
-    }
-  });
+  app.patch(
+    "/api/views/:id",
+    { schema: { params: idParamsSchema, body: savedViewPatchSchema, response: { 200: savedViewOutputSchema } } },
+    (request) => {
+      const id = viewId(request.params.id);
+      try {
+        const view = views.patch(id, request.body);
+        if (!view) throw noSuchView();
+        return view;
+      } catch (error) {
+        if (error instanceof ViewNameTaken) throw nameTaken(error);
+        throw error;
+      }
+    },
+  );
 
-  app.delete<IdParams>("/api/views/:id", (request, reply) => {
-    if (!views.remove(viewId(request.params.id))) throw noSuchView();
-    return reply.code(204).send();
-  });
+  app.delete(
+    "/api/views/:id",
+    { schema: { params: idParamsSchema, response: { 204: z.null() } } },
+    (request, reply) => {
+      if (!views.remove(viewId(request.params.id))) throw noSuchView();
+      reply.code(204);
+      return null;
+    },
+  );
 };
