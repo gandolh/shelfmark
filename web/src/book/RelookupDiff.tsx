@@ -60,19 +60,19 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
 
   return (
     <section
-      className="book-card book-lookup"
+      className="book-lookup min-w-0 p-5 rounded-container bg-surface max-md:p-4"
       aria-labelledby="book-lookup-title"
       aria-busy={state.kind === "loading" || undefined}
     >
-      <h2 className="book-card__title" id="book-lookup-title" tabIndex={-1} ref={heading}>
+      <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-lookup-title" tabIndex={-1} ref={heading}>
         What the sources say now
       </h2>
 
-      {state.kind === "loading" && <p className="book-lookup__line">Looking up {book.isbn13}…</p>}
+      {state.kind === "loading" && <p className="mb-2 text-ink-2 text-body">Looking up {book.isbn13}…</p>}
       {state.kind === "failed" && (
         <>
           <FailureLine>{state.failure.message}</FailureLine>
-          <div className="book-actions">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="secondary" pill onClick={lookup.run}>
               Try again
             </Button>
@@ -84,8 +84,8 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
       )}
       {state.kind === "done" && !draft && (
         <>
-          <p className="book-lookup__line">{notFoundText(state.response.isbn13, state.response.tried)}</p>
-          <div className="book-actions">
+          <p className="mb-2 text-ink-2 text-body">{notFoundText(state.response.isbn13, state.response.tried)}</p>
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="quiet" onClick={onClose}>
               Close
             </Button>
@@ -94,35 +94,37 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
       )}
       {state.kind === "done" && draft && (
         <>
-          <p className="book-lookup__line">
+          <p className="mb-2 text-ink-2 text-body">
             {sourceLine(draft.sources)}.{" "}
             {rows.length === 0
               ? "It matches what you have; there is nothing to take."
               : "Tick the fields to take; the rest stay as they are."}
           </p>
           {rows.length > 0 && (
-            <ul className="book-diff">
+            <ul className="flex flex-col mb-3 list-none [&_li]:border-t [&_li]:border-divider">
               {rows.map((row) => (
                 <li key={row.field}>
-                  <label className="book-diff__row">
+                  <label className="flex items-start gap-3 min-h-touch py-3 cursor-pointer [&_input]:flex-none [&_input]:w-5 [&_input]:h-5 [&_input]:mt-0.5 [&_input]:accent-accent [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-[-2px] [&:has(input:focus-visible)]:rounded-control">
                     <input
                       type="checkbox"
                       checked={ticked.has(row.field)}
                       onChange={() => toggle(row.field)}
                       disabled={saving}
                     />
-                    <span className="book-diff__body">
-                      <span className="book-diff__label">{row.label}</span>
-                      <span className="book-diff__pair">
-                        <span className="book-diff__side">
-                          <span className="book-diff__who">Now</span>
-                          <span className="book-diff__text">
-                            {row.current || <span className="book-none">Empty</span>}
+                    <span className="flex flex-1 flex-col gap-1.5 min-w-0">
+                      <span className="text-meta font-semibold">{row.label}</span>
+                      <span className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-3 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-2">
+                        <span className="flex flex-col gap-px min-w-0">
+                          <span className="text-muted text-label font-semibold">Now</span>
+                          <span className="max-h-[9em] overflow-auto text-body wrap-anywhere whitespace-pre-line">
+                            {row.current || <span className="text-muted">Empty</span>}
                           </span>
                         </span>
-                        <span className="book-diff__side">
-                          <span className="book-diff__who">Sources</span>
-                          <span className="book-diff__text">{row.proposed}</span>
+                        <span className="flex flex-col gap-px min-w-0">
+                          <span className="text-muted text-label font-semibold">Sources</span>
+                          <span className="max-h-[9em] overflow-auto text-body wrap-anywhere whitespace-pre-line">
+                            {row.proposed}
+                          </span>
                         </span>
                       </span>
                     </span>
@@ -132,7 +134,7 @@ export function RelookupDiff({ book, lookup, onApply, onClose }: RelookupDiffPro
             </ul>
           )}
           {failure && <FailureLine>{failure}</FailureLine>}
-          <div className="book-actions">
+          <div className="flex flex-wrap items-center gap-2">
             {rows.length > 0 && (
               <Button
                 variant="primary"

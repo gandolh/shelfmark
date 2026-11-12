@@ -53,15 +53,19 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
   const candidates = state.kind === "done" ? (state.response.draft?.coverCandidates ?? []) : [];
 
   return (
-    <CollapsibleRoot open={open} onOpenChange={setOpen} render={<div className="book-coverpanel" />}>
+    <CollapsibleRoot open={open} onOpenChange={setOpen} render={<div className="flex flex-col gap-2" />}>
       <CollapsibleTrigger render={<Button variant="secondary" size="compact" pill block />}>
         Change cover
       </CollapsibleTrigger>
       {/* aria-live outside the panel: a result is read out even after it closes. */}
-      <p className="book-coverpanel__note" role="status">
+      <p className="text-ink text-small font-semibold text-center empty:hidden" role="status">
         {message}
       </p>
-      <CollapsiblePanel className="book-card book-card--cover" aria-busy={busy || undefined}>
+      <CollapsiblePanel
+        data-cover-panel
+        className="min-w-0 rounded-container bg-surface max-md:p-4 flex flex-col items-stretch gap-3 p-3 md:p-3.5"
+        aria-busy={busy || undefined}
+      >
         <CoverCapture
           photo={null}
           onChange={(photo) => photo && void act(() => uploadCover(book.id, photo.blob), "Cover replaced.")}
@@ -69,7 +73,10 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
           disabled={busy}
         />
         <label
-          className={buttonClass({ variant: "secondary", size: "compact", pill: true }, "book-filepick")}
+          className={buttonClass(
+            { variant: "secondary", size: "compact", pill: true },
+            "cursor-pointer [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-2",
+          )}
           aria-disabled={busy}
         >
           <input className="sr-only" type="file" accept="image/*" disabled={busy} onChange={chooseFile} />
@@ -77,7 +84,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
         </label>
 
         {book.isbn13 !== null && (
-          <div className="book-candidates">
+          <div className="flex flex-col gap-2 items-start">
             <h3 className="add-label">From the lookup</h3>
             {state.kind === "idle" && (
               <Button variant="quiet" size="compact" onClick={lookup.run} disabled={busy}>
@@ -90,12 +97,12 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
               <p className="add-hint">The sources have no cover for this ISBN.</p>
             )}
             {candidates.length > 0 && (
-              <ul className="book-candidates__list">
+              <ul className="flex flex-wrap gap-3 list-none">
                 {candidates.map((candidate) => (
                   <li key={candidate.url}>
                     <button
                       type="button"
-                      className="book-candidate"
+                      className="block rounded-cover focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[3px] disabled:opacity-45"
                       disabled={busy}
                       aria-label={`Use this cover from ${SOURCE_NAMES[candidate.source]}`}
                       onClick={() => void act(() => fetchCover(book.id, candidate.url), "Cover replaced.")}
@@ -111,7 +118,11 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
 
         {book.hasCover &&
           (confirmRemove ? (
-            <div className="book-confirm-inline" role="group" aria-label="Remove the cover">
+            <div
+              className="flex flex-wrap items-center gap-2 text-ink text-meta"
+              role="group"
+              aria-label="Remove the cover"
+            >
               <span>Remove this cover?</span>
               <Button
                 variant="secondary"

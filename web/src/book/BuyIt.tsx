@@ -42,13 +42,16 @@ export function BuyIt({
   };
 
   return (
-    <section className="book-card book-card--form" aria-labelledby="book-buy-title">
-      <h2 className="book-card__title" id="book-buy-title" ref={heading} tabIndex={-1}>
+    <section
+      className="min-w-0 p-5 rounded-container bg-surface max-md:p-4 flex flex-col gap-4"
+      aria-labelledby="book-buy-title"
+    >
+      <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-buy-title" ref={heading} tabIndex={-1}>
         Where does “{book.title}” go?
       </h2>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} disabled={busy} />
       {failure && <FailureLine>{failure}</FailureLine>}
-      <div className="book-actions">
+      <div className="flex flex-wrap items-center gap-2">
         <Button variant="primary" pill aria-disabled={busy || undefined} onClick={() => !busy && void confirm()}>
           {busy ? "Saving…" : "I bought it"}
         </Button>

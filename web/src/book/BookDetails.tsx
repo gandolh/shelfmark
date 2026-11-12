@@ -38,7 +38,7 @@ export function languageName(code: string): string {
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="book-fact">
+    <div className="grid grid-cols-[140px_minmax(0,1fr)] gap-3 items-baseline py-2.75 border-t border-divider text-body first:border-t-0 [&_dt]:text-muted [&_dt]:text-meta max-md:[&_dt]:text-label max-md:[&_dt]:font-semibold [&_dd]:min-w-0 [&_dd]:text-ink [&_dd]:tabular-nums [&_dd]:wrap-anywhere max-md:grid-cols-[minmax(0,1fr)] max-md:gap-0.5">
       <dt>{label}</dt>
       <dd>{children}</dd>
     </div>
@@ -60,11 +60,11 @@ export function BookDetails({ book }: { book: Book }) {
 
   return (
     <>
-      <section className="book-card" aria-labelledby="book-about-book">
-        <h2 className="book-card__title" id="book-about-book">
+      <section className="min-w-0 p-5 rounded-container bg-surface max-md:p-4" aria-labelledby="book-about-book">
+        <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-about-book">
           About the book
         </h2>
-        <dl className="book-facts">
+        <dl className="flex flex-col">
           {book.publisher && <Fact label="Publisher">{book.publisher}</Fact>}
           {book.publishedYear !== null && <Fact label="Year">{book.publishedYear}</Fact>}
           {book.pages !== null && <Fact label="Pages">{book.pages}</Fact>}
@@ -81,35 +81,37 @@ export function BookDetails({ book }: { book: Book }) {
           {book.subjects.length > 0 && <Fact label="Subjects">{book.subjects.join(", ")}</Fact>}
           {book.description && (
             <Fact label="Description">
-              <span className="book-long">{book.description}</span>
+              <span className="block whitespace-pre-line">{book.description}</span>
             </Fact>
           )}
         </dl>
         {!book.publisher && book.publishedYear === null && book.pages === null && !book.description && (
-          <p className="book-empty">
+          <p className="text-muted text-meta">
             Nothing recorded about this book yet. Edit adds details; Re-run lookup finds them from the ISBN.
           </p>
         )}
       </section>
 
-      <section className="book-card" aria-labelledby="book-about-copy">
-        <h2 className="book-card__title" id="book-about-copy">
+      <section className="min-w-0 p-5 rounded-container bg-surface max-md:p-4" aria-labelledby="book-about-copy">
+        <h2 className="mb-1 text-ink text-row-title font-semibold" id="book-about-copy">
           About this copy
         </h2>
-        <dl className="book-facts">
+        <dl className="flex flex-col">
           {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
-          <Fact label="Shelf">{book.shelf ?? <span className="book-none">No shelf</span>}</Fact>
+          <Fact label="Shelf">{book.shelf ?? <span className="text-muted">No shelf</span>}</Fact>
           <Fact label="Status">
-            <span className={book.status === "reading" ? "book-reading" : undefined}>{STATUS_LABELS[book.status]}</span>
+            <span className={book.status === "reading" ? "text-accent font-semibold" : undefined}>
+              {STATUS_LABELS[book.status]}
+            </span>
           </Fact>
           {book.rating !== null && (
             <Fact label="Rating">
-              <span className="book-stars">
+              <span className="inline-flex gap-0.5 align-middle text-accent">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <StarIcon key={n} on={n <= (book.rating ?? 0)} size={16} />
                 ))}
               </span>
-              <span className="book-stars__text">{book.rating} of 5</span>
+              <span className="ml-2 text-ink-2">{book.rating} of 5</span>
             </Fact>
           )}
           {book.format && <Fact label="Format">{FORMAT_LABELS[book.format]}</Fact>}
@@ -119,9 +121,12 @@ export function BookDetails({ book }: { book: Book }) {
           {book.priceMinor !== null && <Fact label="Price">{priceLine(book.priceMinor, book.currency)}</Fact>}
           {book.tags.length > 0 && (
             <Fact label="Tags">
-              <ul className="book-tags">
+              <ul className="flex flex-wrap gap-1.5 list-none">
                 {book.tags.map((tag) => (
-                  <li key={tag} className="book-tag">
+                  <li
+                    key={tag}
+                    className="inline-flex items-center min-h-7 px-3 rounded-pill bg-control text-ink text-meta"
+                  >
                     {tag}
                   </li>
                 ))}
@@ -130,7 +135,7 @@ export function BookDetails({ book }: { book: Book }) {
           )}
           {book.notes && (
             <Fact label="Notes">
-              <span className="book-long">{book.notes}</span>
+              <span className="block whitespace-pre-line">{book.notes}</span>
             </Fact>
           )}
           <Fact label="Added">{dayText(book.createdAt.slice(0, 10))}</Fact>

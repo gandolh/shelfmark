@@ -43,13 +43,16 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
     <fieldset className="add-choice" disabled={disabled}>
       <legend className="add-label">{label}</legend>
       {value.length > 0 && (
-        <ul className="book-chips">
+        <ul className="flex flex-wrap gap-1.5 list-none">
           {value.map((entry) => (
-            <li key={entry} className="book-chip">
+            <li
+              key={entry}
+              className="inline-flex items-center min-h-7 px-3 rounded-pill bg-control text-ink text-meta gap-0.5 pr-1"
+            >
               {entry}
               <button
                 type="button"
-                className="book-chip__remove"
+                className="relative flex items-center justify-center w-6 h-6 rounded-pill text-ink-2 before:content-[''] before:absolute before:-inset-y-2.5 before:-inset-x-1.5 hover:bg-control-hover hover:text-ink focus-visible:outline-2 focus-visible:outline-focus-ring"
                 aria-label={`Remove ${entry} from ${label.toLowerCase()}`}
                 onClick={() => onChange(value.filter((v) => v !== entry))}
               >
@@ -60,7 +63,7 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
         </ul>
       )}
       <input
-        className="add-input book-chips__input"
+        className="add-input mt-2"
         type="text"
         value={text}
         onChange={(event) =>

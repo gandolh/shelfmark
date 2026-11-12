@@ -15,7 +15,6 @@ import { DeleteBook } from "./DeleteBook";
 import { EditForm } from "./EditForm";
 import { RelookupDiff } from "./RelookupDiff";
 import { useLookup } from "./useLookup";
-import "./book.css";
 
 const BACK = { to: LIBRARY, label: "Library" } as const;
 
@@ -37,7 +36,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
   if (status === "loading") {
     return (
       <Page title="Book" back={BACK}>
-        <p className="book-empty" role="status">
+        <p className="text-muted text-meta" role="status">
           Opening the book…
         </p>
       </Page>
@@ -46,8 +45,8 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
   if (status === "error") {
     return (
       <Page title="Book" back={BACK}>
-        <div className="book-missing" role="alert">
-          <p className="book-missing__title">The library didn’t load</p>
+        <div className="flex flex-col items-start gap-2.5 pt-2" role="alert">
+          <p className="text-row-title font-semibold">The library didn’t load</p>
           <p className="add-hint">{error?.message ?? "Shelfmark can’t be reached."}</p>
           <Button variant="secondary" pill onClick={() => void refresh()}>
             Try again
@@ -58,8 +57,8 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
   }
   return (
     <Page title="Not found" back={BACK}>
-      <div className="book-missing">
-        <p className="book-missing__title">This book isn’t in your library</p>
+      <div className="flex flex-col items-start gap-2.5 pt-2">
+        <p className="text-row-title font-semibold">This book isn’t in your library</p>
         <p className="add-hint">It may have been deleted, or the link is wrong.</p>
         <ButtonLink to={LIBRARY} variant="secondary" pill>
           Back to the Library
@@ -116,10 +115,10 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
   const authors = authorLine(book.authors);
   const caption =
     book.subtitle || authors ? (
-      <>
-        {book.subtitle && <span className="book-sub">{book.subtitle}</span>}
-        {authors && <span className="book-by">{authors}</span>}
-      </>
+      <span className="flex flex-col gap-0.5">
+        {book.subtitle && <span className="text-body text-ink-2">{book.subtitle}</span>}
+        {authors && <span className="text-body text-muted">{authors}</span>}
+      </span>
     ) : undefined;
 
   const toolbar = editing ? undefined : (
@@ -155,14 +154,14 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
   );
 
   return (
-    <Page title={book.title} caption={caption} toolbar={toolbar} back={BACK}>
-      <div className="book">
-        <div className="book__cover">
+    <Page title={book.title} caption={caption} toolbar={toolbar} back={BACK} book>
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 items-start md:grid-cols-[260px_minmax(0,720px)] md:gap-10 md:pt-1.5">
+        <div className="flex flex-col gap-3 w-[min(100%,168px)] mx-auto md:sticky md:top-[calc(var(--spacing-topbar)_+_24px)] md:w-full md:m-0 max-md:has-data-[cover-panel]:w-full max-md:has-data-[cover-panel]:[&>:first-child]:w-42 max-md:has-data-[cover-panel]:[&>:first-child]:self-center">
           <CoverImage book={book} width="100%" alt={`Cover of ${book.title}`} loading="eager" />
           <CoverPanel book={book} lookup={lookup} />
         </div>
-        <div className="book__main">
-          <p className="book-notice" role="status">
+        <div className="flex flex-col gap-4 min-w-0">
+          <p className="text-ink text-meta font-semibold empty:hidden" role="status">
             {notice}
           </p>
           {buying && !editing && book.collection === "wishlist" && (

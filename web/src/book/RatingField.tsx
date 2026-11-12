@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { cn } from "../lib/cn";
 import { Toggle, ToggleGroup } from "../components/ui/ToggleGroup";
 
 export function StarIcon({ on, size = 24 }: { on: boolean; size?: number }) {
@@ -13,7 +14,7 @@ export function StarIcon({ on, size = 24 }: { on: boolean; size?: number }) {
       strokeLinejoin="round"
       aria-hidden="true"
       focusable="false"
-      className={on ? "book-star book-star--on" : "book-star"}
+      className={on ? undefined : "text-muted"}
     >
       <path d="M12 3.4l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.7l6.1-.7z" />
     </svg>
@@ -39,7 +40,7 @@ export function RatingField({
       <legend className="add-label">Rating</legend>
       <ToggleGroup
         aria-label="Rating"
-        className="book-rating"
+        className="flex items-center gap-0.5 mt-1.5"
         aria-describedby={hint}
         value={value === null ? null : String(value)}
         onChoose={(next) => onChange(next === null ? null : Number(next))}
@@ -48,13 +49,16 @@ export function RatingField({
           <Toggle
             key={n}
             value={String(n)}
-            className="book-rating__star"
+            className={cn(
+              "flex size-10 items-center justify-center rounded-control hover:bg-control focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-focus-ring max-md:size-touch",
+              n <= (value ?? 0) ? "text-accent" : "text-muted",
+            )}
             aria-label={`${n} ${n === 1 ? "star" : "stars"}`}
           >
             <StarIcon on={value !== null && n <= value} />
           </Toggle>
         ))}
-        <span className="book-rating__text">{value === null ? "Not rated" : `${value} of 5`}</span>
+        <span className="ml-2.5 text-ink-2 text-meta">{value === null ? "Not rated" : `${value} of 5`}</span>
       </ToggleGroup>
       <p className="add-hint" id={hint}>
         Press the chosen star again to clear it.

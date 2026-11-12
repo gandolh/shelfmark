@@ -35,8 +35,11 @@ export function DeleteBook({ book, onDelete }: { book: Book; onDelete: () => Pro
   };
 
   return (
-    <section className="book-delete" aria-labelledby="book-delete-title">
-      <h2 className="book-delete__title" id="book-delete-title">
+    <section
+      className="flex flex-col items-start gap-2 mt-4 pt-6 border-t border-hairline"
+      aria-labelledby="book-delete-title"
+    >
+      <h2 className="text-muted text-label font-semibold" id="book-delete-title">
         Delete
       </h2>
       {!asking ? (
@@ -47,13 +50,18 @@ export function DeleteBook({ book, onDelete }: { book: Book; onDelete: () => Pro
           </Button>
         </>
       ) : (
-        <div className="book-delete__ask" role="group" aria-labelledby="book-delete-q">
-          <p className="book-delete__q" id="book-delete-q" tabIndex={-1} ref={heading}>
+        <div className="flex flex-col gap-2 items-start" role="group" aria-labelledby="book-delete-q">
+          <p
+            className="text-row-title font-semibold wrap-anywhere focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-[4px] focus-visible:rounded-[2px]"
+            id="book-delete-q"
+            tabIndex={-1}
+            ref={heading}
+          >
             Delete “{book.title}”?
           </p>
           <p className="add-hint">It leaves your library with its cover and notes. This can’t be undone.</p>
           {failure && <FailureLine>{failure}</FailureLine>}
-          <div className="book-actions">
+          <div className="flex flex-wrap items-center gap-2">
             <Button variant="secondary" pill disabled={busy} onClick={() => void confirm()}>
               {busy ? "Deleting…" : `Delete “${book.title}”`}
             </Button>

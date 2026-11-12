@@ -8,6 +8,7 @@ import { SearchField } from "./SearchField";
 import { useIsDesktop } from "./viewport";
 
 const HEADROW = "flex flex-wrap items-end justify-between gap-4 max-md:flex-nowrap max-md:items-center";
+const BOOK_HEADROW = "md:max-w-[1020px]";
 const TOOLBAR = "flex flex-wrap items-center gap-2 max-md:justify-between";
 
 export interface PageProps {
@@ -34,6 +35,8 @@ export interface PageProps {
   wide?: boolean;
   /** The header (title, caption, toolbar; on a phone the search box too) on a white card like the table's container. */
   card?: boolean;
+  /** The book page's two columns (260 + 40 + 720 px): the heading row stays as wide as they are, on the desktop. */
+  book?: boolean;
   children?: ReactNode;
 }
 
@@ -51,6 +54,7 @@ export function Page({
   bleed = false,
   wide = false,
   card = false,
+  book = false,
   children,
 }: PageProps) {
   const desktop = useIsDesktop();
@@ -85,13 +89,13 @@ export function Page({
         >
           {back && <BackLink to={back.to} label={back.label} />}
           {desktop ? (
-            <div className={HEADROW}>
+            <div className={cn(HEADROW, book && BOOK_HEADROW)}>
               {heading}
               {toolbar && <div className={TOOLBAR}>{toolbar}</div>}
             </div>
           ) : (
             <>
-              <div className={HEADROW}>
+              <div className={cn(HEADROW, book && BOOK_HEADROW)}>
                 {heading}
                 <AccountMenu placement="header" />
               </div>

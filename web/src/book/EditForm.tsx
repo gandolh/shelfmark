@@ -84,7 +84,13 @@ function AreaField({
         {label}
         <span className="add-label__optional">optional</span>
       </label>
-      <textarea {...area} id={id} className="add-input book-area" rows={4} aria-invalid={error !== undefined} />
+      <textarea
+        {...area}
+        id={id}
+        className="add-input h-auto min-h-24 py-2.5 px-3 leading-body resize-y"
+        rows={4}
+        aria-invalid={error !== undefined}
+      />
       {error ? (
         <p className="add-error">
           <AlertIcon size={16} />
@@ -160,9 +166,17 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
   };
 
   return (
-    <form className="book-form" onSubmit={(event) => void submit(event)} noValidate aria-busy={saving || undefined}>
-      <fieldset className="book-card book-card--form" disabled={saving}>
-        <legend className="book-card__title">About the book</legend>
+    <form
+      className="flex flex-col gap-4"
+      onSubmit={(event) => void submit(event)}
+      noValidate
+      aria-busy={saving || undefined}
+    >
+      <fieldset
+        className="flex min-w-0 flex-col gap-4 rounded-container bg-surface p-5 max-md:p-4 [&>legend+*]:clear-both"
+        disabled={saving}
+      >
+        <legend className="float-left mb-1 w-full text-row-title font-semibold text-ink">About the book</legend>
         <TextField label="Title" {...text("title")} required autoFocus autoCapitalize="sentences" />
         <TextField label="Subtitle" optional {...text("subtitle")} autoCapitalize="sentences" />
         <TextField
@@ -183,7 +197,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
             className="add-field--year"
           />
         </div>
-        <div className="book-row">
+        <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-2.5">
           <TextField
             label="Pages"
             optional
@@ -202,7 +216,7 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
             hint="Two letters: ro, en."
           />
         </div>
-        <div className="book-row">
+        <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-2.5">
           <TextField label="Series" optional {...text("series")} autoCapitalize="words" />
           <TextField label="Number in series" optional {...text("seriesNumber")} maxLength={32} />
         </div>
@@ -228,8 +242,11 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
         />
       </fieldset>
 
-      <fieldset className="book-card book-card--form" disabled={saving}>
-        <legend className="book-card__title">About this copy</legend>
+      <fieldset
+        className="flex min-w-0 flex-col gap-4 rounded-container bg-surface p-5 max-md:p-4 [&>legend+*]:clear-both"
+        disabled={saving}
+      >
+        <legend className="float-left mb-1 w-full text-row-title font-semibold text-ink">About this copy</legend>
         <ShelfPicker value={values.shelf} onChange={(shelf) => set("shelf", shelf)} shelves={shelves} />
         <StatusPicker value={values.status} onChange={(status) => set("status", status)} options={STATUSES} />
         <RatingField value={values.rating} onChange={(rating) => set("rating", rating)} />
@@ -245,11 +262,11 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
           options={CONDITION_LABELS}
           onChange={(next) => set("condition", next)}
         />
-        <label className="book-check">
+        <label className="flex items-center gap-2.5 min-h-touch text-body cursor-pointer [&_input]:w-5 [&_input]:h-5 [&_input]:accent-accent [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-2 [&:has(input:focus-visible)]:rounded-control">
           <input type="checkbox" checked={values.signed} onChange={(event) => set("signed", event.target.checked)} />
           Signed by the author
         </label>
-        <div className="book-row">
+        <div className="grid grid-cols-[repeat(2,minmax(0,1fr))] gap-2.5">
           <TextField label="Acquired on" optional {...text("acquiredOn")} type="date" />
           <TextField label="Acquired from" optional {...text("acquiredFrom")} autoCapitalize="words" />
         </div>
@@ -277,8 +294,14 @@ export function EditForm({ book, onSave, onCancel }: EditFormProps) {
       </fieldset>
 
       {failure && <FailureLine>{failure}</FailureLine>}
-      <div className="book-savebar">
-        <Button type="submit" variant="primary" size="large" aria-disabled={saving || undefined}>
+      <div className="sticky bottom-0 z-1 flex gap-2.5 py-3 border-t border-hairline bg-ground max-md:bottom-[calc(var(--spacing-tabbar)_-_10px_+_max(10px,env(safe-area-inset-bottom)))] max-md:mx-[calc(var(--spacing-gutter-phone)_*_-1)] max-md:px-gutter-phone">
+        <Button
+          type="submit"
+          variant="primary"
+          size="large"
+          className="max-md:flex-1"
+          aria-disabled={saving || undefined}
+        >
           {saving ? "Saving…" : "Save"}
         </Button>
         <Button variant="secondary" size="large" pill onClick={onCancel} disabled={saving}>
