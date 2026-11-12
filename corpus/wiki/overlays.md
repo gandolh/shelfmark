@@ -32,10 +32,14 @@ lists `**/ui` as the places.
   `Dialog` sheet on a phone; its header's `Title` names it.
 - `Tabs` (`web/src/components/ui/Tabs.tsx`): the Add page's mode tabs, with the mouse
   down guard inside `Tab`.
-- `ToggleGroup` (`web/src/components/ui/ToggleGroup.tsx`): `SegmentedControl`, the
-  rating and the shelf chips. The rating and chips set a value the form saves
-  later, so pressing the chosen one again clears it ("Not rated" is a value);
-  `SegmentedControl` ignores the empty press.
+- `ToggleGroup` (`web/src/components/ui/ToggleGroup.tsx`): the rating and the shelf
+  chips. They set a value the form saves later, so pressing the chosen one again
+  clears it ("Not rated" is a value).
+- `RadioGroup` (`web/src/components/ui/RadioGroup.tsx`): `SegmentedControl` (the
+  Library's Table / Covers, the sort direction, the filter operators, Import's
+  Save into): one Tab stop, the arrows move and choose, one always chosen
+  (base-ui rule 16; nothing is saved to the server, so not a `ToggleGroup`). Styled
+  on `data-checked`.
 - `Toggle`: the camera's torch button.
 - `Collapsible`: Change cover.
 - `Toast` (`web/src/components/ui/Toast.tsx`): the update prompt, `timeout: 0`, with

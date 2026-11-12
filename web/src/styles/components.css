@@ -172,7 +172,7 @@
   color: var(--ink);
 }
 
-.segmented__item[aria-pressed="true"],
+.segmented__item[data-checked],
 .segmented__item[aria-current] {
   background: var(--surface);
   color: var(--ink);

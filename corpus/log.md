@@ -797,3 +797,7 @@ Brief 04 built without its spike. Wishlist joins Library and Add a book (the "Tw
 
 Brief 06 built. Base UI is imported only under `ui/` folders (`web/src/components/ui/`, `web/src/library/ui/`): the `Dialog` wrapper (Escape guard, house initial focus, `Title`, no backdrop dismissal, `pending`) replaced three copies of one dialog, with `Menu`, `Tabs`, `Collapsible`, `ToggleGroup`, `Toast` and the Library `Panel`. The rating, shelf chips, torch and update prompt moved onto Base UI; the Wishlist's Claude import became a dialog; inline confirms, `<datalist>` and native controls stayed. `check-base-ui` reports 0 for rules 1, 2, 3, 9, 10, 11 and stays `--warn-only` for rule 5 (brief 07). The look is unchanged (before/after screenshots at 1280 and 390), except the Import panel. Web client only; deploy with `node cli.ts shelfmark deploy`.
 
+
+## [2026-11-12] build | Table / Covers switch is a RadioGroup
+
+The todo is closed. `SegmentedControl` (the Library's Table / Covers, the sort direction, the filter operators, Import's Save into) is on a new `RadioGroup` wrapper in `web/src/components/ui/`, per rule 16 of the base-ui skill: one Tab stop, arrows move and choose, one always chosen. Same look, styled on `data-checked`. `ToggleGroup` stays for the rating and the shelf chips.

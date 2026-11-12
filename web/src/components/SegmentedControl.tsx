@@ -1,4 +1,4 @@
-import { Toggle, ToggleGroup } from "./ui/ToggleGroup";
+import { Radio, RadioGroup } from "./ui/RadioGroup";
 
 export interface SegmentedOption<T extends string> {
   value: T;
@@ -18,8 +18,8 @@ export interface SegmentedControlProps<T extends string> {
 
 /**
  * One of a few, as a flat track with the chosen segment raised in white: a
- * Base UI `ToggleGroup` of buttons with `aria-pressed`, one tab stop with ←
- * → between the segments. Pressing the chosen one again keeps it chosen.
+ * Base UI `RadioGroup` (`data-checked` on the chosen one): one tab stop, the
+ * arrow keys move and choose, one is always chosen (base-ui rule 16).
  * Each keeps a 44 px target on a phone. The top bar's two places use the
  * same look with links (layout/TopBar.tsx).
  */
@@ -32,20 +32,19 @@ export function SegmentedControl<T extends string>({
   className,
 }: SegmentedControlProps<T>) {
   return (
-    <ToggleGroup
+    <RadioGroup<T>
       aria-label={label}
       className={["segmented", `segmented--${size}`, className].filter(Boolean).join(" ")}
       value={value}
-      onChoose={(pressed) => {
-        const next = options.find((option) => option.value === pressed);
-        if (next && next.value !== value) onChange(next.value);
+      onChoose={(next) => {
+        if (next !== value) onChange(next);
       }}
     >
       {options.map((option) => (
-        <Toggle key={option.value} value={option.value} className="segmented__item" data-label={option.label}>
+        <Radio key={option.value} value={option.value} className="segmented__item" data-label={option.label}>
           {option.label}
-        </Toggle>
+        </Radio>
       ))}
-    </ToggleGroup>
+    </RadioGroup>
   );
 }

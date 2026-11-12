@@ -6,8 +6,9 @@ import type { ComponentProps } from "react";
  * One of a few as toggles: one tab stop, ← → between them, `aria-pressed` on
  * the chosen one. Pressing the chosen one again gives `null` (clearing); a
  * caller that must keep one chosen ignores it. For a value a form saves later
- * (the rating, the shelf chips) or a look (the segmented control); a picker
- * that writes on each choice would need a guard (base-ui rule 16).
+ * (the rating, the shelf chips); a picker that writes on each choice would
+ * need a guard, and a choice kept on the device or a view switch is a
+ * `RadioGroup` (base-ui rule 16).
  */
 export interface ToggleGroupProps extends Omit<
   ComponentProps<typeof BaseToggleGroup>,
