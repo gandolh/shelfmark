@@ -26,9 +26,11 @@ const app = await buildApp(
       // Loopback (the Vite dev proxy, a server on loopback) plus the proxy's network in a container,
       // so `request.ip` in the logs is the client. Ward's login lockout reads its own list.
       trustProxy: ["loopback", ...config.trustedProxies],
-      // A socket silent this long mid-request is cut. The longest silent wait is a cover download
-      // (10 s) or a lookup's library catalogs, both answered in a request of their own.
-      connectionTimeout: 10_000,
+      // A socket silent this long is cut, an idle keep-alive one too. A lookup is silent for as long as
+      // the sources take: Open Library (8 s), then each library catalog (a 10 s deadline each, and a
+      // 5-10 s pause between requests to one), so a miss can run past 40 s, longer behind a batch.
+      // Above `keepAliveTimeout`, so the idle limit is that one.
+      connectionTimeout: 130_000,
       // The whole request, body included, must arrive within this.
       requestTimeout: 30_000,
       // Longer than the proxy keeps an idle upstream connection (Caddy's default: 2 minutes), so the
