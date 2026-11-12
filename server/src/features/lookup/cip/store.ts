@@ -1,7 +1,7 @@
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
-import { migrate } from "../db/migrations.js";
+import { migrate } from "../../../db/migrations.js";
 import type { Issue } from "./issues.js";
 import type { CipRecord } from "./parse.js";
 

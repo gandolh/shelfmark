@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fakeLibraries } from "../testing/fakeLibraries.js";
+import { fakeLibraries } from "../../testing/fakeLibraries.js";
 import { createLibrarySource, LIBRARIES, LIBRARY_ORDER, readLibrary } from "./libraries.js";
 import { createQueue } from "./queue.js";
 

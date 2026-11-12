@@ -1,10 +1,10 @@
 import { bookCreateSchema } from "@shelfmark/shared";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { openDb, type Db } from "../db/open.js";
-import { fakeFetch, json, recordedInternet, type FakeHandler } from "../testing/fakeFetch.js";
+import { openDb, type Db } from "../../db/open.js";
+import { fakeFetch, json, recordedInternet, type FakeHandler } from "../../testing/fakeFetch.js";
 import { createLookupCache, NOT_FOUND_TTL_MS } from "./cache.js";
 import { createGoogleBooksSource, readGoogleBooks } from "./googlebooks.js";
-import { fakeLibraries, type FixtureName } from "../testing/fakeLibraries.js";
+import { fakeLibraries, type FixtureName } from "../../testing/fakeLibraries.js";
 import { createLibrarySource, LIBRARY_ORDER } from "./libraries.js";
 import { createLookup, emptySourceDraft, mergeDrafts, text, yearOf, type SourceDraft } from "./merge.js";
 import { createOpenLibrarySource } from "./openlibrary.js";

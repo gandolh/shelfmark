@@ -3,7 +3,7 @@ import { recommendationImportSchema } from "@shelfmark/shared";
 import { afterEach, describe, expect, it } from "vitest";
 import { openDb, type Db } from "../db/open.js";
 import { fakeFetch, json } from "../testing/fakeFetch.js";
-import { createQueue, type Clock } from "../lookup/queue.js";
+import { createQueue, type Clock } from "../features/lookup/index.js";
 import { createCatalogCache } from "./cache.js";
 import { dropReason, mergeEditions, type Candidate, type Known } from "./dedup.js";
 import { createImportJob } from "./job.js";

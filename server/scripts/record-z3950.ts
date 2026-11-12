@@ -1,6 +1,6 @@
 /**
  * Records the library catalogs' Z39.50 answers as test fixtures
- * (server/src/lookup/z3950/fixtures/<name>.json): each fixture is the
+ * (server/src/features/lookup/z3950/fixtures/<name>.json): each fixture is the
  * target, the ISBNs asked, and every PDU the server sent, in base64, which
  * the fake server in testing/fakeLibraries.ts replays.
  *
@@ -14,13 +14,13 @@ import { writeFileSync } from "node:fs";
 import { connect as netConnect } from "node:net";
 import { fileURLToPath } from "node:url";
 import { to10 } from "@shelfmark/shared";
-import { decode } from "../src/lookup/z3950/ber.js";
-import { searchIsbns, type Connect, type Target } from "../src/lookup/z3950/client.js";
-import { LIBRARIES, LIBRARY_TIMEOUT_MS, readLibrary, type LibrarySource } from "../src/lookup/libraries.js";
-import { APP_VERSION } from "../src/lookup/openlibrary.js";
-import { createQueue, LIBRARY_SPACING, type Queue } from "../src/lookup/queue.js";
+import { decode } from "../src/features/lookup/z3950/ber.js";
+import { searchIsbns, type Connect, type Target } from "../src/features/lookup/z3950/client.js";
+import { LIBRARIES, LIBRARY_TIMEOUT_MS, readLibrary, type LibrarySource } from "../src/features/lookup/libraries.js";
+import { APP_VERSION } from "../src/features/lookup/openlibrary.js";
+import { createQueue, LIBRARY_SPACING, type Queue } from "../src/features/lookup/queue.js";
 
-const FIXTURES = fileURLToPath(new URL("../src/lookup/z3950/fixtures/", import.meta.url));
+const FIXTURES = fileURLToPath(new URL("../src/features/lookup/z3950/fixtures/", import.meta.url));
 
 interface Case {
   name: string;

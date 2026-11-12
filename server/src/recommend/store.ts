@@ -1,7 +1,7 @@
 import { recommendationSchema, type Recommendation, type RecommendationSource } from "@shelfmark/shared";
 import type { Db } from "../db/open.js";
 import type { Known } from "./dedup.js";
-import { array, record } from "../lookup/merge.js";
+import { array, record } from "../features/lookup/index.js";
 import { titleKey, workKeyOf } from "./keys.js";
 
 /**

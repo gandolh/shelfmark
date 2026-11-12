@@ -1,4 +1,4 @@
-import { ConfigError, loadConfig, loadEnvFile, resolveDataDir } from "../config.js";
+import { ConfigError, loadConfig, loadEnvFile, resolveDataDir } from "../../../config.js";
 import { refreshCip } from "./refresh.js";
 import { cipDatabasePath, openCipStore } from "./store.js";
 

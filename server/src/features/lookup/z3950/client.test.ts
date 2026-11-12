@@ -1,7 +1,7 @@
 import { Duplex } from "node:stream";
 import { to10 } from "@shelfmark/shared";
 import { describe, expect, it } from "vitest";
-import { fakeLibraries, fixtureAnswers } from "../../testing/fakeLibraries.js";
+import { fakeLibraries, fixtureAnswers } from "../../../testing/fakeLibraries.js";
 import { LIBRARIES } from "../libraries.js";
 import { searchIsbns, type Connect, type ExchangeOptions } from "./client.js";
 

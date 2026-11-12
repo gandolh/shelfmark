@@ -1,5 +1,5 @@
 import type { LookupSource } from "@shelfmark/shared";
-import type { Db } from "../db/open.js";
+import type { Db } from "../../db/open.js";
 
 /**
  * The lookup cache (`lookup_cache`, migration 2): each source's raw answer

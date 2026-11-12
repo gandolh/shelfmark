@@ -1,4 +1,4 @@
-import type { CipStore } from "../cip/store.js";
+import type { CipStore } from "./cip/store.js";
 import { emptySourceDraft, record, text, texts, yearOf, type LookupSourceClient, type SourceDraft } from "./merge.js";
 
 /**

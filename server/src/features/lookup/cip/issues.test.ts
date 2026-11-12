@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { createQueue } from "../lookup/queue.js";
-import { fakeFetch, json } from "../testing/fakeFetch.js";
+import { createQueue } from "../queue.js";
+import { fakeFetch, json } from "../../../testing/fakeFetch.js";
 import { issueMonth, issuesIn, listIssues } from "./issues.js";
 
 /** Eleven entries of the real media listing, 2026-10-17: issues in every spelling, and documents that aren't. */

@@ -1,13 +1,17 @@
 import { lookupRequestSchema, parseIsbn, type LookupResponse, type ParseIsbnResult } from "@shelfmark/shared";
 import type { FastifyPluginAsync } from "fastify";
-import type { FeatureContext } from "../app.js";
-import { ApiError } from "../lib/api-error.js";
-import { createLookupCache } from "../lookup/cache.js";
-import { createCipSource } from "../lookup/cip.js";
-import { createGoogleBooksSource } from "../lookup/googlebooks.js";
-import { createLibrarySource, LIBRARY_ORDER } from "../lookup/libraries.js";
-import { createLookup } from "../lookup/merge.js";
-import { createOpenLibrarySource } from "../lookup/openlibrary.js";
+import type { Config } from "../../config.js";
+import type { Db } from "../../db/open.js";
+import { ApiError } from "../../lib/api-error.js";
+import type { BookStore } from "../books/index.js";
+import { createLookupCache } from "./cache.js";
+import type { CipStore } from "./cip/store.js";
+import { createCipSource } from "./cip.js";
+import { createGoogleBooksSource } from "./googlebooks.js";
+import { createLibrarySource, LIBRARY_ORDER } from "./libraries.js";
+import { createLookup } from "./merge.js";
+import { createOpenLibrarySource } from "./openlibrary.js";
+import type { Connect } from "./z3950/client.js";
 
 const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string> = {
   length: "an ISBN has 10 or 13 digits",
@@ -15,13 +19,27 @@ const REASONS: Record<Extract<ParseIsbnResult, { ok: false }>["reason"], string>
   not_isbn: "this is not an ISBN",
 };
 
+/** What the lookup route takes from the app. */
+export interface LookupRoutesOptions {
+  config: Pick<Config, "googleBooksApiKey">;
+  db: Db;
+  /** The copies already saved with an ISBN. */
+  books: BookStore;
+  /** Every outbound request: Open Library and Google Books. Tests pass a fake. */
+  fetch: typeof globalThis.fetch;
+  /** Every outbound TCP connection: the library catalogs' Z39.50. Tests pass a fake. */
+  connect: Connect;
+  /** The CIP index, closed with the app. */
+  cip: CipStore;
+}
+
 /**
  * `POST /api/lookup { isbn }`: an ISBN to a draft, plus the copies
  * already saved with it. Nothing is saved. The sources' queues live as long as
  * the app, so every lookup and every batch shares them: the library catalogs'
  * pause between requests holds across lookups.
  */
-export const lookupRoutes: FastifyPluginAsync<FeatureContext> = async (
+export const lookupRoutes: FastifyPluginAsync<LookupRoutesOptions> = async (
   app,
   { config, db, books, fetch, connect, cip },
 ) => {

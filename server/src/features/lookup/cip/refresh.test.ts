@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { createQueue } from "../lookup/queue.js";
-import { fakeFetch, json, type FakeHandler } from "../testing/fakeFetch.js";
+import { createQueue } from "../queue.js";
+import { fakeFetch, json, type FakeHandler } from "../../../testing/fakeFetch.js";
 import { NoPdfToText, refreshCip, type Log } from "./refresh.js";
 import { openCipStore } from "./store.js";
 

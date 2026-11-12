@@ -7,7 +7,7 @@ export default {
   ignoreBinaries: ["pdftotext"],
   workspaces: {
     ".": { entry: ["docs/images/*.mjs"] },
-    server: { entry: ["src/cip/cli.ts", "scripts/*.ts"] },
+    server: { entry: ["src/features/lookup/cip/cli.ts", "scripts/*.ts"] },
     web: { entry: ["src/ocr/fixtures/record.ts"] },
   },
 };

@@ -23,10 +23,10 @@ import { readFileSync } from "node:fs";
 import { basename } from "node:path";
 import { parseIsbn, type LookupSource } from "@shelfmark/shared";
 import { loadEnvFile } from "../src/config.js";
-import { createGoogleBooksSource } from "../src/lookup/googlebooks.js";
-import { createLibrarySource, LIBRARY_ORDER } from "../src/lookup/libraries.js";
-import type { LookupSourceClient, SourceDraft } from "../src/lookup/merge.js";
-import { createOpenLibrarySource } from "../src/lookup/openlibrary.js";
+import { createGoogleBooksSource } from "../src/features/lookup/googlebooks.js";
+import { createLibrarySource, LIBRARY_ORDER } from "../src/features/lookup/libraries.js";
+import type { LookupSourceClient, SourceDraft } from "../src/features/lookup/merge.js";
+import { createOpenLibrarySource } from "../src/features/lookup/openlibrary.js";
 
 loadEnvFile();
 

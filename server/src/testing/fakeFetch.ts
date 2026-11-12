@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 /**
  * A fake `fetch` for tests, so none touches the network. It records each call
  * and answers from a handler; `recordedInternet` is a handler that answers
- * Open Library and Google Books from `lookup/fixtures/*.json` and serves the
+ * Open Library and Google Books from `features/lookup/fixtures/*.json` and serves the
  * cover hosts as they behaved on 2026-10-15 (Open Library's covers redirect
  * through archive.org).
  *
@@ -12,13 +12,13 @@ import { existsSync, readFileSync } from "node:fs";
  *     // ... fetch.calls
  */
 
-const FIXTURES = new URL("../lookup/fixtures/", import.meta.url);
+const FIXTURES = new URL("../features/lookup/fixtures/", import.meta.url);
 
 export function hasFixture(name: string): boolean {
   return existsSync(new URL(`${name}.json`, FIXTURES));
 }
 
-/** `lookup/fixtures/<name>.json`, parsed. */
+/** `features/lookup/fixtures/<name>.json`, parsed. */
 export function fixture(name: string): unknown {
   return JSON.parse(readFileSync(new URL(`${name}.json`, FIXTURES), "utf8"));
 }

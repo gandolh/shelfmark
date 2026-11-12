@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fixtureAnswers } from "../../testing/fakeLibraries.js";
+import { fixtureAnswers } from "../../../testing/fakeLibraries.js";
 import { CONTEXT, decode, readInteger, readOid, type Tlv } from "./ber.js";
 import { initRequest, presentRequest, readAnswer, searchRequest } from "./protocol.js";
 

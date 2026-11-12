@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, fixture, hang, json, recordedInternet } from "../testing/fakeFetch.js";
+import { fakeFetch, fixture, hang, json, recordedInternet } from "../../testing/fakeFetch.js";
 import { createOpenLibrarySource, languageOf, readOpenLibrary, USER_AGENT } from "./openlibrary.js";
 import { createQueue, type Clock } from "./queue.js";
 

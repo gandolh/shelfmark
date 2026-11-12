@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { openCipStore, type CipStore } from "../cip/store.js";
-import { openDb, type Db } from "../db/open.js";
-import { fakeFetch, recordedInternet } from "../testing/fakeFetch.js";
+import { openCipStore, type CipStore } from "./cip/store.js";
+import { openDb, type Db } from "../../db/open.js";
+import { fakeFetch, recordedInternet } from "../../testing/fakeFetch.js";
 import { createLookupCache } from "./cache.js";
 import { createCipSource, readCip } from "./cip.js";
 import { createGoogleBooksSource } from "./googlebooks.js";

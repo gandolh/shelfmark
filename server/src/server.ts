@@ -1,8 +1,6 @@
 import closeWithGrace from "close-with-grace";
 import { buildApp } from "./app.js";
-import { startCipJob } from "./cip/job.js";
-import { refreshCip } from "./cip/refresh.js";
-import { cipDatabasePath, openCipStore } from "./cip/store.js";
+import { startCip } from "./features/lookup/index.js";
 import { ConfigError, loadConfig, loadEnvFile, resolveDataDir, type Config } from "./config.js";
 
 // The process: settings, the app, shutdown, listen. Nothing else in the server listens.
@@ -42,19 +40,7 @@ const app = await buildApp(
 app.log.info(envFile === undefined ? "no .env: settings from the environment" : `settings from ${envFile}`);
 
 // The weekly CIP refresh, on its own connection to cip.db: lookups read the app's.
-if (config.cipRefresh) {
-  const store = openCipStore(cipDatabasePath(dataDir));
-  const log = {
-    info: (m: string) => app.log.info(m),
-    warn: (m: string) => app.log.warn(m),
-    error: (m: string) => app.log.error(m),
-  };
-  const job = startCipJob(() => refreshCip({ store, fetch: globalThis.fetch, log }), log);
-  app.addHook("onClose", async () => {
-    job.stop();
-    store.close();
-  });
-}
+startCip(app, { ...config, dataDir });
 
 // SIGINT, SIGTERM, an uncaught error: stop taking requests, finish the ones in flight, run every
 // onClose hook (the databases close there), and exit. After 10 s it exits anyway.

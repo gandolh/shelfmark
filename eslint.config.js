@@ -14,7 +14,7 @@ export default [
     // capture helper and the OCR fixture recorder.
     scripts: ["server/scripts", "docs/images", "web/src/ocr/fixtures"],
     // Allowed to print: the server entry, the seed and the CIP refresh talk to the person running them.
-    console: ["server/src/server.ts", "server/src/seed.ts", "server/src/cip/cli.ts"],
+    console: ["server/src/server.ts", "server/src/seed.ts", "server/src/features/lookup/cip/cli.ts"],
     // ScannerDemo is loaded with lazy(import()), which reads `default`.
     defaultExports: ["web/src/scanner/ScannerDemo.tsx"],
     // The Tailwind entry: the unknown-class, conflicting-class and class-order rules read its theme.

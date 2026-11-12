@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { openDb, type Db } from "../db/open.js";
+import { openDb, type Db } from "../../db/open.js";
 import { createLookupCache, NOT_FOUND_TTL_MS } from "./cache.js";
 
 let db: Db;

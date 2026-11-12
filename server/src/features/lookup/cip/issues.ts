@@ -1,6 +1,6 @@
-import { array, record } from "../lookup/merge.js";
-import { getJson, USER_AGENT } from "../lookup/openlibrary.js";
-import type { Queue } from "../lookup/queue.js";
+import { array, record } from "../merge.js";
+import { getJson, USER_AGENT } from "../openlibrary.js";
+import type { Queue } from "../queue.js";
 
 /**
  * Where the CIP lists are: the national library's site is WordPress, and its

@@ -1,8 +1,8 @@
 import { readFileSync } from "node:fs";
 import { Duplex } from "node:stream";
-import { CONTEXT, decode, type Tlv } from "../lookup/z3950/ber.js";
-import type { Connect } from "../lookup/z3950/client.js";
-import { LIBRARIES, type LibrarySource } from "../lookup/libraries.js";
+import { CONTEXT, decode, type Tlv } from "../features/lookup/z3950/ber.js";
+import type { Connect } from "../features/lookup/z3950/client.js";
+import { LIBRARIES, type LibrarySource } from "../features/lookup/libraries.js";
 
 /**
  * The library catalogs for tests, so none touches the network: a fake
@@ -39,7 +39,9 @@ export const FIXTURE_NAMES = [
 export type FixtureName = (typeof FIXTURE_NAMES)[number];
 
 export function loadFixture(name: FixtureName): Fixture {
-  return JSON.parse(readFileSync(new URL(`../lookup/z3950/fixtures/${name}.json`, import.meta.url), "utf8")) as Fixture;
+  return JSON.parse(
+    readFileSync(new URL(`../features/lookup/z3950/fixtures/${name}.json`, import.meta.url), "utf8"),
+  ) as Fixture;
 }
 
 /** The answers' bytes, decoded from base64. */

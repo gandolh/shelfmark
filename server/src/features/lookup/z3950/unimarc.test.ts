@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fixtureAnswers, type FixtureName } from "../../testing/fakeLibraries.js";
+import { fixtureAnswers, type FixtureName } from "../../../testing/fakeLibraries.js";
 import { readAnswer } from "./protocol.js";
 import { clean, parseRecord, readUnimarc, recordFor } from "./unimarc.js";
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fakeFetch, fixture, json, recordedInternet } from "../testing/fakeFetch.js";
+import { fakeFetch, fixture, json, recordedInternet } from "../../testing/fakeFetch.js";
 import { createGoogleBooksSource, readGoogleBooks } from "./googlebooks.js";
 import { createQueue } from "./queue.js";
 

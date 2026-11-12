@@ -5,9 +5,9 @@ import {
   OPEN_LIBRARY_ORIGIN,
   SOURCE_TIMEOUT_MS,
   USER_AGENT,
-} from "../lookup/openlibrary.js";
-import { array, record, text, texts, yearOf } from "../lookup/merge.js";
-import { createQueue, OPEN_LIBRARY_SPACING_MS, type Queue } from "../lookup/queue.js";
+} from "../features/lookup/index.js";
+import { array, record, text, texts, yearOf } from "../features/lookup/index.js";
+import { createQueue, OPEN_LIBRARY_SPACING_MS, type Queue } from "../features/lookup/index.js";
 import type { CatalogCache } from "./cache.js";
 import type { Candidate } from "./dedup.js";
 import { fold, surname, titleKey, workKeyOf } from "./keys.js";

@@ -4,13 +4,18 @@ import { databasePath, openDb, type Db } from "./db/open.js";
 import { auth } from "./plugins/auth/index.js";
 import { errors } from "./plugins/errors.js";
 import { jsonBodyParser } from "./plugins/json-body.js";
-import { cipDatabasePath, openCipStore, type CipStore } from "./cip/store.js";
-import { netConnection, type Connect } from "./lookup/z3950/client.js";
 import { backupRoutes } from "./features/backup/index.js";
 import { bookRoutes, createBookStore, type BookStore } from "./features/books/index.js";
 import { coverRoutes } from "./features/covers/index.js";
+import {
+  cipDatabasePath,
+  lookupRoutes,
+  netConnection,
+  openCipStore,
+  type CipStore,
+  type Connect,
+} from "./features/lookup/index.js";
 import { viewRoutes } from "./features/views/index.js";
-import { lookupRoutes } from "./routes/lookup.js";
 import { recommendationRoutes } from "./routes/recommendations.js";
 
 /** What every feature is handed. Add a field only when more than one feature needs it. */

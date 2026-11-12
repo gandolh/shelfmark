@@ -1,6 +1,6 @@
 import { COVER_MAX_BYTES, COVER_MIME_TYPES, type CoverMime, type CoverSource } from "@shelfmark/shared";
 import { ApiError } from "../../lib/api-error.js";
-import { USER_AGENT } from "../../lookup/openlibrary.js";
+import { USER_AGENT } from "../lookup/index.js";
 
 /** The image type the bytes start with; `null` for anything but JPEG, PNG or WebP. */
 export function sniffImage(bytes: Uint8Array): CoverMime | null {
