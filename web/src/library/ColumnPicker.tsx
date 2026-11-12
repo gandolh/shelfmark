@@ -105,20 +105,30 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
   };
 
   return (
-    <div className="library-panel__content">
+    <div className="flex flex-[1_1_auto] flex-col min-h-0">
       <PanelHeader title="Columns" back={back} onDone={onClose} />
-      <div ref={list} className="library-panel__scroll" data-panel-scroll>
-        <section className="library-panel__section" aria-label="Shown">
-          <h3 className="library-panel__label" aria-hidden="true">
+      <div
+        ref={list}
+        className="flex-[1_1_auto] min-h-0 pt-0.5 pr-1.5 pb-2.5 pl-1.5 overflow-y-auto [overscroll-behavior:contain]"
+        data-panel-scroll
+      >
+        <section className="[&+&]:mt-2.5" aria-label="Shown">
+          <h3
+            className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight"
+            aria-hidden="true"
+          >
             Shown, in order
           </h3>
-          <ul className="library-picker" role="list">
+          <ul className="list-none" role="list">
             {shown.map((id, index) => {
               const column = columnById(id);
               const locked = id === BOOK_COLUMN_ID;
               return (
-                <li key={id} className="library-picker__row">
-                  <label className="library-picker__check">
+                <li
+                  key={id}
+                  className="flex items-center gap-2 min-h-9 pr-1 pl-2.5 rounded-menu-item hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+                >
+                  <label className="[&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent flex flex-[1_1_auto] items-center gap-2.5 min-w-0 min-h-9 text-meta cursor-pointer [&:has(input:disabled)]:cursor-default max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
                     <input
                       type="checkbox"
                       checked
@@ -130,12 +140,12 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
                     <span>{locked ? "Book (cover, title and author)" : column.label}</span>
                   </label>
                   {locked ? (
-                    <span className="library-picker__note">Always first</span>
+                    <span className="pr-1.5 text-muted text-small whitespace-nowrap">Always first</span>
                   ) : (
-                    <span className="library-picker__moves">
+                    <span className="flex gap-0.5">
                       <button
                         type="button"
-                        className="library-icon-button"
+                        className="relative flex items-center justify-center w-7 h-7 rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:opacity-30 disabled:bg-none max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:w-9 max-md:h-9"
                         aria-label={`Move ${column.label} up`}
                         disabled={index <= 1}
                         data-focus-key={`up:${id}`}
@@ -145,7 +155,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
                       </button>
                       <button
                         type="button"
-                        className="library-icon-button"
+                        className="relative flex items-center justify-center w-7 h-7 rounded-control text-ink-2 transition-[background-color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink disabled:opacity-30 disabled:bg-none max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)] max-md:w-9 max-md:h-9"
                         aria-label={`Move ${column.label} down`}
                         disabled={index === shown.length - 1}
                         data-focus-key={`down:${id}`}
@@ -161,14 +171,20 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
           </ul>
         </section>
         {hidden.length > 0 && (
-          <section className="library-panel__section" aria-label="Hidden">
-            <h3 className="library-panel__label" aria-hidden="true">
+          <section className="[&+&]:mt-2.5" aria-label="Hidden">
+            <h3
+              className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight"
+              aria-hidden="true"
+            >
               Hidden
             </h3>
-            <ul className="library-picker" role="list">
+            <ul className="list-none" role="list">
               {hidden.map((column) => (
-                <li key={column.id} className="library-picker__row">
-                  <label className="library-picker__check">
+                <li
+                  key={column.id}
+                  className="flex items-center gap-2 min-h-9 pr-1 pl-2.5 rounded-menu-item hover:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+                >
+                  <label className="[&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent flex flex-[1_1_auto] items-center gap-2.5 min-w-0 min-h-9 text-meta cursor-pointer [&:has(input:disabled)]:cursor-default max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
                     <input
                       type="checkbox"
                       checked={false}
@@ -183,7 +199,7 @@ export function ColumnPicker({ layout, collection, back, onClose }: ColumnPicker
           </section>
         )}
       </div>
-      <div className="library-panel__foot">
+      <div className="flex flex-none py-1 px-2.5 border-t border-divider">
         <button
           type="button"
           className={buttonClass({ variant: "quiet", size: "compact" })}

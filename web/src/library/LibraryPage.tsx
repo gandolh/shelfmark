@@ -50,7 +50,6 @@ import {
 import { Toolbar } from "./Toolbar";
 import { useLibraryView } from "./view";
 import { ViewsMenu } from "./ViewsMenu";
-import "./library.css";
 
 /**
  * The open panel, the control it hangs from, and which of that control's
@@ -228,7 +227,7 @@ export function LibraryPage() {
     >
       {/* The phone's toolbar has no room for Views: it gets a row of its own (desktop: Toolbar). */}
       {ready && !desktop && view.counts.owned > 0 && (
-        <div className="library-tabs-row">
+        <div className="flex items-baseline justify-between gap-3 mb-3.5 border-b border-hairline">
           <ViewsMenu layout={layout} mode={mode} align="end" />
         </div>
       )}
@@ -238,7 +237,7 @@ export function LibraryPage() {
       </span>
       {/* It stays when the change took the books off the page (a status filter, say), so the owner sees why they went. */}
       {shownNotice?.visible && (
-        <p className="library-notice" aria-hidden="true">
+        <p className="-mt-1 mb-3.5 text-ink-2 text-meta leading-body" aria-hidden="true">
           {shownNotice.text}
         </p>
       )}
@@ -395,13 +394,16 @@ function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBa
             onClear,
           ];
   return (
-    <div className="library-selectline">
-      <span className="library-selectline__text" role="status">
+    <div className="flex flex-wrap items-center justify-center gap-y-0 gap-x-1.5 mb-3 py-1 px-3.5 rounded-control bg-accent-tint-soft text-ink-2 text-meta text-center max-md:py-0 max-md:text-body">
+      <span className="empty:hidden max-md:pt-2.5" role="status">
         {text}
       </span>
       <button
         type="button"
-        className={buttonClass({ variant: "quiet", size: "regular" }, "library-selectline__action")}
+        className={buttonClass(
+          { variant: "quiet", size: "regular" },
+          "min-h-7.5 text-meta font-semibold max-md:min-h-touch max-md:text-body",
+        )}
         onClick={onClick}
       >
         {action}

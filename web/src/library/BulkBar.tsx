@@ -97,7 +97,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
   const noTags = tagsOnSelected.length === 0;
 
   const count = (
-    <p className="library-bulk__count">
+    <p className="mr-1 text-ink text-meta font-semibold whitespace-nowrap max-md:text-body">
       <span className="tabular-nums">{summary.count.toLocaleString("en-GB")}</span> selected
     </p>
   );
@@ -148,7 +148,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
     bar = (
       <>
         {count}
-        <div className="library-toolbar__end">
+        <div className="flex items-center gap-0.5 -mr-1">
           <Menu
             label={`Change ${bookCount(summary.count)}`}
             sections={sections}

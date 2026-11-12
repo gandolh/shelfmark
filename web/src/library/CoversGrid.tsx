@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import type { Book } from "@shelfmark/shared";
 import { useWindowVirtualizer } from "@tanstack/react-virtual";
 import {
@@ -65,6 +66,15 @@ export interface CoversGridProps {
   /** A tap while selecting: tick or untick this book. */
   onToggle: (book: Book) => void;
 }
+
+// A cover cell: a link, or a button while books are selected. A long press selects: no link callout, no text
+// selection. The cover (its first child) lifts under a pointer that hovers, and is ringed in the accent once ticked.
+const COVER = [
+  "relative flex w-full min-w-0 flex-col rounded-cover text-start text-ink no-underline select-none [-webkit-touch-callout:none] hover:text-ink focus-visible:outline-offset-4",
+  "[&>:first-child]:mb-2 [&>:first-child]:transition-[transform] [&>:first-child]:duration-(--duration) [&>:first-child]:ease-out",
+  "hover:[&>:first-child]:[transform:translateY(-3px)]",
+  "data-selected:[&>:first-child]:outline-3 data-selected:[&>:first-child]:outline-offset-2 data-selected:[&>:first-child]:outline-accent",
+].join(" ");
 
 export function CoversGrid({
   rows,
@@ -217,13 +227,7 @@ export function CoversGrid({
   };
 
   return (
-    <div
-      ref={grid}
-      className={`library-covers library-covers--${layout}`}
-      role="list"
-      aria-label="Books"
-      style={{ height: virtualizer.getTotalSize() }}
-    >
+    <div ref={grid} className="relative" role="list" aria-label="Books" style={{ height: virtualizer.getTotalSize() }}>
       {items.map((item) => {
         const start = item.index * columns;
         const slice = rows.slice(start, start + columns);
@@ -233,7 +237,7 @@ export function CoversGrid({
             role="none"
             data-index={item.index}
             ref={virtualizer.measureElement}
-            className="library-covers__row"
+            className="absolute top-0 left-0 grid items-start w-full"
             style={{
               transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)`,
               gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
@@ -246,7 +250,7 @@ export function CoversGrid({
               const author = authorLine(book.authors);
               const selected = isSelected(selection, book);
               const shared = {
-                className: "library-cover",
+                className: cn(COVER, selecting && "cursor-pointer"),
                 "data-book-index": index,
                 "data-selected": selected ? "" : undefined,
                 tabIndex: index === tabbable ? 0 : -1,
@@ -267,12 +271,35 @@ export function CoversGrid({
                 <>
                   <CoverImage book={book} />
                   {selecting && (
-                    <span className="library-cover__check" aria-hidden="true">
+                    <span
+                      // An open ring, or the accent disc with a white check once ticked.
+                      className={cn(
+                        "absolute top-1.5 right-1.5 grid size-6 place-items-center rounded-pill text-on-accent",
+                        selected ? "bg-accent" : "bg-surface/88 shadow-[inset_0_0_0_1.5px_var(--color-ink-2)]",
+                      )}
+                      aria-hidden="true"
+                    >
                       {selected && <CheckIcon size={16} />}
                     </span>
                   )}
-                  <span className="library-cover__title">{book.title}</span>
-                  {author && <span className="library-cover__author">{author}</span>}
+                  <span
+                    className={cn(
+                      "line-clamp-2 overflow-hidden text-small leading-tight font-semibold wrap-anywhere",
+                      layout === "desktop" && "text-meta",
+                    )}
+                  >
+                    {book.title}
+                  </span>
+                  {author && (
+                    <span
+                      className={cn(
+                        "mt-0.5 overflow-hidden text-label leading-phone text-ellipsis whitespace-nowrap text-muted",
+                        layout === "desktop" && "text-small",
+                      )}
+                    >
+                      {author}
+                    </span>
+                  )}
                 </>
               );
               return (

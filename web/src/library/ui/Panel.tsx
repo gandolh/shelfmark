@@ -64,14 +64,14 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
   const initialFocus = () => popupRef.current?.querySelector<HTMLElement>("[data-autofocus]") ?? true;
   // Back to what asked for it, or the fallback when that is gone.
   const finalFocus = () => (anchor.isConnected ? anchor : fallback?.()) ?? true;
-  const frame = <div className="library-panel__frame">{children}</div>;
+  const frame = <div className="flex flex-[1_1_auto] flex-col min-h-0">{children}</div>;
 
   if (desktop) {
     return (
       <Popover.Root open modal onOpenChange={onOpenChange}>
         <Popover.Portal>
           <Popover.Positioner
-            className="library-panel-positioner"
+            className="z-float"
             anchor={placedBy}
             side="bottom"
             align={align}
@@ -82,7 +82,7 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
           >
             <Popover.Popup
               ref={popupRef}
-              className="library-panel library-panel--anchored"
+              className="flex flex-col overflow-hidden bg-surface shadow-float text-ink outline-none w-81 max-w-[calc(100vw_-_16px)] max-h-(--available-height) rounded-menu motion-safe:animate-panel-in"
               initialFocus={initialFocus}
               finalFocus={finalFocus}
             >
@@ -96,10 +96,10 @@ export function Panel({ anchor, fallback, desktop, align = "start", onClose, chi
   return (
     <Dialog.Root open onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="library-panel-backdrop" />
+        <Dialog.Backdrop className="fixed inset-0 z-float bg-ink/32" />
         <Dialog.Popup
           ref={popupRef}
-          className="library-panel library-panel--sheet"
+          className="flex flex-col overflow-hidden bg-surface shadow-float text-ink outline-none fixed top-auto right-2 bottom-[max(8px,env(safe-area-inset-bottom))] left-2 z-float w-auto max-h-[min(86dvh,680px)] rounded-sheet motion-safe:animate-sheet-in"
           initialFocus={initialFocus}
           finalFocus={finalFocus}
         >
@@ -123,28 +123,37 @@ export function PanelHeader({ title, back, onDone }: PanelHeaderProps) {
   const done = (
     <button
       type="button"
-      className={buttonClass({ variant: "quiet", size: "compact" }, "library-panel__done")}
+      className={buttonClass({ variant: "quiet", size: "compact" }, "font-semibold")}
       onClick={onDone}
     >
       Done
     </button>
   );
   return (
-    <div className="library-panel__head">
-      <div className="library-panel__start">
+    <div className="grid flex-none grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 min-h-11.5 pt-1.5 pr-2 pb-0.5 pl-2">
+      <div className="justify-self-start min-w-0">
         {back && (
-          <button type="button" className="library-panel__back" data-panel-back onClick={back.onClick}>
+          <button
+            type="button"
+            className="inline-flex items-center gap-0.5 min-h-control pr-2 rounded-control text-accent text-body hover:text-accent-press max-md:min-h-touch"
+            data-panel-back
+            onClick={back.onClick}
+          >
             <BackIcon size={18} />
             {back.label}
           </button>
         )}
       </div>
       {host === "popover" ? (
-        <Popover.Title className="library-panel__title">{title}</Popover.Title>
+        <Popover.Title className="overflow-hidden text-body font-semibold text-center text-ellipsis whitespace-nowrap">
+          {title}
+        </Popover.Title>
       ) : (
-        <Dialog.Title className="library-panel__title">{title}</Dialog.Title>
+        <Dialog.Title className="overflow-hidden text-body font-semibold text-center text-ellipsis whitespace-nowrap">
+          {title}
+        </Dialog.Title>
       )}
-      <div className="library-panel__end">{host === "popover" ? <Popover.Close render={done} /> : done}</div>
+      <div className="justify-self-end">{host === "popover" ? <Popover.Close render={done} /> : done}</div>
     </div>
   );
 }

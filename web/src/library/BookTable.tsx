@@ -73,7 +73,7 @@ const helper = createColumnHelper<typeof features, Book>();
 
 /** 12 + the 69 px cover + 12, and the divider over it. */
 export const ROW_HEIGHT = 94;
-/** The select boxes' track: the table's edge padding and the box (library.css, `.library-tick`). */
+/** The select boxes' track: the table's edge padding and the box (the select cell). */
 const SELECT_WIDTH = { desktop: 48, phone: 44 } as const;
 const MAX_WIDTH = 1200;
 const EMPTY: Book[] = [];
@@ -117,10 +117,27 @@ const RowNavContext = createContext<RowNav>({
   onToggle: () => {},
 });
 
+const STATUS: Record<Book["status"], string> = {
+  reading: "font-semibold text-accent",
+  read: "text-ink-2",
+  unread: "text-muted",
+  abandoned: "text-muted",
+};
+
+// A cell: the text in ink-2, one line cut short with an ellipsis. The first and last cell of a row carry the
+// table's edge padding (`EDGES`, on the row).
+const CELL =
+  "flex min-w-0 items-center overflow-hidden px-3 text-meta leading-tight text-ink-2 [&>span]:overflow-hidden [&>span]:text-ellipsis [&>span]:whitespace-nowrap";
+const EDGES = "[&>:first-child]:pl-6 [&>:last-child]:pr-6 max-md:[&>:first-child]:pl-4 max-md:[&>:last-child]:pr-4";
+// A body row is placed by the virtualizer (its transform); 94 px is ROW_HEIGHT. The row carries the keyboard ring of
+// its title link, and a selected row wears the selected menu row's wash, hovered or not.
+const ROW =
+  "absolute top-0 left-0 grid h-23.5 w-[max(100%,var(--library-width))] cursor-pointer grid-cols-[var(--library-columns)] border-t border-divider transition-[background-color] duration-(--duration-fast) ease-out hover:bg-(--library-row-hover) data-[index=0]:border-t-transparent data-selected:bg-accent-tint-soft has-[a:focus-visible]:bg-(--library-row-hover) has-[a:focus-visible]:outline-2 has-[a:focus-visible]:-outline-offset-2 has-[a:focus-visible]:outline-focus-ring";
+
 function Cell({ column, book, index }: { column: LibraryColumn; book: Book; index: number }) {
   if (column.id === BOOK_COLUMN_ID) return <BookCell book={book} index={index} />;
   const text = column.text(book);
-  if (column.id === "status") return <span className={`library-status library-status--${book.status}`}>{text}</span>;
+  if (column.id === "status") return <span className={STATUS[book.status]}>{text}</span>;
   // Long text gets the whole of it on hover.
   return <span title={text.length > 24 ? text : undefined}>{text}</span>;
 }
@@ -129,12 +146,12 @@ function BookCell({ book, index }: { book: Book; index: number }) {
   const nav = useContext(RowNavContext);
   const author = authorLine(book.authors);
   return (
-    <div className="library-book">
+    <div className="flex items-center gap-3 min-w-0">
       <CoverImage book={book} width={46} />
-      <div className="library-book__text">
+      <div className="flex flex-col gap-0.5 min-w-0">
         <Link
           to={bookRoute(book.id)}
-          className="library-book__title"
+          className="[display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden text-ink text-row-title font-semibold leading-tight no-underline wrap-anywhere hover:text-ink focus-visible:outline-none"
           tabIndex={nav.tabbable === index ? 0 : -1}
           onFocus={() => nav.onFocus(index)}
           onKeyDown={(event) => nav.onKeyDown(event, index, "title")}
@@ -142,7 +159,9 @@ function BookCell({ book, index }: { book: Book; index: number }) {
         >
           {book.title}
         </Link>
-        {author && <span className="library-book__author">{author}</span>}
+        {author && (
+          <span className="overflow-hidden text-muted text-meta text-ellipsis whitespace-nowrap">{author}</span>
+        )}
       </div>
     </div>
   );
@@ -152,8 +171,8 @@ function BookCell({ book, index }: { book: Book; index: number }) {
 function SelectCell({ book, index, selected }: { book: Book; index: number; selected: boolean }) {
   const nav = useContext(RowNavContext);
   return (
-    <div role="cell" className="library-table__cell library-table__cell--select">
-      <label className="library-tick">
+    <div role="cell" className={cn(CELL, "relative")}>
+      <label className="absolute inset-0 flex items-center pl-6 cursor-pointer [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent [&_input]:cursor-pointer max-md:pl-4 max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
         <input
           type="checkbox"
           checked={selected}
@@ -181,8 +200,8 @@ function SelectAllCell({ rows, everything, selection, onToggle }: SelectAllCellP
       ? "the 1 book on this page"
       : `the ${rows.length.toLocaleString("en-GB")} books on this page`;
   return (
-    <div role="columnheader" className="library-table__cell library-table__cell--select">
-      <label className="library-tick">
+    <div role="columnheader" className={cn(CELL, "relative")}>
+      <label className="absolute inset-0 flex items-center pl-6 cursor-pointer [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent [&_input]:cursor-pointer max-md:pl-4 max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
         <input
           ref={box}
           type="checkbox"
@@ -431,16 +450,28 @@ export function BookTable({
     <RowNavContext.Provider value={nav}>
       <div
         ref={root}
-        className="library-table"
+        className="[--library-sticky-top:0px] [--library-row-hover:color-mix(in_srgb,var(--color-surface)_55%,var(--color-ground))] relative overflow-clip rounded-container bg-surface md:[--library-sticky-top:var(--spacing-topbar)]"
         role="table"
         aria-label="Books"
         aria-rowcount={total + 1}
         aria-colcount={headers.length + 1}
         style={style}
       >
-        <div ref={head} className="library-table__head">
+        <div
+          ref={head}
+          className="sticky top-(--library-sticky-top) z-2 overflow-hidden border-b border-divider bg-surface"
+        >
           <div role="rowgroup">
-            <div role="row" aria-rowindex={1} className="library-table__row library-table__row--head">
+            <div
+              role="row"
+              aria-rowindex={1}
+              className={cn(
+                "group/head grid w-[max(100%,var(--library-width))] grid-cols-[var(--library-columns)]",
+                EDGES,
+                // Header cells: 12 px labels that sort, and a handle on the right edge that resizes.
+                "[&>*]:relative [&>*]:overflow-visible [&>*]:pt-3.5 [&>*]:pb-2.5 [&>*]:text-label [&>*]:font-semibold [&>*]:text-muted",
+              )}
+            >
               <SelectAllCell rows={rows} everything={everything} selection={selection} onToggle={onToggleAll} />
               {headers.map((header) => (
                 <HeaderCell key={header.id} header={header} sorting={sorting} onSort={onSort} onResize={onResize} />
@@ -448,8 +479,15 @@ export function BookTable({
             </div>
           </div>
         </div>
-        <div ref={body} className="library-table__body">
-          <div role="rowgroup" className="library-table__rows" style={{ height: virtualizer.getTotalSize() }}>
+        <div
+          ref={body}
+          className="overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          <div
+            role="rowgroup"
+            className="relative w-[max(100%,var(--library-width))]"
+            style={{ height: virtualizer.getTotalSize() }}
+          >
             {items.map((item) => {
               const row = tableRows[item.index];
               if (!row) return null;
@@ -461,7 +499,7 @@ export function BookTable({
                   aria-rowindex={pageStart + item.index + 2}
                   data-index={item.index}
                   data-selected={selected ? "" : undefined}
-                  className="library-table__row"
+                  className={cn(ROW, EDGES)}
                   style={{ transform: `translateY(${item.start - virtualizer.options.scrollMargin}px)` }}
                   onClick={(event) => onRowClick(event, row.original)}
                 >
@@ -477,7 +515,11 @@ export function BookTable({
           </div>
         </div>
         {desktop && geometry.overflows && (
-          <div ref={bar} className="library-table__bar" aria-hidden="true">
+          <div
+            ref={bar}
+            className="sticky bottom-0 z-2 overflow-x-auto overflow-y-hidden border-t border-divider bg-surface [&>div]:h-px"
+            aria-hidden="true"
+          >
             <div style={{ width: totalWidth }} />
           </div>
         )}
@@ -488,9 +530,11 @@ export function BookTable({
 
 function cellClass(column: LibraryColumn): string {
   return cn(
-    "library-table__cell",
-    `library-table__cell--${column.id}`,
-    column.align === "end" ? "library-table__cell--end" : null,
+    CELL,
+    column.id === "book" && "py-3",
+    column.id === "shelf" && "text-ink",
+    (column.id === "added" || column.id === "changed") && "text-muted",
+    column.align === "end" && "justify-end text-right tabular-nums",
   );
 }
 
@@ -522,7 +566,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
     >
       <button
         type="button"
-        className="library-table__sort"
+        className="inline-flex items-center gap-1 min-w-0 max-w-[calc(100%_+_12px)] -my-1 -mx-1.5 py-1 px-1.5 rounded-segment text-inherit whitespace-nowrap transition-[color] duration-(--duration-fast) ease-out hover:text-ink data-sorted:text-ink"
         data-sorted={key ? "" : undefined}
         onClick={(event) => onSort(column.id, event.shiftKey)}
         onKeyDown={(event) => {
@@ -533,10 +577,10 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
           }
         }}
       >
-        <span className="library-table__label">{column.header}</span>
-        {key && <SortIcon desc={key.desc} size={12} className="library-table__arrow" />}
+        <span className="overflow-hidden text-ellipsis">{column.header}</span>
+        {key && <SortIcon desc={key.desc} size={12} className="flex-none text-accent" />}
         {key && sorting.length > 1 && (
-          <span className="library-table__rank tabular-nums" aria-hidden="true">
+          <span className="tabular-nums text-accent text-tab" aria-hidden="true">
             {rank + 1}
           </span>
         )}
@@ -550,7 +594,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
         aria-valuemin={column.minSize}
         aria-valuemax={MAX_WIDTH}
         tabIndex={0}
-        className="library-table__resize"
+        className="absolute top-0 -right-1.5 bottom-0 z-1 w-3 cursor-col-resize touch-none after:content-[''] after:absolute after:top-2.5 after:bottom-2 after:left-1.25 after:w-0.5 after:rounded-pill after:bg-transparent after:transition-[background-color] after:duration-(--duration-fast) after:ease-out group-hover/head:after:bg-divider hover:after:bg-accent focus-visible:after:bg-accent data-resizing:after:bg-accent focus-visible:outline-none"
         data-resizing={header.column.getIsResizing() ? "" : undefined}
         onMouseDown={resizeHandler}
         onTouchStart={resizeHandler}

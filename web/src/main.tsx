@@ -1,9 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-// The one stylesheet (Tailwind and the tokens), then the sheets not yet moved.
+// The one stylesheet: Tailwind, the tokens and the page's defaults.
 import "./styles/index.css";
-import "./styles/tokens.css";
 
 import { App } from "./App";
 import { armFeedback } from "./scanner/feedback";

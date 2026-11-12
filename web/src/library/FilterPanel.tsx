@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import { buttonClass } from "../components/Button";
 import type { Book, Collection } from "@shelfmark/shared";
 import { useId, useLayoutEffect, useMemo, useRef, useState, type ChangeEvent } from "react";
@@ -123,9 +124,12 @@ export function FilterPanel({
       setColumnId(null);
     };
     return (
-      <div ref={body} className="library-panel__content">
+      <div ref={body} className="flex flex-[1_1_auto] flex-col min-h-0">
         <PanelHeader title={column.label} back={{ label: "Filters", onClick: back }} onDone={onClose} />
-        <div className="library-panel__scroll" data-panel-scroll>
+        <div
+          className="flex-[1_1_auto] min-h-0 pt-0.5 pr-1.5 pb-2.5 pl-1.5 overflow-y-auto [overscroll-behavior:contain]"
+          data-panel-scroll
+        >
           <FilterEditor
             key={`${columnId}:${fresh}`}
             column={column}
@@ -137,7 +141,7 @@ export function FilterPanel({
           />
         </div>
         {active && (
-          <div className="library-panel__foot">
+          <div className="flex flex-none py-1 px-2.5 border-t border-divider">
             <button
               type="button"
               className={buttonClass({ variant: "quiet", size: "compact" })}
@@ -163,36 +167,46 @@ export function FilterPanel({
   }
 
   return (
-    <div ref={body} className="library-panel__content">
+    <div ref={body} className="flex flex-[1_1_auto] flex-col min-h-0">
       <PanelHeader title={title} onDone={onClose} />
-      <div className="library-panel__scroll" data-panel-scroll>
+      <div
+        className="flex-[1_1_auto] min-h-0 pt-0.5 pr-1.5 pb-2.5 pl-1.5 overflow-y-auto [overscroll-behavior:contain]"
+        data-panel-scroll
+      >
         {withSort && (
           <SortSection columns={sortable} sorting={sorting} onChange={onSortingChange} takeFocus={!columnsFirst} />
         )}
         {onColumns && (
-          <section className="library-panel__section" aria-label="Table">
-            <h3 className="library-panel__label" aria-hidden="true">
+          <section className="[&+&]:mt-2.5" aria-label="Table">
+            <h3
+              className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight"
+              aria-hidden="true"
+            >
               Table
             </h3>
-            <ul className="library-columns" role="list">
+            <ul className="list-none" role="list">
               <li>
                 <button
                   ref={columnsRow}
                   type="button"
-                  className="library-columns__item"
+                  className="flex items-center gap-2.5 w-full min-h-9 pr-1.5 pl-2.5 rounded-menu-item text-ink text-meta text-left hover:bg-accent-tint-soft focus-visible:bg-accent-tint-soft focus-visible:outline-offset-[-2px] max-md:min-h-touch max-md:text-body"
                   onClick={onColumns}
                   data-autofocus={columnsFirst ? "" : undefined}
                 >
-                  <span className="library-columns__label">Columns</span>
-                  <ChevronIcon size={16} className="library-columns__chevron" />
+                  <span className="flex-none">Columns</span>
+                  <ChevronIcon size={16} className="flex-none ml-auto text-muted" />
                 </button>
               </li>
             </ul>
           </section>
         )}
-        <section className="library-panel__section" aria-label="Filter by">
-          {withSort && <h3 className="library-panel__label">Filter by</h3>}
-          <ul className="library-columns" role="list">
+        <section className="[&+&]:mt-2.5" aria-label="Filter by">
+          {withSort && (
+            <h3 className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight">
+              Filter by
+            </h3>
+          )}
+          <ul className="list-none" role="list">
             {list.map((column, index) => {
               const filter = filters[column.id];
               const summary = isActive(filter) ? filterSummary(column, filter) : null;
@@ -201,13 +215,17 @@ export function FilterPanel({
                 <li key={column.id}>
                   <button
                     type="button"
-                    className="library-columns__item"
+                    className="flex items-center gap-2.5 w-full min-h-9 pr-1.5 pl-2.5 rounded-menu-item text-ink text-meta text-left hover:bg-accent-tint-soft focus-visible:bg-accent-tint-soft focus-visible:outline-offset-[-2px] max-md:min-h-touch max-md:text-body"
                     onClick={() => setColumnId(column.id)}
                     data-autofocus={focusHere ? "" : undefined}
                   >
-                    <span className="library-columns__label">{column.label}</span>
-                    {summary && <span className="library-columns__summary">{summary}</span>}
-                    <ChevronIcon size={16} className="library-columns__chevron" />
+                    <span className="flex-none">{column.label}</span>
+                    {summary && (
+                      <span className="min-w-0 ml-auto overflow-hidden text-accent text-small font-semibold text-ellipsis whitespace-nowrap">
+                        {summary}
+                      </span>
+                    )}
+                    <ChevronIcon size={16} className={cn("flex-none text-muted", summary === null && "ml-auto")} />
                   </button>
                 </li>
               );
@@ -238,14 +256,14 @@ function SortSection({ columns, sorting, onChange, takeFocus }: SortSectionProps
   const rest = sorting.slice(1).map((key) => columnById(key.id).label.toLowerCase());
 
   return (
-    <section className="library-panel__section" aria-labelledby={id}>
-      <h3 id={id} className="library-panel__label">
+    <section className="[&+&]:mt-2.5" aria-labelledby={id}>
+      <h3 id={id} className="block pt-2 pr-2.5 pb-1 pl-2.5 text-muted text-label font-semibold leading-tight">
         Sort by
       </h3>
-      <div className="library-sort">
-        <span className="library-select">
+      <div className="flex flex-wrap items-center gap-2 pt-0.5 pr-2.5 pb-1 pl-2.5">
+        <span className="relative flex flex-[1_1_150px] min-w-0">
           <select
-            className="library-select__input"
+            className="w-full min-h-segment-small pr-7.5 pl-2.5 rounded-control bg-control text-ink text-small appearance-none hover:bg-control-hover max-md:min-h-touch max-md:text-input-phone"
             aria-label="Sort by"
             value={lead.id}
             data-autofocus={takeFocus ? "" : undefined}
@@ -260,7 +278,10 @@ function SortSection({ columns, sorting, onChange, takeFocus }: SortSectionProps
               </option>
             ))}
           </select>
-          <ChevronDownIcon size={16} className="library-select__chevron" />
+          <ChevronDownIcon
+            size={16}
+            className="absolute top-[50%] right-2.25 text-ink-2 pointer-events-none [transform:translateY(-50%)]"
+          />
         </span>
         <SegmentedControl
           label="Direction"
@@ -273,7 +294,9 @@ function SortSection({ columns, sorting, onChange, takeFocus }: SortSectionProps
           onChange={(direction) => onChange([{ id: lead.id, desc: direction === "desc" }, ...sorting.slice(1)])}
         />
       </div>
-      {rest.length > 0 && <p className="library-panel__note">Then by {rest.join(", then ")}.</p>}
+      {rest.length > 0 && (
+        <p className="py-1 px-2.5 text-muted text-small leading-tight">Then by {rest.join(", then ")}.</p>
+      )}
     </section>
   );
 }
@@ -321,17 +344,18 @@ function TextEditor({ column, filter, onChange }: EditorProps) {
   };
 
   return (
-    <div className="library-editor">
+    <div className="flex flex-col items-stretch gap-2.5 py-1 px-2.5">
       <SegmentedControl
         label={`${column.label} filter`}
         size="small"
+        className="self-start"
         options={TEXT_OPS}
         value={op}
         onChange={(value) => update({ kind: "text", op: value, text })}
       />
       {op === "contains" && (
         <input
-          className="library-field"
+          className="w-full min-h-control px-2.5 rounded-control bg-field text-ink text-meta appearance-none focus-visible:outline-offset-[0] [&[type=date]]:pr-1.5 [&::-webkit-calendar-picker-indicator]:opacity-60 max-md:min-h-touch max-md:text-input-phone"
           type="text"
           aria-label={`${column.label} contains`}
           placeholder={`Part of the ${column.label.toLowerCase()}`}
@@ -365,14 +389,16 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
   };
 
   if (options.length === 0) {
-    return <p className="library-panel__note">No book has a {column.label.toLowerCase()} yet.</p>;
+    return (
+      <p className="py-1 px-2.5 text-muted text-small leading-tight">No book has a {column.label.toLowerCase()} yet.</p>
+    );
   }
 
   return (
-    <div className="library-editor">
+    <div className="flex flex-col items-stretch gap-2.5 py-1 px-2.5">
       {options.length > 8 && (
         <input
-          className="library-field"
+          className="w-full min-h-control px-2.5 rounded-control bg-field text-ink text-meta appearance-none focus-visible:outline-offset-[0] [&[type=date]]:pr-1.5 [&::-webkit-calendar-picker-indicator]:opacity-60 max-md:min-h-touch max-md:text-input-phone"
           type="search"
           aria-label={`Find a ${column.label.toLowerCase()} value`}
           placeholder={`Find ${column.label === "Tags" ? "a tag" : `a ${column.label.toLowerCase()}`}`}
@@ -383,10 +409,13 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
           onChange={(event) => setFind(event.target.value)}
         />
       )}
-      <fieldset className="library-options">
+      <fieldset className="min-w-0 -mx-2.5">
         <legend className="sr-only">{column.label}</legend>
         {shown.map((option, index) => (
-          <label key={option.value || NO_VALUE} className="library-option">
+          <label
+            key={option.value || NO_VALUE}
+            className="flex items-center gap-2.5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta cursor-pointer hover:bg-accent-tint-soft [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5"
+          >
             <input
               type="checkbox"
               checked={chosen.has(option.value)}
@@ -396,16 +425,18 @@ function PickEditor({ column, filter, books, filters, query, onChange }: EditorP
             <span
               className={
                 option.value === NO_VALUE
-                  ? "library-option__label library-option__label--none"
-                  : "library-option__label"
+                  ? "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-ink-2"
+                  : "min-w-0 overflow-hidden text-ellipsis whitespace-nowrap"
               }
             >
               {option.label}
             </span>
-            <span className="library-option__count tabular-nums">{option.count}</span>
+            <span className="tabular-nums ml-auto pl-2 text-muted text-small">{option.count}</span>
           </label>
         ))}
-        {shown.length === 0 && <p className="library-panel__note">Nothing called “{find.trim()}”.</p>}
+        {shown.length === 0 && (
+          <p className="py-1 px-2.5 text-muted text-small leading-tight">Nothing called “{find.trim()}”.</p>
+        )}
       </fieldset>
     </div>
   );
@@ -467,15 +498,15 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
     isDate || value === undefined ? undefined : toField(column, value);
 
   return (
-    <div className="library-editor">
-      <div className="library-range">
-        <div className="library-range__field">
-          <label htmlFor={lowId} className="library-panel__label">
+    <div className="flex flex-col items-stretch gap-2.5 py-1 px-2.5">
+      <div className="grid grid-cols-[1fr_1fr] gap-2.5">
+        <div className="flex flex-col min-w-0">
+          <label htmlFor={lowId} className="block px-0 pt-0 pb-1 text-muted text-label font-semibold leading-tight">
             From
           </label>
           <input
             id={lowId}
-            className="library-field tabular-nums"
+            className="tabular-nums w-full min-h-control px-2.5 rounded-control bg-field text-ink text-meta appearance-none focus-visible:outline-offset-[0] [&[type=date]]:pr-1.5 [&::-webkit-calendar-picker-indicator]:opacity-60 max-md:min-h-touch max-md:text-input-phone"
             autoComplete="off"
             placeholder={placeholder(range?.min)}
             value={low}
@@ -487,13 +518,13 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
             {...fieldProps}
           />
         </div>
-        <div className="library-range__field">
-          <label htmlFor={highId} className="library-panel__label">
+        <div className="flex flex-col min-w-0">
+          <label htmlFor={highId} className="block px-0 pt-0 pb-1 text-muted text-label font-semibold leading-tight">
             To
           </label>
           <input
             id={highId}
-            className="library-field tabular-nums"
+            className="tabular-nums w-full min-h-control px-2.5 rounded-control bg-field text-ink text-meta appearance-none focus-visible:outline-offset-[0] [&[type=date]]:pr-1.5 [&::-webkit-calendar-picker-indicator]:opacity-60 max-md:min-h-touch max-md:text-input-phone"
             autoComplete="off"
             placeholder={placeholder(range?.max)}
             value={high}
@@ -505,7 +536,7 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
           />
         </div>
       </div>
-      <p className="library-panel__note">
+      <p className="py-1 px-2.5 text-muted text-small leading-tight">
         {isDate
           ? "Both days included. Leave one empty for no limit."
           : "Both ends included. Leave one empty for no limit."}
@@ -517,10 +548,11 @@ function RangeEditor({ column, filter, books, onChange }: EditorProps) {
 function YesNoEditor({ column, filter, onChange }: EditorProps) {
   const value = filter?.kind === "yesno" ? (filter.value ? "yes" : "no") : "any";
   return (
-    <div className="library-editor">
+    <div className="flex flex-col items-stretch gap-2.5 py-1 px-2.5">
       <SegmentedControl
         label={column.label}
         size="small"
+        className="self-start"
         options={[
           { value: "any", label: "Any" },
           { value: "yes", label: "Yes" },

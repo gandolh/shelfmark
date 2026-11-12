@@ -28,8 +28,6 @@ function fetched(): Fetched {
   };
 }
 
-const layout = { display: "grid", gap: 12, padding: 16, maxWidth: 640, margin: "0 auto" } as const;
-
 export function ScannerDemo() {
   const scanner = useRef<ScannerHandle>(null);
   const [reads, setReads] = useState<Read[]>([]);
@@ -73,13 +71,13 @@ export function ScannerDemo() {
   };
 
   return (
-    <main style={layout}>
-      <h1 style={{ margin: 0 }}>Scanner demo</h1>
-      <p style={{ margin: 0 }}>
+    <main className="mx-auto grid max-w-160 gap-3 p-4">
+      <h1 className="text-title font-bold">Scanner demo</h1>
+      <p>
         State <strong>{state}</strong> · engine <strong>{engine}</strong> · torch{" "}
         <strong>{torchAvailable ? "available" : "not available"}</strong> · fallback asked <strong>{fallbacks}</strong>×
       </p>
-      <div style={{ height: "55vh" }}>
+      <div className="h-[55vh]">
         <CameraScanner
           ref={scanner}
           paused={paused}
@@ -92,7 +90,7 @@ export function ScannerDemo() {
         />
       </div>
       <CameraReadout camera={camera} decodeMs={decodeMs} />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <div className="flex flex-wrap gap-2">
         <button type="button" onClick={() => void read()} disabled={paused}>
           {reading ? "Stop" : "Read"}
         </button>
@@ -110,11 +108,11 @@ export function ScannerDemo() {
         </button>
       </div>
       <section>
-        <h2 style={{ fontSize: 17, margin: "0 0 4px" }}>Read ({reads.length})</h2>
+        <h2 className="mb-1 text-[17px] font-bold">Read ({reads.length})</h2>
         {reads.length === 0 ? (
-          <p style={{ margin: 0 }}>Nothing yet. Hold a book's back cover in the frame and press Read.</p>
+          <p>Nothing yet. Hold a book's back cover in the frame and press Read.</p>
         ) : (
-          <ol style={{ margin: 0, paddingLeft: 20 }}>
+          <ol className="list-decimal pl-5">
             {reads.map(({ id, at, code }) => (
               <li key={id}>
                 {at} ·{" "}
@@ -132,11 +130,11 @@ export function ScannerDemo() {
       </section>
       {network !== null && (
         <section>
-          <h2 style={{ fontSize: 17, margin: "0 0 4px" }}>Fetched</h2>
-          <p style={{ margin: 0, overflowWrap: "anywhere" }}>
+          <h2 className="mb-1 text-[17px] font-bold">Fetched</h2>
+          <p className="wrap-anywhere">
             .wasm: {network.wasm.length === 0 ? "none (native engine)" : network.wasm.join(", ")}
           </p>
-          <p style={{ margin: 0, overflowWrap: "anywhere" }}>
+          <p className="wrap-anywhere">
             Other origins: {network.foreign.length === 0 ? "none" : network.foreign.join(", ")}
           </p>
         </section>

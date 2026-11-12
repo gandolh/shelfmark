@@ -36,23 +36,26 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
   if (active.length === 0) return null;
 
   return (
-    <div ref={root} className="library-chips">
-      <ul className="library-chips__list" role="list" aria-label="Filters on">
+    <div ref={root} className="flex flex-wrap items-center gap-2 mb-4">
+      <ul className="flex flex-wrap gap-2 list-none" role="list" aria-label="Filters on">
         {active.map(([column, filter], index) => {
           const text = describeFilter(column, filter);
           return (
-            <li key={column.id} className="library-chip">
+            <li
+              key={column.id}
+              className="inline-flex items-center min-w-0 max-w-full min-h-segment-small rounded-pill bg-accent-tint text-accent-press text-small leading-tight"
+            >
               <button
                 type="button"
-                className="library-chip__label"
+                className="relative text-inherit flex items-center min-w-0 max-w-85 min-h-segment-small pr-1 pl-3 rounded-[var(--radius-pill)_0_0_var(--radius-pill)] font-semibold text-left max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0"
                 aria-haspopup="dialog"
                 onClick={(event) => onEdit(column.id, event.currentTarget)}
               >
-                <span className="library-chip__text">{text}</span>
+                <span className="overflow-hidden text-ellipsis whitespace-nowrap">{text}</span>
               </button>
               <button
                 type="button"
-                className="library-chip__remove"
+                className="relative text-inherit flex flex-none items-center justify-center w-6 h-6 mr-0.75 rounded-pill transition-[background-color] duration-(--duration-fast) ease-out hover:bg-[color-mix(in_srgb,var(--color-accent)_16%,var(--color-accent-tint))] max-md:before:content-[''] max-md:before:absolute max-md:before:inset-y-[calc((100%_-_var(--spacing-touch))_/_2)] max-md:before:inset-x-0 max-md:before:[inset-inline:calc((100%_-_var(--spacing-touch))_/_2)]"
                 data-chip-remove
                 aria-label={`Remove filter: ${text}`}
                 onClick={() => {
@@ -68,7 +71,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
       </ul>
       <button
         type="button"
-        className={buttonClass({ variant: "quiet", size: "compact" }, "library-chips__clear")}
+        className={buttonClass({ variant: "quiet", size: "compact" }, "text-meta")}
         onClick={() => {
           pendingFocus.current = 0;
           clearFilters();

@@ -92,42 +92,45 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
 
   if (!desktop) {
     return (
-      <nav className="library-pager library-pager--phone" aria-label="Pages">
+      <nav className="flex text-ink-2 flex-col items-stretch gap-1 mt-3.5 text-body" aria-label="Pages">
         {pages > 1 && (
-          <div className="library-pager__steps">
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 [&>:first-child]:justify-self-start [&>:last-child]:justify-self-end">
             {step("Previous", page - 1, page <= 1)}
-            <p className="library-pager__where tabular-nums">
+            <p className="tabular-nums text-ink-2 text-center whitespace-nowrap">
               Page {number(page)} of {number(pages)}
             </p>
             {step("Next", page + 1, page >= pages)}
           </div>
         )}
-        <div className="library-pager__size">{perPage}</div>
+        <div className="flex justify-center">{perPage}</div>
         {live}
       </nav>
     );
   }
 
   return (
-    <nav className="library-pager library-pager--desktop" aria-label="Pages">
-      <p className="library-pager__range tabular-nums">
+    <nav
+      className="flex items-center mt-4.5 text-ink-2 text-meta flex-wrap justify-between gap-y-3 gap-x-6"
+      aria-label="Pages"
+    >
+      <p className="tabular-nums text-muted">
         {number(first)}–{number(last)} of {number(total)}
       </p>
-      <div className="library-pager__end">
+      <div className="flex flex-wrap items-center justify-end gap-2 ml-auto">
         {pages > 1 && (
           <>
             {step("Previous", page - 1, page <= 1)}
-            <div className="library-pager__pages">
+            <div className="flex items-center gap-0.5">
               {pageItems(page, pages).map((item, index) =>
                 item === "gap" ? (
-                  <span key={`gap-${index}`} className="library-pager__gap" aria-hidden="true">
+                  <span key={`gap-${index}`} className="min-w-5 text-muted text-center select-none" aria-hidden="true">
                     …
                   </span>
                 ) : (
                   <button
                     key={item}
                     type="button"
-                    className="library-pager__page tabular-nums"
+                    className="tabular-nums min-w-control h-control px-1.5 rounded-control text-ink-2 cursor-pointer transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink aria-[current=page]:bg-accent-tint aria-[current=page]:text-accent-press aria-[current=page]:font-semibold aria-[current=page]:cursor-default"
                     aria-current={item === page ? "page" : undefined}
                     aria-label={`Page ${number(item)}`}
                     onClick={turn(item)}

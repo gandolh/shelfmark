@@ -1,5 +1,5 @@
-import { buttonClass } from "../components/Button";
 import type { RefObject } from "react";
+import { toolClass } from "./tool";
 import { SegmentedControl } from "../components/SegmentedControl";
 import { activeFilters } from "./filters";
 import { ColumnsIcon, FilterIcon, SlidersIcon } from "./icons";
@@ -49,7 +49,10 @@ export function Toolbar({
   const badge =
     count > 0 ? (
       <>
-        <span className="library-count tabular-nums" aria-hidden="true">
+        <span
+          className="tabular-nums inline-flex items-center justify-center min-w-4.5 h-4.5 px-1.25 rounded-pill bg-accent text-on-accent text-tab font-semibold leading-none"
+          aria-hidden="true"
+        >
           {count}
         </span>
         <span className="sr-only">, {count === 1 ? "1 filter" : `${count} filters`} on</span>
@@ -69,13 +72,13 @@ export function Toolbar({
           value={mode}
           onChange={onModeChange}
         />
-        <span className="library-toolbar__divider" aria-hidden="true" />
-        <div className="library-toolbar__group">
+        <span className="flex-none w-px h-5.5 mx-2 bg-hairline" aria-hidden="true" />
+        <div className="flex items-center gap-0.5">
           <ViewsMenu layout="desktop" mode={mode} />
           <button
             ref={filterButton}
             type="button"
-            className={buttonClass({ variant: null, size: "regular" }, "library-tool")}
+            className={toolClass()}
             aria-haspopup="dialog"
             aria-expanded={open === "filter"}
             onClick={onFilter}
@@ -88,7 +91,7 @@ export function Toolbar({
             <button
               ref={columnsButton}
               type="button"
-              className={buttonClass({ variant: null, size: "regular" }, "library-tool")}
+              className={toolClass()}
               aria-haspopup="dialog"
               aria-expanded={open === "columns"}
               onClick={onColumns}
@@ -119,7 +122,7 @@ export function Toolbar({
       <button
         ref={filterButton}
         type="button"
-        className={buttonClass({ variant: null, size: "regular" }, "library-tool library-tool--end")}
+        className={toolClass("max-md:-mr-2")}
         aria-haspopup="dialog"
         aria-expanded={open !== null}
         onClick={onFilter}

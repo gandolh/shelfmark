@@ -100,12 +100,15 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
           </p>
         )}
         <fieldset
-          className="library-options"
+          className="min-w-0 -mx-2.5"
           aria-describedby={fieldError && choice !== NEW_SHELF ? `${id}-error` : undefined}
         >
           <legend className="sr-only">Shelf</legend>
           {shelves.map((shelf, index) => (
-            <label key={shelf.name} className="library-option">
+            <label
+              key={shelf.name}
+              className="flex items-center gap-2.5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta cursor-pointer hover:bg-accent-tint-soft [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5"
+            >
               <input
                 type="radio"
                 name={`${id}-shelf`}
@@ -113,16 +116,16 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
                 onChange={() => pick(shelf.name)}
                 data-autofocus={index === 0 ? "" : undefined}
               />
-              <span className="library-option__label">{shelf.name}</span>
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{shelf.name}</span>
               {/* Heard as "Bedroom · B1, 5 books", not "Bedroom · B1 5". */}
-              <span className="library-option__count tabular-nums">
+              <span className="tabular-nums ml-auto pl-2 text-muted text-small">
                 <span className="sr-only">, </span>
                 {shelf.count}
                 <span className="sr-only"> {shelf.count === 1 ? "book" : "books"}</span>
               </span>
             </label>
           ))}
-          <label className="library-option">
+          <label className="flex items-center gap-2.5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta cursor-pointer hover:bg-accent-tint-soft [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
             <input
               type="radio"
               name={`${id}-shelf`}
@@ -134,11 +137,11 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
               }}
               data-autofocus={shelves.length === 0 ? "" : undefined}
             />
-            <span className="library-option__label">A new shelf</span>
+            <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">A new shelf</span>
           </label>
-          <label className="library-option">
+          <label className="flex items-center gap-2.5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta cursor-pointer hover:bg-accent-tint-soft [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5">
             <input type="radio" name={`${id}-shelf`} checked={choice === NO_SHELF} onChange={() => pick(NO_SHELF)} />
-            <span className="library-option__label library-option__label--none">No shelf</span>
+            <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-ink-2">No shelf</span>
           </label>
         </fieldset>
         {choice === NEW_SHELF && (
@@ -293,18 +296,21 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
       pending={pending}
     >
       <form className="flex flex-col gap-4" onSubmit={submit} noValidate>
-        <fieldset className="library-options" aria-describedby={fieldError ? `${id}-error` : undefined}>
+        <fieldset className="min-w-0 -mx-2.5" aria-describedby={fieldError ? `${id}-error` : undefined}>
           <legend className="sr-only">Tags</legend>
           {tags.map((tag, index) => (
-            <label key={tag.name} className="library-option">
+            <label
+              key={tag.name}
+              className="flex items-center gap-2.5 min-h-9 px-2.5 rounded-menu-item text-ink text-meta cursor-pointer hover:bg-accent-tint-soft [&_input]:flex-none [&_input]:w-4 [&_input]:h-4 [&_input]:accent-accent max-md:min-h-touch max-md:text-body max-md:[&_input]:w-4.5 max-md:[&_input]:h-4.5"
+            >
               <input
                 type="checkbox"
                 checked={chosen.has(tag.name)}
                 onChange={(event) => toggle(tag.name, event.target.checked)}
                 data-autofocus={index === 0 ? "" : undefined}
               />
-              <span className="library-option__label">{tag.name}</span>
-              <span className="library-option__count tabular-nums">
+              <span className="min-w-0 overflow-hidden text-ellipsis whitespace-nowrap">{tag.name}</span>
+              <span className="tabular-nums ml-auto pl-2 text-muted text-small">
                 <span className="sr-only">, on </span>
                 {tag.count === count ? "all" : `${tag.count} of ${count}`}
               </span>

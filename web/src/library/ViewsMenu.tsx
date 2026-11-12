@@ -1,4 +1,4 @@
-import { buttonClass } from "../components/Button";
+import { toolClass } from "./tool";
 import type { SavedView } from "@shelfmark/shared";
 import { useMemo, useState } from "react";
 import { Menu, type MenuSection } from "../components/ui/Menu";
@@ -104,14 +104,23 @@ export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
           <>
             <ViewsIcon />
             {/* The name may be long: it is cut short with an ellipsis, and keeps its width while the open button turns semibold. */}
-            <span className="library-views__label" data-label={text}>
-              <span className="library-views__text">{text}</span>
+            <span
+              className="inline-grid grid-cols-[minmax(0,auto)] max-w-45 after:[grid-area:1_/_1] after:overflow-hidden after:text-ellipsis after:whitespace-nowrap after:content-[attr(data-label)] after:invisible after:font-semibold after:select-none after:pointer-events-none max-md:max-w-32"
+              data-label={text}
+            >
+              <span className="[grid-area:1_/_1] overflow-hidden text-ellipsis whitespace-nowrap">{text}</span>
             </span>
             <ChevronDownIcon size={14} />
           </>
         }
         triggerLabel={matched ? `Views, ${matched.name}` : undefined}
-        triggerClassName={buttonClass({ variant: null, size: "regular" }, "library-views library-tool")}
+        triggerClassName={toolClass(
+          // On the phone it sits on the tabs' baseline: its label, not its leading icon, gives the button its baseline,
+          // and padding instead of a min-height keeps the 44 px target without dropping the label to the top of the box.
+          layout === "phone"
+            ? "max-md:-mr-2 max-md:min-h-0 max-md:items-baseline max-md:pt-3 max-md:pb-[13px] max-md:[&_svg]:self-center"
+            : undefined,
+        )}
         align={align}
       />
       {failed && (
