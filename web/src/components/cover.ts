@@ -1,6 +1,6 @@
 /**
- * The no-cover placeholder's tint: one of eight (`--cover-1-bg` … `--cover-8-bg`
- * in styles/tokens.css), picked from the title so a book keeps its colour
+ * The no-cover placeholder's tint: one of eight (`--color-cover-1-bg` … `--color-cover-8-bg`
+ * in styles/index.css), picked from the title so a book keeps its colour
  * everywhere and between visits. Free databases miss most Romanian covers, so
  * many books wear one of these.
  */

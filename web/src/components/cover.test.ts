@@ -3,12 +3,12 @@ import { describe, expect, it } from "vitest";
 import { authorLine, COVER_TINT_COUNT, coverTint, tintKey } from "./cover";
 
 // The stylesheet the app ships. (A `?raw` import is empty: Vitest leaves CSS unprocessed.)
-const tokens = readFileSync(new URL("../styles/tokens.css", import.meta.url), "utf8");
+const tokens = readFileSync(new URL("../styles/index.css", import.meta.url), "utf8");
 
-/** `--cover-3-bg: #33503E;` → { 3: { bg: "#33503E" } }. */
+/** `--color-cover-3-bg: #33503E;` → { 3: { bg: "#33503E" } }. */
 function coverTokens(): Map<number, { bg?: string; ink?: string }> {
   const tints = new Map<number, { bg?: string; ink?: string }>();
-  for (const match of tokens.matchAll(/--cover-(\d+)-(bg|ink):\s*(#[0-9a-f]{6})\s*;/gi)) {
+  for (const match of tokens.matchAll(/--color-cover-(\d+)-(bg|ink):\s*(#[0-9a-f]{6})\s*;/gi)) {
     const [, n = "", part, value = ""] = match;
     const tint = tints.get(Number(n)) ?? {};
     tint[part as "bg" | "ink"] = value;
@@ -68,13 +68,13 @@ describe("coverTint", () => {
   });
 });
 
-describe("the tints in tokens.css", () => {
+describe("the tints in index.css", () => {
   it("defines exactly eight, each with its ink", () => {
     const tints = coverTokens();
     expect([...tints.keys()].sort((a, b) => a - b)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
     for (const [n, tint] of tints) {
-      expect(tint.bg, `--cover-${n}-bg`).toBeDefined();
-      expect(tint.ink, `--cover-${n}-ink`).toBeDefined();
+      expect(tint.bg, `--color-cover-${n}-bg`).toBeDefined();
+      expect(tint.ink, `--color-cover-${n}-ink`).toBeDefined();
     }
   });
 

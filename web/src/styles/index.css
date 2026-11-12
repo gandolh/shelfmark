@@ -1,0 +1,330 @@
+/*
+ * Shelfmark's one stylesheet (base-ui rule 5): the layer order, Tailwind, the
+ * tokens as `@theme`, and the page's own defaults. The tokens are DESIGN.md's
+ * names, in Tailwind's namespaces (`bg-ground`, `text-ink-2`, `text-body`,
+ * `rounded-control`, `h-control`).
+ */
+
+@layer theme, base, components, utilities;
+
+@import "tailwindcss";
+
+/* Only Shelfmark's own scales exist: no Tailwind palette, text scale, radii or shadows. */
+@theme {
+  --color-*: initial;
+  --font-*: initial;
+  --text-*: initial;
+  --font-weight-*: initial;
+  --tracking-*: initial;
+  --leading-*: initial;
+  --radius-*: initial;
+  --shadow-*: initial;
+  --inset-shadow-*: initial;
+  --drop-shadow-*: initial;
+  --ease-*: initial;
+  --animate-*: initial;
+}
+
+/*
+ * The tokens. Static, so every one is in the page whether or not a utility
+ * reads it. The values are DESIGN.md's front matter, value for value.
+ */
+@theme static {
+  /* Colour */
+  --color-ground: #f5f5f3; /* page background */
+  --color-surface: #ffffff; /* table container, menus, sheets */
+  --color-control: #e6e6e2; /* segmented controls, secondary buttons */
+  --color-field: #e9e9e6; /* search field */
+  --color-hairline: #e2e2df; /* top bar and tab bar borders */
+  --color-divider: #ecece9; /* table row dividers */
+  --color-ink: #1b1b1d; /* primary text */
+  --color-ink-2: #45454a; /* secondary text */
+  --color-muted: #5f5f65; /* captions, counts (5.6:1 on ground) */
+  --color-accent: #0e6e8c; /* the one interactive colour */
+  --color-accent-press: #0a4f65; /* pressed, link hover */
+  --color-accent-tint: #dcedf2; /* an open menu button */
+  --color-accent-tint-soft: #edf5f8; /* the selected menu row */
+
+  /* Derived: mixes and aliases of the above, never a new hue */
+  --color-on-accent: var(--color-surface); /* text on the accent */
+  /* The tab bar's ground, a shade lighter than the page. */
+  --color-bar: color-mix(in srgb, var(--color-surface) 40%, var(--color-ground));
+  --color-control-hover: color-mix(in srgb, var(--color-control) 92%, var(--color-ink));
+  --color-control-press: color-mix(in srgb, var(--color-control) 84%, var(--color-ink));
+  /* The unselected half of a segmented track, under the pointer. */
+  --color-segment-hover: color-mix(in srgb, var(--color-surface) 45%, var(--color-control));
+  --color-field-placeholder: var(--color-muted); /* 5.2:1 on field */
+  --color-focus-ring: var(--color-accent);
+  --color-selection: var(--color-accent-tint);
+  --color-scrollbar-thumb: color-mix(in srgb, var(--color-muted) 40%, var(--color-ground));
+
+  /*
+   * No-cover placeholder: eight tints, each with its text. A book without a
+   * cover gets a typographic one on a tint picked from its title
+   * (components/cover.ts). Every ink passes 4.5:1 on its tint
+   * (components/cover.test.ts reads these lines).
+   */
+  --color-cover-1-bg: #7b2d35; /* oxblood */
+  --color-cover-1-ink: #f7eee6;
+  --color-cover-2-bg: #d4a23a; /* ochre */
+  --color-cover-2-ink: #2a1f10;
+  --color-cover-3-bg: #33503e; /* forest */
+  --color-cover-3-ink: #eef0e2;
+  --color-cover-4-bg: #2c3e57; /* slate */
+  --color-cover-4-ink: #eaeff5;
+  --color-cover-5-bg: #5c3f78; /* plum */
+  --color-cover-5-ink: #f2ecf7;
+  --color-cover-6-bg: #dccdb0; /* sand */
+  --color-cover-6-ink: #3a2e22;
+  --color-cover-7-bg: #b9c3a5; /* sage */
+  --color-cover-7-ink: #26301f;
+  --color-cover-8-bg: #2e2e30; /* charcoal, gold letters */
+  --color-cover-8-ink: #e8c66c;
+
+  /* Type */
+  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --text-title: 34px; /* page title, 700, -0.02em */
+  --text-title-phone: 32px;
+  --text-wordmark: 17px; /* "Shelfmark" in the top bar, 600 */
+  --text-row-title: 16px; /* a book's title in a row, 600 */
+  --text-action-large: 16px; /* a sheet's primary action, 600 */
+  --text-input-phone: 16px; /* fields on a phone: below 16 px iOS zooms in */
+  --text-body: 15px;
+  --text-meta: 14px; /* authors, publishers, controls on the desktop */
+  --text-small: 13px; /* small segmented controls, grid titles */
+  --text-label: 12px; /* column heads, menu section labels, 600 */
+  --text-tab: 11px; /* tab bar labels */
+
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --tracking-title: -0.02em;
+  --tracking-wordmark: -0.01em;
+
+  --leading-body: 1.45;
+  --leading-phone: 1.4;
+  --leading-tight: 1.25;
+
+  /* Radii */
+  --radius-cover: 3px;
+  --radius-segment: 6px; /* the selected half of a small segmented control */
+  --radius-menu-item: 7px;
+  --radius-control: 8px; /* buttons, segments, a small segmented track */
+  --radius-field: 10px; /* the search field */
+  --radius-track: 10px; /* a segmented track */
+  --radius-menu: 12px;
+  --radius-container: 16px; /* the table's white container */
+  --radius-sheet: 20px; /* the floating sheet */
+  --radius-pill: 999px;
+
+  /* Elevation: the cover, and what floats. Nothing else casts a shadow */
+  --shadow-cover: 0 6px 14px rgba(27, 27, 29, 0.22), 0 1px 2px rgba(27, 27, 29, 0.2);
+  --shadow-float: 0 16px 40px rgba(27, 27, 29, 0.18); /* menus and the scan sheet */
+
+  /* Sizes: every width, height and gap in the app is a pixel value */
+  --spacing: 4px;
+  --spacing-touch: 44px; /* the smallest target on a phone */
+  --spacing-control: 34px; /* buttons and the search field on the desktop */
+  --spacing-control-large: 48px; /* a sheet's primary action */
+  --spacing-segment: 32px;
+  --spacing-segment-small: 30px;
+  --spacing-topbar: 63px; /* 12 + 38 + 12 + the hairline: sticky things sit under it */
+  --spacing-tabbar: 76px; /* 66 of targets + 10 at the bottom, before the safe area */
+  --spacing-gutter-desktop: 40px;
+  --spacing-gutter-phone: 16px;
+  --container-page: 1180px;
+
+  /* Motion: state changes only, short, ease-out */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Layers */
+  --z-index-bar: 10;
+  --z-index-float: 100;
+}
+
+/* Enter animations (state changes only, short, ease-out). There are no exit animations. */
+@theme {
+  --animate-sheet-in: sheet-in var(--duration-sheet) var(--ease-out);
+  --animate-dialog-in: dialog-in var(--duration) var(--ease-out);
+  --animate-panel-in: panel-in var(--duration) var(--ease-out);
+  --animate-fade-in: fade-in var(--duration) var(--ease-out);
+  --animate-pulse: pulse 1.4s var(--ease-out) infinite alternate;
+  --animate-progress: progress 1.2s var(--ease-out) infinite;
+  --animate-hit: hit 450ms ease-out;
+
+  @keyframes sheet-in {
+    from {
+      transform: translateY(calc(100% + 12px));
+    }
+  }
+
+  @keyframes dialog-in {
+    from {
+      transform: translateY(8px);
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      transform: translateY(-4px);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse {
+    to {
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes progress {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(290%);
+    }
+  }
+
+  @keyframes hit {
+    from {
+      opacity: 0.55;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+}
+
+/* Variables no utility namespace owns. */
+:root {
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-sheet: 240ms;
+}
+
+/*
+ * The page itself and the parts of the browser nobody draws: Tailwind's
+ * preflight is the reset, and this puts back what the app relied on beyond
+ * it: the app's type on body, selection, the caret, one focus ring, accent
+ * links, tabular numerals and thin scrollbars.
+ */
+@layer base {
+  :root {
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  }
+
+  /* The app's 15 px lives on body; html keeps the reader's own size. */
+  body {
+    min-height: 100dvh;
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Preflight leaves the cursor alone; a button is a pointer unless it is off. */
+  button {
+    cursor: pointer;
+  }
+
+  button:disabled {
+    cursor: default;
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-accent);
+  }
+
+  /* Preflight fades the placeholder to half the text colour; the app's is a token. */
+  ::placeholder {
+    color: var(--color-field-placeholder);
+    opacity: 1;
+  }
+
+  ::selection {
+    background: var(--color-selection);
+    color: var(--color-ink);
+  }
+
+  /* One focus ring everywhere, in the accent, only for the keyboard. */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Preflight makes a link its parent's colour with no underline; the app's are accent and underlined. */
+  a {
+    color: var(--color-accent);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
+  }
+
+  a:hover {
+    color: var(--color-accent-press);
+  }
+
+  /* Years, counts, ISBNs and prices line up in columns. */
+  time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Thin scrollbars where the engine draws them (Chromium and Firefox take
+     `scrollbar-color` above; WebKit's legacy pseudo-elements cover Safari). */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--color-scrollbar-thumb) padding-box;
+  }
+
+  /* The one place !important is the point: it must beat every utility's transition and animation. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 1ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 1ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

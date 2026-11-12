@@ -6,10 +6,6 @@
 :root {
   color-scheme: light; /* no dark theme is planned (design.md) */
   font-family: var(--font-sans);
-  font-size: var(--text-body);
-  line-height: var(--leading-body);
-  color: var(--ink);
-  background: var(--ground);
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
@@ -28,6 +24,9 @@ body {
   margin: 0;
   min-height: 100dvh;
   background: var(--ground);
+  color: var(--ink);
+  font-size: var(--text-body);
+  line-height: var(--leading-body);
 }
 
 h1,

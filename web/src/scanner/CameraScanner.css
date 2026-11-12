@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  min-height: 16rem;
+  min-height: 240px;
   height: 100%;
   background: var(--ink);
   color: var(--surface);
@@ -31,7 +31,7 @@
   position: absolute;
   left: 50%;
   top: 50%;
-  width: min(78%, 22rem);
+  width: min(78%, 330px);
   aspect-ratio: 3 / 2;
   transform: translate(-50%, -50%);
   border: 2px solid var(--surface);
@@ -77,7 +77,7 @@
 
 .scanner-message p {
   margin: 0;
-  max-width: 28rem;
+  max-width: 420px;
 }
 
 .scanner-message-title {
