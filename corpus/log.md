@@ -733,7 +733,7 @@ enforced in each repo. Four briefs, in order:
 
 - [05 the house style and the quality harness](briefs/done/05-the-house-style-harness.md);
 - [06 Base UI by the conventions](briefs/done/06-base-ui-by-the-conventions.md);
-- [07 the web app to Tailwind](briefs/todo/07-the-web-app-to-tailwind.md);
+- [07 the web app to Tailwind](briefs/done/07-the-web-app-to-tailwind.md);
 - [08 the server in the code structure](briefs/todo/08-the-server-in-the-code-structure.md).
 
 No bump brief: `web/package.json` pins 1.9.0 and the lockfile resolves 1.9.0.

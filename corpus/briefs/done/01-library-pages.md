@@ -36,7 +36,7 @@ collection, Owned, Wishlist.
 - [LibraryPage.tsx](../../../web/src/library/LibraryPage.tsx),
   [BookTable.tsx](../../../web/src/library/BookTable.tsx),
   [CoversGrid.tsx](../../../web/src/library/CoversGrid.tsx),
-  [library.css](../../../web/src/library/library.css).
+  `library.css` (removed 2026-11-12).
 - `web/src/export/ExportMenu.tsx` (removed 2026-11-04): the label of the
   "What you see now" entry only.
 - `DESIGN.md`: the Library bullets under "Layout".

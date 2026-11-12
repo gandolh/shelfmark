@@ -76,7 +76,7 @@ code under `web/src/export/` and the view's export-only column list in
 ## Files you OWN (step 3)
 
 - [Toolbar.tsx](../../../web/src/library/Toolbar.tsx),
-  [library.css](../../../web/src/library/library.css) (the toolbar rules).
+  `library.css` (removed 2026-11-12) (the toolbar rules).
 - [ViewsMenu.tsx](../../../web/src/library/ViewsMenu.tsx) and
   `ExportMenu.tsx` (removed by the pick): their trigger's look only.
 - `DESIGN.md`: the Library toolbar bullets.
@@ -84,7 +84,7 @@ code under `web/src/export/` and the view's export-only column list in
 ## Files you must NOT touch
 
 - What the controls do: the panels, menus and dialogs behind them stay.
-- [tokens.css](../../../web/src/styles/tokens.css): no new hue. A divider,
+- `tokens.css` (removed 2026-11-12): no new hue. A divider,
   a gap or a tone from the existing tokens is the most a group gets.
 - The bulk bar, unless the pick draws it.
 

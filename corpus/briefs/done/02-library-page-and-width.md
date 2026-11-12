@@ -10,11 +10,11 @@ brief.
 
 - The table at 1920 px scrolled sideways (Author cut off) while the page
   left empty space on both sides: every page is capped at
-  `--page-width: 1180px` ([tokens.css](../../../web/src/styles/tokens.css)).
+  `--page-width: 1180px` (`tokens.css` (removed 2026-11-12)).
 - In the phone's "Filter and sort" sheet the sort field picker ("Price")
   floats over the Tags and Language rows instead of sitting under "Sort by".
   Cause: two rules share `.library-select` in
-  [library.css](../../../web/src/library/library.css). The first (near line
+  `library.css` (removed 2026-11-12). The first (near line
   449) wraps the sort `<select>`; the second (near line 778) is the table
   row's tick-box label, `position: absolute; inset: 0; padding-left: 24px`,
   and it comes later, so it wins.
@@ -39,9 +39,9 @@ glossary's words: book, collection, Owned, Wishlist.
   [CoversGrid.tsx](../../../web/src/library/CoversGrid.tsx),
   [BulkBar.tsx](../../../web/src/library/BulkBar.tsx), the delete dialog in
   [BulkDialogs.tsx](../../../web/src/library/BulkDialogs.tsx),
-  [library.css](../../../web/src/library/library.css).
+  `library.css` (removed 2026-11-12).
 - [Page.tsx](../../../web/src/layout/Page.tsx) and
-  [shell.css](../../../web/src/styles/shell.css): two opt-in props, so no
+  `shell.css` (removed 2026-11-12): two opt-in props, so no
   other page changes.
 - `DESIGN.md`: the Layout section.
 
@@ -50,7 +50,7 @@ glossary's words: book, collection, Owned, Wishlist.
 - `server/`, [store.ts](../../../web/src/books/store.ts): the list stays whole.
 - `savedViews.ts`, `savedViewsStore.ts`: a saved view stores no page, size
   or selection.
-- [tokens.css](../../../web/src/styles/tokens.css): `--page-width` stays
+- `tokens.css` (removed 2026-11-12): `--page-width` stays
   1180 px for every other page. No new token or hue.
 - [Toolbar.tsx](../../../web/src/library/Toolbar.tsx): how its buttons are
   grouped is [brief 03](03-library-toolbar-groups.md)'s.
