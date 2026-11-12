@@ -80,6 +80,12 @@ describe("mapError", () => {
     expect(mapped).toEqual({ status: 500, body: internal, fault: "unhandled" });
     expect(JSON.stringify(mapped)).not.toContain("SQLITE");
     expect(mapError("a string")).toEqual({ status: 500, body: internal, fault: "unhandled" });
+    // Not a reply fault: an error that only has a `method` property (the provider's own check would say it is).
+    expect(mapError(Object.assign(new Error("boom"), { method: "GET", url: "/x" }))).toEqual({
+      status: 500,
+      body: internal,
+      fault: "unhandled",
+    });
     // A 5xx a library raised is a 500 here too, not its own message.
     expect(mapError(Object.assign(new Error("secret detail"), { statusCode: 503 })).body).toEqual(internal);
   });

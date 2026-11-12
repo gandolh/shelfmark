@@ -1,4 +1,4 @@
-import { hasZodFastifySchemaValidationErrors, isResponseSerializationError } from "@fastify/type-provider-zod";
+import { hasZodFastifySchemaValidationErrors, ResponseSerializationError } from "@fastify/type-provider-zod";
 import type { FastifyError, FastifyPluginAsync, FastifyReply } from "fastify";
 import fp from "fastify-plugin";
 import { z } from "zod";
@@ -71,7 +71,8 @@ export function mapError(error: unknown): MappedError {
     return { status, body: errorBody(status === 404 ? "not_found" : "validation", message) };
   }
 
-  const fault = isResponseSerializationError(error) ? "reply" : "unhandled";
+  // `instanceof`: the provider's `isResponseSerializationError` is true for any object with a `method` property.
+  const fault = error instanceof ResponseSerializationError ? "reply" : "unhandled";
   return { status: 500, body: errorBody("internal", "Something went wrong on the server."), fault };
 }
 
@@ -84,7 +85,7 @@ export function mapError(error: unknown): MappedError {
 const errorHandling: FastifyPluginAsync = async (app) => {
   app.setErrorHandler((error: unknown, request, reply) => {
     const { status, body, fault } = mapError(error);
-    if (fault === "reply" && isResponseSerializationError(error)) {
+    if (error instanceof ResponseSerializationError) {
       // A handler sent what its response schema doesn't allow: a bug to fix, never the client's fault.
       // Method, URL and the error's name and code only: the issues would quote a book's own fields.
       request.log.error(
