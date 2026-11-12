@@ -36,7 +36,7 @@ export function ToastHost() {
   return (
     <Toast.Provider toastManager={manager} limit={1}>
       <Toast.Portal>
-        <Toast.Viewport className="update-prompt">
+        <Toast.Viewport className="fixed inset-0 z-float pointer-events-none">
           <ToastList />
         </Toast.Viewport>
       </Toast.Portal>
@@ -47,8 +47,16 @@ export function ToastHost() {
 function ToastList() {
   const { toasts } = Toast.useToastManager();
   return toasts.map((toast) => (
-    <Toast.Root key={toast.id} toast={toast} className={cn(SHEET, "update-prompt__sheet")}>
-      <Toast.Title className="update-prompt__text" />
+    <Toast.Root
+      key={toast.id}
+      toast={toast}
+      className={cn(
+        SHEET,
+        // Over the tab bar on a phone, at the corner of the window on the desktop.
+        "bottom-[calc(var(--spacing-tabbar)+env(safe-area-inset-bottom)+12px)] pointer-events-auto flex-row items-center justify-between md:right-6 md:bottom-6 md:left-auto md:mx-0 md:w-90",
+      )}
+    >
+      <Toast.Title className="text-ink text-body font-semibold" />
       <Toast.Action render={<Button variant="primary" size="compact" />} />
     </Toast.Root>
   ));

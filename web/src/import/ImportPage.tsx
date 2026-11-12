@@ -1,3 +1,4 @@
+import { cn } from "../lib/cn";
 import type { Collection } from "@shelfmark/shared";
 import { useMemo, useRef, useState } from "react";
 import { lookupIsbn } from "../add/api";
@@ -21,7 +22,6 @@ import {
   type RowFlag,
   type SaveReport,
 } from "./rows";
-import "./import.css";
 
 /** A home library is hundreds to a few thousand books; a bigger file is the wrong file. */
 const MAX_ROWS = 5000;
@@ -71,7 +71,7 @@ export function ImportPage() {
   const [step, setStep] = useState<Step>({ kind: "choose" });
   return (
     <Page title="Import a CSV" back={{ to: LIBRARY, label: "Library" }}>
-      <div className="import">
+      <div className="flex flex-col gap-4 max-w-page">
         {step.kind === "choose" && (
           <ChooseFile
             error={step.error}
@@ -125,9 +125,9 @@ function ChooseFile({
   };
 
   return (
-    <section className="import__card">
-      <h2 className="import__heading">Choose a CSV file</h2>
-      <p className="import__text">
+    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+      <h2 className="text-row-title font-semibold">Choose a CSV file</h2>
+      <p className="text-ink-2 text-meta leading-body">
         A Goodreads, Libib or LibraryThing export, a Shelfmark export, or a spreadsheet saved as CSV. A file with only a
         column of ISBNs works: the details can be looked up afterwards.
       </p>
@@ -148,7 +148,7 @@ function ChooseFile({
         Choose a file
       </Button>
       {error && (
-        <p className="import__error" role="alert">
+        <p className="text-ink text-meta font-semibold" role="alert">
           {error}
         </p>
       )}
@@ -172,26 +172,31 @@ function MapColumns({
   const usable = isUsable(mapping);
 
   return (
-    <section className="import__card">
-      <h2 className="import__heading">Match the columns</h2>
-      <p className="import__text">
+    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+      <h2 className="text-row-title font-semibold">Match the columns</h2>
+      <p className="text-ink-2 text-meta leading-body">
         {file.format ? `This looks like a ${file.format.name} export.` : "This isn't an export Shelfmark knows."} Say
         what each column holds. One with a title or an ISBN is needed.
       </p>
-      <ul className="import-map">
+      <ul className="flex flex-col self-stretch list-none">
         {header.map((name, column) => {
           const samples = file.table
             .slice(1, 4)
             .map((row) => row[column] ?? "")
             .filter((cell) => cell !== "");
           return (
-            <li key={column} className="import-map__row">
-              <div className="import-map__column">
-                <span className="import-map__name">{name || `Column ${column + 1}`}</span>
-                <span className="import-map__sample">{samples.join(" · ") || "empty"}</span>
+            <li
+              key={column}
+              className="flex flex-wrap items-center justify-between gap-y-2 gap-x-4 py-2.5 border-t border-divider"
+            >
+              <div className="flex flex-col min-w-0 max-w-full">
+                <span className="text-body font-semibold">{name || `Column ${column + 1}`}</span>
+                <span className="overflow-hidden max-w-105 text-muted text-small text-ellipsis whitespace-nowrap">
+                  {samples.join(" · ") || "empty"}
+                </span>
               </div>
               <select
-                className="import-select"
+                className="min-h-control px-2.5 bg-field rounded-control text-ink text-meta max-md:min-h-touch max-md:text-input-phone"
                 aria-label={`What column ${name || column + 1} holds`}
                 value={mapping[column] ?? ""}
                 onChange={(event) => {
@@ -210,8 +215,8 @@ function MapColumns({
           );
         })}
       </ul>
-      {!usable && <p className="import__error">Pick a Title or an ISBN column to go on.</p>}
-      <div className="import__actions">
+      {!usable && <p className="text-ink text-meta font-semibold">Pick a Title or an ISBN column to go on.</p>}
+      <div className="flex flex-wrap items-center gap-3">
         <Button variant="primary" disabled={!usable} onClick={() => onContinue(mapping)}>
           Preview the rows
         </Button>
@@ -303,23 +308,28 @@ function Preview({
   };
 
   return (
-    <section className="import__card">
-      <h2 className="import__heading">
+    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+      <h2 className="text-row-title font-semibold">
         {plural(rows.length, "row", "rows")} in {file.name}
       </h2>
-      <p className="import__text">
+      <p className="text-ink-2 text-meta leading-body">
         {ENCODING_NOTE[file.encoding]}{" "}
         {file.format ? `Recognised as a ${file.format.name} export.` : "Columns matched by hand."}{" "}
-        <button type="button" className="import__link" onClick={onChangeColumns} disabled={busy}>
+        <button
+          type="button"
+          className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+          onClick={onChangeColumns}
+          disabled={busy}
+        >
           Change columns
         </button>
       </p>
-      <p className="import__text">
+      <p className="text-ink-2 text-meta leading-body">
         {plural(counts.duplicates, "row is", "rows are")} already in your library or repeated,{" "}
         {plural(counts.invalid, "has an", "have an")} invalid ISBN. Both are unticked.
       </p>
 
-      <div className="import__bar">
+      <div className="flex flex-wrap items-center gap-3">
         <SegmentedControl
           label="Save into"
           options={[
@@ -332,22 +342,32 @@ function Preview({
             setTouched(new Map());
           }}
         />
-        <span className="import__text">
-          <button type="button" className="import__link" onClick={() => setAll(true)} disabled={busy}>
+        <span className="text-ink-2 text-meta leading-body">
+          <button
+            type="button"
+            className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+            onClick={() => setAll(true)}
+            disabled={busy}
+          >
             Tick all
           </button>
           {" · "}
-          <button type="button" className="import__link" onClick={() => setAll(false)} disabled={busy}>
+          <button
+            type="button"
+            className="text-accent cursor-pointer hover:[&:not(:disabled)]:text-accent-press hover:[&:not(:disabled)]:underline disabled:text-muted disabled:cursor-default"
+            onClick={() => setAll(false)}
+            disabled={busy}
+          >
             Untick all
           </button>
         </span>
       </div>
 
       {(targets.length > 0 || progress.kind === "looking") && (
-        <div className="import__lookup">
+        <div className="flex flex-wrap items-center gap-3">
           {progress.kind === "looking" ? (
             <>
-              <p role="status" className="import__text">
+              <p role="status" className="text-ink-2 text-meta leading-body">
                 Looking up {progress.done} of {progress.total}, one at a time.
               </p>
               <Button variant="secondary" onClick={() => stop.current?.abort()}>
@@ -356,7 +376,7 @@ function Preview({
             </>
           ) : (
             <>
-              <p className="import__text">
+              <p className="text-ink-2 text-meta leading-body">
                 {plural(targets.length, "ticked row has", "ticked rows have")} an ISBN and no title. Looking them up
                 asks the book sources one request at a time, which takes a while for a long list.
               </p>
@@ -368,13 +388,13 @@ function Preview({
         </div>
       )}
       {lookupNote && (
-        <p role="status" className="import__text">
+        <p role="status" className="text-ink-2 text-meta leading-body">
           {lookupNote}
         </p>
       )}
 
-      <div className="import__scroll">
-        <table className="import-table">
+      <div className="self-stretch overflow-x-auto">
+        <table className="w-full border-collapse text-meta text-left [&_th]:py-1.5 [&_th]:px-2.5 [&_th]:text-muted [&_th]:text-label [&_th]:font-semibold [&_td]:py-2 [&_td]:px-2.5 [&_td]:border-t [&_td]:border-divider [&_td]:align-top [&_tbody_tr:not([data-ticked])_td:not(:first-child):not(:last-child)]:text-muted">
           <thead>
             <tr>
               <th scope="col">
@@ -395,20 +415,26 @@ function Preview({
                   <td>
                     <input
                       type="checkbox"
-                      className="import-check"
+                      className="w-4.5 h-4.5 accent-accent"
                       checked={ticked.has(index)}
                       disabled={busy}
                       aria-label={`Import line ${row.line}${row.title ? `, ${row.title}` : ""}`}
                       onChange={(event) => setTick(index, event.currentTarget.checked)}
                     />
                   </td>
-                  <td>{row.title || <span className="import__muted">none yet</span>}</td>
+                  <td>{row.title || <span className="text-muted">none yet</span>}</td>
                   <td>{row.authors.join(", ")}</td>
-                  <td className="import-table__isbn">{row.isbn13 ?? row.isbnText}</td>
+                  <td className="tabular-nums whitespace-nowrap">{row.isbn13 ?? row.isbnText}</td>
                   <td>{collection === "wishlist" ? "" : (row.details.shelf ?? "")}</td>
                   <td>
                     {rowFlags.map((flag) => (
-                      <span key={flag} className={`import-flag import-flag--${flag}`}>
+                      <span
+                        key={flag}
+                        className={cn(
+                          "mr-1.5 mb-1 inline-block rounded-pill bg-control px-2 py-0.5 text-label font-semibold whitespace-nowrap text-ink-2",
+                          flag === "needs-lookup" && "bg-accent-tint text-accent-press",
+                        )}
+                      >
                         {FLAG_TEXT[flag]}
                       </span>
                     ))}
@@ -420,9 +446,9 @@ function Preview({
         </table>
       </div>
 
-      <div className="import__actions">
+      <div className="flex flex-wrap items-center gap-3">
         {progress.kind === "saving" ? (
-          <p role="status" className="import__text">
+          <p role="status" className="text-ink-2 text-meta leading-body">
             Saving {progress.done} of {progress.total}…
           </p>
         ) : (
@@ -435,11 +461,11 @@ function Preview({
         </Button>
       </div>
       {ticked.size > saveable.length && (
-        <p className="import__text">
+        <p className="text-ink-2 text-meta leading-body">
           {plural(ticked.size - saveable.length, "ticked row has", "ticked rows have")} no title and will be left out.
         </p>
       )}
-      {!ready && <p className="import__text">Loading your library to check for duplicates…</p>}
+      {!ready && <p className="text-ink-2 text-meta leading-body">Loading your library to check for duplicates…</p>}
     </section>
   );
 }
@@ -460,13 +486,13 @@ function Done({
   onAgain: () => void;
 }) {
   return (
-    <section className="import__card">
-      <h2 className="import__heading">
+    <section className="flex flex-col items-start gap-3 p-5 bg-surface rounded-container">
+      <h2 className="text-row-title font-semibold">
         {report.saved === 0
           ? "Nothing was saved"
           : `${plural(report.saved, "book", "books")} saved to ${collection === "owned" ? "Owned" : "the Wishlist"}`}
       </h2>
-      <ul className="import__text import__counts">
+      <ul className="text-ink-2 text-meta leading-body pl-5">
         <li>{plural(report.saved, "book", "books")} saved</li>
         <li>{plural(skippedDuplicates, "row", "rows")} skipped as duplicates</li>
         {leftOut > 0 && <li>{plural(leftOut, "row", "rows")} left out (unticked, invalid or without a title)</li>}
@@ -474,7 +500,7 @@ function Done({
         {report.untried > 0 && <li>{plural(report.untried, "row", "rows")} not tried: the server stopped answering</li>}
       </ul>
       {report.failed.length > 0 && (
-        <ul className="import__failures">
+        <ul className="pl-5 text-meta">
           {report.failed.map((failure) => (
             <li key={failure.line}>
               Line {failure.line}
@@ -483,7 +509,7 @@ function Done({
           ))}
         </ul>
       )}
-      <div className="import__actions">
+      <div className="flex flex-wrap items-center gap-3">
         <ButtonLink variant="primary" to={LIBRARY}>
           Back to the Library
         </ButtonLink>

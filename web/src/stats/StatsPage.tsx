@@ -14,7 +14,6 @@ import {
   statusFilter,
   type LibraryFilter,
 } from "./links";
-import "./stats.css";
 
 const STATUS_NAMES: Record<string, string> = {
   unread: "Unread",
@@ -33,25 +32,29 @@ function plural(n: number, one: string, many: string): string {
  * and money spent per year, all worked out here from the books already loaded.
  * A count opens the Library on those books.
  */
+// A table on a white card: left-aligned cells on divider rules, the last column right-aligned, no rule under the last row.
+const TABLE =
+  "w-full border-collapse bg-surface rounded-container text-body [&_th]:py-2.5 [&_th]:px-4 [&_th]:border-b [&_th]:border-divider [&_th]:text-left [&_th]:font-regular [&_td]:py-2.5 [&_td]:px-4 [&_td]:border-b [&_td]:border-divider [&_td]:text-left [&_td]:font-regular last:[&_td]:text-right last:[&_td]:tabular-nums [&_tr:last-child>*]:border-b-0";
+
 export function StatsPage() {
   const { books, status } = useBooks();
   const stats = useMemo(() => computeStats(books), [books]);
 
   return (
     <Page title="Stats" caption="Owned books only" back={{ to: LIBRARY, label: "Library" }}>
-      <div className="stats">
+      <div className="flex flex-col gap-5 max-w-page">
         {status === "loading" && books.length === 0 ? (
-          <p className="stats__note">Loading your books…</p>
+          <p className="text-muted text-meta">Loading your books…</p>
         ) : stats.owned === 0 ? (
-          <p className="stats__note">No owned books yet. Add one and its counts show here.</p>
+          <p className="text-muted text-meta">No owned books yet. Add one and its counts show here.</p>
         ) : (
           <>
-            <dl className="stats__totals">
+            <dl className="flex flex-wrap gap-3">
               <Total label="Books owned" value={stats.owned} />
               <Total label="Authors" value={stats.distinctAuthors} />
               <Total label="Shelves in use" value={stats.shelvesInUse} />
             </dl>
-            <p className="stats__note">
+            <p className="text-muted text-meta">
               <Link to={WISHLIST}>Wishlist: {stats.wishlist}</Link>
             </p>
 
@@ -80,16 +83,18 @@ export function StatsPage() {
             </Section>
             <Section title="Spent per year">
               {stats.spending.length === 0 ? (
-                <p className="stats__note">No book has both a price and an acquired date yet.</p>
+                <p className="text-muted text-meta">No book has both a price and an acquired date yet.</p>
               ) : (
                 stats.spending.map((money) => (
-                  <table key={money.currency} className="stats__table">
-                    <caption className="stats__caption">{money.currency}</caption>
+                  <table key={money.currency} className={TABLE}>
+                    <caption className="pt-2.5 pr-4 pl-4 bg-surface text-muted text-label font-semibold text-left">
+                      {money.currency}
+                    </caption>
                     <tbody>
                       {money.years.map((row) => (
                         <tr key={row.year}>
                           <th scope="row">{row.year}</th>
-                          <td className="stats__detail">{plural(row.books, "book", "books")}</td>
+                          <td className="text-muted text-meta">{plural(row.books, "book", "books")}</td>
                           <td className="stats__num">{formatPrice(row.totalMinor, money.currency)}</td>
                         </tr>
                       ))}
@@ -98,7 +103,7 @@ export function StatsPage() {
                 ))
               )}
               {stats.unpriced > 0 && (
-                <p className="stats__foot">
+                <p className="text-muted text-meta">
                   {plural(stats.unpriced, "book has", "books have")} no price or no acquired date, so{" "}
                   {stats.unpriced === 1 ? "it isn't" : "they aren't"} counted here.
                 </p>
@@ -113,7 +118,7 @@ export function StatsPage() {
 
 function Total({ label, value }: { label: string; value: number }) {
   return (
-    <div className="stats__total">
+    <div className="flex-[1_1_140px] py-4 px-5 bg-surface rounded-container [&_dt]:text-muted [&_dt]:text-label [&_dt]:font-semibold [&_dd]:mt-1 [&_dd]:text-title-phone [&_dd]:font-bold [&_dd]:tabular-nums">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>
@@ -122,8 +127,8 @@ function Total({ label, value }: { label: string; value: number }) {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="stats__section">
-      <h2 className="stats__heading">{title}</h2>
+    <section className="flex flex-col gap-2">
+      <h2 className="text-row-title font-semibold">{title}</h2>
       {children}
     </section>
   );
@@ -135,7 +140,7 @@ function Count({ count, filter, label }: { count: number; filter: LibraryFilter 
   return (
     <button
       type="button"
-      className="stats__count"
+      className="min-w-11 min-h-11 -my-3 px-1 text-accent tabular-nums cursor-pointer hover:text-accent-press hover:underline"
       aria-label={`${count} ${label}, show in Library`}
       onClick={() => openInLibrary(filter)}
     >
@@ -158,7 +163,7 @@ function List({
   const { shown, more } = top(rows);
   return (
     <>
-      <table className="stats__table">
+      <table className={TABLE}>
         <tbody>
           {shown.map((row) => (
             <tr key={row.key}>
@@ -174,7 +179,7 @@ function List({
           ))}
         </tbody>
       </table>
-      {more > 0 && <p className="stats__foot">and {more} more</p>}
+      {more > 0 && <p className="text-muted text-meta">and {more} more</p>}
     </>
   );
 }
@@ -183,7 +188,7 @@ function Rooms({ rooms }: { rooms: readonly Room[] }) {
   const { shown, more } = top(rooms);
   return (
     <>
-      <table className="stats__table">
+      <table className={TABLE}>
         <tbody>
           {shown.flatMap((room) => {
             const name = room.room === "" ? "No shelf" : room.room;
@@ -200,7 +205,7 @@ function Rooms({ rooms }: { rooms: readonly Room[] }) {
                 </td>
               </tr>,
               ...(shelves ?? []).map((shelf) => (
-                <tr key={`${room.room}/${shelf.key}`} className="stats__sub">
+                <tr key={`${room.room}/${shelf.key}`} className="[&_th]:pl-8 [&_th]:text-ink-2">
                   <th scope="row">{shelf.key}</th>
                   <td>
                     <Count count={shelf.count} label={shelf.key} filter={shelfFilter([shelf.key])} />
@@ -211,7 +216,7 @@ function Rooms({ rooms }: { rooms: readonly Room[] }) {
           })}
         </tbody>
       </table>
-      {more > 0 && <p className="stats__foot">and {more} more</p>}
+      {more > 0 && <p className="text-muted text-meta">and {more} more</p>}
     </>
   );
 }

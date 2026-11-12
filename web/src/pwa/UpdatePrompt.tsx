@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { dismiss, notify } from "../components/ui/Toast";
-import "./pwa.css";
 import { applyUpdate, registerServiceWorker, useUpdateWaiting } from "./register";
 
 /**

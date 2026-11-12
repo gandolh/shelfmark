@@ -1,7 +1,6 @@
 import { useEffect, useSyncExternalStore } from "react";
 import { lookupIsbn } from "../add/api";
 import { startScanQueue } from "../offline/queueStore";
-import "./pwa.css";
 
 function subscribe(notify: () => void): () => void {
   window.addEventListener("online", notify);
@@ -23,7 +22,10 @@ export function OfflineNotice() {
   );
   if (online) return null;
   return (
-    <p className="offline-notice" role="status">
+    <p
+      className="fixed md:top-[calc(var(--spacing-topbar)+8px)] top-[calc(env(safe-area-inset-top)_+_8px)] right-0 left-0 z-float w-fit max-w-[calc(100%_-_2_*_var(--spacing-gutter-phone))] mx-auto py-1.5 px-3.5 border border-hairline rounded-pill bg-surface text-ink-2 text-meta leading-tight text-center"
+      role="status"
+    >
       You&rsquo;re offline. Your library will be back when you are.
     </p>
   );
