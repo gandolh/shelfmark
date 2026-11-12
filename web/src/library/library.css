@@ -1448,7 +1448,7 @@ button.library-cover {
  * filter panel's rows): the account's Change password dialog in this page's
  * names. A white floating panel with the menus' shadow over a dimmed page:
  * in the middle of the window on the desktop, the floating sheet over the
- * bottom on a phone. Its field and error are the login page's (auth/auth.css).
+ * bottom on a phone. Its field and error are the login page's.
  */
 .library-dialog-backdrop {
   position: fixed;

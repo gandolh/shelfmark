@@ -5,7 +5,6 @@ import { AlertIcon } from "../auth/icons";
 import { Button } from "../components/Button";
 import { Dialog, DialogActions } from "../components/ui/Dialog";
 import { NAME_TAKEN } from "./savedViewsStore";
-import "../auth/auth.css";
 
 /**
  * The Views menu's dialogs: name a view (save, rename) and
@@ -22,9 +21,12 @@ const NAME_MAX = 80;
 
 export function DialogFailure({ children }: { children: string }) {
   return (
-    <p className="auth-error" role="alert">
+    <p
+      className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+      role="alert"
+    >
       <AlertIcon />
-      <span className="auth-error__text">{children}</span>
+      <span className="flex-1 min-w-0">{children}</span>
     </p>
   );
 }

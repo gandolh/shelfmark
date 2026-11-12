@@ -251,9 +251,12 @@ function PasswordForm(props: PasswordFormProps) {
         onChange={update("repeat")}
       />
       {blockFailure !== null && (
-        <p className="auth-error" role="alert">
+        <p
+          className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          role="alert"
+        >
           <AlertIcon />
-          <span className="auth-error__text">{blockFailure}</span>
+          <span className="flex-1 min-w-0">{blockFailure}</span>
         </p>
       )}
       <DialogActions desktop={desktop} onCancel={onCancel}>
@@ -286,9 +289,12 @@ function ConfirmWithWard(props: {
         choose one here, so you can still sign in while Ward is down.
       </p>
       {failure !== null && (
-        <p className="auth-error" role="alert">
+        <p
+          className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+          role="alert"
+        >
           <AlertIcon />
-          <span className="auth-error__text">{accountMessage(failure)}</span>
+          <span className="flex-1 min-w-0">{accountMessage(failure)}</span>
         </p>
       )}
       <DialogActions desktop={desktop} onCancel={onCancel}>

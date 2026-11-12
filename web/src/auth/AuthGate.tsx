@@ -4,7 +4,6 @@ import { Button } from "../components/Button";
 import { LOGIN, navigate, useMatchedRoute } from "../router";
 import { LoginPage } from "./LoginPage";
 import { afterSignIn, forgetReturnPath, rememberReturnPath } from "./session";
-import "./auth.css";
 
 /**
  * The session gate around the whole app. The vendored hooks hold the session
@@ -64,20 +63,27 @@ export interface GateScreenProps {
 /** What the gate shows instead of the app or the login page. Pure, so a test can render it. */
 export function GateScreen({ state, onRetry }: GateScreenProps) {
   return (
-    <main className="gate" aria-busy={state === "loading" || undefined}>
-      <div className="gate__column">
-        <header className="gate__head">
-          <h1 className="gate__wordmark">Shelfmark</h1>
+    <main
+      className="grid min-h-[100dvh] pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone [place-items:start_center] bg-ground max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
+      aria-busy={state === "loading" || undefined}
+    >
+      <div className="flex flex-col gap-6 w-full max-w-95">
+        <header className="flex flex-col gap-1.5 px-1">
+          <h1 className="text-ink text-title font-bold tracking-title leading-tight max-md:text-title-phone">
+            Shelfmark
+          </h1>
           {state === "loading" ? (
-            <p className="gate__wait">Loading…</p>
+            <p className="text-muted text-meta motion-safe:animate-fade-in motion-safe:[animation-delay:400ms] motion-safe:[animation-fill-mode:both]">
+              Loading…
+            </p>
           ) : (
-            <p className="gate__lede" role="alert">
+            <p className="text-muted text-body leading-tight" role="alert">
               Shelfmark can't be reached. Check your connection, then try again.
             </p>
           )}
         </header>
         {state === "unreachable" && (
-          <div className="gate__actions">
+          <div className="flex">
             <Button variant="secondary" pill onClick={onRetry}>
               Try again
             </Button>

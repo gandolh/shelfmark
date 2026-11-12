@@ -6,7 +6,6 @@ import { AuthField } from "./Field";
 import { AlertIcon } from "./icons";
 import { loginMessage, sessionReasonMessage, wardSignInMessage } from "./messages";
 import { wardReturnTo } from "./session";
-import "./auth.css";
 
 export interface LoginViewProps {
   /** The server has Ward configured: "Sign in with Ward" shows only then. */
@@ -74,21 +73,26 @@ export function LoginView({
   };
 
   return (
-    <main className="gate" aria-busy={pending || wardPending || undefined}>
-      <div className="gate__column">
-        <header className="gate__head">
-          <h1 className="gate__wordmark">Shelfmark</h1>
-          <p className="gate__lede">Sign in to your library.</p>
+    <main
+      className="grid min-h-[100dvh] pt-[max(14vh,64px)] pr-gutter-phone pb-12 pl-gutter-phone [place-items:start_center] bg-ground max-md:pt-[calc(env(safe-area-inset-top)_+_max(7vh,80px))] max-md:leading-phone"
+      aria-busy={pending || wardPending || undefined}
+    >
+      <div className="flex flex-col gap-6 w-full max-w-95">
+        <header className="flex flex-col gap-1.5 px-1">
+          <h1 className="text-ink text-title font-bold tracking-title leading-tight max-md:text-title-phone">
+            Shelfmark
+          </h1>
+          <p className="text-muted text-body leading-tight">Sign in to your library.</p>
         </header>
 
         {notice !== null && (
-          <p className="gate__notice" role="status">
+          <p className="py-3 px-3.5 rounded-control bg-accent-tint-soft text-ink text-meta leading-tight" role="status">
             {notice}
           </p>
         )}
 
-        <div className="login__panel">
-          <form className="login__form" onSubmit={submit} noValidate aria-label="Sign in">
+        <div className="flex flex-col gap-4.5 p-6 rounded-container bg-surface max-md:py-5 max-md:px-4">
+          <form className="flex flex-col gap-4" onSubmit={submit} noValidate aria-label="Sign in">
             <AuthField
               ref={usernameRef}
               label="Username"
@@ -121,29 +125,43 @@ export function LoginView({
               }}
             />
             {error !== null && (
-              <p className="auth-error" role="alert">
+              <p
+                className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+                role="alert"
+              >
                 <AlertIcon />
-                <span className="auth-error__text">{loginMessage(error)}</span>
+                <span className="flex-1 min-w-0">{loginMessage(error)}</span>
               </p>
             )}
-            <Button type="submit" variant="primary" size="large" block className="login__submit" disabled={pending}>
+            <Button type="submit" variant="primary" size="large" block className="mt-1" disabled={pending}>
               {pending ? "Signing in…" : "Sign in"}
             </Button>
           </form>
 
           {wardEnabled && (
-            <div className="login__ward">
-              <p className="login__or" aria-hidden="true">
+            <div className="flex flex-col gap-3">
+              <p
+                className="flex items-center gap-3 text-muted text-small leading-none before:content-[''] before:flex-1 before:h-px before:bg-divider after:content-[''] after:flex-1 after:h-px after:bg-divider"
+                aria-hidden="true"
+              >
                 or
               </p>
               <Button variant="secondary" pill size="large" block disabled={wardPending} onClick={onWard}>
                 {wardPending ? "Opening Ward…" : "Sign in with Ward"}
               </Button>
               {wardError !== null && (
-                <p className="auth-error" role="alert">
+                <p
+                  className="flex items-start gap-2 py-2.5 px-3 rounded-control bg-field text-ink text-meta font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+                  role="alert"
+                >
                   <AlertIcon />
-                  <span className="auth-error__text">{wardSignInMessage(wardError)}</span>
-                  <Button variant="quiet" size="compact" className="auth-error__dismiss" onClick={onDismissWard}>
+                  <span className="flex-1 min-w-0">{wardSignInMessage(wardError)}</span>
+                  <Button
+                    variant="quiet"
+                    size="compact"
+                    className="flex-none min-h-0 -mt-0.5 -mr-1 -mb-0.5 text-meta font-semibold"
+                    onClick={onDismissWard}
+                  >
                     Dismiss
                   </Button>
                 </p>

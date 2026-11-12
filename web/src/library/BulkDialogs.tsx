@@ -159,7 +159,11 @@ export function ShelfDialog({ owned, wishlist, shelves, desktop, returnFocus, on
           />
         )}
         {fieldError && choice !== NEW_SHELF && (
-          <p id={`${id}-error`} className="auth-field__error" role="alert">
+          <p
+            id={`${id}-error`}
+            className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+            role="alert"
+          >
             {fieldError}
           </p>
         )}
@@ -308,7 +312,11 @@ export function RemoveTagsDialog({ count, tags, desktop, returnFocus, onClose, o
           ))}
         </fieldset>
         {fieldError && (
-          <p id={`${id}-error`} className="auth-field__error" role="alert">
+          <p
+            id={`${id}-error`}
+            className="flex items-start gap-1.5 text-ink text-small font-semibold leading-tight [&_svg]:flex-none [&_svg]:-mt-0.25"
+            role="alert"
+          >
             {fieldError}
           </p>
         )}
