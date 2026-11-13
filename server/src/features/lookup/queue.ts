@@ -9,12 +9,28 @@
 export interface Clock {
   /** Milliseconds, monotonic. */
   now(): number;
-  sleep(ms: number): Promise<void>;
+  /** Resolves after `ms`, or rejects with the signal's reason when `signal` aborts first. */
+  sleep(ms: number, signal?: AbortSignal): Promise<void>;
 }
 
 export const realClock: Clock = {
   now: () => performance.now(),
-  sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  sleep: (ms, signal) =>
+    new Promise((resolve, reject) => {
+      if (signal?.aborted) {
+        reject(signal.reason as Error);
+        return;
+      }
+      const onAbort = () => {
+        clearTimeout(timer);
+        reject(signal?.reason as Error);
+      };
+      const timer = setTimeout(() => {
+        signal?.removeEventListener("abort", onAbort);
+        resolve();
+      }, ms);
+      signal?.addEventListener("abort", onAbort, { once: true });
+    }),
 };
 
 /** Open Library allows 3 requests a second with a `User-Agent` naming the app: 2.5 keeps under it. */
@@ -43,8 +59,11 @@ export interface Queue {
   run<T>(task: () => Promise<T>): Promise<T>;
 }
 
-/** `spacing` in milliseconds is a fixed spacing from the previous start. */
-export function createQueue(spacing: number | Spacing, clock: Clock = realClock): Queue {
+/**
+ * `spacing` in milliseconds is a fixed spacing from the previous start. Once `signal` aborts, a task
+ * waiting its turn or its pause fails with the signal's reason at once and starts nothing.
+ */
+export function createQueue(spacing: number | Spacing, clock: Clock = realClock, signal?: AbortSignal): Queue {
   const { ms, from } = typeof spacing === "number" ? { ms: () => spacing, from: "start" } : spacing;
   let tail: Promise<unknown> = Promise.resolve();
   // The previous task's start or end, whichever `from` says, and the pause drawn after it.
@@ -54,9 +73,10 @@ export function createQueue(spacing: number | Spacing, clock: Clock = realClock)
   return {
     run<T>(task: () => Promise<T>): Promise<T> {
       const turn = tail.then(async () => {
+        signal?.throwIfAborted();
         // A loop, because a timer may fire a millisecond early.
         for (let wait = last + gap - clock.now(); wait > 0; wait = last + gap - clock.now()) {
-          await clock.sleep(wait);
+          await clock.sleep(wait, signal);
         }
         if (from === "start") last = clock.now();
         try {

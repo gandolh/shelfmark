@@ -84,7 +84,7 @@ export interface GoogleBooksOptions extends SourceClientOptions {
 export function createGoogleBooksSource(options: GoogleBooksOptions): LookupSourceClient {
   const { apiKey } = options;
   const fetch = options.fetch ?? globalThis.fetch;
-  const queue = options.queue ?? createQueue(GOOGLE_BOOKS_SPACING_MS);
+  const queue = options.queue ?? createQueue(GOOGLE_BOOKS_SPACING_MS, undefined, options.signal);
   const timeoutMs = options.timeoutMs ?? SOURCE_TIMEOUT_MS;
 
   return {
@@ -98,6 +98,7 @@ export function createGoogleBooksSource(options: GoogleBooksOptions): LookupSour
         getJson("Google Books", `${GOOGLE_BOOKS_API}/volumes?${query}`, {
           fetch,
           timeoutMs,
+          signal: options.signal,
           headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
         }),
       );

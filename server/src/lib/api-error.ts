@@ -12,6 +12,8 @@ export const ERROR_STATUS = {
   /** The change clashes with what is stored: a saved view's name another view has (`features/views/routes.ts`). */
   conflict: 409,
   internal: 500,
+  /** The server is stopping and gave up the request in flight (a lookup cut by the shutdown). */
+  unavailable: 503,
   /** A host the server called (a cover download) failed or timed out. */
   upstream: 502,
 } as const satisfies Record<string, number>;

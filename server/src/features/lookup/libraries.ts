@@ -66,12 +66,14 @@ export interface LibrarySourceOptions {
   /** Default: a fresh queue at the libraries' pace. */
   queue?: Queue;
   timeoutMs?: number;
+  /** Aborts the exchange in flight and every one waiting in the queue. Default: never. */
+  signal?: AbortSignal;
 }
 
 export function createLibrarySource(source: LibrarySource, options: LibrarySourceOptions = {}): LookupSourceClient {
   const target = LIBRARIES[source];
   const connect = options.connect ?? netConnection;
-  const queue = options.queue ?? createQueue(LIBRARY_SPACING);
+  const queue = options.queue ?? createQueue(LIBRARY_SPACING, undefined, options.signal);
   const timeoutMs = options.timeoutMs ?? LIBRARY_TIMEOUT_MS;
 
   return {
@@ -84,6 +86,7 @@ export function createLibrarySource(source: LibrarySource, options: LibrarySourc
         searchIsbns(target, isbns, {
           connect,
           timeoutMs,
+          signal: options.signal,
           maxRecords: MAX_RECORDS,
           implementation: { name: "Shelfmark", version: APP_VERSION },
         }),

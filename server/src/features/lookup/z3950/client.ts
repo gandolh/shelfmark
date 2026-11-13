@@ -32,6 +32,8 @@ export interface SearchResult {
 export interface ExchangeOptions {
   connect: Connect;
   timeoutMs: number;
+  /** Destroys the socket and rejects with the signal's reason when it aborts. */
+  signal?: AbortSignal;
   maxRecords: number;
   implementation: { name: string; version: string };
 }
@@ -52,6 +54,7 @@ export function searchIsbns(target: Target, isbns: readonly string[], options: E
       if (settled) return;
       settled = true;
       clearTimeout(timer);
+      options.signal?.removeEventListener("abort", onAbort);
       socket?.destroy();
       if (error) reject(error);
       else if (result) resolve(result);
@@ -62,6 +65,13 @@ export function searchIsbns(target: Target, isbns: readonly string[], options: E
       error.name = "TimeoutError";
       finish(error);
     }, options.timeoutMs);
+
+    const onAbort = () => finish(options.signal?.reason as Error);
+    if (options.signal?.aborted) {
+      finish(options.signal.reason as Error);
+      return;
+    }
+    options.signal?.addEventListener("abort", onAbort, { once: true });
 
     const ask = (pdu: Buffer) =>
       new Promise<Answer>((answered) => {

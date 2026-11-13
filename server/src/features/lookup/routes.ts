@@ -43,15 +43,24 @@ export const lookupRoutes: FastifyPluginAsyncZod<LookupRoutesOptions> = async (
   app,
   { config, db, books, fetch, connect, cip },
 ) => {
+  // A stop aborts every request in flight, in `preClose`: `app.close()` waits for the requests in
+  // flight before it runs `onClose`, and a lookup can wait on the catalogs for 40 s or more.
+  const stopping = new AbortController();
+  app.addHook("preClose", async () => {
+    stopping.abort(new DOMException("The server is stopping", "AbortError"));
+  });
+  const { signal } = stopping;
+
   const lookup = createLookup({
     sources: [
-      createOpenLibrarySource({ fetch }),
-      ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect })),
+      createOpenLibrarySource({ fetch, signal }),
+      ...LIBRARY_ORDER.map((library) => createLibrarySource(library, { connect, signal })),
       createCipSource(cip),
-      createGoogleBooksSource({ apiKey: config.googleBooksApiKey, fetch }),
+      createGoogleBooksSource({ apiKey: config.googleBooksApiKey, fetch, signal }),
     ],
     cache: createLookupCache(db),
     onError: (source, isbn13, error) => {
+      if (signal.aborted) return;
       app.log.warn(
         { source, isbn13, reason: error instanceof Error ? error.message : String(error) },
         "lookup source failed",
@@ -70,6 +79,8 @@ export const lookupRoutes: FastifyPluginAsyncZod<LookupRoutesOptions> = async (
 
       const copies = books.findByIsbn(isbn13);
       const { draft, tried } = await lookup.lookup(isbn13);
+      // Cut by a stop: the draft would be built from the sources that answered before it.
+      if (signal.aborted) throw new ApiError("unavailable", "The server is stopping. Try again in a moment.");
       return {
         isbn13,
         draft,

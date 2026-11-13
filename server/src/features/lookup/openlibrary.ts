@@ -54,17 +54,27 @@ export interface SourceClientOptions {
   queue?: Queue;
   /** Per request. Default 8 s. */
   timeoutMs?: number;
+  /** Aborts every request in flight and every one waiting in the queue. Default: never. */
+  signal?: AbortSignal;
 }
 
 /** GET a JSON answer, or throw with a message that names the source and never the URL. */
 export async function getJson(
   label: string,
   url: string,
-  { fetch, timeoutMs, headers }: { fetch: typeof globalThis.fetch; timeoutMs: number; headers: Record<string, string> },
+  {
+    fetch,
+    timeoutMs,
+    headers,
+    signal,
+  }: { fetch: typeof globalThis.fetch; timeoutMs: number; headers: Record<string, string>; signal?: AbortSignal },
 ): Promise<unknown> {
   let response: Response;
   try {
-    response = await fetch(url, { headers, signal: AbortSignal.timeout(timeoutMs) });
+    response = await fetch(url, {
+      headers,
+      signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs),
+    });
   } catch (error) {
     const timedOut = error instanceof Error && error.name === "TimeoutError";
     throw new Error(
@@ -232,7 +242,7 @@ export function readOpenLibrary(isbn13: string, response: unknown): SourceDraft 
 
 export function createOpenLibrarySource(options: SourceClientOptions = {}): LookupSourceClient {
   const fetch = options.fetch ?? globalThis.fetch;
-  const queue = options.queue ?? createQueue(OPEN_LIBRARY_SPACING_MS);
+  const queue = options.queue ?? createQueue(OPEN_LIBRARY_SPACING_MS, undefined, options.signal);
   const timeoutMs = options.timeoutMs ?? SOURCE_TIMEOUT_MS;
   const headers = { "User-Agent": USER_AGENT, Accept: "application/json" };
 
@@ -242,6 +252,7 @@ export function createOpenLibrarySource(options: SourceClientOptions = {}): Look
         fetch,
         timeoutMs,
         headers,
+        signal: options.signal,
       }),
     );
 
