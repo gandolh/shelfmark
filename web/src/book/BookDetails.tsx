@@ -1,6 +1,5 @@
 import { to10, type Book, type MetadataSource } from "@shelfmark/shared";
 import type { ReactNode } from "react";
-import { STATUS_LABELS } from "../add/StatusPicker";
 import { priceLine } from "./money";
 import { StarIcon } from "./RatingField";
 
@@ -37,7 +36,7 @@ export function languageName(code: string): string {
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="grid grid-cols-[140px_minmax(0,1fr)] items-baseline gap-3 border-t border-divider py-2.75 text-body first:border-t-0 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-0.5 [&_dd]:min-w-0 [&_dd]:wrap-anywhere [&_dd]:text-ink [&_dd]:tabular-nums [&_dt]:text-meta [&_dt]:text-muted max-md:[&_dt]:text-label max-md:[&_dt]:font-semibold">
+    <div className="grid grid-cols-[152px_minmax(0,1fr)] gap-4 border-b border-divider py-3 last:border-b-0 last:pb-0 max-md:grid-cols-[minmax(0,1fr)] max-md:gap-1 [&_dd]:max-w-[60ch] [&_dd]:min-w-0 [&_dd]:wrap-anywhere [&_dd]:text-ink [&_dt]:text-meta [&_dt]:leading-body [&_dt]:text-muted">
       <dt>{label}</dt>
       <dd>{children}</dd>
     </div>
@@ -45,10 +44,10 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /**
- * Everything the book holds, in two groups: about the book (what is printed
- * in it) and about this copy (what the owner knows about the one on the
- * shelf). A fact the book doesn't have is left out, except the shelf and the
- * status, which every owned copy answers.
+ * Everything the book holds, in two flat cards: about this copy (what the
+ * owner knows about the one on the shelf), then about the book (what is
+ * printed in it). The shelf and the status are set large above them, in
+ * BookPage. A fact the book doesn't have is left out.
  */
 export function BookDetails({ book }: { book: Book }) {
   const isbn10 = book.isbn13 === null ? null : to10(book.isbn13);
@@ -61,13 +60,62 @@ export function BookDetails({ book }: { book: Book }) {
 
   return (
     <>
+      <section className="min-w-0 rounded-container bg-surface p-5 max-md:p-4" aria-labelledby="book-about-copy">
+        <h2 className="font-book text-heading leading-heading font-semibold text-ink" id="book-about-copy">
+          About this copy
+        </h2>
+        <dl className="mt-2 flex flex-col">
+          {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
+          {book.rating !== null && (
+            <Fact label="Rating">
+              <span className="inline-flex gap-0.5 align-middle text-accent">
+                {[1, 2, 3, 4, 5].map((n) => (
+                  <StarIcon key={n} on={n <= (book.rating ?? 0)} size={16} />
+                ))}
+              </span>
+              <span className="ml-2 text-ink-2">{book.rating} of 5</span>
+            </Fact>
+          )}
+          {book.format && <Fact label="Format">{FORMAT_LABELS[book.format]}</Fact>}
+          {book.condition && <Fact label="Condition">{CONDITION_LABELS[book.condition]}</Fact>}
+          {book.signed && <Fact label="Signed">Signed by the author</Fact>}
+          {acquired !== "" && <Fact label="Acquired">{acquired}</Fact>}
+          {book.priceMinor !== null && <Fact label="Price">{priceLine(book.priceMinor, book.currency)}</Fact>}
+          {book.tags.length > 0 && (
+            <Fact label="Tags">
+              <ul className="flex list-none flex-wrap gap-1.5">
+                {book.tags.map((tag) => (
+                  <li
+                    key={tag}
+                    className="inline-flex h-7 items-center rounded-pill bg-control px-3 text-meta text-ink"
+                  >
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+            </Fact>
+          )}
+          {book.notes && (
+            <Fact label="Notes">
+              <span className="block whitespace-pre-line">{book.notes}</span>
+            </Fact>
+          )}
+          <Fact label="Added">{dayText(book.createdAt.slice(0, 10))}</Fact>
+          <Fact label="Details from">{SOURCES[book.metadataSource]}</Fact>
+        </dl>
+      </section>
+
       <section className="min-w-0 rounded-container bg-surface p-5 max-md:p-4" aria-labelledby="book-about-book">
-        <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-book">
+        <h2 className="font-book text-heading leading-heading font-semibold text-ink" id="book-about-book">
           About the book
         </h2>
-        <dl className="my-3.75 flex flex-col">
+        <dl className="mt-2 flex flex-col">
           {book.publisher && <Fact label="Publisher">{book.publisher}</Fact>}
-          {book.publishedYear !== null && <Fact label="Year">{book.publishedYear}</Fact>}
+          {book.publishedYear !== null && (
+            <Fact label="Year">
+              <span className="text-muted">{book.publishedYear}</span>
+            </Fact>
+          )}
           {book.pages !== null && <Fact label="Pages">{book.pages}</Fact>}
           {book.language && <Fact label="Language">{languageName(book.language)}</Fact>}
           {book.series && (
@@ -91,57 +139,6 @@ export function BookDetails({ book }: { book: Book }) {
             Nothing recorded about this book yet. Edit adds details; Re-run lookup finds them from the ISBN.
           </p>
         )}
-      </section>
-
-      <section className="min-w-0 rounded-container bg-surface p-5 max-md:p-4" aria-labelledby="book-about-copy">
-        <h2 className="mb-1 text-row-title font-semibold text-ink" id="book-about-copy">
-          About this copy
-        </h2>
-        <dl className="my-3.75 flex flex-col">
-          {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
-          <Fact label="Shelf">{book.shelf ?? <span className="text-muted">No shelf</span>}</Fact>
-          <Fact label="Status">
-            <span className={book.status === "reading" ? "font-semibold text-accent" : undefined}>
-              {STATUS_LABELS[book.status]}
-            </span>
-          </Fact>
-          {book.rating !== null && (
-            <Fact label="Rating">
-              <span className="inline-flex gap-0.5 align-middle text-accent">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <StarIcon key={n} on={n <= (book.rating ?? 0)} size={16} />
-                ))}
-              </span>
-              <span className="ml-2 text-ink-2">{book.rating} of 5</span>
-            </Fact>
-          )}
-          {book.format && <Fact label="Format">{FORMAT_LABELS[book.format]}</Fact>}
-          {book.condition && <Fact label="Condition">{CONDITION_LABELS[book.condition]}</Fact>}
-          {book.signed && <Fact label="Signed">Signed by the author</Fact>}
-          {acquired !== "" && <Fact label="Acquired">{acquired}</Fact>}
-          {book.priceMinor !== null && <Fact label="Price">{priceLine(book.priceMinor, book.currency)}</Fact>}
-          {book.tags.length > 0 && (
-            <Fact label="Tags">
-              <ul className="flex list-none flex-wrap gap-1.5">
-                {book.tags.map((tag) => (
-                  <li
-                    key={tag}
-                    className="inline-flex min-h-7 items-center rounded-pill bg-control px-3 text-meta text-ink"
-                  >
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            </Fact>
-          )}
-          {book.notes && (
-            <Fact label="Notes">
-              <span className="block whitespace-pre-line">{book.notes}</span>
-            </Fact>
-          )}
-          <Fact label="Added">{dayText(book.createdAt.slice(0, 10))}</Fact>
-          <Fact label="Details from">{SOURCES[book.metadataSource]}</Fact>
-        </dl>
       </section>
     </>
   );

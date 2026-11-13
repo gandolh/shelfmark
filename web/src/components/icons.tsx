@@ -98,3 +98,23 @@ export function CheckIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** A pencil: Edit. */
+export function EditIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={1.75} {...props}>
+      <path d="M4 20h4L19 9l-4-4L4 16z" />
+    </Icon>
+  );
+}
+
+/** A picture: Change cover. */
+export function ImageIcon(props: IconProps) {
+  return (
+    <Icon strokeWidth={1.75} {...props}>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="9" cy="10" r="2" />
+      <path d="M21 16l-5-5-9 9" />
+    </Icon>
+  );
+}

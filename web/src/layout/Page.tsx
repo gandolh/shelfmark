@@ -8,7 +8,6 @@ import { SearchField } from "./SearchField";
 import { useIsDesktop } from "./viewport";
 
 const HEADROW = "flex flex-wrap items-end justify-between gap-4 max-md:flex-nowrap max-md:items-center";
-const BOOK_HEADROW = "md:max-w-[1020px]";
 const TOOLBAR = "flex flex-wrap items-center gap-2 max-md:justify-between";
 
 export interface PageProps {
@@ -35,8 +34,11 @@ export interface PageProps {
   wide?: boolean;
   /** The header (title, caption, toolbar; on a phone the search box too) on a white card like the table's container. */
   card?: boolean;
-  /** The book page's two columns (260 + 40 + 720 px): the heading row stays as wide as they are, on the desktop. */
-  book?: boolean;
+  /**
+   * The page draws its own heading (the book page sets the title beside the cover): the header holds only the
+   * back link, and on a phone the account button. `title` still names the window.
+   */
+  bare?: boolean;
   children?: ReactNode;
 }
 
@@ -54,7 +56,7 @@ export function Page({
   bleed = false,
   wide = false,
   card = false,
-  book = false,
+  bare = false,
   children,
 }: PageProps) {
   const desktop = useIsDesktop();
@@ -89,15 +91,22 @@ export function Page({
             card && "rounded-container bg-surface max-md:mb-2.5 max-md:rounded-t-none md:p-6",
           )}
         >
-          {back && <BackLink to={back.to} label={back.label} />}
-          {desktop ? (
-            <div className={cn(HEADROW, book && BOOK_HEADROW)}>
+          {bare ? (
+            <div className="flex items-center justify-between gap-4 md:mx-auto md:w-full md:max-w-[1020px]">
+              {back && <BackLink to={back.to} label={back.label} />}
+              {!desktop && <AccountMenu placement="header" />}
+            </div>
+          ) : (
+            back && <BackLink to={back.to} label={back.label} />
+          )}
+          {bare ? null : desktop ? (
+            <div className={HEADROW}>
               {heading}
               {toolbar && <div className={TOOLBAR}>{toolbar}</div>}
             </div>
           ) : (
             <>
-              <div className={cn(HEADROW, book && BOOK_HEADROW)}>
+              <div className={HEADROW}>
                 {heading}
                 <AccountMenu placement="header" />
               </div>
@@ -135,7 +144,7 @@ function BackLink({ to, label }: { to: Route; label: string }) {
   return (
     <Link
       to={to}
-      className="-ml-1.5 inline-flex min-h-8 items-center gap-0.5 self-start rounded-control pr-1.5 text-body no-underline max-md:-mt-1.5 max-md:-mb-1 max-md:min-h-touch"
+      className="-ml-2 inline-flex min-h-control items-center gap-1 self-start rounded-control px-2 text-meta font-semibold text-accent no-underline hover:bg-row-hover max-md:min-h-control-large max-md:text-body"
       onClick={onClick}
     >
       <BackIcon size={18} />

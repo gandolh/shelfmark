@@ -1,10 +1,13 @@
 import type { Book, BookPatch } from "@shelfmark/shared";
 import { useEffect, useRef, useState } from "react";
+import { cn } from "../lib/cn";
 import { todayIso } from "../add/flow";
 import { saveFailure } from "../add/words";
 import { deleteBook, patchBook, useBook, useBooks } from "../books/store";
 import { Button, ButtonLink } from "../components/Button";
+import { STATUS_LABELS } from "../add/StatusPicker";
 import { CoverImage } from "../components/CoverImage";
+import { EditIcon } from "../components/icons";
 import { authorLine } from "../components/cover";
 import { Page } from "../layout/Page";
 import { LIBRARY, navigate, type RouteParams } from "../router";
@@ -48,7 +51,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
         <div className="flex flex-col items-start gap-2.5 pt-2" role="alert">
           <p className="text-row-title font-semibold">The library didn’t load</p>
           <p className="text-small leading-tight text-muted">{error?.message ?? "Shelfmark can’t be reached."}</p>
-          <Button variant="secondary" pill onClick={() => void refresh()}>
+          <Button variant="secondary" onClick={() => void refresh()}>
             Try again
           </Button>
         </div>
@@ -60,7 +63,7 @@ export function BookPage({ params }: { params: RouteParams<"book"> }) {
       <div className="flex flex-col items-start gap-2.5 pt-2">
         <p className="text-row-title font-semibold">This book isn’t in your library</p>
         <p className="text-small leading-tight text-muted">It may have been deleted, or the link is wrong.</p>
-        <ButtonLink to={LIBRARY} variant="secondary" pill>
+        <ButtonLink to={LIBRARY} variant="secondary">
           Back to the Library
         </ButtonLink>
       </div>
@@ -113,28 +116,25 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
   };
 
   const authors = authorLine(book.authors);
-  const caption =
-    book.subtitle || authors ? (
-      <span className="flex flex-col gap-0.5">
-        {book.subtitle && <span className="text-body text-ink-2">{book.subtitle}</span>}
-        {authors && <span className="text-body text-muted">{authors}</span>}
-      </span>
-    ) : undefined;
 
-  const toolbar = editing ? undefined : (
-    <>
+  const actions = editing ? undefined : (
+    <div className="flex flex-wrap items-center gap-2 max-md:w-full max-md:[&>*]:flex-[1_1_100%]">
       {book.collection === "wishlist" && (
         <Button
           id="book-buy"
           variant="primary"
-          pill
           aria-expanded={buying}
           onClick={() => (setNotice(null), setBuying(true))}
         >
           I bought it
         </Button>
       )}
-      <Button id="book-edit" variant="secondary" pill onClick={() => (setNotice(null), setEditing(true))}>
+      <Button
+        id="book-edit"
+        variant="secondary"
+        icon={<EditIcon size={18} />}
+        onClick={() => (setNotice(null), setEditing(true))}
+      >
         Edit
       </Button>
       {book.isbn13 !== null && (
@@ -150,17 +150,46 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
           Re-run lookup
         </Button>
       )}
-    </>
+    </div>
   );
 
   return (
-    <Page title={book.title} caption={caption} toolbar={toolbar} back={BACK} book>
-      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-5 md:grid-cols-[260px_minmax(0,720px)] md:gap-10 md:pt-1.5">
-        <div className="mx-auto flex w-[min(100%,168px)] flex-col gap-3 max-md:has-data-[cover-panel]:w-full md:sticky md:top-[calc(var(--spacing-topbar)_+_24px)] md:m-0 md:w-full max-md:has-data-[cover-panel]:[&>:first-child]:w-42 max-md:has-data-[cover-panel]:[&>:first-child]:self-center">
+    <Page title={book.title} back={BACK} bare>
+      <div className="flex flex-wrap items-start gap-x-12 gap-y-6 max-lg:gap-x-6 max-md:gap-y-2 md:mx-auto md:w-full md:max-w-[1020px] md:pt-2">
+        <div className="flex flex-none basis-60 flex-col gap-4 max-lg:basis-50 max-md:basis-full max-md:items-center md:sticky md:top-[calc(var(--spacing-topbar)_+_32px)] [&>:first-child]:w-full max-md:[&>:first-child]:w-42">
           <CoverImage book={book} width="100%" alt={`Cover of ${book.title}`} loading="eager" />
           <CoverPanel book={book} lookup={lookup} />
         </div>
-        <div className="flex min-w-0 flex-col gap-4">
+        <div className="flex max-w-180 min-w-0 flex-[999_1_360px] flex-col gap-4 max-md:basis-full">
+          <div>
+            <h1 className="font-book text-title leading-title font-semibold tracking-title wrap-anywhere max-md:text-title-phone max-md:leading-9">
+              {book.title}
+            </h1>
+            {book.subtitle && <p className="text-body text-ink-2">{book.subtitle}</p>}
+            {authors && <p className="text-body text-ink-2">{authors}</p>}
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 pb-2">
+            <dl className="flex flex-wrap gap-8">
+              <div className="flex flex-col gap-1">
+                <dt className="text-label leading-label font-semibold text-muted">Shelf</dt>
+                <dd className="text-heading leading-heading font-semibold">
+                  {book.shelf ?? <span className="text-muted">No shelf</span>}
+                </dd>
+              </div>
+              <div className="flex flex-col gap-1">
+                <dt className="text-label leading-label font-semibold text-muted">Status</dt>
+                <dd
+                  className={cn(
+                    "text-heading leading-heading font-semibold",
+                    book.status === "reading" && "text-accent",
+                  )}
+                >
+                  {STATUS_LABELS[book.status]}
+                </dd>
+              </div>
+            </dl>
+            {actions}
+          </div>
           <p className="text-meta font-semibold text-ink empty:hidden" role="status">
             {notice}
           </p>

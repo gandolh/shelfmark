@@ -29,7 +29,7 @@ interface ButtonLook {
 
 const BASE = [
   "relative inline-flex min-h-control flex-none items-center justify-center gap-1.5 rounded-control px-3",
-  "text-center text-meta leading-tight font-regular whitespace-nowrap text-ink no-underline select-none",
+  "text-center text-meta leading-tight font-semibold whitespace-nowrap text-ink no-underline select-none",
   "transition-[background-color,color] duration-(--duration-fast) ease-out",
   "disabled:pointer-events-none disabled:opacity-55 aria-disabled:pointer-events-none aria-disabled:opacity-55",
   "[&_svg]:flex-none",
@@ -39,7 +39,7 @@ const VARIANT: Record<ButtonVariant, string> = {
   primary:
     "bg-accent px-4 font-semibold text-on-accent hover:bg-accent-press hover:text-on-accent active:bg-accent-press active:text-on-accent",
   secondary:
-    "bg-control text-ink hover:bg-control-hover hover:text-ink active:bg-control-press active:bg-accent-tint active:text-on-accent-tint aria-expanded:bg-accent-tint aria-expanded:font-semibold aria-expanded:text-on-accent-tint",
+    "bg-control text-ink hover:bg-control-hover hover:text-ink active:bg-accent-tint active:text-on-accent-tint aria-expanded:bg-accent-tint aria-expanded:font-semibold aria-expanded:text-on-accent-tint",
   quiet:
     "px-2 font-semibold text-accent hover:bg-row-hover hover:text-accent-press active:bg-row-hover active:text-accent-press",
 };

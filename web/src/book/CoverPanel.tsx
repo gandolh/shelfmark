@@ -7,6 +7,7 @@ import { ImageReadError, resizeImage } from "../add/resize";
 import { saveFailure, SOURCE_NAMES } from "../add/words";
 import { Button } from "../components/Button";
 import { CoverImage } from "../components/CoverImage";
+import { ImageIcon } from "../components/icons";
 import { CollapsiblePanel, CollapsibleRoot, CollapsibleTrigger } from "../components/ui/Collapsible";
 import type { BookLookup } from "./useLookup";
 
@@ -53,8 +54,16 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
   const candidates = state.kind === "done" ? (state.response.draft?.coverCandidates ?? []) : [];
 
   return (
-    <CollapsibleRoot open={open} onOpenChange={setOpen} render={<div className="flex flex-col gap-2" />}>
-      <CollapsibleTrigger render={<Button variant="secondary" size="compact" pill block />}>
+    <CollapsibleRoot
+      open={open}
+      onOpenChange={setOpen}
+      render={<div className="flex flex-col gap-3 max-md:items-center" />}
+    >
+      <CollapsibleTrigger
+        render={
+          <Button variant="secondary" icon={<ImageIcon size={18} />} block className="max-md:w-auto max-md:flex-none" />
+        }
+      >
         Change cover
       </CollapsibleTrigger>
       {/* aria-live outside the panel: a result is read out even after it closes. */}
@@ -63,7 +72,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
       </p>
       <CollapsiblePanel
         data-cover-panel
-        className="flex min-w-0 flex-col items-stretch gap-3 rounded-container bg-surface p-3 max-md:p-4 md:p-3.5"
+        className="flex w-full min-w-0 flex-col items-stretch gap-3 rounded-container bg-surface p-4"
         aria-busy={busy || undefined}
       >
         <CoverCapture
@@ -74,7 +83,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
         />
         <label
           className={buttonClass(
-            { variant: "secondary", size: "compact", pill: true },
+            { variant: "secondary", size: "compact" },
             "cursor-pointer [&:has(input:focus-visible)]:outline-2 [&:has(input:focus-visible)]:outline-focus-ring [&:has(input:focus-visible)]:outline-offset-2",
           )}
           aria-disabled={busy}
@@ -85,7 +94,7 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
 
         {book.isbn13 !== null && (
           <div className="flex flex-col items-start gap-2">
-            <h3 className="block text-label leading-tight font-semibold text-muted">From the lookup</h3>
+            <h3 className="block text-label leading-label font-semibold text-muted">From the lookup</h3>
             {state.kind === "idle" && (
               <Button variant="quiet" size="compact" onClick={lookup.run} disabled={busy}>
                 Look for covers
@@ -131,7 +140,6 @@ export function CoverPanel({ book, lookup }: { book: Book; lookup: BookLookup })
               <Button
                 variant="secondary"
                 size="compact"
-                pill
                 disabled={busy}
                 onClick={() => void act(() => removeCover(book.id), "Cover removed.")}
               >
