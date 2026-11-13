@@ -64,7 +64,6 @@ export function Toolbar({
       <>
         <SegmentedControl
           label="View"
-          size="small"
           options={[
             { value: "table", label: "Table" },
             { value: "covers", label: "Covers" },
@@ -72,7 +71,7 @@ export function Toolbar({
           value={mode}
           onChange={onModeChange}
         />
-        <span className="mx-2 h-5.5 w-px flex-none bg-hairline" aria-hidden="true" />
+        <span className="mx-3 h-6 w-px flex-none bg-hairline" aria-hidden="true" />
         <div className="flex items-center gap-0.5">
           <ViewsMenu layout="desktop" mode={mode} />
           <button
@@ -111,7 +110,6 @@ export function Toolbar({
     <>
       <SegmentedControl
         label="View"
-        size="small"
         options={[
           { value: "covers", label: "Covers" },
           { value: "table", label: "Table" },

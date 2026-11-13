@@ -284,7 +284,7 @@ export function CoversGrid({
                   )}
                   <span
                     className={cn(
-                      "line-clamp-2 overflow-hidden text-small leading-tight font-semibold wrap-anywhere",
+                      "line-clamp-2 overflow-hidden font-book text-small leading-row-title font-semibold wrap-anywhere",
                       layout === "desktop" && "text-meta",
                     )}
                   >
@@ -293,7 +293,7 @@ export function CoversGrid({
                   {author && (
                     <span
                       className={cn(
-                        "mt-0.5 overflow-hidden text-label leading-phone text-ellipsis whitespace-nowrap text-muted",
+                        "mt-0.5 overflow-hidden text-label leading-phone text-ellipsis whitespace-nowrap text-ink-2",
                         layout === "desktop" && "text-small",
                       )}
                     >

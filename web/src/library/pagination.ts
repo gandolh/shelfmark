@@ -39,7 +39,7 @@ export function pageSlice<T>(rows: readonly T[], page: number, size: number): re
   return rows.slice(start, start + size);
 }
 
-/** The first and last book a page shows, counted from 1 over the whole list: 51 and 100 for "51–100 of 1,234". 0 and 0 when the list is empty. */
+/** The first and last book a page shows, counted from 1 over the whole list: 51 and 100 for "51 to 100 of 1,234". 0 and 0 when the list is empty. */
 export function pageRange(page: number, size: number, total: number): { first: number; last: number } {
   if (total <= 0) return { first: 0, last: 0 };
   const start = (clampPage(page, pageCount(total, size)) - 1) * size;

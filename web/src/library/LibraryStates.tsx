@@ -3,7 +3,7 @@ import type { ViewMode } from "./prefs";
 
 /**
  * What the Library shows when it has no rows to show: the books on their
- * way (a quiet skeleton of the view, after a beat so a fast load never
+ * way (a still skeleton of the view, after a beat so a fast load never
  * flickers), and a short message with the one way forward.
  */
 
@@ -16,9 +16,9 @@ export function LibrarySkeleton({ mode }: { mode: ViewMode }) {
       >
         {Array.from({ length: 12 }, (_, i) => (
           <div key={i} className="flex flex-col gap-1.5">
-            <span className="mb-2.5 block aspect-[2/3] w-full rounded-cover bg-control motion-safe:animate-pulse" />
-            <span className="block h-2.75 w-[80%] rounded-pill bg-control motion-safe:animate-pulse" />
-            <span className="block h-2.75 w-[55%] rounded-pill bg-control motion-safe:animate-pulse" />
+            <span className="mb-2.5 block aspect-[2/3] w-full rounded-cover bg-control" />
+            <span className="block h-2.75 w-[80%] rounded-pill bg-control" />
+            <span className="block h-2.75 w-[55%] rounded-pill bg-control" />
           </div>
         ))}
       </div>
@@ -31,10 +31,10 @@ export function LibrarySkeleton({ mode }: { mode: ViewMode }) {
     >
       {Array.from({ length: 7 }, (_, i) => (
         <div key={i} className="flex h-23.5 items-center gap-3 border-t border-divider px-6 py-3 max-md:pl-4">
-          <span className="block aspect-[2/3] w-11.5 flex-none rounded-cover bg-control motion-safe:animate-pulse" />
+          <span className="block aspect-[2/3] w-11.5 flex-none rounded-cover bg-control" />
           <span className="flex flex-1 flex-col gap-2">
-            <span className="block h-2.75 w-[min(260px,60%)] rounded-pill bg-control motion-safe:animate-pulse" />
-            <span className="block h-2.75 w-[min(150px,35%)] rounded-pill bg-control motion-safe:animate-pulse" />
+            <span className="block h-2.75 w-[min(260px,60%)] rounded-pill bg-control" />
+            <span className="block h-2.75 w-[min(150px,35%)] rounded-pill bg-control" />
           </span>
         </div>
       ))}
@@ -56,10 +56,7 @@ export function LibraryMessage({
       className="flex flex-col items-center gap-1.5 rounded-container bg-surface pt-16 pr-6 pb-18 pl-6 text-center max-md:pt-12 max-md:pr-5 max-md:pb-14 max-md:pl-5"
       aria-labelledby="library-message-title"
     >
-      <h2
-        id="library-message-title"
-        className="text-[length:calc(var(--text-row-title)*1.25)] leading-tight font-bold tracking-wordmark"
-      >
+      <h2 id="library-message-title" className="font-book text-heading leading-heading font-semibold">
         {title}
       </h2>
       {children && <p className="max-w-[46ch] text-body text-muted">{children}</p>}

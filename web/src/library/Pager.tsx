@@ -25,9 +25,9 @@ function where(page: number, pages: number, size: number, total: number): string
 
 /**
  * The Library's page controls, under the table or the covers (design.md).
- * Desktop: the range on the left ("51–100 of 1,234"); on the right
+ * Desktop: the range on the left ("51 to 100 of 1,234"); on the right
  * Previous, the page numbers with gaps, Next and the "Per page" menu.
- * Phone: Previous, "Page 3 of 25" and Next, with "Per page" as accent text
+ * Phone: Previous, "Page 3 of 25" and Next, with "Per page" as a button
  * under them. While a size over 10 puts everything on one page, only the
  * range (desktop) and "Per page" stay, so the size can go back down;
  * LibraryPage hides the pager otherwise (`showsPager`).
@@ -57,7 +57,10 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
   const step = (label: "Previous" | "Next", next: number, blocked: boolean) => (
     <button
       type="button"
-      className={buttonClass({ variant: "secondary", size: "regular" })}
+      className={buttonClass(
+        { variant: blocked ? null : "secondary", size: "regular" },
+        blocked ? "bg-transparent text-muted" : undefined,
+      )}
       aria-disabled={blocked ? "true" : undefined}
       onClick={turn(next)}
     >
@@ -69,7 +72,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
     <Menu
       label="Books per page"
       trigger={`${pageSize} per page`}
-      triggerClassName={desktop ? undefined : buttonClass({ variant: "quiet", size: "regular" })}
+      triggerClassName={buttonClass({ variant: "secondary", size: "regular" }, desktop ? "ml-2" : undefined)}
       align={desktop ? "end" : "start"}
       sections={[
         {
@@ -92,7 +95,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
 
   if (!desktop) {
     return (
-      <nav className="mt-3.5 flex flex-col items-stretch gap-1 text-body text-ink-2" aria-label="Pages">
+      <nav className="mt-5 flex flex-col items-stretch gap-4 text-body text-ink-2" aria-label="Pages">
         {pages > 1 && (
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3 [&>:first-child]:justify-self-start [&>:last-child]:justify-self-end">
             {step("Previous", page - 1, page <= 1)}
@@ -102,7 +105,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
             {step("Next", page + 1, page >= pages)}
           </div>
         )}
-        <div className="flex justify-center">{perPage}</div>
+        <div className="flex justify-start">{perPage}</div>
         {live}
       </nav>
     );
@@ -110,11 +113,11 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
 
   return (
     <nav
-      className="mt-4.5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-meta text-ink-2"
+      className="mt-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 text-meta text-ink-2"
       aria-label="Pages"
     >
       <p className="text-muted tabular-nums">
-        {number(first)}–{number(last)} of {number(total)}
+        {number(first)} to {number(last)} of {number(total)}
       </p>
       <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
         {pages > 1 && (
@@ -130,7 +133,7 @@ export function Pager({ page, pageCount: pages, pageSize, total, desktop, onPage
                   <button
                     key={item}
                     type="button"
-                    className="h-control min-w-control cursor-pointer rounded-control px-1.5 text-ink-2 tabular-nums transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink aria-[current=page]:cursor-default aria-[current=page]:bg-accent-tint aria-[current=page]:font-semibold aria-[current=page]:text-accent-press"
+                    className="h-9 min-w-9 cursor-pointer rounded-control px-1.5 text-ink-2 tabular-nums transition-[background-color,color] duration-(--duration-fast) ease-out hover:bg-control hover:text-ink aria-[current=page]:cursor-default aria-[current=page]:bg-accent-tint aria-[current=page]:font-semibold aria-[current=page]:text-on-accent-tint"
                     aria-current={item === page ? "page" : undefined}
                     aria-label={`Page ${number(item)}`}
                     onClick={turn(item)}

@@ -227,7 +227,7 @@ export function LibraryPage() {
     >
       {/* The phone's toolbar has no room for Views: it gets a row of its own (desktop: Toolbar). */}
       {ready && !desktop && view.counts.owned > 0 && (
-        <div className="mb-3.5 flex items-baseline justify-between gap-3 border-b border-hairline">
+        <div className="mb-2 flex items-baseline justify-between gap-3">
           <ViewsMenu layout={layout} mode={mode} align="end" />
         </div>
       )}
@@ -394,7 +394,7 @@ function SelectionBand({ line, onSelectPage, onSelectAll, onClear }: SelectionBa
             onClear,
           ];
   return (
-    <div className="mb-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0 rounded-control bg-accent-tint-soft px-3.5 py-1 text-center text-meta text-ink-2 max-md:py-0 max-md:text-body">
+    <div className="mb-3 flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0 rounded-control bg-accent-tint px-3.5 py-1 text-center text-meta text-on-accent-tint max-md:py-0 max-md:text-body">
       <span className="empty:hidden max-md:pt-2.5" role="status">
         {text}
       </span>
