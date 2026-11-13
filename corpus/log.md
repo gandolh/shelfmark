@@ -782,7 +782,7 @@ renames the entry and the Dockerfile `CMD` in one commit, keeps "nothing
 boots the app" (tests without `inject()`), and puts the transform-free
 saved-view output schema in the views feature. Order: 05, 04, 06, 07, 09, with
 08 apart from 06 and 07. Brief 09, [a redesign with Hallmark, on the estate
-board](briefs/todo/09-a-redesign-with-hallmark-on-the-estate-board.md), covers
+board](briefs/done/09-a-redesign-with-hallmark-on-the-estate-board.md), covers
 Library, Add a book, Wishlist and the rest.
 
 ## [2026-11-11] build | The house style and the quality harness
