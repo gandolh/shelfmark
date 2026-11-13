@@ -16,6 +16,7 @@ const twMerge = extendTailwindMerge({
         "title",
         "title-phone",
         "wordmark",
+        "heading",
         "row-title",
         "action-large",
         "input-phone",
@@ -27,7 +28,7 @@ const twMerge = extendTailwindMerge({
       ],
       "font-weight": ["regular", "semibold", "bold"],
       tracking: ["title", "wordmark"],
-      leading: ["body", "phone", "tight"],
+      leading: ["body", "phone", "tight", "title", "heading", "row-title", "meta", "label"],
       // Sizes the app names: tailwind-merge needs them to see that `min-h-0` replaces `min-h-control`.
       spacing: [
         "touch",
@@ -44,6 +45,7 @@ const twMerge = extendTailwindMerge({
       container: ["page"],
       radius: ["cover", "segment", "menu-item", "control", "field", "track", "menu", "container", "sheet", "pill"],
       shadow: ["cover", "float"],
+      font: ["sans", "book"],
     },
     classGroups: {
       z: [{ z: ["bar", "float"] }],

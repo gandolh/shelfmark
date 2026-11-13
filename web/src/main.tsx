@@ -1,6 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
+// Self-hosted variable fonts: Public Sans sets the controls, Literata what a book says.
+import "@fontsource-variable/public-sans";
+import "@fontsource-variable/literata";
 // The one stylesheet: Tailwind, the tokens and the page's defaults.
 import "./styles/index.css";
 

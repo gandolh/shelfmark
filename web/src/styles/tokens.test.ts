@@ -35,6 +35,8 @@ const TEXT: readonly (readonly [string, string])[] = [
   ["ink", "ground"],
   ["ink", "surface"],
   ["ink", "control"],
+  ["ink", "row-hover"],
+  ["ink", "field"],
   ["ink", "accent-tint-soft"],
   ["ink-2", "ground"],
   ["ink-2", "surface"],
@@ -45,6 +47,11 @@ const TEXT: readonly (readonly [string, string])[] = [
   ["muted", "control"],
   ["field-placeholder", "field"],
   ["accent", "ground"],
+  ["accent", "field"],
+  ["on-accent-tint", "accent-tint"],
+  ["ink-2", "row-hover"],
+  ["muted", "row-hover"],
+  ["ink", "control-raised"],
   ["accent", "surface"],
   ["accent", "accent-tint-soft"],
   ["accent-press", "accent-tint"],
@@ -59,6 +66,9 @@ const PARTS: readonly (readonly [string, string])[] = [
   ["accent", "surface"],
   ["focus-ring", "ground"],
   ["ink-2", "surface"],
+  ["outline", "field"],
+  ["outline", "surface"],
+  ["outline", "ground"],
 ];
 
 describe.each<Theme>(["light", "dark"])("the %s tokens", (theme) => {

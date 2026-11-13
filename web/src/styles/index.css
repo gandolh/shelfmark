@@ -42,107 +42,109 @@
  * reads it. The values are DESIGN.md's front matter, value for value.
  */
 @theme static {
-  /* Colour */
-  --color-ground: light-dark(#f5f5f3, #121214); /* page background */
-  --color-surface: light-dark(#ffffff, #1c1c1f); /* table container, menus, sheets */
-  --color-control: light-dark(#e6e6e2, #2a2a2e); /* segmented controls, secondary buttons */
-  --color-field: light-dark(#e9e9e6, #26262a); /* search field */
-  --color-hairline: light-dark(#e2e2df, #34343a); /* top bar and tab bar borders */
-  --color-divider: light-dark(#ecece9, #2c2c31); /* table row dividers */
-  --color-ink: light-dark(#1b1b1d, #ececee); /* primary text */
-  --color-ink-2: light-dark(#45454a, #c4c4ca); /* secondary text */
-  --color-muted: light-dark(#5f5f65, #9a9aa2); /* captions, counts (5.6:1 on ground) */
-  --color-accent: light-dark(#0e6e8c, #5bb8d4); /* the one interactive colour */
-  --color-accent-press: light-dark(#0a4f65, #8ad0e6); /* pressed, link hover */
-  --color-accent-tint: light-dark(#dcedf2, #1f3a44); /* an open menu button */
-  --color-accent-tint-soft: light-dark(#edf5f8, #172a31); /* the selected menu row */
+  /* Colour: warm neutrals and one teal accent */
+  --color-ground: light-dark(#f6f3ef, #141310); /* the page, the top bar, the tab bar */
+  --color-surface: light-dark(#fffefd, #23211e); /* the islands: header card, table box, fact cards, draft, menus */
+  --color-control: light-dark(#e8e6e1, #302e29); /* secondary buttons, segmented tracks, chips */
+  --color-control-hover: light-dark(#dfdcd6, #3a3833); /* was a color-mix */
+  --color-control-raised: light-dark(#fffefd, #4a4743); /* NEW: the current segment, a raised tile on its track */
+  --color-field: light-dark(#ece9e4, #191714); /* inputs and the search field */
+  --color-row-hover: light-dark(#f4f2ee, #2a2925); /* NEW: a table row under the pointer, inside the table box */
+  --color-hairline: light-dark(#e0deda, #373531); /* the board's rule: dividers, the bars' edges */
+  --color-divider: light-dark(#e0deda, #373531); /* the same rule; table row dividers */
+  --color-outline: light-dark(#7e7b75, #83807a); /* NEW: fields, checkboxes, the new-shelf chip */
+  --color-ink: light-dark(#1d1c18, #ebe9e5);
+  --color-ink-2: light-dark(#44423e, #c9c7c2); /* secondary text, table cells */
+  --color-muted: light-dark(#63605b, #a7a49f); /* captions, counts, column heads, hints */
+  --color-accent: light-dark(#0a6b84, #79c5d8); /* the one colour that means press this */
+  --color-accent-press: light-dark(#005368, #a0dcec); /* the board's accent-hover */
+  --color-on-accent: light-dark(#fefdfb, #0b181d); /* was var(--color-surface); dark now differs */
+  --color-accent-tint: light-dark(#d8eef6, #173b46); /* the board's accent-wash: the current selection, a chip, a selected row */
+  --color-accent-tint-soft: light-dark(#edf5f8, #172a31); /* the selected menu row; the board draws it on accent-tint, kept until nothing reads it */
+  --color-on-accent-tint: light-dark(#004b5f, #b2e5f2); /* NEW: text on the wash */
+  --color-cover-edge: light-dark(#1d1c18, #4f4d48); /* NEW: the cover's dark-theme edge (light uses the shadow's own rgb) */
 
   /* Derived: mixes and aliases of the above, never a new hue */
-  --color-on-accent: var(--color-surface); /* text on the accent */
-  /* The tab bar's ground, a shade lighter than the page. */
   --color-bar: color-mix(in srgb, var(--color-surface) 40%, var(--color-ground));
-  --color-control-hover: color-mix(in srgb, var(--color-control) 92%, var(--color-ink));
   --color-control-press: color-mix(in srgb, var(--color-control) 84%, var(--color-ink));
-  /* The unselected half of a segmented track, under the pointer. */
-  --color-segment-hover: color-mix(in srgb, var(--color-surface) 45%, var(--color-control));
-  /* A filter chip under the pointer. */
+  --color-segment-hover: color-mix(in srgb, var(--color-control-raised) 45%, var(--color-control));
   --color-accent-tint-hover: color-mix(in srgb, var(--color-accent) 16%, var(--color-accent-tint));
-  --color-field-placeholder: var(--color-muted); /* 5.2:1 on field */
-  --color-focus-ring: var(--color-accent);
+  --color-field-placeholder: var(--color-muted);
+  --color-focus-ring: var(--color-accent); /* the board's focus equals the accent in both themes */
   --color-selection: var(--color-accent-tint);
   --color-scrollbar-thumb: color-mix(in srgb, var(--color-muted) 40%, var(--color-ground));
-  /* Behind a dialog or a panel. */
   --color-scrim: light-dark(color-mix(in srgb, var(--color-ink) 32%, transparent), rgb(0 0 0 / 0.6));
-  /* The camera view: dark in both themes, because it is a camera. */
   --color-camera: #1b1b1d;
   --color-camera-ink: #ffffff;
 
-  /*
-   * No-cover placeholder: eight tints, each with its text. A book without a
-   * cover gets a typographic one on a tint picked from its title
-   * (components/cover.ts). Every ink passes 4.5:1 on its tint
-   * (components/cover.test.ts reads these lines).
-   */
-  --color-cover-1-bg: light-dark(#7b2d35, #9a3a44); /* oxblood */
+  /* The eight no-cover tints, each with its text (components/cover.test.ts reads these lines); dark calmed a step */
+  --color-cover-1-bg: light-dark(#7b2d35, #7f3439); /* oxblood */
   --color-cover-1-ink: light-dark(#f7eee6, #fbf1ea);
-  --color-cover-2-bg: light-dark(#d4a23a, #8a6620); /* ochre */
+  --color-cover-2-bg: light-dark(#d4a23a, #836329); /* ochre */
   --color-cover-2-ink: light-dark(#2a1f10, #fff4dc);
-  --color-cover-3-bg: light-dark(#33503e, #3f6450); /* forest */
+  --color-cover-3-bg: light-dark(#33503e, #395844); /* forest */
   --color-cover-3-ink: light-dark(#eef0e2, #f1f4e6);
-  --color-cover-4-bg: light-dark(#2c3e57, #3a5273); /* slate */
+  --color-cover-4-bg: light-dark(#2c3e57, #384e6b); /* slate */
   --color-cover-4-ink: light-dark(#eaeff5, #eef3f9);
-  --color-cover-5-bg: light-dark(#5c3f78, #75509a); /* plum */
+  --color-cover-5-bg: light-dark(#5c3f78, #5e457a); /* plum */
   --color-cover-5-ink: light-dark(#f2ecf7, #f6f0fa);
-  --color-cover-6-bg: light-dark(#dccdb0, #5a4f3c); /* sand */
+  --color-cover-6-bg: light-dark(#dccdb0, #564c3b); /* sand */
   --color-cover-6-ink: light-dark(#3a2e22, #f0e6d2);
-  --color-cover-7-bg: light-dark(#b9c3a5, #4a5a3e); /* sage */
+  --color-cover-7-bg: light-dark(#b9c3a5, #49543d); /* sage */
   --color-cover-7-ink: light-dark(#26301f, #e9eedf);
-  --color-cover-8-bg: light-dark(#2e2e30, #3a3a3d); /* charcoal, gold letters */
+  --color-cover-8-bg: light-dark(#2e2e30, #323335); /* charcoal, gold letters */
   --color-cover-8-ink: light-dark(#e8c66c, #efd27a);
 
-  /* Type */
-  --font-sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Type: Literata for what a book says (titles, heads, the wordmark), Public Sans for the rest. Sizes: 12 14 16 20 32 */
+  --font-sans: "Public Sans Variable", "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-book: "Literata Variable", Literata, Georgia, "Times New Roman", serif; /* NEW */
 
-  --text-title: 34px; /* page title, 700, -0.02em */
-  --text-title-phone: 32px;
-  --text-wordmark: 17px; /* "Shelfmark" in the top bar, 600 */
-  --text-row-title: 16px; /* a book's title in a row, 600 */
+  --text-title: 32px; /* page title, Literata 600, 32/40 */
+  --text-title-phone: 28px; /* 28/36 */
+  --text-wordmark: 20px; /* "Shelfmark" in the top bar, Literata 600 (was 17) */
+  --text-heading: 20px; /* NEW: section heads, a draft's title, Literata 600, 20/28 */
+  --text-row-title: 16px; /* a book's title wherever it is listed, Literata 600, 16/22 */
   --text-action-large: 16px; /* a sheet's primary action, 600 */
-  --text-input-phone: 16px; /* fields on a phone: below 16 px iOS zooms in */
-  --text-body: 15px;
-  --text-meta: 14px; /* authors, publishers, controls on the desktop */
-  --text-small: 13px; /* small segmented controls, grid titles */
-  --text-label: 12px; /* column heads, menu section labels, 600 */
-  --text-tab: 11px; /* tab bar labels */
+  --text-input-phone: 16px;
+  --text-body: 16px; /* Public Sans 400, 16/24 (was 15) */
+  --text-meta: 14px; /* table cells, controls, 14/20; figures tabular */
+  --text-small: 14px; /* the board has one 14; small segmented controls, grid titles */
+  --text-label: 12px; /* column heads, legends, tab labels, 600, 12/16, sentence case */
+  --text-tab: 12px; /* was 11 */
 
   --font-weight-regular: 400;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  --tracking-title: -0.02em;
-  --tracking-wordmark: -0.01em;
+  --tracking-title: 0; /* the board's titles are untracked; was -0.02em */
+  --tracking-wordmark: 0;
 
-  --leading-body: 1.45;
-  --leading-phone: 1.4;
+  --leading-body: 1.5; /* 24/16, was 1.45 */
+  --leading-phone: 1.5;
   --leading-tight: 1.25;
+  --leading-title: 1.25; /* NEW: 40/32 */
+  --leading-heading: 1.4; /* NEW: 28/20 */
+  --leading-row-title: 1.375; /* NEW: 22/16 */
+  --leading-meta: 1.43; /* NEW: 20/14 */
+  --leading-label: 1.33; /* NEW: 16/12 */
 
-  /* Radii */
+  /* Radii: cover 3, control 8, panel 16, full 999 */
   --radius-cover: 3px;
-  --radius-segment: 6px; /* the selected half of a small segmented control */
-  --radius-menu-item: 7px;
-  --radius-control: 8px; /* buttons, segments, a small segmented track */
-  --radius-field: 10px; /* the search field */
-  --radius-track: 10px; /* a segmented track */
-  --radius-menu: 12px;
-  --radius-container: 16px; /* the table's white container */
-  --radius-sheet: 20px; /* the floating sheet */
+  --radius-control: 8px;
+  --radius-container: 16px; /* the board's panel: the table box, the island cards */
   --radius-pill: 999px;
+  --radius-segment: 6px;
+  --radius-menu-item: 7px;
+  --radius-field: 10px;
+  --radius-track: 10px;
+  --radius-menu: 12px;
+  --radius-sheet: 20px;
 
-  /* Elevation: the cover, and what floats. Nothing else casts a shadow */
+  /* Elevation: the cover, and what floats; light shadows, dark a lighter card with a hairline and an edged cover */
   --shadow-cover:
-    0 6px 14px light-dark(rgba(27, 27, 29, 0.22), rgba(0, 0, 0, 0.5)),
-    0 1px 2px light-dark(rgba(27, 27, 29, 0.2), rgba(0, 0, 0, 0.5));
-  --shadow-float: 0 16px 40px light-dark(rgba(27, 27, 29, 0.18), rgba(0, 0, 0, 0.55)); /* menus and the scan sheet */
+    0 6px 14px light-dark(rgb(40 36 30 / 0.2), transparent), 0 1px 2px light-dark(rgb(40 36 30 / 0.18), transparent),
+    0 0 0 1px light-dark(transparent, var(--color-cover-edge));
+  --shadow-float: 0 12px 32px light-dark(rgb(40 36 30 / 0.16), transparent), 0 0 0 1px var(--color-hairline); /* menus and the scan sheet */
 
   /* Sizes: every width, height and gap in the app is a pixel value */
   --spacing: 4px;
@@ -256,7 +258,7 @@
     color-scheme: light dark;
   }
 
-  /* The app's 15 px lives on body; html keeps the reader's own size. */
+  /* The app's 16 px lives on body; html keeps the reader's own size. */
   body {
     min-height: 100dvh;
     background: var(--color-ground);
