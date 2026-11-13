@@ -43,7 +43,7 @@ export function FilterChips({ filters, onEdit, filterButton }: FilterChipsProps)
           return (
             <li
               key={column.id}
-              className="inline-flex min-h-segment-small max-w-full min-w-0 items-center rounded-pill bg-accent-tint text-small leading-tight text-accent-press"
+              className="inline-flex min-h-segment-small max-w-full min-w-0 items-center rounded-pill bg-accent-tint text-small leading-tight text-on-accent-tint"
             >
               <button
                 type="button"

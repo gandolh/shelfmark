@@ -29,6 +29,8 @@ export interface IsbnFieldProps {
   /** A lookup is running: the button waits. */
   busy?: boolean;
   autoFocus?: boolean;
+  /** A draft is open under the field: Look up turns grey, shares the field's row and the hint goes. */
+  draftOpen?: boolean;
   /** `large` is Type ISBN's own field; `regular` fits a sheet. */
   size?: "large" | "regular";
 }
@@ -48,6 +50,7 @@ export function IsbnField({
   keepFocus = true,
   busy = false,
   autoFocus,
+  draftOpen = false,
   size = "large",
 }: IsbnFieldProps) {
   const id = useId();
@@ -90,15 +93,13 @@ export function IsbnField({
       className={cn(
         "grid grid-cols-[minmax(0,1fr)_auto] gap-x-2.5 gap-y-1.5 [grid-template-areas:'label_label'_'box_submit'_'note_note']",
         size === "large" &&
+          !draftOpen &&
           "max-md:grid-cols-[minmax(0,1fr)] max-md:[grid-template-areas:'label'_'box'_'note'_'submit']",
       )}
       onSubmit={submit}
       noValidate
     >
-      <label
-        className="block text-label leading-tight font-semibold text-muted [grid-area:label]"
-        htmlFor={`${id}-input`}
-      >
+      <label className="block text-meta leading-meta font-semibold text-ink [grid-area:label]" htmlFor={`${id}-input`}>
         {label}
       </label>
       <div className="relative min-w-0 [grid-area:box]" data-invalid={problem !== null || undefined}>
@@ -106,7 +107,7 @@ export function IsbnField({
           ref={input}
           id={`${id}-input`}
           className={cn(
-            "h-control-large w-full appearance-none rounded-field bg-field pr-13 pl-4 text-(length:--text-isbn) font-semibold tracking-[0.04em] tabular-nums focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring",
+            "h-control-large w-full appearance-none rounded-control border border-outline bg-field pr-13 pl-4 text-(length:--text-isbn) tracking-[0.02em] tabular-nums focus-visible:outline-2 focus-visible:-outline-offset-1 focus-visible:outline-focus-ring aria-invalid:border-ink-2 aria-invalid:shadow-[inset_0_0_0_1px_var(--color-ink-2)] aria-invalid:outline-[1.5px] aria-invalid:outline-offset-[-1.5px] aria-invalid:outline-ink-2 focus-visible:aria-invalid:outline-2 focus-visible:aria-invalid:outline-offset-[0] focus-visible:aria-invalid:outline-focus-ring",
             size === "regular" && "text-input-phone tracking-[0.02em]",
           )}
           type="text"
@@ -142,9 +143,9 @@ export function IsbnField({
       </div>
       <Button
         type="submit"
-        variant="primary"
+        variant={draftOpen ? "secondary" : "primary"}
         size="large"
-        className={cn("[grid-area:submit]", size === "large" && "max-md:mt-1.5")}
+        className={cn("[grid-area:submit]", size === "large" && !draftOpen && "max-md:mt-1.5")}
         aria-disabled={busy || undefined}
       >
         {submitLabel}
@@ -161,8 +162,9 @@ export function IsbnField({
           {problem}
         </p>
       ) : (
-        hint && (
-          <p key="hint" id={describedBy} className="text-small leading-tight text-muted [grid-area:note]">
+        hint &&
+        !draftOpen && (
+          <p key="hint" id={describedBy} className="text-meta leading-meta text-muted [grid-area:note]">
             {hint}
           </p>
         )

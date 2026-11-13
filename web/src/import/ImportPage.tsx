@@ -432,7 +432,7 @@ function Preview({
                         key={flag}
                         className={cn(
                           "mr-1.5 mb-1 inline-block rounded-pill bg-control px-2 py-0.5 text-label font-semibold whitespace-nowrap text-ink-2",
-                          flag === "needs-lookup" && "bg-accent-tint text-accent-press",
+                          flag === "needs-lookup" && "bg-accent-tint text-on-accent-tint",
                         )}
                       >
                         {FLAG_TEXT[flag]}

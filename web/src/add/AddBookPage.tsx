@@ -344,6 +344,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
     <Page
       title={target === "wishlist" ? "Add to your wishlist" : "Add a book"}
       bleed
+      narrow
       caption={desktop ? status : undefined}
     >
       <TabsRoot
@@ -353,7 +354,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
         render={
           <div
             className={cn(
-              "relative flex flex-[1_0_auto] flex-col [--add-top-room:96px] [--text-isbn:22px] [--text-result-title:20px] [--text-sheet-heading:17px]",
+              "relative flex flex-[1_0_auto] flex-col [--add-top-room:96px] [--text-isbn:16px] [--text-result-title:20px] [--text-sheet-heading:17px]",
               "md:gap-5 md:[--add-top-room:0px]",
             )}
           />
@@ -395,7 +396,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
                 <div className="absolute top-[calc(var(--add-top-room)_-_32px)] right-3 z-2 flex flex-col gap-2 md:top-3">
                   {torchAvailable && (
                     <Toggle
-                      className="flex h-touch w-touch items-center justify-center rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-accent-press"
+                      className="flex h-touch w-touch items-center justify-center rounded-pill bg-ground/92 text-ink transition-[background-color,color] duration-(--duration-fast) ease-out aria-pressed:bg-accent-tint aria-pressed:text-on-accent-tint"
                       pressed={torch}
                       onPressedChange={setTorch}
                       aria-label="Torch"
@@ -447,12 +448,13 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "isbn" && (
-            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-150 md:gap-5 md:p-0">
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-160 md:gap-5 md:p-0">
               <IsbnField
                 ref={isbnField}
                 onSubmit={on.submitIsbn}
                 keepFocus={desktop}
                 busy={step.kind === "looking"}
+                draftOpen={step.kind !== "ready" && step.kind !== "looking"}
                 autoFocus={focusOnEnter}
               />
               <div ref={result} className="empty:hidden">
@@ -461,7 +463,7 @@ export function AddBookPage({ target = "owned" }: { target?: Collection } = {}) 
             </div>
           )}
           {mode === "manual" && (
-            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-150 md:gap-5 md:p-0">
+            <div className="flex flex-col gap-4 pt-1 pr-gutter-phone pb-6 pl-gutter-phone md:max-w-160 md:gap-5 md:p-0">
               {sheet(false, focusOnEnter)}
             </div>
           )}

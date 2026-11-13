@@ -66,7 +66,7 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
 
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-label leading-tight font-semibold text-muted">{label}</legend>
+      <legend className="block text-label leading-label font-semibold text-muted">{label}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         <ToggleGroup
           aria-label={label}
@@ -81,7 +81,7 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
             <Toggle
               key={shelf}
               value={shelf}
-              className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-3.5 text-meta leading-tight text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
+              className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-4 text-meta leading-meta text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-on-accent-tint has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-on-accent-tint max-md:min-h-control-large max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
             >
               <span
                 className="inline-flex min-w-0 flex-col after:pointer-events-none after:invisible after:h-0 after:overflow-hidden after:font-semibold after:content-[attr(data-label)] after:select-none"
@@ -93,7 +93,7 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
           ))}
         </ToggleGroup>
         {writing ? (
-          <span className="relative inline-flex min-h-9 w-[min(100%,260px)] max-w-full cursor-text items-center gap-1.5 rounded-pill bg-field text-meta leading-tight text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-field in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:min-h-touch max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-[none]">
+          <span className="relative inline-flex min-h-9 w-[min(100%,260px)] max-w-full cursor-text items-center gap-1.5 rounded-pill bg-field text-meta leading-meta text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-field in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-on-accent-tint has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-on-accent-tint max-md:min-h-control-large max-md:min-h-touch max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-[none]">
             <input
               className="h-9 w-full appearance-none rounded-[inherit] bg-transparent px-3.5 text-input-phone text-ink focus-visible:outline-2 focus-visible:outline-offset-[0] focus-visible:outline-focus-ring max-md:min-h-touch"
               type="text"
@@ -122,7 +122,7 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
         ) : (
           <button
             type="button"
-            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-transparent px-3.5 pl-2.75 text-meta leading-tight text-ink-2 shadow-none [outline:1px_dashed_var(--color-muted)] outline-offset-[-1px] transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
+            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-transparent px-4 pl-3 text-meta leading-meta text-ink-2 shadow-none [outline:1px_dashed_var(--color-outline)] outline-offset-[-1px] transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-on-accent-tint has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-on-accent-tint max-md:min-h-control-large max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
             onClick={open}
           >
             <PlusIcon size={16} />

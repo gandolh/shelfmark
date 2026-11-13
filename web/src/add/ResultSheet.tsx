@@ -175,7 +175,7 @@ export function ResultSheet({
     </Sheet>
   ) : (
     <section
-      className="flex flex-col gap-3.5 rounded-container bg-surface p-4 motion-safe:animate-dialog-in md:gap-4 md:p-5"
+      className="flex flex-col gap-4 rounded-container bg-surface p-4 motion-safe:animate-dialog-in md:p-6"
       aria-labelledby={headingId}
     >
       {content}
@@ -202,8 +202,8 @@ function useHeadingFocus(takeFocus: boolean) {
 /** The row every result opens with: the cover, then what the book is. */
 function Head({ cover, children }: { cover: ReactNode; children: ReactNode }) {
   return (
-    <div className="flex items-start gap-3.5">
-      <div className="w-15 flex-none">{cover}</div>
+    <div className="flex items-start gap-4">
+      <div className="w-18 flex-none">{cover}</div>
       <div className="flex min-w-0 flex-col gap-0.5">{children}</div>
     </div>
   );
@@ -231,12 +231,12 @@ function Looking({ isbn13, headingId, takeFocus, on }: Shared & { isbn13: string
 
   return (
     <>
-      <Head cover={<span className="block aspect-[2/3] w-15 rounded-cover bg-control" />}>
+      <Head cover={<span className="block aspect-[2/3] w-18 rounded-cover bg-control" />}>
         <h2
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere tabular-nums focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
+          className="font-book text-(length:--text-result-title) leading-heading font-semibold wrap-anywhere tabular-nums focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {isbn13}
         </h2>
@@ -290,12 +290,12 @@ function Found({
 
   return (
     <>
-      <Head cover={<CoverImage book={cover.book} src={cover.src} width={60} loading="eager" />}>
+      <Head cover={<CoverImage book={cover.book} src={cover.src} width={72} loading="eager" />}>
         <h2
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
+          className="font-book text-(length:--text-result-title) leading-heading font-semibold wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {details.title}
           {details.subtitle && (
@@ -303,7 +303,7 @@ function Found({
           )}
         </h2>
         {byline && <p className="mt-0.5 text-body text-ink-2">{byline}</p>}
-        {meta && <p className="text-meta text-muted tabular-nums">{meta}</p>}
+        {meta && <p className="text-meta text-muted">{meta}</p>}
         <p className="mt-0.5 text-small text-muted">{sourceLine(proposal.origin)}</p>
       </Head>
       {proposal.cover.kind === "none" && <CoverCapture photo={photo} onChange={setPhoto} disabled={save.saving} />}
@@ -324,7 +324,7 @@ function Found({
       {proposal.origin !== "copy" && (
         <Button
           variant="secondary"
-          pill
+          size="large"
           block
           aria-disabled={save.saving || undefined}
           onClick={() => {
@@ -370,7 +370,7 @@ function Owned({
 
   return (
     <>
-      <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
+      <Head cover={<CoverImage book={coverBook} src={src} width={72} loading="eager" />}>
         <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           <CheckIcon size={15} />
           Already in your library
@@ -379,7 +379,7 @@ function Owned({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
+          className="font-book text-(length:--text-result-title) leading-heading font-semibold wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
@@ -390,10 +390,10 @@ function Owned({
         {words.next}
       </Button>
       <div className="grid grid-cols-[1fr_1fr] gap-2.5">
-        <Button variant="secondary" pill block onClick={on.anotherCopy}>
+        <Button variant="secondary" size="large" block onClick={on.anotherCopy}>
           Add another copy
         </Button>
-        <ButtonLink to={bookRoute(newest.id)} variant="secondary" pill block>
+        <ButtonLink to={bookRoute(newest.id)} variant="secondary" size="large" block>
           Open the book
         </ButtonLink>
       </div>
@@ -432,7 +432,7 @@ function Wishlisted({
 
   return (
     <>
-      <Head cover={<CoverImage book={coverBook} src={src} width={60} loading="eager" />}>
+      <Head cover={<CoverImage book={coverBook} src={src} width={72} loading="eager" />}>
         <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           <CheckIcon size={15} />
           On your wishlist
@@ -441,7 +441,7 @@ function Wishlisted({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
+          className="font-book text-(length:--text-result-title) leading-heading font-semibold wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
@@ -461,10 +461,10 @@ function Wishlisted({
         {save.saving ? "Saving…" : "I bought it"}
       </Button>
       <div className="grid grid-cols-[1fr_1fr] gap-2.5">
-        <Button variant="secondary" pill block onClick={on.discard} disabled={save.saving}>
+        <Button variant="secondary" size="large" block onClick={on.discard} disabled={save.saving}>
           {words.next}
         </Button>
-        <ButtonLink to={bookRoute(wanted.id)} variant="secondary" pill block>
+        <ButtonLink to={bookRoute(wanted.id)} variant="secondary" size="large" block>
           Open the book
         </ButtonLink>
       </div>
@@ -493,7 +493,7 @@ function Offline({
   const coverBook: CoverBook = { title, authors: [], language: null };
   return (
     <>
-      <Head cover={<CoverImage book={coverBook} width={60} loading="eager" />}>
+      <Head cover={<CoverImage book={coverBook} width={72} loading="eager" />}>
         <p className="inline-flex items-center gap-1.25 text-small font-semibold text-accent">
           {answer.kind === "absent" ? <AlertIcon size={15} /> : <CheckIcon size={15} />}
           {offlineStatus(answer)}
@@ -502,7 +502,7 @@ function Offline({
           ref={heading}
           id={headingId}
           tabIndex={-1}
-          className="text-(length:--text-result-title) leading-[1.2] font-bold tracking-[-0.01em] wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
+          className="font-book text-(length:--text-result-title) leading-heading font-semibold wrap-anywhere focus-visible:rounded-[2px] focus-visible:outline-offset-[4px]"
         >
           {title}
         </h2>
@@ -538,7 +538,7 @@ function LookLater({ isbn13, shelves, defaultShelf, waiting, on }: LookLaterProp
   return (
     <>
       <ShelfPicker value={shelf} onChange={setShelf} shelves={shelves} />
-      <Button variant="secondary" pill block onClick={() => on.lookLater(isbn13, shelf)}>
+      <Button variant="secondary" size="large" block onClick={() => on.lookLater(isbn13, shelf)}>
         Look it up later
       </Button>
     </>
@@ -571,10 +571,10 @@ function Other({ code, headingId, takeFocus, words, on }: Shared & { code: strin
         </div>
       </div>
       <div className="grid grid-cols-[1fr_1fr] gap-2.5">
-        <Button variant="secondary" pill block onClick={on.typeIsbn}>
+        <Button variant="secondary" size="large" block onClick={on.typeIsbn}>
           Type the ISBN
         </Button>
-        <Button variant="secondary" pill block onClick={on.byHand}>
+        <Button variant="secondary" size="large" block onClick={on.byHand}>
           Add by hand
         </Button>
       </div>
@@ -687,12 +687,12 @@ function Queue({ queue, headingId, takeFocus, on }: Shared & { queue: readonly Q
                 </span>
               </div>
               {item.state === "answered" && (
-                <Button variant="secondary" pill onClick={() => on.openQueued(item.id)}>
+                <Button variant="secondary" onClick={() => on.openQueued(item.id)}>
                   Review
                 </Button>
               )}
               {item.state === "failed" && (
-                <Button variant="secondary" pill onClick={() => on.openQueued(item.id)}>
+                <Button variant="secondary" onClick={() => on.openQueued(item.id)}>
                   Add by hand
                 </Button>
               )}

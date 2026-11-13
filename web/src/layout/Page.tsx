@@ -32,6 +32,8 @@ export interface PageProps {
   bleed?: boolean;
   /** Desktop only: the window's width less the gutters, instead of the 1180 px column (the Library). */
   wide?: boolean;
+  /** Desktop only: a 1100 px column, for a page that is one form (Add a book). */
+  narrow?: boolean;
   /** The header (title, caption, toolbar; on a phone the search box too) on a white card like the table's container. */
   card?: boolean;
   /**
@@ -55,6 +57,7 @@ export function Page({
   back,
   bleed = false,
   wide = false,
+  narrow = false,
   card = false,
   bare = false,
   children,
@@ -80,6 +83,7 @@ export function Page({
       className={cn(
         "flex flex-[1_0_auto] flex-col md:mx-auto md:w-full md:max-w-page md:gap-4 md:px-gutter-desktop md:pt-8 md:pb-12",
         wide && "md:max-w-none",
+        narrow && "md:max-w-[1100px]",
       )}
     >
       {hidden ? (

@@ -102,7 +102,7 @@ function Recommendations({ recs }: { recs: RecommendationsState }) {
             <button
               key={code ?? "all"}
               type="button"
-              className="min-h-segment cursor-pointer rounded-pill bg-control px-3.5 text-small text-ink-2 aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press"
+              className="min-h-segment cursor-pointer rounded-pill bg-control px-3.5 text-small text-ink-2 aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-on-accent-tint"
               aria-pressed={language === code}
               onClick={() => setLanguage(code)}
             >

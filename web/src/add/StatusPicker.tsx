@@ -36,12 +36,12 @@ export function StatusPicker({
   const name = useId();
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-label leading-tight font-semibold text-muted">{label}</legend>
+      <legend className="block text-label leading-label font-semibold text-muted">{label}</legend>
       <div className="mt-2 flex flex-wrap gap-2">
         {options.map((status) => (
           <label
             key={status}
-            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-3.5 text-meta leading-tight text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-accent-press has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-accent-press max-md:text-body max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
+            className="relative inline-flex min-h-9 max-w-full cursor-pointer items-center gap-1.5 rounded-pill bg-control px-4 text-meta leading-meta text-ink transition-[background-color,color] duration-(--duration-fast) ease-out select-none hover:bg-control-hover in-[fieldset:disabled]:cursor-default in-[fieldset:disabled]:opacity-45 has-checked:bg-accent-tint has-checked:font-semibold has-checked:text-on-accent-tint has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-focus-ring aria-pressed:bg-accent-tint aria-pressed:font-semibold aria-pressed:text-on-accent-tint max-md:min-h-control-large max-md:before:absolute max-md:before:inset-x-0 max-md:before:-inset-y-1 max-md:before:content-['']"
           >
             <input
               className="absolute inset-0 h-full w-full [cursor:inherit] opacity-0"
