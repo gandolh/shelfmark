@@ -59,10 +59,19 @@
   --color-accent: light-dark(#0a6b84, #79c5d8); /* the one colour that means press this */
   --color-accent-press: light-dark(#005368, #a0dcec); /* the board's accent-hover */
   --color-on-accent: light-dark(#fefdfb, #0b181d); /* was var(--color-surface); dark now differs */
-  --color-accent-tint: light-dark(#d8eef6, #173b46); /* the board's accent-wash: the current selection, a chip, a selected row */
-  --color-accent-tint-soft: light-dark(#edf5f8, #172a31); /* the selected menu row; the board draws it on accent-tint, kept until nothing reads it */
+  --color-accent-tint: light-dark(
+    #d8eef6,
+    #173b46
+  ); /* the board's accent-wash: the current selection, a chip, a selected row */
+  --color-accent-tint-soft: light-dark(
+    #edf5f8,
+    #172a31
+  ); /* the selected menu row; the board draws it on accent-tint, kept until nothing reads it */
   --color-on-accent-tint: light-dark(#004b5f, #b2e5f2); /* NEW: text on the wash */
-  --color-cover-edge: light-dark(#1d1c18, #4f4d48); /* NEW: the cover's dark-theme edge (light uses the shadow's own rgb) */
+  --color-cover-edge: light-dark(
+    #1d1c18,
+    #4f4d48
+  ); /* NEW: the cover's dark-theme edge (light uses the shadow's own rgb) */
 
   /* Derived: mixes and aliases of the above, never a new hue */
   --color-bar: color-mix(in srgb, var(--color-surface) 40%, var(--color-ground));
@@ -144,7 +153,8 @@
   --shadow-cover:
     0 6px 14px light-dark(rgb(40 36 30 / 0.2), transparent), 0 1px 2px light-dark(rgb(40 36 30 / 0.18), transparent),
     0 0 0 1px light-dark(transparent, var(--color-cover-edge));
-  --shadow-float: 0 12px 32px light-dark(rgb(40 36 30 / 0.16), transparent), 0 0 0 1px var(--color-hairline); /* menus and the scan sheet */
+  --shadow-float:
+    0 12px 32px light-dark(rgb(40 36 30 / 0.16), transparent), 0 0 0 1px var(--color-hairline); /* menus and the scan sheet */
 
   /* Sizes: every width, height and gap in the app is a pixel value */
   --spacing: 4px;
