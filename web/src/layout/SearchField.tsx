@@ -42,21 +42,21 @@ export function SearchField({
   return (
     <div
       className={cn(
-        "flex min-w-0 items-center gap-2 rounded-field bg-field px-2.5 text-muted focus-within:outline-2 focus-within:outline-offset-0 focus-within:outline-focus-ring",
-        placement === "bar" ? "min-h-control flex-[0_1_240px]" : "min-h-10",
+        "flex min-w-0 items-center gap-2 rounded-control border border-outline bg-field px-3 text-muted focus-within:outline-2 focus-within:-outline-offset-1 focus-within:outline-focus-ring",
+        placement === "bar" ? "min-h-control flex-[0_1_240px]" : "min-h-control-large",
       )}
       role="search"
     >
       <label htmlFor={id} className="flex flex-none cursor-text">
-        <SearchIcon size={placement === "bar" ? 15 : 16} />
+        <SearchIcon size={18} />
         <span className="sr-only">Search books</span>
       </label>
       <input
         ref={input}
         id={id}
         className={cn(
-          "h-control min-w-0 flex-1 appearance-none bg-transparent text-meta text-ink focus-visible:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
-          placement === "header" && "h-10 text-input-phone",
+          "h-9 min-w-0 flex-1 appearance-none bg-transparent text-meta text-ink focus-visible:outline-none [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none",
+          placement === "header" && "h-12 text-input-phone",
         )}
         type="search"
         enterKeyHint="search"

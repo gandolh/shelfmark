@@ -19,15 +19,15 @@ export interface CoverBook {
 // A cover at 2:3 with the cover shadow. Its width is `--cover-width` (the `width` prop) or the container's.
 export const COVER_CLASS =
   "relative block aspect-[2/3] w-[var(--cover-width,100%)] flex-none overflow-hidden rounded-cover bg-control shadow-cover";
-// The placeholder is sized off its own width (`cqi`, the container named `cover`); under 72 px it drops the byline.
+// The placeholder is sized off its own width (`cqi`, the container named `cover`); at 72 px and under it is the title's first letter.
 const FACE =
-  "absolute inset-0 flex flex-col justify-between gap-[6cqi] pt-[12cqi] pr-[10cqi] pb-[11cqi] pl-[16cqi] text-left leading-[1.1] before:absolute before:inset-y-0 before:start-[7cqi] before:border-s before:border-current/24 before:content-[''] @max-[72px]/cover:pr-[9cqi] @max-[72px]/cover:pb-[9cqi]";
+  "absolute inset-0 flex flex-col justify-between pt-[11cqi] pr-[10cqi] pb-[11cqi] pl-[17cqi] text-left leading-[1.12] before:absolute before:inset-y-0 before:start-[7cqi] before:border-s before:border-current/24 before:content-[''] @max-[72px]/cover:pt-[9cqi] @max-[72px]/cover:pr-[8cqi] @max-[72px]/cover:pb-[9cqi] @max-[72px]/cover:pl-[20cqi]";
 const TITLE =
-  "line-clamp-5 overflow-hidden text-[length:var(--cover-title-size,12.5cqi)] font-bold tracking-[-0.015em] wrap-break-word hyphens-auto text-balance @max-[72px]/cover:line-clamp-4";
+  "line-clamp-5 overflow-hidden font-book text-[length:var(--cover-title-size,13cqi)] font-semibold wrap-break-word hyphens-auto text-balance @max-[72px]/cover:hidden";
+// At 72 px and under the title would be too small to read: the placeholder shows the title's first letter.
+const INITIAL = "hidden font-book text-[44cqi] leading-none font-semibold @max-[72px]/cover:block";
 const BYLINE =
-  "flex flex-col gap-[4.5cqi] before:w-[16cqi] before:border-t-[max(1px,0.8cqi)] before:border-current before:content-[''] @max-[72px]/cover:hidden";
-const AUTHOR =
-  "line-clamp-2 overflow-hidden text-[7.5cqi] leading-[1.3] font-semibold tracking-[0.06em] wrap-break-word uppercase";
+  "line-clamp-2 overflow-hidden border-t border-current pt-[4cqi] font-book text-[8.5cqi] leading-[1.2] wrap-break-word @max-[72px]/cover:hidden";
 
 export interface CoverImageProps {
   book: CoverBook;
@@ -84,23 +84,20 @@ export function CoverImage({ book, src, width, alt = "", loading = "lazy", class
       {...(alt ? { role: "img", "aria-label": alt } : { "aria-hidden": true })}
     >
       <span className={FACE} lang={book.language ?? undefined}>
+        <span className={INITIAL}>{[...book.title.trim()][0]?.toUpperCase()}</span>
         <span className={TITLE}>{book.title}</span>
-        {author && (
-          <span className={BYLINE}>
-            <span className={AUTHOR}>{author}</span>
-          </span>
-        )}
+        {author && <span className={BYLINE}>{author}</span>}
       </span>
     </span>
   );
 }
 
 /**
- * The placeholder title's size, in the cover's own width (`cqi`): 12.5 unless
+ * The placeholder title's size, in the cover's own width (`cqi`): 13 unless
  * its longest word would not fit across the face, then smaller, so a word
  * like "Punishment" or "irealitatea" stays whole rather than breaking.
  */
 function titleSize(title: string): string {
   const longest = Math.max(1, ...title.split(/\s+/).map((word) => [...word].length));
-  return `${Math.max(7, Math.min(12.5, 112 / longest)).toFixed(2)}cqi`;
+  return `${Math.max(7, Math.min(13, 112 / longest)).toFixed(2)}cqi`;
 }

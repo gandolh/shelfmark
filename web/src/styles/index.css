@@ -59,19 +59,10 @@
   --color-accent: light-dark(#0a6b84, #79c5d8); /* the one colour that means press this */
   --color-accent-press: light-dark(#005368, #a0dcec); /* the board's accent-hover */
   --color-on-accent: light-dark(#fefdfb, #0b181d); /* was var(--color-surface); dark now differs */
-  --color-accent-tint: light-dark(
-    #d8eef6,
-    #173b46
-  ); /* the board's accent-wash: the current selection, a chip, a selected row */
-  --color-accent-tint-soft: light-dark(
-    #edf5f8,
-    #172a31
-  ); /* the selected menu row; the board draws it on accent-tint, kept until nothing reads it */
-  --color-on-accent-tint: light-dark(#004b5f, #b2e5f2); /* NEW: text on the wash */
-  --color-cover-edge: light-dark(
-    #1d1c18,
-    #4f4d48
-  ); /* NEW: the cover's dark-theme edge (light uses the shadow's own rgb) */
+  --color-accent-tint: light-dark(#d8eef6, #173b46); /* the current selection, a chip, a selected row */
+  --color-accent-tint-soft: light-dark(#edf5f8, #172a31); /* unused: kept until nothing reads it */
+  --color-on-accent-tint: light-dark(#004b5f, #b2e5f2); /* text on the wash */
+  --color-cover-edge: light-dark(#1d1c18, #4f4d48); /* a cover's dark edge */
 
   /* Derived: mixes and aliases of the above, never a new hue */
   --color-bar: color-mix(in srgb, var(--color-surface) 40%, var(--color-ground));
@@ -145,7 +136,7 @@
   --radius-segment: 6px;
   --radius-menu-item: 7px;
   --radius-field: 10px;
-  --radius-track: 10px;
+  --radius-track: 12px;
   --radius-menu: 12px;
   --radius-sheet: 20px;
 
@@ -159,11 +150,11 @@
   /* Sizes: every width, height and gap in the app is a pixel value */
   --spacing: 4px;
   --spacing-touch: 44px; /* the smallest target on a phone */
-  --spacing-control: 34px; /* buttons and the search field on the desktop */
+  --spacing-control: 36px; /* buttons and the search field on the desktop */
   --spacing-control-large: 48px; /* a sheet's primary action */
   --spacing-segment: 32px;
   --spacing-segment-small: 30px;
-  --spacing-topbar: 63px; /* 12 + 38 + 12 + the hairline: sticky things sit under it */
+  --spacing-topbar: 64px; /* the bar, hairline included: sticky things sit under it */
   --spacing-tabbar: 76px; /* 66 of targets + 10 at the bottom, before the safe area */
   --spacing-gutter-desktop: 40px;
   --spacing-gutter-phone: 16px;
@@ -183,7 +174,6 @@
   --animate-dialog-in: dialog-in var(--duration) var(--ease-out);
   --animate-panel-in: panel-in var(--duration) var(--ease-out);
   --animate-fade-in: fade-in var(--duration) var(--ease-out);
-  --animate-pulse: pulse 1.4s var(--ease-out) infinite alternate;
   --animate-progress: progress 1.2s var(--ease-out) infinite;
   --animate-hit: hit 450ms ease-out;
 
@@ -208,12 +198,6 @@
   @keyframes fade-in {
     from {
       opacity: 0;
-    }
-  }
-
-  @keyframes pulse {
-    to {
-      opacity: 0.55;
     }
   }
 
@@ -335,6 +319,48 @@
 
   a:hover {
     color: var(--color-accent-press);
+  }
+
+  /* A checkbox is drawn, so its edge passes 3:1 in both themes (native ones follow the platform). */
+  input[type="checkbox"] {
+    display: inline-grid;
+    flex: none;
+    place-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1.5px solid var(--color-outline);
+    border-radius: 4px;
+    background: var(--color-surface);
+    appearance: none;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"]:checked,
+  input[type="checkbox"]:indeterminate {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  input[type="checkbox"]:checked::after {
+    width: 9px;
+    height: 5px;
+    border: solid var(--color-on-accent);
+    border-width: 0 0 2px 2px;
+    content: "";
+    transform: translateY(-1px) rotate(-45deg);
+  }
+
+  input[type="checkbox"]:indeterminate::after {
+    width: 9px;
+    height: 2px;
+    background: var(--color-on-accent);
+    content: "";
+  }
+
+  input[type="checkbox"]:disabled {
+    cursor: default;
+    opacity: 0.55;
   }
 
   /* Years, counts, ISBNs and prices line up in columns. */

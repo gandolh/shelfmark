@@ -114,17 +114,17 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
         triggerLabel="Account"
         triggerClassName={cn(
           "group/account flex items-center justify-center rounded-pill text-ink-2",
-          placement === "bar" ? "size-control" : "-mr-1.5 size-touch",
+          placement === "bar" ? "size-control" : "size-control-large",
         )}
         align="end"
         trigger={
           <span
             className={cn(
-              "flex items-center justify-center rounded-pill bg-control transition-[background-color,color] duration-(--duration-fast) ease-out group-hover/account:bg-control-hover group-aria-expanded/account:bg-accent-tint group-aria-expanded/account:text-accent-press",
-              placement === "bar" ? "size-full" : "size-8",
+              "flex items-center justify-center rounded-pill bg-control transition-[background-color,color] duration-(--duration-fast) ease-out group-hover/account:bg-control-hover group-aria-expanded/account:bg-accent-tint group-aria-expanded/account:text-on-accent-tint",
+              "size-full",
             )}
           >
-            <AccountIcon size={17} />
+            <AccountIcon size={18} />
           </span>
         }
         sections={sections}

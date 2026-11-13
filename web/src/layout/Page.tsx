@@ -12,7 +12,7 @@ const BOOK_HEADROW = "md:max-w-[1020px]";
 const TOOLBAR = "flex flex-wrap items-center gap-2 max-md:justify-between";
 
 export interface PageProps {
-  /** The page's `<h1>` and the window's title: 34 px on the desktop, the large 32 px title on a phone. */
+  /** The page's `<h1>` and the window's title: 32 px on the desktop, in the book face, the 28 px title on a phone. */
   title: string;
   /** A line under the title: "14 books, newest first". */
   caption?: ReactNode;
@@ -65,16 +65,18 @@ export function Page({
   }, [title]);
 
   const heading = (
-    <div className="flex min-w-0 flex-col gap-0.5">
-      <h1 className="text-title leading-[1.15] font-bold tracking-title max-md:text-title-phone">{title}</h1>
-      {caption && <p className="text-muted tabular-nums">{caption}</p>}
+    <div className="flex min-w-0 flex-col gap-1">
+      <h1 className="font-book text-title leading-title font-semibold tracking-title max-md:text-title-phone max-md:leading-9">
+        {title}
+      </h1>
+      {caption && <p className="text-body text-muted">{caption}</p>}
     </div>
   );
 
   return (
     <div
       className={cn(
-        "flex flex-[1_0_auto] flex-col md:mx-auto md:w-full md:max-w-page md:gap-4.5 md:px-gutter-desktop md:pt-9 md:pb-12",
+        "flex flex-[1_0_auto] flex-col md:mx-auto md:w-full md:max-w-page md:gap-4 md:px-gutter-desktop md:pt-8 md:pb-12",
         wide && "md:max-w-none",
       )}
     >
@@ -84,7 +86,7 @@ export function Page({
         <header
           className={cn(
             "flex flex-col gap-2.5 max-md:px-gutter-phone max-md:pt-3.5 max-md:pb-3",
-            card && "rounded-container bg-surface max-md:mb-2.5 max-md:rounded-t-none md:px-6 md:py-5.5",
+            card && "rounded-container bg-surface max-md:mb-2.5 max-md:rounded-t-none md:p-6",
           )}
         >
           {back && <BackLink to={back.to} label={back.label} />}

@@ -72,7 +72,7 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
       <BaseMenu.Portal>
         <BaseMenu.Positioner className="z-float" side="bottom" align={align} sideOffset={GAP} collisionPadding={MARGIN}>
           <BaseMenu.Popup
-            className="flex max-w-[calc(100vw_-_16px)] min-w-56 flex-col rounded-menu bg-surface p-1.5 text-ink shadow-float outline-none motion-safe:animate-panel-in"
+            className="flex max-w-[calc(100vw_-_16px)] min-w-56 flex-col rounded-container bg-surface p-2 text-ink shadow-float outline-none motion-safe:animate-panel-in"
             aria-label={label}
             finalFocus={() => {
               const item = chosen.current;
@@ -88,8 +88,8 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                 {section.label ? (
                   <BaseMenu.GroupLabel
                     className={cn(
-                      "pt-1.5 pr-2.5 pb-0.5 pl-2.5 text-label font-semibold text-muted",
-                      sectionIndex > 0 && "pt-2.5",
+                      "pt-2 pr-3 pb-1 pl-3 text-label leading-label font-semibold text-muted",
+                      sectionIndex > 0 && "pt-3",
                     )}
                   >
                     {section.label}
@@ -100,7 +100,7 @@ export function Menu({ label, sections, trigger, triggerLabel, triggerClassName,
                 {section.items.map((item) => (
                   <BaseMenu.Item
                     key={item.label}
-                    className="flex min-h-9 cursor-default items-center justify-between gap-5 rounded-menu-item px-2.5 text-left text-meta text-ink select-none focus-visible:outline-offset-[-2px] data-disabled:bg-none data-disabled:text-muted data-highlighted:bg-accent-tint-soft max-md:min-h-touch max-md:text-body"
+                    className="flex min-h-control cursor-default items-center justify-between gap-5 rounded-control px-3 text-left text-meta text-ink select-none focus-visible:outline-offset-[-2px] data-disabled:bg-none data-disabled:text-muted data-highlighted:bg-accent-tint data-highlighted:text-on-accent-tint max-md:min-h-touch max-md:text-body"
                     disabled={item.disabled}
                     onClick={() => {
                       chosen.current = item;
