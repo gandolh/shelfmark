@@ -2,19 +2,24 @@
 name: Shelfmark
 description: A catalog of the owner's physical books. A familiar table app, light, where the cover leads and the chrome recedes.
 colors:
-  ground: "#F5F5F3"
-  surface: "#FFFFFF"
-  control: "#E6E6E2"
-  field: "#E9E9E6"
-  hairline: "#E2E2DF"
-  divider: "#ECECE9"
-  ink: "#1B1B1D"
-  ink-2: "#45454A"
-  muted: "#5F5F65"
-  accent: "#0E6E8C"
-  accent-press: "#0A4F65"
-  accent-tint: "#DCEDF2"
+  ground: "#F6F3EF"
+  surface: "#FFFEFD"
+  control: "#E8E6E1"
+  field: "#ECE9E4"
+  hairline: "#E0DEDA"
+  divider: "#E0DEDA"
+  ink: "#1D1C18"
+  ink-2: "#44423E"
+  muted: "#63605B"
+  accent: "#0A6B84"
+  accent-press: "#005368"
+  accent-tint: "#D8EEF6"
   accent-tint-soft: "#EDF5F8"
+  control-raised: "#FFFEFD"
+  row-hover: "#F4F2EE"
+  outline: "#7E7B75"
+  on-accent-tint: "#004B5F"
+  cover-edge: "#1D1C18"
   cover-1-bg: "#7B2D35"
   cover-1-ink: "#F7EEE6"
   cover-2-bg: "#D4A23A"
@@ -33,59 +38,59 @@ colors:
   cover-8-ink: "#E8C66C"
 typography:
   title:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
-    fontSize: "34px"
-    fontWeight: 700
-    letterSpacing: "-0.02em"
-  title-phone:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Literata Variable\", Literata, Georgia, serif"
     fontSize: "32px"
-    fontWeight: 700
-    letterSpacing: "-0.02em"
-  wordmark:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
-    fontSize: "17px"
     fontWeight: 600
-    letterSpacing: "-0.01em"
+    letterSpacing: "0"
+  title-phone:
+    fontFamily: "\"Literata Variable\", Literata, Georgia, serif"
+    fontSize: "28px"
+    fontWeight: 600
+    letterSpacing: "0"
+  wordmark:
+    fontFamily: "\"Literata Variable\", Literata, Georgia, serif"
+    fontSize: "20px"
+    fontWeight: 600
+    letterSpacing: "0"
   row-title:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Literata Variable\", Literata, Georgia, serif"
     fontSize: "16px"
     fontWeight: 600
     lineHeight: 1.25
   action-large:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "16px"
     fontWeight: 600
   input-phone:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "16px"
     fontWeight: 400
   body:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
-    fontSize: "15px"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontSize: "16px"
     fontWeight: 400
-    lineHeight: 1.45
+    lineHeight: 1.5
   body-phone:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
-    fontSize: "15px"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontSize: "16px"
     fontWeight: 400
-    lineHeight: 1.4
+    lineHeight: 1.5
   meta:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "14px"
     fontWeight: 400
     lineHeight: 1.25
   small:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "13px"
     fontWeight: 400
     lineHeight: 1.25
   label:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "12px"
     fontWeight: 600
   tab:
-    fontFamily: "system-ui, -apple-system, \"Segoe UI\", sans-serif"
+    fontFamily: "\"Public Sans Variable\", system-ui, -apple-system, \"Segoe UI\", sans-serif"
     fontSize: "11px"
     fontWeight: 400
     lineHeight: 1.25
@@ -105,11 +110,11 @@ spacing:
   gutter-desktop: "40px"
   page-width: "1180px"
   touch: "44px"
-  control-height: "34px"
+  control-height: "36px"
   control-height-large: "48px"
   segment-height: "32px"
   segment-height-small: "30px"
-  topbar-height: "63px"
+  topbar-height: "64px"
   tabbar-height: "76px"
 components:
   button-primary:
@@ -317,8 +322,10 @@ Derived from the same roles, checked by `web/src/styles/tokens.test.ts` (4.5:1 f
 
 ## Typography
 
-**Display Font:** none distinct; the page title is the system font at 700.
-**Body Font:** the system stack (`system-ui, -apple-system, "Segoe UI", sans-serif`)
+**Display Font:** Literata (self-hosted variable font, 600): page titles, section heads, a book's title in a row and the wordmark (`font-book`).
+**Body Font:** Public Sans (self-hosted variable font, `font-sans`, with the system stack behind it): the controls and everything else.
+
+_History, kept (2026-11-13):_ "**Display Font:** none distinct; the page title is the system font at 700" and "**Body Font:** the system stack". Both stood from the first build until the Covers, typeset redesign.
 
 **Character:** the platform's own voice, used at a handful of sizes so the app feels native on the owner's phone and laptop. Weight, not size or face, does the hierarchy work: 700 for the page title, 600 for book titles, labels and anything selected, 400 for the rest.
 
@@ -358,7 +365,7 @@ The shell picks the layout in script: from 768 px it is the desktop (`.shell--de
 - Active filters show as removable chips under the toolbar, with a quiet "clear" at the end.
 - Table: default columns Book, Publisher (150 px), Year (80 px, the label and its sort arrow whole), Shelf (150 px), Status (112 px, "Abandoned" whole), Added; columns resize and the choice is remembered. Before Book, a 48 px track of select boxes (44 px on a phone; 16 px boxes, 18 px on a phone, in the accent), the header's box ticking the books on the page on show (every page is the Select all band's). A selected row takes the faint teal wash. Rows are 94 px with the 46 px cover; the head sticks under the top bar on the desktop and to the top on a phone. First and last cells pad 24 px (16 px on a phone).
 - Covers: three columns on a phone, more on the desktop, title (two lines) over author. A long press selects a cover; while books are selected, each cover carries a 24 px mark in its top corner, an open ink-2 ring on a near-white disc or the accent disc with a white check, and a ticked cover is ringed in the accent.
-- Pages: the table and the covers show one page of the list, 10 books by default (10, 25, 50 or 100, remembered per layout). The pager sits under the list. It is gone when everything fits on one page, unless a larger size put more than 10 books there; then only the range and "Per page" stay, so the size can go back down. Desktop: the column's width, 18 px under the list; on the left the range in muted tabular figures ("51–100 of 1,234"); on the right Previous, the page numbers with gaps ("1 … 4 5 6 … 25", always seven once there are more than seven pages), Next, and the "10 per page" menu as a secondary button. Previous and Next are secondary buttons, faded at the ends; the numbers are 34 px ink-2 text buttons that take the control fill on hover, and the current page wears the teal wash with accent-press semibold text. Phone: at the end of the list, above the tab bar, Previous and Next as 44 px secondary buttons either side of "Page 3 of 25" in ink-2, and "10 per page" centred under them as accent text; nothing goes in the toolbar. The caption under the title keeps the total. Turning the page brings the list's top just under the top bar (the top of the window on a phone), and focus stays on the control pressed.
+- Pages: the table and the covers show one page of the list, 10 books by default (10, 25, 50 or 100, remembered per layout). The pager sits under the list. It is gone when everything fits on one page, unless a larger size put more than 10 books there; then only the range and "Per page" stay, so the size can go back down. Desktop: the column's width, 18 px under the list; on the left the range in muted tabular figures ("51 to 100 of 1,234"); on the right Previous, the page numbers with gaps ("1 … 4 5 6 … 25", always seven once there are more than seven pages), Next, and the "10 per page" menu as a secondary button. Previous and Next are secondary buttons, faded at the ends; the numbers are 34 px ink-2 text buttons that take the control fill on hover, and the current page wears the teal wash with accent-press semibold text. Phone: at the end of the list, above the tab bar, Previous and Next as 44 px secondary buttons either side of "Page 3 of 25" in ink-2, and "10 per page" as a secondary button under them (on the desktop it is the pager's last control; a disabled Previous is muted text with no fill); nothing goes in the toolbar. The caption under the title keeps the total. Turning the page brings the list's top just under the top bar (the top of the window on a phone), and focus stays on the control pressed.
 
 **Add a book.** On the desktop the Scan / Type ISBN / By hand switch heads the content column directly under the title; under it, Scan is a rounded camera stage (420 to 660 px tall) and Type ISBN and By hand are one column up to 600 px. On a phone the camera fills the screen down to the tab bar and the switch and session counter float over it.
 
@@ -375,11 +382,11 @@ A hybrid, deliberately lopsided: surfaces are separated by tone (white container
 - **Float** (`box-shadow: 0 16px 40px rgba(27, 27, 29, 0.18)`): menus, the scan sheet and the phone's panel sheets, the desktop Filter/Columns panels, the password dialog, the update prompt, the account notice, and the skip link while focused.
 
 ### Named Rules
-**The Lit Object Rule.** The cover is the only thing with a shadow besides floating menus and sheets. A card, a button, a chip or a container never gets one; if something needs to separate from the ground, make it white.
+**The Lit Object Rule.** The cover is the only thing with a shadow besides floating menus and sheets, in light. In dark, covers get a 1 px `cover-edge` and floating parts a hairline instead of a shadow. A card, a button, a chip or a container never gets one; if something needs to separate from the ground, make it white.
 
 ## Shapes
 
-Gently rounded throughout, with the radius growing with the size of the thing: a cover's corners are barely softened (3 px) so it still reads as a printed object; segments 6 px; menu rows 7 px; buttons and small tracks 8 px; fields and segmented tracks 10 px; menus 12 px; the table container, book-page cards and the desktop camera stage 16 px; the floating sheet and the desktop dialog 20 px. Chips, the "Add a book" pill, a sheet's large action, the account disc and the offline notice are full pills. Controls have no borders; edges come from fill against ground. Covers are always 2:3.
+Gently rounded throughout, with the radius growing with the size of the thing: a cover's corners are barely softened (3 px) so it still reads as a printed object; segments 6 px; menu rows 7 px; buttons and small tracks 8 px; fields and segmented tracks 10 px; menus 12 px; the table container, book-page cards and the desktop camera stage 16 px; the floating sheet and the desktop dialog 20 px. Chips, the "Add a book" pill, a sheet's large action, the account disc and the offline notice are full pills. Fields and checkboxes have a 3:1 `outline` edge (1 px; an error is ink, semibold, a mark and a heavier edge of the same width); other controls have no borders, their edges come from fill against ground. _History, kept: "Controls have no borders" (until 2026-11-13)._ Covers are always 2:3.
 
 ## Components
 
@@ -409,7 +416,7 @@ The workhorse switch: the three places in the top bar, Table / Covers, Add a boo
 - **Internal Padding:** 20 px on the desktop, 16 px on a phone.
 
 ### Inputs / Fields
-- **Style:** field-grey fill, no border, 10 px corners; search 34 px on the desktop (40 px in the phone header) with a muted icon and a muted round clear button; form inputs 42 px; the ISBN field 48 px.
+- **Style:** field-grey fill with a 3:1 `outline` edge, 8 px corners (was: field-grey fill, no border, 10 px corners, until 2026-11-13); search 34 px on the desktop (40 px in the phone header) with a muted icon and a muted round clear button; form inputs 42 px; the ISBN field 48 px.
 - **Focus:** a 2 px accent outline on the field's edge (offset 0); the search box carries the ring for its input.
 - **Error:** a 1.5 px ink-2 outline on the field and an ink semibold message with its mark under it. No red.
 - **On a phone:** 16 px text so iOS does not zoom.
@@ -456,3 +463,15 @@ State changes only, short, one curve: `cubic-bezier(0.22, 1, 0.36, 1)` at 120 ms
 - **Don't** use decorative gradients; the camera's vignette is the one gradient, and it is functional.
 - **Don't** write "item", "record", "entry", "location", "result" or "match" for what the glossary calls a book, shelf or draft, or "search" for a lookup.
 - **Don't** fade a sheet in from nothing; it rises from its edge.
+
+## Covers, typeset (2026-11-13)
+
+The redesign approved on the estate board keeps Covers, the table-first Library, the three places and the account menu. It changes the type (Literata for what a book says, Public Sans for the controls, sizes 12 14 16 20 32, line heights as `leading-*` tokens), warms the neutrals (ground `#F6F3EF`, a deeper teal `#0A6B84`), gives dark its own palette (a warm grey ground, lighter surfaces as they rise, hairlines, a light teal with dark text on it, cover tints calmed a step and edged), and draws one card radius, 16 px. New tokens: `control-raised`, `row-hover`, `outline`, `on-accent-tint`, `cover-edge`, `font-book`, `text-heading`, five `leading-*`.
+
+- **Library:** a flat `surface` header card and table box, 16 px apart; the caption is body size, 4 px under the title; the toolbar sits bottom-aligned in the card. Phone: the header card runs full bleed with rounded lower corners and Views sits on the ground; rows show the shelf and the status under the author. The desktop pager reads "1 to 10 of 27".
+- **A book:** title and author beside a 240 px cover that stays put while the facts scroll; Shelf and Status are set large above two flat cards, About this copy then About the book. Two columns hold down to 768; on a phone the cover leads, centred.
+- **Add, Type ISBN:** the label over a 3:1 field; with a draft open the field and Look up share a row, Look up turns grey and the hint goes; the draft is a flat card. One filled primary per screen.
+- **The no-cover placeholder:** the book's title and author in Literata; at 72 px and under, the title's first letter.
+- **Chips and segments:** the current radio chip is the teal wash (48 px on a phone); the current segment is a raised tile with a hairline.
+- **Tabular figures** only where digits stack: the Year column, the pager and the ISBN field. A book's publisher and year are separate facts, the year muted.
+- **Still:** the library's loading skeleton no longer pulses.

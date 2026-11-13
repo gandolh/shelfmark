@@ -1,6 +1,6 @@
 ---
 summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the three-place navigation (Library, Add a book, Wishlist; two places until 2026-11-10) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card, full width and toolbar (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-11-11
+updated: 2026-11-13
 ---
 
 # Design
@@ -54,10 +54,12 @@ palette, type or marks.
 | `accent-press` | `#0A4F65` | pressed, link hover |
 | `accent-tint` | `#DCEDF2` | open menu button, selected menu row (`#EDF5F8`) |
 
-- **Type:** the system stack (`system-ui, -apple-system, 'Segoe UI',
-  sans-serif`). Page title 34 px / 700 / -0.02em (32 px on the phone); row
-  title 16 px / 600; body 15 px; meta 14 px; labels 12 px / 600; tabular
-  figures for years and counts.
+- **Type (2026-11-13):** Public Sans (`font-sans`) for the controls and
+  Literata (`font-book`) for page titles, section heads, a book's title in a
+  row and the wordmark, both self-hosted. Sizes 12 14 16 20 32 (28 title on a
+  phone), body 16, tabular figures only for the Year column, the pager and the
+  ISBN field. _History: the system stack, page title 34 px / 700 / -0.02em,
+  body 15 px, until the Covers, typeset redesign._
 - **Radii:** covers 3 px; controls 8 px; segmented tracks 10 px; pill buttons
   full; table container 16 px; floating sheet 20 px.
 - **Elevation:** covers `0 6px 14px rgba(27,27,29,.22), 0 1px 2px
@@ -177,9 +179,13 @@ measurements (code-led build, no approved comp). Detector: no findings.
 - Verdict pass: all seven resolved, `ship`.
 - Judged fine as built: the 260 px book-page cover ("the cover leads"), and
   the three chip styles (toggle, tag, filter chip), which read as one family.
-- Left for the owner: whether the 46×69 table placeholder should drop its
+- Answered 2026-11-13 (the redesign): at 72 px and under a no-cover placeholder shows the title's first letter. Was left for the owner: whether the 46×69 table placeholder should drop its
   title and author for a simpler mark (real covers are just as unreadable at
   that size, and a miniature keeps a book the same in Table and Covers);
   whether the desktop Add result should show a larger cover than the phone
   sheet's 60×90; and a look at the Sign in with Ward states, which the review
   could not capture without Ward configured.
+
+## Covers, typeset (2026-11-13)
+
+The redesign built for brief 09 is recorded in [DESIGN.md](../../DESIGN.md) (its last section) and the decision in [decisions.md](decisions.md). The tokens are in `web/src/styles/index.css`; `e2e/` holds the browser checks.

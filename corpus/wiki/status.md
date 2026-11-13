@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-11-04, per area. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-12
+summary: Snapshot as of 2026-11-04, per area; the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+updated: 2026-11-13
 ---
 
 # Status
@@ -23,6 +23,8 @@ estate calls of 2026-11-09. The product calls are in
 `DESIGN.md`, and the run's rulings in [log.md](../log.md).
 
 ## By area
+
+- **The redesign, "Covers, typeset"** (2026-11-13, brief 09). Tokens, the shell, the Library, a book and Add a book in the new look, the other screens restyled by the tokens; Public Sans and Literata self-hosted; Playwright (`web/e2e/`) checks focus rings, reduced motion, 390 px overflow and targets, and the themes. Built on local `main`, not pushed, not deployed (web client only: `node cli.ts shelfmark deploy`). See [DESIGN.md](../../DESIGN.md) and [decisions.md](decisions.md).
 
 - **Wishlist and recommendations** (2026-11-11, brief 04). Wishlist is the third place; Library holds owned books only; the Claude import path, the dedup and the three tables are built on local `main`, not deployed. The spike of TasteDive and an embedding ranker is not run: it needs the owner's real library and verdict ([recommendations.md](recommendations.md), [todo](../todos/recommendations-spike.md)).
 

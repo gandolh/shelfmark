@@ -1,6 +1,6 @@
 ---
 summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward; English interface; the familiar table app in the Covers variant, light; three places (Library, Add a book, Wishlist; two until 2026-11-10); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app).
-updated: 2026-11-12
+updated: 2026-11-13
 ---
 
 # Decisions
@@ -63,6 +63,8 @@ library scale; Grid, which hides covers. Mock-ups and tokens:
 [design.md](design.md).
 
 _2026-11-12_, brief 07 (revisit of "light, no dark theme"): the owner's call of 2026-11-10 gives every app a Light / Dark / System switch. Light stays the choice on a first visit, even where the system prefers dark; the choice is kept on the device (`shelfmark.theme` in `localStorage`, as the Library's prefs are), so it is a `RadioGroup` in the account menu's Theme dialog (the base-ui skill's rule 16 over the brief's guarded `ToggleGroup`, which is for a picker that saves to the server). Every colour is `light-dark(light, dark)`; the dark set is a first pass for the redesign to refine, and the camera view stays dark in both. The "light" above is the first-visit default, not a ban.
+
+_2026-11-13_, brief 09 (revisit of the type, the field edge and two small lines; Covers, the table-first Library, the three places and the account menu stand): the owner approved the direction "Covers, typeset" on the estate redesign board. Public Sans now sets the controls and Literata sets page titles, section heads, a book's title in a row and the wordmark, both self-hosted (`@fontsource-variable`, pinned at 5.3.0); old line kept as history: "the system stack, weight does the hierarchy". Fields and checkboxes get a 3:1 `outline` edge (old line: "controls have no borders"); the No Danger Hue Rule stands, an error is ink, semibold, a mark and a heavier edge of the same width. At 72 px and under a no-cover placeholder shows the title's first letter (the question left for the owner on 2026-11-04, answered). The desktop pager reads "1 to 10 of 27" (was "1–10 of 27"), a disabled Previous is muted text with no fill, and the phone's "10 per page" is a button under the row (was accent text). Cover shadow holds in light; in dark covers get a 1 px edge and floating parts a hairline. Dark is its own palette, no longer a first pass. Rejected: system type kept (no voice), a distinct book face for the whole UI (Literata only where the book speaks).
 
 ## Two places only: Library and Add a book (three since 2026-11-10: Wishlist)
 _2026-10-14_. The owner asked for no Loans tab and no Settings tab unless it
