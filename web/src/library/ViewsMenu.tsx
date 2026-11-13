@@ -118,7 +118,7 @@ export function ViewsMenu({ layout, mode, align = "start" }: ViewsMenuProps) {
           // On the phone it sits on the tabs' baseline: its label, not its leading icon, gives the button its baseline,
           // and padding instead of a min-height keeps the 44 px target without dropping the label to the top of the box.
           layout === "phone"
-            ? "max-md:-mr-2 max-md:min-h-0 max-md:items-baseline max-md:pt-3 max-md:pb-[13px] max-md:[&_svg]:self-center"
+            ? "max-md:-mr-2 max-md:min-h-0 max-md:items-baseline max-md:pt-3 max-md:pb-4 max-md:[&_svg]:self-center"
             : undefined,
         )}
         align={align}

@@ -118,7 +118,7 @@ export function StatsPage() {
 
 function Total({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex-[1_1_140px] rounded-container bg-surface px-5 py-4 [&_dd]:mt-1 [&_dd]:text-title-phone [&_dd]:font-bold [&_dd]:tabular-nums [&_dt]:text-label [&_dt]:font-semibold [&_dt]:text-muted">
+    <div className="flex-[1_1_140px] rounded-container bg-surface px-5 py-4 [&_dd]:mt-1 [&_dd]:font-book [&_dd]:text-title-phone [&_dd]:font-semibold [&_dd]:tabular-nums [&_dt]:text-label [&_dt]:font-semibold [&_dt]:text-muted">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>

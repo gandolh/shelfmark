@@ -602,7 +602,7 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
         aria-valuemin={column.minSize}
         aria-valuemax={MAX_WIDTH}
         tabIndex={0}
-        className="absolute top-0 -right-1.5 bottom-0 z-1 w-3 cursor-col-resize touch-none after:absolute after:top-2.5 after:bottom-2 after:left-1.25 after:w-0.5 after:rounded-pill after:bg-transparent after:transition-[background-color] after:duration-(--duration-fast) after:ease-out after:content-[''] group-hover/head:after:bg-divider hover:after:bg-accent focus-visible:outline-none focus-visible:after:bg-accent data-resizing:after:bg-accent"
+        className="absolute top-0 -right-1.5 bottom-0 z-1 w-3 cursor-col-resize touch-none after:absolute after:top-2.5 after:bottom-2 after:left-1.25 after:w-0.5 after:rounded-pill after:bg-transparent after:transition-[background-color] after:duration-(--duration-fast) after:ease-out after:content-[''] group-hover/head:after:bg-divider hover:after:bg-accent focus-visible:after:bg-accent data-resizing:after:bg-accent"
         data-resizing={header.column.getIsResizing() ? "" : undefined}
         onMouseDown={resizeHandler}
         onTouchStart={resizeHandler}

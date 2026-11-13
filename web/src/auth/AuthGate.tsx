@@ -69,7 +69,7 @@ export function GateScreen({ state, onRetry }: GateScreenProps) {
     >
       <div className="flex w-full max-w-95 flex-col gap-6">
         <header className="flex flex-col gap-1.5 px-1">
-          <h1 className="text-title leading-tight font-bold tracking-title text-ink max-md:text-title-phone">
+          <h1 className="font-book text-title leading-title font-semibold tracking-title text-ink max-md:text-title-phone">
             Shelfmark
           </h1>
           {state === "loading" ? (
