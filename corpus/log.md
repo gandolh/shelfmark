@@ -827,3 +827,7 @@ Not run: `docker build` (local Docker gives an I/O error). The built `server/dis
 ## [2026-11-13] decision | Redesign approved: "Covers, typeset"
 
 The owner approved the redesign direction "Covers, typeset" (round 2) on the estate redesign board, with every question on the board standing as proposed. Brief 09's build step starts.
+
+## [2026-11-13] build | The redesign, "Covers, typeset"
+
+Brief 09 built on local `main`, one commit per step, by redesign-shelfmark: tokens, the shell, the Library, a book, Add a book, the other screens by token, Playwright checks, DESIGN.md and the decision. Web client only. See the brief's outcome note.

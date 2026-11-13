@@ -83,3 +83,15 @@ Answered 2026-11-10: Q39 (Hallmark, with taste-skill 2.5's useful parts; approva
 - Brief 04's Wishlist page is a screen of its own here: the wished-for books, the Add a book button and the recommendations share one page, so the proposal must keep the recommendations visibly apart from the books the owner chose.
 - Brief 06's wrappers (`Dialog`, `Menu`, `Tabs`, `ToggleGroup`, `Toast`, `Panel`) are restyled through tokens, not rewritten.
 - Brief 05's formatter and lint run on every redesign commit.
+
+## Outcome (2026-11-13)
+
+Built as "Covers, typeset" on local `main`, one commit per step, by redesign-shelfmark. Web client only; not pushed, not deployed.
+
+- **Commits.** Approval line, tokens (with Literata and Public Sans, `@fontsource-variable` 5.3.0), the shell and its parts, the Library, a book, Add a book, the Playwright checks, the docs.
+- **Contrast** (script over the built tokens, both themes, every text and icon pair listed in `tokens.test.ts`, which now also covers `row-hover`, `control-raised`, `on-accent-tint`, `outline` and the field): text minimum 5.02:1 light (muted on control), 5.08:1 dark (the ochre cover's text); UI parts minimum 3.48:1 light (outline on field), 4.08:1 dark.
+- **Checks.** `@playwright/test` 1.63.0 in `web/` (`e2e/floor.spec.ts`): a ring on every Tab stop of six screens, no infinite animation under reduced motion, no overflow and 44 px targets at 390, light first and dark and system. `npm run check` parts, `npm run build` and `bash corpus/lint.sh` pass.
+- **Comps against the build** (changed pixels, demo data against the comps' own, so book titles, the cover prompt row and row heights differ): Library 1280 4.0% light / 2.9% dark, 390 11.8% / 10.2%; Add 1280 8.2% / 9.1%, 390 15.9% / 21.7%; Book 1280 11.1% / 10.9%, 390 17.3% / 20.4%.
+- **Deviations.** Phone table rows are 91 px (the comps' grow to about 95); `--radius-track` is 12 px to match the comps' segmented track; the draft's meta line keeps "Penguin Classics · 2003" (the copy rule), only the book page splits publisher and year; most secondary buttons lost `pill` and are 8 px (large ones stay pills); `accent-tint-soft` stays in the file, unused apart from tests.
+- **No figure or book is invented;** the Add draft in the shots is a stubbed lookup of the board's Emma, nothing reached a catalog.
+- **Owner step.** Deploy: `node cli.ts shelfmark deploy` from the vps-deploy checkout.
