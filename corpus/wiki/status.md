@@ -30,6 +30,8 @@ estate calls of 2026-11-09. The product calls are in
 
 - **The server in feature folders** (2026-11-12, brief 08). `server.ts` / `app.ts` / `config.ts`, `plugins/` and `features/<name>/`, a response schema on every route but the two byte routes, `check-structure` strict; built on local `main`, not pushed and not deployed. Owner steps: the deploy and the container checks in [the brief](../briefs/done/08-the-server-in-the-code-structure.md).
 
+- **A stop aborts lookups** (2026-11-13, brief 10). A `preClose` hook aborts every outbound lookup in flight (fetches, Z39.50 sockets, queue pauses); the route answers 503. Built on local `main`, not deployed (`node cli.ts shelfmark server`). The recommendations feature's Open Library calls and the CIP refresh have no signal yet.
+
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
 - **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app

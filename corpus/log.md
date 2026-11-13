@@ -831,3 +831,7 @@ The owner approved the redesign direction "Covers, typeset" (round 2) on the est
 ## [2026-11-13] build | The redesign, "Covers, typeset"
 
 Brief 09 built on local `main`, one commit per step, by redesign-shelfmark: tokens, the shell, the Library, a book, Add a book, the other screens by token, Playwright checks, DESIGN.md and the decision. Web client only. See the brief's outcome note.
+
+## [2026-11-13] build | A stop aborts the lookups in flight
+
+Brief 10 (from the todo "A lookup in flight holds the shutdown"), built on local `main` by fix-shelfmark: a `preClose` hook aborts every outbound lookup, the Z39.50 sockets and the queues' pauses included; the route answers 503 and the close finishes at once. Server only, not deployed. The recommendations feature and the CIP refresh still have no signal.

@@ -34,3 +34,7 @@ The server's timeout values (`connectionTimeout` 130 s and the others) are an op
 - `npm run check` and `bash corpus/lint.sh` exit 0.
 - The test in step 4 fails without the `preClose` hook (close waits) and passes with it.
 - No call to a real remote from any test.
+
+## Outcome (2026-11-13)
+
+Built on local `main` (`c3cf248`), server only: `node cli.ts shelfmark server`. `lookupRoutes` makes one `AbortController` and aborts it in a `preClose` hook. Each source takes the signal: `getJson` joins it with its timeout, `searchIsbns` destroys its socket, and the queue's turn and pause stop (`Clock.sleep` takes the signal), so no timer outlives the stop. The route answers 503 `unavailable` (a new code in `lib/api-error.ts`) when the stop cut the lookup. `shutdown.test.ts` runs the route on a real socket over stubs that never answer (Open Library hanging; then the catalogs hanging): 503 and `close()` under a second; with the hook turned back into `onClose` both fail by timeout. Timeouts untouched. Not covered: the recommendations feature's Open Library calls and the CIP refresh job have no signal (the todo named the lookup only). Not run: the built server under SIGTERM (owner: stop the container during a lookup after the deploy).
