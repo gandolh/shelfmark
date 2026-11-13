@@ -1,11 +1,13 @@
 ---
 title: A lookup in flight holds the shutdown
 created: 2026-11-12
-status: open
+status: promoted
 tags: [server]
 ---
 
 # A lookup in flight holds the shutdown
+
+Promoted to [brief 10](../briefs/todo/10-abort-lookups-on-close.md).
 
 Found by brief 08's builder (2026-11-12). A book lookup can wait on the catalogs for up to about 40 s on a miss.
 If the container is stopped while one runs, Fastify waits for it, `close-with-grace` runs out its 10 s, and the
