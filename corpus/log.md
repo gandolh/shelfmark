@@ -835,3 +835,7 @@ Brief 09 built on local `main`, one commit per step, by redesign-shelfmark: toke
 ## [2026-11-13] build | A stop aborts the lookups in flight
 
 Brief 10 (from the todo "A lookup in flight holds the shutdown"), built on local `main` by fix-shelfmark: a `preClose` hook aborts every outbound lookup, the Z39.50 sockets and the queues' pauses included; the route answers 503 and the close finishes at once. Server only, not deployed. The recommendations feature and the CIP refresh still have no signal.
+
+## [2026-11-13] blocked | The recommendations spike waits on the owner
+
+The owner (2026-11-13) keeps the TasteDive and embedding spike parked: it needs a copy of their library, a TasteDive key and their count of useful picks out of 10, so only they can run it. The todo moved to `todos/blocked/`.

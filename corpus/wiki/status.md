@@ -26,7 +26,7 @@ estate calls of 2026-11-09. The product calls are in
 
 - **The redesign, "Covers, typeset"** (2026-11-13, brief 09). Tokens, the shell, the Library, a book and Add a book in the new look, the other screens restyled by the tokens; Public Sans and Literata self-hosted; Playwright (`web/e2e/`) checks focus rings, reduced motion, 390 px overflow and targets, and the themes. Built on local `main`, not pushed, not deployed (web client only: `node cli.ts shelfmark deploy`). See [DESIGN.md](../../DESIGN.md) and [decisions.md](decisions.md).
 
-- **Wishlist and recommendations** (2026-11-11, brief 04). Wishlist is the third place; Library holds owned books only; the Claude import path, the dedup and the three tables are built on local `main`, not deployed. The spike of TasteDive and an embedding ranker is not run: it needs the owner's real library and verdict ([recommendations.md](recommendations.md), [todo](../todos/recommendations-spike.md)).
+- **Wishlist and recommendations** (2026-11-11, brief 04). Wishlist is the third place; Library holds owned books only; the Claude import path, the dedup and the three tables are built on local `main`, not deployed. The spike of TasteDive and an embedding ranker is not run: it needs the owner's real library and verdict ([recommendations.md](recommendations.md), [todo](../todos/blocked/recommendations-spike.md)).
 
 - **The server in feature folders** (2026-11-12, brief 08). `server.ts` / `app.ts` / `config.ts`, `plugins/` and `features/<name>/`, a response schema on every route but the two byte routes, `check-structure` strict; built on local `main`, not pushed and not deployed. Owner steps: the deploy and the container checks in [the brief](../briefs/done/08-the-server-in-the-code-structure.md).
 
