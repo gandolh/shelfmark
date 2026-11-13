@@ -823,3 +823,7 @@ Brief 08 built on local `main`, one commit per step, by shelfmark-08. `server.ts
 **`connectionTimeout` is 130 s,** not the brief's 10 s: a lookup waits on up to four sources (8 s, then 10 s each with a 5-10 s pause between requests to one library) and is silent while it does.
 
 Not run: `docker build` (local Docker gives an I/O error). The built `server/dist/server.js` ran on a real socket from a scratch folder, every setting pinned (config.ts loads the repo's `.env` by a fixed path; a pinned key wins): health 200, signed out 401, sign-in then the books, the views and a backup download 200, a bad body 400, SIGTERM exit 0 from the node PID in 0.03 s.
+
+## [2026-11-13] decision | Redesign approved: "Covers, typeset"
+
+The owner approved the redesign direction "Covers, typeset" (round 2) on the estate redesign board, with every question on the board standing as proposed. Brief 09's build step starts.
