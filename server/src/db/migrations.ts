@@ -1,5 +1,8 @@
 import type { Database } from "better-sqlite3";
 
+/** One migration: SQL, or a step that needs code (a check that can refuse, data moved by a rule). */
+type Migration = string | ((db: Database) => void);
+
 /**
  * Applied in order on boot, each in its own transaction, tracked in
  * `PRAGMA user_version`. Never edit a shipped entry; append a new one with a
@@ -10,7 +13,7 @@ import type { Database } from "better-sqlite3";
  * rebuilding the table, and those lists may grow. The shared schemas guard
  * them on the way in.
  */
-export const migrations: readonly string[] = [
+export const migrations: readonly Migration[] = [
   // 1: books, tags and covers.
   `
   CREATE TABLE books (
@@ -141,20 +144,75 @@ export const migrations: readonly string[] = [
     fetched_at  TEXT NOT NULL
   ) WITHOUT ROWID;
   `,
+
+  // 5: each reader their own status and rating. A `readings` row is
+  // one person's status and rating on one book, kept only while it says
+  // something: `unread` with no rating is no row. `user_id` is an `auth_users`
+  // id with no foreign key: that table is the accounts library's, made after
+  // these migrations on a fresh database, and no user is ever deleted.
+  // The statuses and ratings stored on `books` move to the earliest-created
+  // owner account, then their columns go.
+  (db) => {
+    db.exec(`
+      CREATE TABLE readings (
+        book_id     INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+        user_id     TEXT NOT NULL,
+        status      TEXT NOT NULL DEFAULT 'unread' CHECK (status IN ('unread', 'reading', 'read', 'abandoned')),
+        rating      INTEGER CHECK (rating BETWEEN 1 AND 5),
+        updated_at  TEXT NOT NULL,
+        PRIMARY KEY (book_id, user_id)
+      );
+    `);
+    const SAYS_SOMETHING = "status <> 'unread' OR rating IS NOT NULL";
+    const toMove =
+      db.prepare<[], { n: number }>(`SELECT count(*) AS n FROM books WHERE ${SAYS_SOMETHING}`).get()?.n ?? 0;
+    if (toMove > 0) {
+      const owner = earliestOwner(db, toMove);
+      // The book's updated_at is the latest the status can have been set: the migration's own time would be a guess.
+      db.prepare(
+        `INSERT INTO readings (book_id, user_id, status, rating, updated_at)
+         SELECT id, ?, status, rating, updated_at FROM books WHERE ${SAYS_SOMETHING}`,
+      ).run(owner);
+    }
+    db.exec("ALTER TABLE books DROP COLUMN status; ALTER TABLE books DROP COLUMN rating;");
+  },
 ];
 
+/**
+ * The id of the account the books' statuses and ratings move to: the
+ * earliest-created with the `owner` role (Shelfmark's only role, the seed's
+ * and Sign in with Ward's), ties by id. The role is written out, not imported:
+ * a shipped migration never changes. Throws, naming the problem, when there is
+ * none, so a status is never dropped.
+ */
+function earliestOwner(db: Database, books: number): string {
+  const what = `${books} ${books === 1 ? "book has" : "books have"} a status or a rating to move to the owner's account`;
+  const accounts = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_users'").get();
+  if (accounts === undefined) {
+    throw new Error(`Migration 5: ${what}, but the database has no accounts (no auth_users table).`);
+  }
+  const owner = db
+    .prepare<[], { id: string }>("SELECT id FROM auth_users WHERE role = 'owner' ORDER BY created_at, id LIMIT 1")
+    .get();
+  if (owner === undefined) {
+    throw new Error(`Migration 5: ${what}, but auth_users has no account with the owner role.`);
+  }
+  return owner.id;
+}
+
 /** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */
-export function migrate(db: Database, list: readonly string[] = migrations): void {
+export function migrate(db: Database, list: readonly Migration[] = migrations): void {
   const current = db.pragma("user_version", { simple: true }) as number;
   if (current > list.length) {
     throw new Error(
       `The database is at schema version ${current}, but this server only knows ${list.length}. Run a newer server.`,
     );
   }
-  list.slice(current).forEach((sql, index) => {
+  list.slice(current).forEach((step, index) => {
     const version = current + index + 1;
     db.transaction(() => {
-      db.exec(sql);
+      if (typeof step === "string") db.exec(step);
+      else step(db);
       db.pragma(`user_version = ${version}`);
     })();
   });

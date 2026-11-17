@@ -97,6 +97,7 @@ function book(extra: Partial<Book> = {}): Book {
     currency: "RON",
     metadataSource: "openlibrary",
     tags: ["Favourite"],
+    readers: [],
     hasCover: true,
     coverUpdatedAt: "2026-03-04T08:00:00.000Z",
     createdAt: "2026-03-03T10:00:00.000Z",

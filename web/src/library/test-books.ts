@@ -40,6 +40,7 @@ export function book(fields: Partial<Book> = {}): Book {
     currency: "RON",
     metadataSource: "manual",
     tags: [],
+    readers: [],
     hasCover: false,
     coverUpdatedAt: null,
     createdAt: `2026-01-01T10:00:${String(id % 60).padStart(2, "0")}.000Z`,

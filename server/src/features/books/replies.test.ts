@@ -17,8 +17,11 @@ afterEach(() => {
   db.close();
 });
 
+/** The account every book is written as. */
+const ME = "user-ana";
+
 /** A book as the form sends it, through the request schema, then stored: the way a row is really made. */
-const create = (input: Record<string, unknown>) => store.create(bookCreateSchema.parse(input));
+const create = (input: Record<string, unknown>) => store.create(bookCreateSchema.parse(input), ME);
 
 /** The serialised reply holds the same JSON as the body it was made from. */
 const sameJson = (serialized: string, body: unknown) =>
@@ -46,7 +49,7 @@ describe("the book replies through their response schemas", () => {
 
   it("send the bulk result with its books, deleted and skipped", () => {
     const ids = [create({ title: "A" }).id, create({ title: "B" }).id];
-    const outcome = store.bulk(ids, { kind: "status", status: "read" });
+    const outcome = store.bulk(ids, { kind: "status", status: "read" }, ME);
     if (!("done" in outcome)) throw new Error("expected the bulk change to run");
     expect(sameJson(serialize(bookBulkResultSchema, outcome.done), outcome.done)).toBe(true);
   });
@@ -62,6 +65,8 @@ describe("the book replies through their response schemas", () => {
   it("refuse a stored value out of shape, which would be a 500: a rating, an ISBN, a time", () => {
     const book = create({ title: "A" });
     expect(serializationFailure(bookSchema, { ...book, rating: 6 })).toBeTruthy();
+    const reader = { userId: "user-mihai", username: "Mihai", status: "read", rating: 6, updatedAt: book.updatedAt };
+    expect(serializationFailure(bookSchema, { ...book, readers: [reader] })).toBeTruthy();
     expect(serializationFailure(bookSchema, { ...book, isbn13: "123" })).toBeTruthy();
     expect(serializationFailure(bookSchema, { ...book, createdAt: "2020-01-01 00:00:00" })).toBeTruthy();
     expect(serializationFailure(bookListSchema, { books: [{ ...book, title: 5 }] })).toBeTruthy();

@@ -32,6 +32,7 @@ const book: Book = {
   currency: "RON",
   metadataSource: "manual",
   tags: ["Romanian"],
+  readers: [],
   hasCover: false,
   coverUpdatedAt: null,
   createdAt: "2026-10-14T09:00:00.000Z",

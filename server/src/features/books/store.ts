@@ -7,39 +7,50 @@ import {
   type BookPatch,
   type BulkChange,
   type Collection,
+  type Reader,
 } from "@shelfmark/shared";
 import type { Db } from "../../db/open.js";
+import { createReadingStore, OWN_READING, saysSomething, settleReading } from "./readings.js";
 
 /**
  * The books store: the only module that runs SQL on `books`, `tags` and
  * `book_tags` (it reads `covers` only to say whether a book has one, and
- * since when). Other
+ * since when; the readings are `readings.ts`'s). Other
  * features read books through it.
  *
  * Inputs are already parsed with the shared schemas; the store applies the
  * defaults, the tag rules and the author-sort rule, and sets the times.
+ *
+ * A book is read as `reader` (an account's id) sees it: their own status and
+ * rating, everyone else's in `readers` (`readings.ts`). Read as nobody (another
+ * feature asking whether a book exists), every reader is in `readers`. Writing
+ * a status or rating changes the reader's own only, never the book's row.
  */
 export interface BookStore {
-  /** Every book, both collections, by id. One query for the books and one for all their tags. */
-  list(): Book[];
-  get(id: number): Book | undefined;
-  create(input: BookCreate): Book;
+  /** Every book, both collections, by id. Three statements: the books, all their tags, all their readers. */
+  list(reader?: string): Book[];
+  get(id: number, reader?: string): Book | undefined;
+  /** A `status` or `rating` in `input` is the reader's; without a reader, one that isn't the default throws. */
+  create(input: BookCreate, reader?: string): Book;
   /** `undefined` when there is no such book. */
-  patch(id: number, patch: BookPatch): Book | undefined;
-  /** `false` when there is no such book. The cover and the book's tag links go with it (cascade). */
+  patch(id: number, patch: BookPatch, reader: string): Book | undefined;
+  /** `false` when there is no such book. The cover, the tag links and the readings go with it (cascade). */
   remove(id: number): boolean;
   /** Every copy with this ISBN-13, owned and wishlist alike, by id. */
-  findByIsbn(isbn13: string): Book[];
+  findByIsbn(isbn13: string, reader?: string): Book[];
   /**
    * One change to many books, in one transaction. `ids` are
    * distinct. When any of them names no book, nothing changes and the answer
-   * is `{ unknown }`, those ids in order.
+   * is `{ unknown }`, those ids in order. A status change is the reader's own.
    */
-  bulk(ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] };
+  bulk(ids: readonly number[], change: BulkChange, reader: string): { done: BookBulkResult } | { unknown: number[] };
 }
 
-/** The stored fields: everything in `Book` but the id, the tags, the cover's facts and the times. */
-type BookFields = Omit<Book, "id" | "tags" | "hasCover" | "coverUpdatedAt" | "createdAt" | "updatedAt">;
+/** The stored fields: everything in `Book` but the id, the tags, the cover's facts, the times and the readings. */
+type BookFields = Omit<
+  Book,
+  "id" | "tags" | "hasCover" | "coverUpdatedAt" | "createdAt" | "updatedAt" | "status" | "rating" | "readers"
+>;
 
 /** Each field's column. Typed against `Book`, so a field the shared schema gains fails here until it has one. */
 const COLUMNS: Record<keyof BookFields, string> = {
@@ -62,8 +73,6 @@ const COLUMNS: Record<keyof BookFields, string> = {
   condition: "condition",
   shelf: "shelf",
   signed: "signed",
-  status: "status",
-  rating: "rating",
   notes: "notes",
   acquiredOn: "acquired_on",
   acquiredFrom: "acquired_from",
@@ -94,8 +103,6 @@ const DEFAULTS: Omit<BookFields, "title"> = {
   condition: null,
   shelf: null,
   signed: false,
-  status: "unread",
-  rating: null,
   notes: null,
   acquiredOn: null,
   acquiredFrom: null,
@@ -105,7 +112,7 @@ const DEFAULTS: Omit<BookFields, "title"> = {
 };
 
 /** A `books` row as the select below returns it: camelCase aliases, JSON and 0/1 still raw. */
-type BookRow = Omit<Book, "authors" | "subjects" | "signed" | "hasCover" | "tags"> & {
+type BookRow = Omit<Book, "authors" | "subjects" | "signed" | "hasCover" | "tags" | "readers"> & {
   authors: string;
   subjects: string;
   signed: number;
@@ -117,18 +124,19 @@ interface TagRow {
   name: string;
 }
 
+/** The reader's own status and rating come with the book; `@reader` is `null` to read as nobody. */
 const SELECT_BOOKS = `
-  SELECT b.id AS id, ${FIELDS.map((key) => `b.${COLUMNS[key]} AS ${key}`).join(", ")},
+  SELECT b.id AS id, ${FIELDS.map((key) => `b.${COLUMNS[key]} AS ${key}`).join(", ")}, ${OWN_READING.columns},
          b.created_at AS createdAt, b.updated_at AS updatedAt,
          c.book_id IS NOT NULL AS hasCover, c.updated_at AS coverUpdatedAt
-  FROM books b LEFT JOIN covers c ON c.book_id = b.id`;
+  FROM books b LEFT JOIN covers c ON c.book_id = b.id ${OWN_READING.join}`;
 
 // book_tags.rowid is insertion order, which keeps a book's tags in the order they were given.
 const SELECT_TAGS = `
   SELECT bt.book_id AS bookId, t.name AS name
   FROM book_tags bt JOIN tags t ON t.id = bt.tag_id`;
 
-function toBook(row: BookRow, tags: string[]): Book {
+function toBook(row: BookRow, tags: string[], readers: Reader[]): Book {
   return {
     ...row,
     authors: JSON.parse(row.authors) as string[],
@@ -136,6 +144,7 @@ function toBook(row: BookRow, tags: string[]): Book {
     signed: row.signed === 1,
     hasCover: row.hasCover === 1,
     tags,
+    readers,
   };
 }
 
@@ -180,11 +189,13 @@ function normalizeTags(tags: readonly string[]): { name: string; key: string }[]
 }
 
 export function createBookStore(db: Db, now: () => Date = () => new Date()): BookStore {
-  const listRows = db.prepare<[], BookRow>(`${SELECT_BOOKS} ORDER BY b.id`);
+  const listRows = db.prepare<[{ reader: string | null }], BookRow>(`${SELECT_BOOKS} ORDER BY b.id`);
   const listTags = db.prepare<[], TagRow>(`${SELECT_TAGS} ORDER BY bt.rowid`);
-  const getRow = db.prepare<[number], BookRow>(`${SELECT_BOOKS} WHERE b.id = ?`);
+  const getRow = db.prepare<[{ id: number; reader: string | null }], BookRow>(`${SELECT_BOOKS} WHERE b.id = @id`);
   const getTags = db.prepare<[number], TagRow>(`${SELECT_TAGS} WHERE bt.book_id = ? ORDER BY bt.rowid`);
-  const isbnRows = db.prepare<[string], BookRow>(`${SELECT_BOOKS} WHERE b.isbn13 = ? ORDER BY b.id`);
+  const isbnRows = db.prepare<[{ isbn13: string; reader: string | null }], BookRow>(
+    `${SELECT_BOOKS} WHERE b.isbn13 = @isbn13 ORDER BY b.id`,
+  );
   const isbnTags = db.prepare<[string], TagRow>(
     `${SELECT_TAGS} WHERE bt.book_id IN (SELECT id FROM books WHERE isbn13 = ?) ORDER BY bt.rowid`,
   );
@@ -210,14 +221,13 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
   const knownBooks = db.prepare<[{ ids: string }], { id: number; collection: Collection }>(
     `SELECT id, collection FROM books WHERE id IN (${IDS})`,
   );
-  const rowsOf = db.prepare<[{ ids: string }], BookRow>(`${SELECT_BOOKS} WHERE b.id IN (${IDS}) ORDER BY b.id`);
+  const rowsOf = db.prepare<[{ ids: string; reader: string | null }], BookRow>(
+    `${SELECT_BOOKS} WHERE b.id IN (${IDS}) ORDER BY b.id`,
+  );
   const tagsOf = db.prepare<[{ ids: string }], TagRow>(`${SELECT_TAGS} WHERE bt.book_id IN (${IDS}) ORDER BY bt.rowid`);
   // Only the books whose value changes are written, so the others keep their updatedAt.
   const setShelves = db.prepare<[{ ids: string; shelf: string | null; at: string }]>(
     `UPDATE books SET shelf = @shelf, updated_at = @at WHERE id IN (${IDS}) AND shelf IS NOT @shelf`,
-  );
-  const setStatuses = db.prepare<[{ ids: string; status: string; at: string }]>(
-    `UPDATE books SET status = @status, updated_at = @at WHERE id IN (${IDS}) AND status <> @status`,
   );
   const touch = db.prepare<[string, number]>("UPDATE books SET updated_at = ? WHERE id = ?");
   const linkTagOnce = db.prepare<[number, number]>("INSERT OR IGNORE INTO book_tags (book_id, tag_id) VALUES (?, ?)");
@@ -226,25 +236,22 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
   );
   const deleteBooks = db.prepare<[{ ids: string }]>(`DELETE FROM books WHERE id IN (${IDS})`);
 
-  function withTags(rows: BookRow[], tagRows: TagRow[]): Book[] {
+  const readings = createReadingStore(db);
+
+  /** The books, each with its tags and its readers (by book, `ReadingStore.readers`). */
+  function assemble(rows: BookRow[], tagRows: TagRow[], readers: Map<number, Reader[]>): Book[] {
     const byBook = new Map<number, string[]>();
     for (const { bookId, name } of tagRows) {
       const names = byBook.get(bookId);
       if (names) names.push(name);
       else byBook.set(bookId, [name]);
     }
-    return rows.map((row) => toBook(row, byBook.get(row.id) ?? []));
+    return rows.map((row) => toBook(row, byBook.get(row.id) ?? [], readers.get(row.id) ?? []));
   }
 
-  function get(id: number): Book | undefined {
-    const row = getRow.get(id);
-    return (
-      row &&
-      toBook(
-        row,
-        getTags.all(id).map((tag) => tag.name),
-      )
-    );
+  function get(id: number, reader?: string): Book | undefined {
+    const row = getRow.get({ id, reader: reader ?? null });
+    return row && assemble([row], getTags.all(id), readings.readers(reader, [id]))[0];
   }
 
   /** The tag's id, made if no tag has its key yet. */
@@ -260,41 +267,51 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
   }
 
   /** `get` for a row that was just written in the same transaction. */
-  function reread(id: number): Book {
-    const book = get(id);
+  function reread(id: number, reader: string | undefined): Book {
+    const book = get(id, reader);
     if (!book) throw new Error(`Book ${id} vanished inside its own transaction.`);
     return book;
   }
 
-  const create = db.transaction((input: BookCreate): Book => {
+  const create = db.transaction((input: BookCreate, reader: string | undefined): Book => {
     const fields: BookFields = { ...DEFAULTS, ...settle(input), title: input.title };
     fields.authorSort ??= deriveAuthorSort(fields.authors);
+    const reading = settleReading(input);
     const at = now().toISOString();
     const id = Number(insertBook.run({ ...toParams(fields), createdAt: at, updatedAt: at }).lastInsertRowid);
     if (input.tags) setTags(id, input.tags);
-    return reread(id);
+    if (reader !== undefined) readings.set(id, reader, reading, at);
+    else if (saysSomething(reading)) {
+      throw new Error("A status or a rating is someone's own: create the book with its reader.");
+    }
+    return reread(id, reader);
   });
 
-  const patch = db.transaction((id: number, changes: BookPatch): Book | undefined => {
-    const current = get(id);
+  const patch = db.transaction((id: number, changes: BookPatch, reader: string): Book | undefined => {
+    const current = get(id, reader);
     if (!current) return undefined;
     const set = settle(changes);
-    if (Object.keys(set).length === 0 && changes.tags === undefined) return current;
+    const reading = settleReading(changes);
+    const bookChanges = Object.keys(set).length > 0 || changes.tags !== undefined;
+    if (!bookChanges && Object.keys(reading).length === 0) return current;
+    const at = now().toISOString();
 
-    const next: BookFields = { ...fieldsOf(current), ...set };
-    // "Derived" means the stored key is what the stored authors give: no flag
-    // to keep in step. A key the owner typed differs, and survives new authors.
-    const wasDerived = current.authorSort === deriveAuthorSort(current.authors);
-    if (
-      changes.authorSort === null ||
-      (changes.authorSort === undefined && changes.authors !== undefined && wasDerived)
-    ) {
-      next.authorSort = deriveAuthorSort(next.authors);
+    if (bookChanges) {
+      const next: BookFields = { ...fieldsOf(current), ...set };
+      // "Derived" means the stored key is what the stored authors give: no flag
+      // to keep in step. A key the owner typed differs, and survives new authors.
+      const wasDerived = current.authorSort === deriveAuthorSort(current.authors);
+      if (
+        changes.authorSort === null ||
+        (changes.authorSort === undefined && changes.authors !== undefined && wasDerived)
+      ) {
+        next.authorSort = deriveAuthorSort(next.authors);
+      }
+      updateBook.run({ ...toParams(next), id, updatedAt: at });
+      if (changes.tags !== undefined) setTags(id, changes.tags ?? []);
     }
-
-    updateBook.run({ ...toParams(next), id, updatedAt: now().toISOString() });
-    if (changes.tags !== undefined) setTags(id, changes.tags ?? []);
-    return reread(id);
+    readings.set(id, reader, reading, at);
+    return reread(id, reader);
   });
 
   const remove = db.transaction((id: number): boolean => {
@@ -303,14 +320,14 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
     return removed;
   });
 
-  /** The books with these ids, by id: two statements, however many there are. */
-  function listOf(ids: readonly number[]): Book[] {
+  /** The books with these ids, by id: three statements, however many there are. */
+  function listOf(ids: readonly number[], reader: string): Book[] {
     const param = { ids: JSON.stringify(ids) };
-    return withTags(rowsOf.all(param), tagsOf.all(param));
+    return assemble(rowsOf.all({ ...param, reader }), tagsOf.all(param), readings.readers(reader, ids));
   }
 
   const bulk = db.transaction(
-    (ids: readonly number[], change: BulkChange): { done: BookBulkResult } | { unknown: number[] } => {
+    (ids: readonly number[], change: BulkChange, reader: string): { done: BookBulkResult } | { unknown: number[] } => {
       const known = knownBooks.all({ ids: JSON.stringify(ids) });
       if (known.length !== ids.length) {
         const found = new Set(known.map((book) => book.id));
@@ -336,7 +353,8 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
           setShelves.run({ ids: param, shelf: change.shelf, at });
           break;
         case "status":
-          setStatuses.run({ ids: param, status: change.status, at });
+          // The reader's own rows only, and never the books' updatedAt: the books didn't change.
+          readings.setStatuses(applied, reader, change.status, at);
           break;
         case "addTags": {
           const tagIds = normalizeTags(change.tags).map(tagId);
@@ -357,17 +375,21 @@ export function createBookStore(db: Db, now: () => Date = () => new Date()): Boo
         }
       }
 
-      return { done: { books: listOf(applied), deleted: [], skipped: [...skipped].sort((a, b) => a - b) } };
+      return { done: { books: listOf(applied, reader), deleted: [], skipped: [...skipped].sort((a, b) => a - b) } };
     },
   );
 
   return {
-    list: () => withTags(listRows.all(), listTags.all()),
+    list: (reader) => assemble(listRows.all({ reader: reader ?? null }), listTags.all(), readings.readers(reader)),
     get,
-    create: (input) => create(input),
-    patch: (id, changes) => patch(id, changes),
+    create: (input, reader) => create(input, reader),
+    patch: (id, changes, reader) => patch(id, changes, reader),
     remove: (id) => remove(id),
-    findByIsbn: (isbn13) => withTags(isbnRows.all(isbn13), isbnTags.all(isbn13)),
-    bulk: (ids, change) => bulk(ids, change),
+    findByIsbn: (isbn13, reader) => {
+      const rows = isbnRows.all({ isbn13, reader: reader ?? null });
+      const ids = rows.map((row) => row.id);
+      return assemble(rows, isbnTags.all(isbn13), readings.readers(reader, ids));
+    },
+    bulk: (ids, change, reader) => bulk(ids, change, reader),
   };
 }

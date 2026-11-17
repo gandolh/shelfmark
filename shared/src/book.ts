@@ -44,7 +44,29 @@ const ISBN13_MESSAGE = "must be 13 digits starting with 978 or 979";
 /** Bare digits. The check digit is `parseIsbn`'s job (isbn.ts), run where raw input comes in. */
 export const isbn13Schema = z.string().regex(ISBN13, { message: ISBN13_MESSAGE });
 
-/** A book as the API returns it. Every key is always present; `null` means not set. */
+const ratingSchema = z.number().int().min(1).max(5);
+
+/**
+ * Another person's status and rating on a book (`Book.readers`). Only someone
+ * with a status other than `unread`, or a rating, is one.
+ */
+export const readerSchema = z.object({
+  /** Their account's id. */
+  userId: z.string(),
+  /** Their username as it is now: a rename shows at once. */
+  username: z.string(),
+  status: statusSchema,
+  rating: ratingSchema.nullable(),
+  /** When they last changed their status or rating (UTC ISO). */
+  updatedAt: z.iso.datetime(),
+});
+export type Reader = z.infer<typeof readerSchema>;
+
+/**
+ * A book as the API returns it. Every key is always present; `null` means not
+ * set. `status` and `rating` are the signed-in person's own; everyone else's
+ * are in `readers`.
+ */
 export const bookSchema = z.object({
   id: z.number().int().positive(),
   isbn13: isbn13Schema.nullable(),
@@ -72,8 +94,10 @@ export const bookSchema = z.object({
   /** "Room · shelf", free text. */
   shelf: z.string().nullable(),
   signed: z.boolean(),
+  /** The signed-in person's own: `unread` until they set one. */
   status: statusSchema,
-  rating: z.number().int().min(1).max(5).nullable(),
+  /** The signed-in person's own, `null` until they give one. */
+  rating: ratingSchema.nullable(),
   notes: z.string().nullable(),
   /** `YYYY-MM-DD`. */
   acquiredOn: z.iso.date().nullable(),
@@ -85,6 +109,8 @@ export const bookSchema = z.object({
   metadataSource: metadataSourceSchema,
   /** Tag names, in the order they were given. */
   tags: z.array(z.string()),
+  /** Everyone but the signed-in person with a status or a rating on this book, by username. */
+  readers: z.array(readerSchema),
   /** Whether `GET /api/books/:id/cover` has an image. */
   hasCover: z.boolean(),
   /**
@@ -176,8 +202,9 @@ const bookFields = {
 /**
  * `POST /api/books`. Only the title is required. Left out, `collection` is
  * `owned`, `status` `unread`, `signed` false, `currency` RON, `metadataSource`
- * `manual`, and `authorSort` is derived from the first author. Unknown keys are
- * refused, so a misspelt field is a 400 rather than silently dropped.
+ * `manual`, and `authorSort` is derived from the first author. A `status` or
+ * `rating` is the signed-in person's own. Unknown keys are refused, so a
+ * misspelt field is a 400 rather than silently dropped.
  */
 export const bookCreateSchema = z.strictObject({ title: titleSchema, ...bookFields });
 export type BookCreate = z.infer<typeof bookCreateSchema>;
@@ -186,7 +213,8 @@ export type BookCreate = z.infer<typeof bookCreateSchema>;
  * `PATCH /api/books/:id`. Every field is optional; a missing one is left as it
  * is and `null` clears it (see `clearable`). The title can be changed, never
  * cleared. A patch of `authors` re-derives `authorSort` only if the stored one
- * was derived; `authorSort: null` derives it again.
+ * was derived; `authorSort: null` derives it again. `status` and `rating`
+ * change only the signed-in person's own, and leave the book's `updatedAt`.
  */
 export const bookPatchSchema = z.strictObject({ title: titleSchema.optional(), ...bookFields });
 export type BookPatch = z.infer<typeof bookPatchSchema>;
@@ -199,8 +227,8 @@ const someTags = names.pipe(z.array(z.string()).min(1, { message: "name at least
 
 /**
  * One change to many books (`BookBulk.change`): put them on a shelf (`null`
- * takes them off any shelf; a blank counts as `null`), set their status, add
- * or remove tags, or delete them. A shelf is an owned book's only: a shelf
+ * takes them off any shelf; a blank counts as `null`), set the signed-in
+ * person's own status on them, add or remove tags, or delete them. A shelf is an owned book's only: a shelf
  * change leaves wishlist books as they are and answers them as skipped.
  * Tags match case-insensitively, as everywhere: adding "signed" to a book
  * tagged "Signed" leaves it with one tag, spelt as the library spells it.

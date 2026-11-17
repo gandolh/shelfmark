@@ -34,6 +34,7 @@ function makeBook(id: number, title: string, extra: Partial<Book> = {}): Book {
     currency: "RON",
     metadataSource: "manual",
     tags: [],
+    readers: [],
     hasCover: false,
     coverUpdatedAt: null,
     createdAt: "2026-10-14T09:00:00.000Z",
