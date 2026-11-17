@@ -203,13 +203,19 @@ export interface SeedConfig {
   password: string;
   /** `DATA_DIR`, resolved as the server resolves it. */
   dataDir: string;
+  /**
+   * `SHELFMARK_READINGS_TO`, as the server reads it: the seed opens the
+   * database too, so a seed run first must move the statuses as the server would.
+   */
+  readingsTo: string | undefined;
 }
 
-/** `SEED_USERNAME` (trimmed), `SEED_PASSWORD` (as typed, spaces and all) and `DATA_DIR`. */
+/** `SEED_USERNAME` (trimmed), `SEED_PASSWORD` (as typed, spaces and all), `DATA_DIR` and `SHELFMARK_READINGS_TO`. */
 export function loadSeedConfig(env: NodeJS.ProcessEnv = process.env): SeedConfig {
   return {
     username: env.SEED_USERNAME?.trim() ?? "",
     password: env.SEED_PASSWORD ?? "",
     dataDir: resolveDataDir(env.DATA_DIR || DEFAULT_DATA_DIR),
+    readingsTo: env.SHELFMARK_READINGS_TO || undefined,
   };
 }

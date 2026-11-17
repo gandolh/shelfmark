@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     throw new Error("Set SEED_USERNAME and SEED_PASSWORD in the environment, or run this in a terminal to be asked.");
   }
 
-  const db = openDb(databasePath(settings.dataDir));
+  const db = openDb(databasePath(settings.dataDir), { readingsTo: settings.readingsTo });
   try {
     const created = await seedOwner(openAccounts(db), { username, password });
     console.log(created ? `Created ${username}.` : `${username} already exists; left as it was.`);
