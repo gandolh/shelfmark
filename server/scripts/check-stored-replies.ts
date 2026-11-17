@@ -3,7 +3,10 @@
  * would answer 500 (a time that isn't ISO, a rating out of range, an ISBN that doesn't match): the library
  * and the saved views and recommendations. Read-only on your file: it works on a copy in a temporary folder.
  *
- *     npx tsx server/scripts/check-stored-replies.ts <a downloaded backup of shelfmark.db>
+ *     npx tsx server/scripts/check-stored-replies.ts <a downloaded backup of shelfmark.db> [username]
+ *
+ * The username, when given, is `SHELFMARK_READINGS_TO`'s: the account the per-reader migration gives the books'
+ * statuses and ratings to, so a dry run on an older backup moves them as the server will.
  *
  * It prints each failing row's id and the field and the rule that failed, never the value. Exit 0: no row fails.
  */
@@ -19,15 +22,18 @@ import { savedViewOutputSchema } from "../src/features/views/schemas.js";
 import { createViewStore } from "../src/features/views/store.js";
 
 const source = process.argv[2];
+const readingsTo = process.argv[3];
 if (source === undefined) {
-  console.error("Usage: npx tsx server/scripts/check-stored-replies.ts <a downloaded backup of shelfmark.db>");
+  console.error(
+    "Usage: npx tsx server/scripts/check-stored-replies.ts <a downloaded backup of shelfmark.db> [username]",
+  );
   process.exit(2);
 }
 
 const dir = mkdtempSync(join(tmpdir(), "shelfmark-check-"));
 const copy = join(dir, "shelfmark.db");
 copyFileSync(source, copy);
-const db = openDb(copy);
+const db = openDb(copy, { readingsTo });
 
 let failures = 0;
 function check(kind: string, schema: z.ZodType, rows: readonly { id: number | string }[]): void {

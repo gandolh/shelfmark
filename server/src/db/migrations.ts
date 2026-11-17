@@ -1,7 +1,14 @@
 import type { Database } from "better-sqlite3";
+import { foldUsername } from "../../vendor/ward/ward-auth.js";
+
+/** What a migration may be told from the server's settings. */
+export interface MigrateOptions {
+  /** The username the per-reader migration gives the books' statuses and ratings to (`SHELFMARK_READINGS_TO`). */
+  readingsTo?: string | undefined;
+}
 
 /** One migration: SQL, or a step that needs code (a check that can refuse, data moved by a rule). */
-type Migration = string | ((db: Database) => void);
+type Migration = string | ((db: Database, options: MigrateOptions) => void);
 
 /**
  * Applied in order on boot, each in its own transaction, tracked in
@@ -150,9 +157,10 @@ export const migrations: readonly Migration[] = [
   // something: `unread` with no rating is no row. `user_id` is an `auth_users`
   // id with no foreign key: that table is the accounts library's, made after
   // these migrations on a fresh database, and no user is ever deleted.
-  // The statuses and ratings stored on `books` move to the earliest-created
-  // owner account, then their columns go.
-  (db) => {
+  // The statuses and ratings stored on `books` move to the account named by
+  // `SHELFMARK_READINGS_TO`, or else the earliest-created owner account, then
+  // their columns go.
+  (db, { readingsTo }) => {
     db.exec(`
       CREATE TABLE readings (
         book_id     INTEGER NOT NULL REFERENCES books(id) ON DELETE CASCADE,
@@ -167,7 +175,7 @@ export const migrations: readonly Migration[] = [
     const toMove =
       db.prepare<[], { n: number }>(`SELECT count(*) AS n FROM books WHERE ${SAYS_SOMETHING}`).get()?.n ?? 0;
     if (toMove > 0) {
-      const owner = earliestOwner(db, toMove);
+      const owner = readingsTo === undefined ? earliestOwner(db, toMove) : namedAccount(db, toMove, readingsTo);
       // The book's updated_at is the latest the status can have been set: the migration's own time would be a guess.
       db.prepare(
         `INSERT INTO readings (book_id, user_id, status, rating, updated_at)
@@ -200,8 +208,28 @@ function earliestOwner(db: Database, books: number): string {
   return owner.id;
 }
 
+/**
+ * The id of the account named `username` (compared folded, as sign-in does).
+ * Throws, naming the problem, when there is none: a typo must not hand the
+ * statuses to somebody else, or drop them.
+ */
+function namedAccount(db: Database, books: number, username: string): string {
+  const what = `${books} ${books === 1 ? "book has" : "books have"} a status or a rating to move to "${username}"`;
+  const accounts = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'auth_users'").get();
+  if (accounts === undefined) {
+    throw new Error(`Migration 5: ${what}, but the database has no accounts (no auth_users table).`);
+  }
+  const account = db
+    .prepare<[string], { id: string }>("SELECT id FROM auth_users WHERE username_folded = ?")
+    .get(foldUsername(username));
+  if (account === undefined) {
+    throw new Error(`Migration 5: ${what}, but no account has that username (SHELFMARK_READINGS_TO).`);
+  }
+  return account.id;
+}
+
 /** Brings the schema up to `list.length`, tracked in `PRAGMA user_version`. */
-export function migrate(db: Database, list: readonly Migration[] = migrations): void {
+export function migrate(db: Database, list: readonly Migration[] = migrations, options: MigrateOptions = {}): void {
   const current = db.pragma("user_version", { simple: true }) as number;
   if (current > list.length) {
     throw new Error(
@@ -212,7 +240,7 @@ export function migrate(db: Database, list: readonly Migration[] = migrations): 
     const version = current + index + 1;
     db.transaction(() => {
       if (typeof step === "string") db.exec(step);
-      else step(db);
+      else step(db, options);
       db.pragma(`user_version = ${version}`);
     })();
   });

@@ -29,6 +29,12 @@ export interface Config {
   webBase: string;
   /** Optional: lookups skip Google Books when unset. */
   googleBooksApiKey: string | undefined;
+  /**
+   * `SHELFMARK_READINGS_TO`: the username that the per-reader migration gives
+   * the books' existing statuses and ratings to, when the earliest account is
+   * not the one in use. Read once, by that migration; inert afterwards.
+   */
+  readingsTo: string | undefined;
   /** `CIP_REFRESH`: whether the server refreshes the CIP index weekly (`features/lookup/cip/job.ts`). Default on; `off` stops it. */
   cipRefresh: boolean;
   /**
@@ -81,6 +87,7 @@ const envSchema = z.object({
     }),
   ).transform((value) => value ?? "/shelfmark/"),
   GOOGLE_BOOKS_API_KEY: optional(z.string()),
+  SHELFMARK_READINGS_TO: optional(z.string()),
   CIP_REFRESH: optional(z.enum(["on", "off"], { error: "CIP_REFRESH must be on or off." })).transform(
     (value) => value !== "off",
   ),
@@ -156,6 +163,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
     apiPrefix: values.SHELFMARK_API_PREFIX,
     webBase: values.SHELFMARK_BASE,
     googleBooksApiKey: values.GOOGLE_BOOKS_API_KEY,
+    readingsTo: values.SHELFMARK_READINGS_TO,
     cipRefresh: values.CIP_REFRESH,
     ward,
     trustedProxies: proxies,

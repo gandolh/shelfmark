@@ -235,6 +235,31 @@ describe("migration 5", () => {
     }
   });
 
+  it("gives them to the account SHELFMARK_READINGS_TO names, matched as sign-in folds it", () => {
+    const db = atVersion4();
+    addAccounts(db, [
+      ["first", "owner", 100],
+      ["acasa", "owner", 300],
+    ]);
+    migrate(db, undefined, { readingsTo: "ACASA" });
+    expect(readings(db)).toEqual([
+      expect.objectContaining({ book: 1, user: "acasa" }),
+      expect.objectContaining({ book: 2, user: "acasa" }),
+    ]);
+    db.close();
+  });
+
+  it("refuses, changing nothing, when SHELFMARK_READINGS_TO names no account", () => {
+    const db = atVersion4();
+    addAccounts(db, [["first", "owner", 100]]);
+    expect(() => migrate(db, undefined, { readingsTo: "acsa" })).toThrow(
+      /2 books have .*"acsa".*no account has that username/,
+    );
+    expect(version(db)).toBe(4);
+    expect(columns(db)).toEqual(expect.arrayContaining(["status", "rating"]));
+    db.close();
+  });
+
   it("moves nothing on a fresh database, which has no accounts yet", () => {
     const db = open();
     expect(readings(db)).toEqual([]);

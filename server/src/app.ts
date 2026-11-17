@@ -81,7 +81,7 @@ export interface BuildAppOptions {
 export async function buildApp(config: Config, options: BuildAppOptions = {}): Promise<FastifyInstance> {
   const app = Fastify({ ...options.server, logger: options.logger ?? false });
 
-  const db = openDb(databasePath(config.dataDir));
+  const db = openDb(databasePath(config.dataDir), { readingsTo: config.readingsTo });
   const cip = openCipStore(cipDatabasePath(config.dataDir));
   app.addHook("onClose", async () => {
     db.close();
