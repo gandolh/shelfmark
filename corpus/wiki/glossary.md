@@ -1,6 +1,6 @@
 ---
-summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status, lookup and draft, CIP and the CIP block, library catalog and CIP index. Use these words in code, UI copy and briefs.
-updated: 2026-11-11
+summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status (each person's own) and reader, lookup and draft, CIP and the CIP block, library catalog and CIP index. Use these words in code, UI copy and briefs.
+updated: 2026-11-17
 ---
 
 # Glossary
@@ -42,8 +42,15 @@ it; it is not stored separately.
 _Avoid_: area, zone
 
 **Status**:
-The owner's reading state of a book: unread, reading, read or abandoned.
+A person's own reading state of a book: unread, reading, read or abandoned.
+Since 2026-11-17 each person signed in has their own on every book, with their
+own rating beside it.
 _Avoid_: progress, state
+
+**Reader**:
+Someone other than you with a status other than unread, or a rating, on a
+book; the API lists them in `Book.readers`.
+_Avoid_: member, user (for this sense), viewer
 
 **Lookup**:
 Fetching a book's details for an ISBN from the metadata sources, through the

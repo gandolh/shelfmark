@@ -1,6 +1,6 @@
 ---
-summary: The SQLite schema as shipped on 2026-10-15 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
-updated: 2026-11-12
+summary: The SQLite schema as shipped on 2026-10-15 on 2026-10-14 and extended since. One row per physical copy (decided) with bibliographic fields, personal fields and provenance, wishlist rows in the same table; each person's own status and rating in readings (migration 5, 2026-11-17); tags (matched case-insensitively), covers (as BLOBs), the lookup cache and saved views (migration 3, unique names via name_key) as their own tables; bulk changes in one transaction; no isbn10 column; defaults, CHECKs and what null means; how ISBNs, authors, author sort, money and dates are stored; and why there is no full-text index.
+updated: 2026-11-17
 ---
 
 # Data model
@@ -10,8 +10,12 @@ Shipped on 2026-10-15 on 2026-10-14 as migration 1 in
 copy** is the owner's decision ([decisions.md](decisions.md)); the rest came
 from the 2026-10-14 research. Column names follow [glossary.md](glossary.md).
 The API's `Book` ([book.ts](../../shared/src/book.ts)) is a row in camelCase
-plus `tags`, `hasCover` and `coverUpdatedAt`; [features/books/store.ts](../../server/src/features/books/store.ts) is the
-only module that runs SQL on `books`, `tags` and `book_tags`.
+plus `tags`, `hasCover` and `coverUpdatedAt`, and the signed-in person's own
+`status` and `rating` with everyone else's in `readers` (see `readings`
+below); [features/books/store.ts](../../server/src/features/books/store.ts) is the
+only module that runs SQL on `books`, `tags` and `book_tags`, and
+[readings.ts](../../server/src/features/books/readings.ts) beside it the only
+one that writes `readings`.
 
 ## `books`: one row per copy (owned or wished)
 
@@ -20,14 +24,14 @@ only module that runs SQL on `books`, `tags` and `book_tags`.
 | Identity | `id` INTEGER PK; `isbn13` TEXT nullable, indexed, **not unique**, CHECKed to 13 digits starting `978`/`979`; `barcode` TEXT nullable (raw non-ISBN code). No `isbn10` column: it is derived from `isbn13` when shown (null for `979`). |
 | Bibliographic | `title` NOT NULL, not blank; `subtitle`; `authors` NOT NULL DEFAULT `'[]'` (JSON array of display names); `author_sort` ("Cărtărescu, Mircea", derived, editable); `publisher`; `published_year` INTEGER; `pages` INTEGER > 0; `language` (ISO 639-1, e.g. `ro`); `series`; `series_number` TEXT ("3a", "II"); `description`; `subjects` NOT NULL DEFAULT `'[]'` (JSON array) |
 | Copy | `collection` NOT NULL DEFAULT `'owned'` (`owned`, `wishlist`); `format` (`hardcover`, `paperback`, `other`); `condition` (`new`, `good`, `worn`, `damaged`); `shelf` TEXT ("Living room · A2"); `signed` INTEGER 0/1, NOT NULL DEFAULT 0 |
-| Reading | `status` NOT NULL DEFAULT `'unread'` (`unread`, `reading`, `read`, `abandoned`); `rating` 1-5 nullable; `notes` |
+| Reading | `notes`. `status` and `rating` were here until migration 5 (2026-11-17) moved them to `readings`, one per person |
 | Acquired | `acquired_on` TEXT `YYYY-MM-DD`; `acquired_from` TEXT (shop, person); `price_minor` INTEGER ≥ 0 + `currency` NOT NULL DEFAULT `'RON'` |
 | Provenance | `metadata_source` NOT NULL DEFAULT `'manual'` (`openlibrary`, `googlebooks`, `manual`, `import`) |
 | Times | `created_at`, `updated_at` NOT NULL (UTC ISO strings, set by the store) |
 
 Every other column is nullable. CHECKs hold the settled vocabularies
-(`collection`, `status`, `format`, `condition`), `signed`, `rating`, the ISBN
-shape and the JSON arrays. `metadata_source` and `currency` have no CHECK on
+(`collection`, `format`, `condition`), `signed`, the ISBN shape and the JSON
+arrays. `metadata_source` and `currency` have no CHECK on
 purpose: SQLite can't change a CHECK without rebuilding the table, and both
 lists may grow. The shared zod schemas guard them on the way in.
 
@@ -39,6 +43,23 @@ but doubles the join and the edit UI for a case that hardly happens.
 
 ## Other tables
 
+- **`readings`** (migration 5, 2026-11-17): `book_id` (FK to `books`,
+  `ON DELETE CASCADE`), `user_id` TEXT, `status` NOT NULL DEFAULT `'unread'`
+  (CHECKed to the four statuses), `rating` 1-5 nullable, `updated_at`; primary
+  key `(book_id, user_id)`. One person's own status and rating on one book
+  ([decisions.md](decisions.md)), kept only while it says something: back to
+  `unread` with no rating deletes the row. `user_id` is an `auth_users` id with
+  **no foreign key**: that table is the accounts library's, created after the
+  app's migrations on a fresh database, and no account is ever deleted. A row
+  whose account has no `auth_users` row is left out of every reply. Every book
+  reply reads as the signed-in person: their own `status` and `rating`
+  (`unread` and `null` without a row), and `readers`, everyone else with a
+  row, sorted by username, the name read from `auth_users` at reply time.
+  Writing a status or rating never touches the book's `updated_at`. The
+  migration gave every status and rating already on `books` to the
+  earliest-created account with the `owner` role (ties by id; the reading's
+  `updated_at` is the book's), then dropped the two columns; with something to
+  move and no such account it throws and changes nothing.
 - **`tags`** (`id`, `name`, `name_key` UNIQUE) and **`book_tags`**
   (`book_id`, `tag_id`, primary key on both, each FK `ON DELETE CASCADE`,
   indexed by `tag_id`). A table, not a JSON column, so renaming a tag is one
@@ -101,8 +122,9 @@ but doubles the join and the edit UI for a case that hardly happens.
   server does not enforce the empty fields; the screens do.
 - A bulk change (2026-10-23; `POST /api/books/bulk`) is one transaction in
   the books store: it checks every id first and changes nothing if one names
-  no book. Only the rows whose shelf, status or tags actually change are
-  written, so the rest keep their `updated_at`. A shelf change skips wishlist
+  no book. Only the rows whose shelf or tags actually change are written, so
+  the rest keep their `updated_at`. A status change writes only the caller's
+  `readings` rows and no book's `updated_at`. A shelf change skips wishlist
   rows (they have no shelf). Added tags go through `name_key` like any other,
   and `book_tags`' primary key keeps a book from getting a tag twice.
 - Money in minor units (bani) to avoid float sums.
@@ -118,4 +140,6 @@ but doubles the join and the edit UI for a case that hardly happens.
 migrated once by `buildApp` ([open.ts](../../server/src/db/open.ts)) and
 gitignored. It holds everything, covers included, so the backup is this one
 file ([export.md](export.md)). Migrations are tracked in `PRAGMA user_version`;
-a later brief appends one, never edits a shipped one.
+a later brief appends one, never edits a shipped one. An entry is SQL, or a
+function when it needs code (migration 5's move and its refusal), run in the
+same transaction.

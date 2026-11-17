@@ -839,3 +839,7 @@ Brief 10 (from the todo "A lookup in flight holds the shutdown"), built on local
 ## [2026-11-13] blocked | The recommendations spike waits on the owner
 
 The owner (2026-11-13) keeps the TasteDive and embedding spike parked: it needs a copy of their library, a TasteDive key and their count of useful picks out of 10, so only they can run it. The todo moved to `todos/blocked/`.
+
+## [2026-11-17] build | Each reader their own status and rating (server)
+
+[Brief 11](briefs/done/11-each-reader-their-own-status-server.md), built on local `main`: migration 5 adds `readings`, moves every stored status and rating to the earliest-created owner account and drops the two columns from `books`, refusing when there is something to move and no owner. Book replies carry the caller's own `status` and `rating` and everyone else's in `readers`; writes touch only the caller's row. Server and shared; the web compiles unchanged until brief 12. Not deployed. The "One user" decision is revisited by "Each reader their own status and rating" ([decisions.md](wiki/decisions.md)): the owner's call of 2026-11-17, rejecting one shared status with the last setter's name. "Admin" in the brief is the `owner` role, Shelfmark's only one; the board asks the owner to confirm the account.

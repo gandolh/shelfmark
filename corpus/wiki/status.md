@@ -1,6 +1,6 @@
 ---
-summary: Snapshot as of 2026-11-04, per area; the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-13
+summary: Snapshot as of 2026-11-04, per area; the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed; each reader their own status and rating (brief 11, server) built on local main 2026-11-17, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+updated: 2026-11-17
 ---
 
 # Status
@@ -31,6 +31,8 @@ estate calls of 2026-11-09. The product calls are in
 - **The server in feature folders** (2026-11-12, brief 08). `server.ts` / `app.ts` / `config.ts`, `plugins/` and `features/<name>/`, a response schema on every route but the two byte routes, `check-structure` strict; built on local `main`, not pushed and not deployed. Owner steps: the deploy and the container checks in [the brief](../briefs/done/08-the-server-in-the-code-structure.md).
 
 - **A stop aborts lookups** (2026-11-13, brief 10). A `preClose` hook aborts every outbound lookup in flight (fetches, Z39.50 sockets, queue pauses); the route answers 503. Built on local `main`, not deployed (`node cli.ts shelfmark server`). The recommendations feature's Open Library calls and the CIP refresh have no signal yet.
+
+- **Each reader their own status and rating** (2026-11-17, brief 11, the server). A `readings` table, one row per book and account; migration 5 moved every stored status and rating to the earliest-created owner account and dropped the columns from `books`. Book replies carry the caller's own `status` and `rating` and the others in `readers`. Built on local `main`, not pushed, not deployed (`node cli.ts shelfmark server`; the migration is one-way, so a backup first). The web half (showing `readers`) is brief 12. The board asks the owner to confirm which account took the old statuses.
 
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
