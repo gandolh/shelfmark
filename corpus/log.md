@@ -847,3 +847,13 @@ The owner (2026-11-13) keeps the TasteDive and embedding spike parked: it needs 
 ## [2026-11-17] build | Each reader their own status and rating (web)
 
 [Brief 12](briefs/done/12-each-reader-their-own-status-web.md), built on local `main`: the book page says "Your status" and "Your rating" and lists every other reader under them, one line each; the Library gains a Readers column, on by default, that neither sorts nor filters; every status and rating control, filter and table header says it is yours. The export's headers follow the labels and the import reads both the new and the old. Web, plus `readers` in `LIBRARY_COLUMN_IDS`, so the server must be built from this commit before the web is deployed. Not deployed. The board asks whether a column a version adds should join a saved column order at its default place (today it goes last).
+
+## [2026-11-17] done | Brief 13: name the account the old statuses go to
+
+The owner has two accounts and uses the newer one, `acasa`, so migration 5's
+default (the earliest-created owner) would have given their statuses to the
+wrong one. `SHELFMARK_READINGS_TO` now names the account; a name with no
+account stops the migration with nothing changed. vps-deploy passes the key
+(`c28fdf7`) and the owner's local secrets file holds the value. `npm run check`
+911 tests.
+
