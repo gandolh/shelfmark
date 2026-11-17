@@ -70,8 +70,10 @@ export function isActive(filter: Filter | undefined): filter is Filter {
 export function activeFilters(filters: Filters): [LibraryColumn, Filter][] {
   const entries: [LibraryColumn, Filter][] = [];
   for (const [id, filter] of Object.entries(filters)) {
-    if (isColumnId(id) && isActive(filter) && columnById(id).kind === filter.kind)
-      entries.push([columnById(id), filter]);
+    if (!isColumnId(id) || !isActive(filter)) continue;
+    const column = columnById(id);
+    // A column that only shows (Readers) filters nothing, whatever a stored view says.
+    if (column.kind === filter.kind && !column.showOnly) entries.push([column, filter]);
   }
   return entries;
 }

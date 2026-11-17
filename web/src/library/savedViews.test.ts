@@ -53,7 +53,7 @@ describe("currentViewState", () => {
       collection: "wishlist",
       filters: UNREAD_LIVING_ROOM,
       sorting: [{ id: "year", desc: true }],
-      columns: ["publisher", "year", "shelf", "status", "added"],
+      columns: ["publisher", "year", "shelf", "status", "readers", "added"],
     });
     expect(savedViewStateSchema.safeParse(state).success).toBe(true);
   });

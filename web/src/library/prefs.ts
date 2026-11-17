@@ -67,12 +67,13 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-/** Known columns, each once, in a direction; the default when nothing usable is left. */
+/** Known columns that sort, each once, in a direction; the default when nothing usable is left. */
 export function normalizeSorting(value: unknown): Sorting {
   if (!Array.isArray(value)) return DEFAULT_SORTING;
   const keys: SortKey[] = [];
   for (const item of value) {
     if (!isRecord(item) || !isColumnId(item.id) || typeof item.desc !== "boolean") continue;
+    if (columnById(item.id).showOnly) continue;
     if (keys.some((key) => key.id === item.id)) continue;
     keys.push({ id: item.id, desc: item.desc });
   }

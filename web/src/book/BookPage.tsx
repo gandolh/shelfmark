@@ -16,6 +16,7 @@ import { BuyIt } from "./BuyIt";
 import { CoverPanel } from "./CoverPanel";
 import { DeleteBook } from "./DeleteBook";
 import { EditForm } from "./EditForm";
+import { OtherReaders } from "./OtherReaders";
 import { RelookupDiff } from "./RelookupDiff";
 import { useLookup } from "./useLookup";
 
@@ -169,25 +170,29 @@ function BookView({ book, onLeaving }: { book: Book; onLeaving: () => void }) {
             {authors && <p className="text-body text-ink-2">{authors}</p>}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-4 pt-4 pb-2">
-            <dl className="flex flex-wrap gap-8">
-              <div className="flex flex-col gap-1">
-                <dt className="text-label leading-label font-semibold text-muted">Shelf</dt>
-                <dd className="text-heading leading-heading font-semibold">
-                  {book.shelf ?? <span className="text-muted">No shelf</span>}
-                </dd>
-              </div>
-              <div className="flex flex-col gap-1">
-                <dt className="text-label leading-label font-semibold text-muted">Status</dt>
-                <dd
-                  className={cn(
-                    "text-heading leading-heading font-semibold",
-                    book.status === "reading" && "text-accent",
-                  )}
-                >
-                  {STATUS_LABELS[book.status]}
-                </dd>
-              </div>
-            </dl>
+            {/* The status is the signed-in person's own; everyone else's are the lines under it. */}
+            <div className="flex min-w-0 flex-col gap-3">
+              <dl className="flex flex-wrap gap-8">
+                <div className="flex flex-col gap-1">
+                  <dt className="text-label leading-label font-semibold text-muted">Shelf</dt>
+                  <dd className="text-heading leading-heading font-semibold">
+                    {book.shelf ?? <span className="text-muted">No shelf</span>}
+                  </dd>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <dt className="text-label leading-label font-semibold text-muted">Your status</dt>
+                  <dd
+                    className={cn(
+                      "text-heading leading-heading font-semibold",
+                      book.status === "reading" && "text-accent",
+                    )}
+                  >
+                    {STATUS_LABELS[book.status]}
+                  </dd>
+                </div>
+              </dl>
+              <OtherReaders readers={book.readers} />
+            </div>
             {actions}
           </div>
           <p className="text-meta font-semibold text-ink empty:hidden" role="status">

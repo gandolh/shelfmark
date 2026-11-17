@@ -17,7 +17,7 @@ export interface StatusPickerProps {
   onChange: (status: Status) => void;
   /** The statuses to offer, in order. Default Unread, Reading, Read. */
   options?: readonly Status[];
-  /** The group's visible label. Default "Status". */
+  /** The group's visible label. Default "Your status": a status is the signed-in person's own. */
   label?: string;
   disabled?: boolean;
 }
@@ -30,7 +30,7 @@ export function StatusPicker({
   value,
   onChange,
   options = ADD_STATUSES,
-  label = "Status",
+  label = "Your status",
   disabled,
 }: StatusPickerProps) {
   const name = useId();

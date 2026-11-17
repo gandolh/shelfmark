@@ -42,7 +42,7 @@ const STALE =
 
 /**
  * The bulk bar: in place of the Library's toolbar while books are
- * selected. "3 selected", then, on the desktop, Move to shelf, Set status, Add tags, Remove tags, Delete and
+ * selected. "3 selected", then, on the desktop, Move to shelf, Set your status, Add tags, Remove tags, Delete and
  * Clear; on a phone, where six don't fit a row, an Actions menu and Clear.
  * Each change is one `POST /api/books/bulk`. The selection stays after a
  * change, so another can follow; a delete lets go of the deleted books.
@@ -120,7 +120,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
         >
           Move to shelf…
         </Button>
-        <Menu label="Set status" sections={[{ items: statusItems }]} trigger="Set status" />
+        <Menu label="Set your status" sections={[{ items: statusItems }]} trigger="Set your status" />
         <Button onClick={() => open("addTags")}>Add tags…</Button>
         <Button
           onClick={() => open("removeTags")}
@@ -142,7 +142,7 @@ export function BulkBar({ selected, everyPage, books, desktop, onNotice }: BulkB
           { label: "Remove tags…", disabled: noTags, onSelect: () => open("removeTags") },
         ],
       },
-      { label: "Set status", items: statusItems },
+      { label: "Set your status", items: statusItems },
       { items: [{ label: "Delete…", onSelect: () => open("delete") }] },
     ];
     bar = (

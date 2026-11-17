@@ -124,8 +124,8 @@ const STATUS: Record<Book["status"], string> = {
   abandoned: "text-muted",
 };
 
-// A cell: the text in ink-2, one line cut short with an ellipsis. The first and last cell of a row carry the
-// table's edge padding (`EDGES`, on the row).
+// A cell: the text in ink-2, one line cut short with an ellipsis (but the readers, which wrap). The first and last
+// cell of a row carry the table's edge padding (`EDGES`, on the row).
 const CELL =
   "flex min-w-0 items-center overflow-hidden px-3 text-meta leading-meta text-ink-2 [&>span]:overflow-hidden [&>span]:text-ellipsis [&>span]:whitespace-nowrap";
 const EDGES = "[&>:first-child]:pl-6 [&>:last-child]:pr-6 max-md:[&>:first-child]:pl-4 max-md:[&>:last-child]:pr-4";
@@ -138,6 +138,8 @@ function Cell({ column, book, index }: { column: LibraryColumn; book: Book; inde
   if (column.id === BOOK_COLUMN_ID) return <BookCell book={book} index={index} />;
   const text = column.text(book);
   if (column.id === "status") return <span className={STATUS[book.status]}>{text}</span>;
+  // Names are never cut: the readers wrap, and past the row's height the cell scrolls rather than hide a name.
+  if (column.id === "readers") return <p className="max-h-full min-w-0 overflow-y-auto wrap-anywhere">{text}</p>;
   // Long text gets the whole of it on hover.
   return <span title={text.length > 24 ? text : undefined}>{text}</span>;
 }
@@ -572,28 +574,33 @@ function HeaderCell({ header, sorting, onSort, onResize }: HeaderCellProps) {
       aria-sort={rank === 0 && key ? (key.desc ? "descending" : "ascending") : undefined}
       className={cellClass(column)}
     >
-      <button
-        type="button"
-        className="-mx-1.5 -my-1 inline-flex max-w-[calc(100%_+_12px)] min-w-0 items-center gap-1 rounded-segment px-1.5 py-1 whitespace-nowrap text-inherit transition-[color] duration-(--duration-fast) ease-out hover:text-ink data-sorted:text-ink"
-        data-sorted={key ? "" : undefined}
-        onClick={(event) => onSort(column.id, event.shiftKey)}
-        onKeyDown={(event) => {
-          // Shift with Enter or Space adds a key, as a shift-click does.
-          if ((event.key === "Enter" || event.key === " ") && event.shiftKey) {
-            event.preventDefault();
-            onSort(column.id, true);
-          }
-        }}
-      >
-        <span className="overflow-hidden text-ellipsis">{column.header}</span>
-        {key && <SortIcon desc={key.desc} size={12} className="flex-none" />}
-        {key && sorting.length > 1 && (
-          <span className="text-tab tabular-nums" aria-hidden="true">
-            {rank + 1}
-          </span>
-        )}
-        {sortedText && <span className="sr-only">{sortedText}</span>}
-      </button>
+      {/* A column that only shows has a plain label: there is nothing to sort by. */}
+      {column.showOnly ? (
+        <span>{column.header}</span>
+      ) : (
+        <button
+          type="button"
+          className="-mx-1.5 -my-1 inline-flex max-w-[calc(100%_+_12px)] min-w-0 items-center gap-1 rounded-segment px-1.5 py-1 whitespace-nowrap text-inherit transition-[color] duration-(--duration-fast) ease-out hover:text-ink data-sorted:text-ink"
+          data-sorted={key ? "" : undefined}
+          onClick={(event) => onSort(column.id, event.shiftKey)}
+          onKeyDown={(event) => {
+            // Shift with Enter or Space adds a key, as a shift-click does.
+            if ((event.key === "Enter" || event.key === " ") && event.shiftKey) {
+              event.preventDefault();
+              onSort(column.id, true);
+            }
+          }}
+        >
+          <span className="overflow-hidden text-ellipsis">{column.header}</span>
+          {key && <SortIcon desc={key.desc} size={12} className="flex-none" />}
+          {key && sorting.length > 1 && (
+            <span className="text-tab tabular-nums" aria-hidden="true">
+              {rank + 1}
+            </span>
+          )}
+          {sortedText && <span className="sr-only">{sortedText}</span>}
+        </button>
+      )}
       <div
         role="separator"
         aria-orientation="vertical"

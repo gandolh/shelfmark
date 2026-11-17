@@ -67,7 +67,7 @@ export function BookDetails({ book }: { book: Book }) {
         <dl className="mt-2 flex flex-col">
           {book.collection === "wishlist" && <Fact label="Collection">Wishlist</Fact>}
           {book.rating !== null && (
-            <Fact label="Rating">
+            <Fact label="Your rating">
               <span className="inline-flex gap-0.5 align-middle text-accent">
                 {[1, 2, 3, 4, 5].map((n) => (
                   <StarIcon key={n} on={n <= (book.rating ?? 0)} size={16} />

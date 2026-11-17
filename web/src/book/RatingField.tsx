@@ -22,8 +22,8 @@ export function StarIcon({ on, size = 24 }: { on: boolean; size?: number }) {
 }
 
 /**
- * The rating as five toggles in one group: one tab stop, ← → between the stars. Pressing the current rating again clears
- * it: a book can be unrated, and a slider or a select would hide that.
+ * The signed-in person's own rating as five toggles in one group: one tab stop, ← → between the stars. Pressing the
+ * current rating again clears it: a book can be unrated, and a slider or a select would hide that.
  */
 export function RatingField({
   value,
@@ -37,9 +37,9 @@ export function RatingField({
   const hint = useId();
   return (
     <fieldset className="min-w-0" disabled={disabled}>
-      <legend className="block text-label leading-tight font-semibold text-muted">Rating</legend>
+      <legend className="block text-label leading-tight font-semibold text-muted">Your rating</legend>
       <ToggleGroup
-        aria-label="Rating"
+        aria-label="Your rating"
         className="mt-1.5 flex items-center gap-0.5"
         aria-describedby={hint}
         value={value === null ? null : String(value)}

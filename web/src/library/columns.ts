@@ -6,6 +6,8 @@ import {
   STATUSES,
   type Book,
   type LibraryColumnId,
+  type Reader,
+  type Status,
 } from "@shelfmark/shared";
 
 /**
@@ -18,6 +20,9 @@ import {
  * tabs above the table choose it; `columnApplies` in view.ts drops the columns
  * a wishlist book never fills) and `createdAt`/`updatedAt` under their own
  * names ("Added", "Changed").
+ *
+ * Status and rating are the signed-in person's own, so their labels say
+ * "Your"; everyone else's are in the Readers column, which only shows.
  */
 
 export type ColumnKind = "text" | "pick" | "number" | "date" | "yesno";
@@ -38,8 +43,10 @@ interface ColumnBase {
   minSize: number;
   /** Numbers line up on the right. */
   align: "start" | "end";
-  /** In the table until the owner hides it: book, publisher, year, shelf, status, added. */
+  /** In the table until the owner hides it: book, publisher, year, shelf, status, readers, added. */
   defaultVisible: boolean;
+  /** Shown only, never sorted or filtered by (Readers): its header is a plain label and the filter list leaves it out. */
+  showOnly?: boolean;
   /** What a cell shows and a CSV writes: "Reading", "12 Oct 2025", "RON 59.90". Empty when unset. */
   text: (book: Book) => string;
   /** The caption's words for each direction: "oldest first" / "newest first". */
@@ -169,6 +176,21 @@ const SOURCE_LABELS: Record<string, string> = {
   manual: "By hand",
   import: "Import",
 };
+
+/** What someone is doing now comes first; an unread reader is one who only gave a rating. */
+const READER_ORDER: readonly Status[] = ["reading", "read", "abandoned", "unread"];
+
+/**
+ * The other readers grouped by status, each group's names in the order
+ * given (the server's, by username): "Reading: Mihai · Read: Ana, Ion".
+ * Empty when there are none.
+ */
+export function readersText(readers: readonly Reader[]): string {
+  return READER_ORDER.flatMap((status) => {
+    const names = readers.filter((reader) => reader.status === status).map((reader) => reader.username);
+    return names.length === 0 ? [] : [`${STATUS_LABELS[status]}: ${names.join(", ")}`];
+  }).join(" · ");
+}
 
 function labelFrom(labels: Record<string, string>): (value: string) => string {
   return (value) => labels[value] ?? value;
@@ -301,14 +323,24 @@ export const COLUMNS: readonly LibraryColumn[] = [
   }),
   pick({
     id: "status",
-    label: "Status",
-    header: "Status",
-    size: 112, // "Abandoned" whole
+    label: "Your status",
+    header: "Your status",
+    size: 112, // "Abandoned" whole, and the header with its sort arrow
 
     defaultVisible: true,
     values: (book) => [book.status],
     optionLabel: labelFrom(STATUS_LABELS),
     order: STATUSES,
+  }),
+  text({
+    id: "readers",
+    label: "Readers",
+    header: "Readers",
+    size: 180,
+    minSize: 120,
+    defaultVisible: true,
+    showOnly: true,
+    value: (book) => readersText(book.readers) || null,
   }),
   date({
     id: "added",
@@ -391,9 +423,9 @@ export const COLUMNS: readonly LibraryColumn[] = [
   yesno({ id: "signed", label: "Signed", header: "Signed", size: 80, value: (book) => book.signed }),
   number({
     id: "rating",
-    label: "Rating",
-    header: "Rating",
-    size: 72,
+    label: "Your rating",
+    header: "Your rating",
+    size: 104, // the header and its sort arrow whole
     value: (book) => book.rating,
     text: (book) => (book.rating === null ? "" : `${book.rating}/5`),
   }),

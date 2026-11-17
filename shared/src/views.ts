@@ -27,6 +27,7 @@ export const LIBRARY_COLUMN_IDS = [
   "year",
   "shelf",
   "status",
+  "readers",
   "added",
   "isbn",
   "barcode",

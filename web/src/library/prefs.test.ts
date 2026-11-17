@@ -37,7 +37,7 @@ describe("readPrefs", () => {
     expect(readPrefs(null, "desktop")).toEqual(defaultPrefs("desktop"));
   });
 
-  it("shows book, publisher, year, shelf, status and added by default, newest first", () => {
+  it("shows book, publisher, year, shelf, status, readers and added by default, newest first", () => {
     const prefs = defaultPrefs("desktop");
     expect(prefs.columnOrder.filter((id) => prefs.columnVisibility[id])).toEqual([
       "book",
@@ -45,6 +45,7 @@ describe("readPrefs", () => {
       "year",
       "shelf",
       "status",
+      "readers",
       "added",
     ]);
     expect(prefs.sorting).toEqual(DEFAULT_SORTING);

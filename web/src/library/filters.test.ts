@@ -180,7 +180,7 @@ describe("describeFilter", () => {
     expect(describeFilter(columnById("shelf"), { kind: "pick", values: ["Bedroom", "Study · B1", NO_VALUE] })).toBe(
       "Shelf: Bedroom, Study · B1 and 1 more",
     );
-    expect(describeFilter(columnById("status"), { kind: "pick", values: ["reading"] })).toBe("Status: Reading");
+    expect(describeFilter(columnById("status"), { kind: "pick", values: ["reading"] })).toBe("Your status: Reading");
     expect(describeFilter(columnById("notes"), { kind: "text", op: "empty", text: "" })).toBe("Notes is empty");
     expect(describeFilter(columnById("book"), { kind: "text", op: "contains", text: " road " })).toBe(
       "Title contains “road”",
