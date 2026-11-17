@@ -1,6 +1,6 @@
 ---
 summary: How CSV import works and why it is shaped so. The account-menu entry (no third place), encoding detection, the header sets that map automatically, the preview flags and default ticks, the one-at-a-time lookups that spare the Google Books key, and how rows are saved. Read before changing web/src/import/.
-updated: 2026-11-11
+updated: 2026-11-17
 ---
 
 # CSV import
@@ -35,7 +35,7 @@ in [decisions.md](decisions.md)).
    | Goodreads | `Exclusive Shelf` | ISBNs arrive as `="..."`; `Exclusive Shelf` is the status; `Bookshelves` are tags |
    | LibraryThing | `Primary Author` | authors are "Last, First" and are flipped |
    | Libib | `ean_isbn13` or `item_type` | works with an ISBN column alone |
-   | Shelfmark | `Number in series`, `Details from` or `Acquired from` | the Library's column labels |
+   | Shelfmark | `Number in series`, `Details from` or `Acquired from` | the Library's column labels; `Your status` and `Your rating` since 2026-11-17, `Status` and `Rating` before, both read |
 
    Any other file gets the mapping step, prefilled from common header names;
    it needs a Title or an ISBN column to go on.

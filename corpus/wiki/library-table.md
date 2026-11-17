@@ -1,6 +1,6 @@
 ---
-summary: How the main table of books works. TanStack Table running in the browser over every book, shown a page at a time in the browser (10 by default since 2026-11-04, the pager, since 2026-11-02), the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23; the header's box ticks the page and "Select all" every page since 2026-11-04), and why filtering does not need the server.
-updated: 2026-11-04
+summary: How the main table of books works. TanStack Table running in the browser over every book, shown a page at a time in the browser (10 by default since 2026-11-04, the pager, since 2026-11-02), the filter type each column gets, diacritics-insensitive search (Cartarescu finds Cărtărescu, ş and ș match), the layout remembered per device and saved views on the server (where the Views menu sits), virtual scrolling, row selection and the bulk bar (2026-10-23; the header's box ticks the page and "Select all" every page since 2026-11-04), your status and rating and the Readers column that only shows (2026-11-17), and why filtering does not need the server.
+updated: 2026-11-17
 ---
 
 # Library table
@@ -76,6 +76,18 @@ its sort list and the column picker leave the four out on the wishlist too
 The pick-list options come from the data (faceted values with counts), so a new
 shelf name appears in the filter as soon as one book uses it. Active filters
 show as removable chips above the table, with "Clear all".
+
+Since 2026-11-17 status and rating are the signed-in person's own
+(`Book.status`, `Book.rating`), so their filters, sort, chips and column picker
+say "Your status" and "Your rating", and so do their headers. Everyone else's
+are in **Readers**, on by default after Your status: the others grouped by
+status, reading first and unread (a rating alone) last, e.g. "Reading: Mihai ·
+Read: Ana, Ion" (`readersText` in [columns.ts](../../web/src/library/columns.ts)).
+It only shows (`showOnly`): its header is a plain label, the filter and sort
+lists leave it out, and a stored sort or filter naming it is dropped. Its names
+wrap, never cut; past the row's 91 px the cell scrolls. The export writes it like
+any column. A device with saved column prefs gets it at the end of the order,
+as with any column a version adds.
 
 ## Search
 
@@ -161,7 +173,7 @@ selection keeps each id with the book's `createdAt`, so a new book that
 takes a deleted one's id is not selected.
 
 While books are selected the **bulk bar** takes the toolbar's place: the
-count, then Move to shelf, Set status, Add tags, Remove tags, Delete and Clear
+count, then Move to shelf, Set your status, Add tags, Remove tags, Delete and Clear
 on the desktop; the count, an Actions menu and Clear on a phone, where six
 buttons don't fit (Views stays at the end of the tabs row). Clear puts the
 toolbar back as it was. Each action is one `POST /api/books/bulk` with
