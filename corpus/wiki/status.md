@@ -60,7 +60,8 @@ estate calls of 2026-11-09. The product calls are in
   queue, bulk edit from the table, saved views, CSV import, stats, a CIP
   block read from a photo ([cip-photo.md](cip-photo.md)), a subtitle field on
   the by-hand form.
-- **Change the username** (2026-10-24), on ward-auth 0.4.0.
+- **Change the username** (2026-10-24), on ward-auth 0.4.0; ward-auth is 1.1.0 since 2026-11-19 (below).
+- **ward-auth 1.1.0, Ward link and unlink ask for the password** (2026-11-19, brief 14). Both vendored copies are on 1.1.0. The account menu's Sign in with Ward opens a dialog with a Current password field (`web/src/account/WardLinkDialog.tsx`); a wrong password or too many tries shows beside the field. A rename onto a look-alike (`AIice` for `alice`) answers `username_taken`. The first boot runs the library's username-key migration, and there is no step back without a backup. Built on local `main`, not pushed, not deployed (`node cli.ts shelfmark all`).
 - **Pages in the Library** (2026-11-02). The table and the covers show one
   page at a time, with a pager under the list
   ([library-table.md](library-table.md)).

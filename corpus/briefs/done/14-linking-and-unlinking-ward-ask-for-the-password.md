@@ -45,6 +45,20 @@ What the update changes here:
 
 ## Acceptance
 
-- [ ] Both vendored copies at the new version; the tests above pass; `npm run check` exit 0; `bash corpus/lint.sh` OK.
-- [ ] The outcome note lists each CHANGELOG entry this app crossed and what it needed.
-- [ ] End move `ready_for_deploy` with the app's deploy step (server and web both change).
+- [x] Both vendored copies at the new version; the tests above pass; `npm run check` exit 0; `bash corpus/lint.sh` OK.
+- [x] The outcome note lists each CHANGELOG entry this app crossed and what it needed.
+- [x] End move `ready_for_deploy` with the app's deploy step (server and web both change).
+
+## Outcome
+
+Built 2026-11-19 on `main` (5bdce54), not pushed; Ready for deploy (`node cli.ts shelfmark all`: the server and the web both change). `npm run check` exit 0, 918 tests.
+
+CHANGELOG entries crossed, and what each needed:
+
+- 0.5.0 `usernameFor` and `usernameMaxLength`: opt-in; the app passes neither. Nothing.
+- 0.6.0 migration 4 and `disableUser`: the migration runs by itself; the app never disables an account. Nothing.
+- 0.7.0 `returnTo`: opt-in on the sign-in; nothing.
+- 1.0.0: `link(currentPassword)` and `unlink(currentPassword)`; the typecheck found the three call sites in `web/src/account/`. The menu item opens `WardLinkDialog` (Link Ward or Unlink Ward), which calls `linkWard(password)` or `unlinkWard(password)`; `invalid_credentials`, `invalid_request` and `too_many_attempts` show beside the field, which keeps focus; any other refusal shows in a note under it. An account with no password gets "Set a password" instead, which opens Change password.
+- 1.1.0 migration 5 (`username_skeleton`): ran at the first start on a scratch database, migrations 1 to 5 applied, no "read the same" warning. Nothing by hand.
+
+Rename: Change username was already on; it is keyed by nothing else (the user id), so no change. Tests: `server/src/plugins/auth/auth.test.ts` (link and unlink without, wrong and right password; a linked user still signs in with a password after unlinking; look-alike renames answer `username_taken`), `web/src/account/account.test.ts` (the call carries the password; a wrong one reads "That isn't your current password."), and `web/e2e/ward-link.spec.ts` (the dialog with the API stubbed, no Ward; shots at 1280 light and 390 dark read, nothing clipped). The server had no route tests before; the new file builds the app on a temporary data folder. No real Ward round trip was run.
