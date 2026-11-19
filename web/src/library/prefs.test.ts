@@ -3,11 +3,13 @@ import {
   DEFAULT_ORDER,
   DEFAULT_VISIBILITY,
   defaultPrefs,
+  mergeColumnOrder,
   prefsKey,
   readPrefs,
   writePrefs,
   type PrefsStorage,
 } from "./prefs";
+import { shownColumns } from "./savedViews";
 import { DEFAULT_SORTING } from "./sort";
 
 function memoryStorage(initial: Record<string, string> = {}): PrefsStorage & { data: Record<string, string> } {
@@ -79,7 +81,7 @@ describe("readPrefs", () => {
     expect(prefs.columnSizing).toEqual({ publisher: 200 });
   });
 
-  it("drops unknown columns, keeps the book first and visible, adds new columns at the end", () => {
+  it("drops unknown columns, keeps the book first and visible, adds new columns at their place", () => {
     const storage = memoryStorage({
       [prefsKey("desktop")]: JSON.stringify({
         sorting: [
@@ -94,7 +96,9 @@ describe("readPrefs", () => {
     });
     const prefs = readPrefs(storage, "desktop");
     expect(prefs.sorting).toEqual([{ id: "book", desc: false }]);
-    expect(prefs.columnOrder.slice(0, 3)).toEqual(["book", "status", "shelf"]);
+    expect(prefs.columnOrder[0]).toBe("book");
+    expect(prefs.columnOrder.indexOf("status")).toBeLessThan(prefs.columnOrder.indexOf("shelf"));
+    expect(prefs.columnOrder).not.toContain("gone");
     expect([...prefs.columnOrder].sort()).toEqual([...DEFAULT_ORDER].sort());
     expect(prefs.columnVisibility.book).toBe(true);
     expect(prefs.columnSizing).toEqual({ year: 56, book: 1200 });
@@ -172,5 +176,46 @@ describe("writePrefs", () => {
   it("says no, without throwing, when storage refuses", () => {
     expect(writePrefs(throwing, "desktop", defaultPrefs("desktop"))).toBe(false);
     expect(writePrefs(null, "desktop", defaultPrefs("desktop"))).toBe(false);
+  });
+});
+
+describe("a new column joins a stored order at its place", () => {
+  const storedBeforeReaders = DEFAULT_ORDER.filter((id) => id !== "readers");
+
+  it("puts Readers right after Your status in an order saved before Readers", () => {
+    const order = mergeColumnOrder(storedBeforeReaders);
+    expect(order).toEqual(DEFAULT_ORDER);
+    expect(order[order.indexOf("status") + 1]).toBe("readers");
+  });
+
+  it("shows Readers after Your status on a device order saved before Readers", () => {
+    const storage = memoryStorage({
+      [prefsKey("desktop")]: JSON.stringify({ columnOrder: storedBeforeReaders }),
+    });
+    const prefs = readPrefs(storage, "desktop");
+    expect(prefs.columnOrder.indexOf("readers")).toBe(prefs.columnOrder.indexOf("status") + 1);
+    const shown = shownColumns(prefs);
+    expect(shown[shown.indexOf("status") + 1]).toBe("readers");
+    expect(JSON.parse(storage.getItem(prefsKey("desktop")) ?? "{}").columnOrder).toEqual(storedBeforeReaders);
+  });
+
+  it("keeps a reordered order and slots the new column after its default neighbour", () => {
+    const reordered = ["book", "added", ...storedBeforeReaders.filter((id) => id !== "book" && id !== "added")];
+    reordered.splice(reordered.indexOf("status"), 1);
+    reordered.unshift("status");
+    reordered.unshift("book");
+    const order = mergeColumnOrder(reordered);
+    expect(order.slice(0, 5)).toEqual(["book", "status", "readers", "added", "authors"]);
+    expect(order).toHaveLength(DEFAULT_ORDER.length);
+  });
+
+  it("keeps two new columns in their default order", () => {
+    const order = mergeColumnOrder(["book", "authors", "year"], ["book", "authors", "x1", "x2", "year", "x3"] as never);
+    expect(order).toEqual(["book", "authors", "x1", "x2", "year", "x3"]);
+  });
+
+  it("puts a new column first when nothing before it is named, and drops one that is gone", () => {
+    const order = mergeColumnOrder(["gone", "shelf", "shelf"], ["book", "new", "shelf"] as never);
+    expect(order).toEqual(["book", "new", "shelf"]);
   });
 });

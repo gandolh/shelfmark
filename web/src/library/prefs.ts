@@ -80,12 +80,37 @@ export function normalizeSorting(value: unknown): Sorting {
   return keys.length > 0 ? keys : DEFAULT_SORTING;
 }
 
-/** Every column once: the book first, the saved order next, and columns this version added at the end. */
-export function normalizeOrder(value: unknown): readonly ColumnId[] {
-  const saved = Array.isArray(value) ? value.filter(isColumnId) : [];
+/**
+ * Every column once: the book first, the stored order next, and a column the
+ * stored order doesn't name (one a newer version added) right after the
+ * nearest column before it in the default order that is already placed; two
+ * new columns keep their default order between them. Unknown ids drop. The
+ * stored value is not rewritten here: it changes only when the person
+ * changes the columns.
+ */
+export function mergeColumnOrder(stored: unknown, defaults: readonly ColumnId[] = DEFAULT_ORDER): readonly ColumnId[] {
   const order: ColumnId[] = [BOOK_COLUMN_ID];
-  for (const id of [...saved, ...DEFAULT_ORDER]) if (!order.includes(id)) order.push(id);
+  for (const id of Array.isArray(stored) ? stored : []) {
+    if (isColumnId(id) && !order.includes(id)) order.push(id);
+  }
+  defaults.forEach((id, index) => {
+    if (order.includes(id)) return;
+    let at = 0;
+    for (let before = index - 1; before >= 0; before--) {
+      const found = order.indexOf(defaults[before] as ColumnId);
+      if (found >= 0) {
+        at = found + 1;
+        break;
+      }
+    }
+    order.splice(at, 0, id);
+  });
   return order;
+}
+
+/** Every column once, in the stored order with new columns merged in (`mergeColumnOrder`). */
+export function normalizeOrder(value: unknown): readonly ColumnId[] {
+  return mergeColumnOrder(value);
 }
 
 /** Every column shown or not: the saved choice where there is one, the default otherwise; the book always shown. */

@@ -86,8 +86,12 @@ Read: Ana, Ion" (`readersText` in [columns.ts](../../web/src/library/columns.ts)
 It only shows (`showOnly`): its header is a plain label, the filter and sort
 lists leave it out, and a stored sort or filter naming it is dropped. Its names
 wrap, never cut; past the row's 91 px the cell scrolls. The export writes it like
-any column. A device with saved column prefs gets it at the end of the order,
-as with any column a version adds.
+any column. A column a stored order doesn't name (a device's saved prefs, a view)
+joins it right after the nearest earlier column of the default order that is
+already placed, first if none, so a device saved before Readers shows it after
+Your status (`mergeColumnOrder` in [prefs.ts](../../web/src/library/prefs.ts),
+2026-11-19). The merge runs on read; the stored value changes only when the
+person changes the columns.
 
 ## Search
 
