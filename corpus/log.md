@@ -860,3 +860,7 @@ account stops the migration with nothing changed. vps-deploy passes the key
 ## [2026-11-19] done | Brief 14: linking and unlinking Ward ask for the password
 
 Both vendored ward-auth copies went from 0.4.0 to 1.1.0 (checksums checked against the staged build). The account menu's Sign in with Ward item now opens a small password dialog for link and unlink, in place of acting at once; a refusal shows beside the field. A rename onto a look-alike is refused with `username_taken` (a server test). Crossed: 0.5.0 `usernameFor` (opt-in, unused), 0.6.0 migration 4 (ran by itself), 0.7.0 `returnTo` (opt-in, unused), 1.0.0 the password on link and unlink, 1.1.0 migration 5. Local `main`, not pushed, not deployed.
+
+## [2026-11-19] done | Brief 15: a new column joins a saved order at its place
+
+One merge, `mergeColumnOrder` (`web/src/library/prefs.ts`), on read: a column a stored order doesn't name goes after the nearest earlier default column already placed, first if none. Readers now follows Your status on a device saved before it. Web only. Local `main`, not pushed, not deployed.

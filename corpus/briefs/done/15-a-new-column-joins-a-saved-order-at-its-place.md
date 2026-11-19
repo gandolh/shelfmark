@@ -36,3 +36,7 @@ Filed 2026-11-19 from the owner's answer to shelfmark-12's question 1: "a new co
 
 - [ ] The tests above pass; `npm run check` exit 0; `bash corpus/lint.sh` OK.
 - [ ] End move `ready_for_deploy`, owner step: deploy with briefs 11 to 14 (`node cli.ts shelfmark server`, then `node cli.ts shelfmark deploy`).
+
+## Outcome (2026-11-19)
+
+`mergeColumnOrder` in `web/src/library/prefs.ts` is the one merge; `normalizeOrder` calls it, and every read of a stored order (device prefs, a view applied, the table's own reorder) goes through `normalizeOrder`. Read-only: nothing rewrites the stored value. A saved view's own column list is a shown set, so a view that doesn't name Readers still hides it; only the order of hidden columns follows the merge. Rule read literally: against a very sparse stored order, columns it doesn't name each go after their nearest placed default neighbour, so they gather by default order. Tests in `prefs.test.ts` (five new cases; the old-prefs case fails on the old code, which put Readers last). Web only, no server change. Check: `npm run check` exit 0 (923 tests). Shot at 1280 light with a pre-Readers order: Readers sits after Your status. Local `main`, not deployed.
