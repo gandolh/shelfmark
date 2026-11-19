@@ -1,4 +1,4 @@
-import { useSession, useWardResult, type SessionState } from "../../vendor/ward/ward-auth-react.js";
+import { useSession, useWardResult, type AuthError, type SessionState } from "../../vendor/ward/ward-auth-react.js";
 import { apiUrl } from "../api";
 import { accountMessage } from "../auth/messages";
 import { authClient } from "../auth/session";
@@ -22,6 +22,16 @@ export class NotYet extends Error {
   constructor(what: string) {
     super(`Not yet: ${what}`);
     this.name = "NotYet";
+  }
+}
+
+/** A refused account action: `message` is for the person, `error` is the library's answer (the dialog reads its code). */
+export class AccountActionError extends Error {
+  readonly error: AuthError;
+  constructor(error: AuthError) {
+    super(accountMessage(error));
+    this.name = "AccountActionError";
+    this.error = error;
   }
 }
 
@@ -71,22 +81,24 @@ export async function changePassword(): Promise<void> {
 /**
  * Link this account to a Ward account, so "Sign in with Ward" works: off to
  * Ward, which comes back to the Library with the result (`useWardNotice`).
- * Rejects only when it couldn't get to Ward.
+ * Ward's library wants the account's password first. Rejects with an
+ * `AccountActionError` when it couldn't get to Ward (or the password was wrong).
  */
-export async function linkWard(): Promise<void> {
-  const result = await authClient().startWardLink();
-  if (!result.ok) throw new Error(accountMessage(result.error));
+export async function linkWard(currentPassword: string): Promise<void> {
+  const result = await authClient().startWardLink(currentPassword);
+  if (!result.ok) throw new AccountActionError(result.error);
 }
 
 /**
  * Unlink Ward from this account; the password still signs in. Refused until
- * the account has a password. A session that began with Ward ends with it,
- * and then the login page loads afresh, as on signing out.
+ * the account has a password, and until it is typed again. A session that
+ * began with Ward ends with it, and then the login page loads afresh, as on
+ * signing out.
  */
-export async function unlinkWard(): Promise<void> {
+export async function unlinkWard(currentPassword: string): Promise<void> {
   const client = authClient();
-  const result = await client.unlinkWard();
-  if (!result.ok) throw new Error(accountMessage(result.error));
+  const result = await client.unlinkWard(currentPassword);
+  if (!result.ok) throw new AccountActionError(result.error);
   if (client.getState().status === "signed_out") window.location.replace(pathFor(LOGIN));
 }
 

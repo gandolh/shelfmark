@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { linkWard, signOut, unlinkWard, usernameOf, wardLinkOf } from "./actions";
+import { AccountActionError, linkWard, signOut, unlinkWard, usernameOf, wardLinkOf } from "./actions";
 import { checkPasswords } from "./ChangePassword";
 import { checkUsername } from "./ChangeUsername";
 
@@ -75,12 +75,16 @@ describe("the account actions", () => {
     vi.unstubAllEnvs();
   });
 
+  const bodies: unknown[] = [];
+
   function serve(status: number, body?: unknown) {
     const calls: { url: string; method: string | undefined }[] = [];
+    bodies.length = 0;
     vi.stubGlobal(
       "fetch",
       vi.fn(async (url: string, init?: RequestInit) => {
         calls.push({ url, method: init?.method });
+        if (typeof init?.body === "string") bodies.push(JSON.parse(init.body));
         return body === undefined ? new Response(null, { status }) : Response.json(body, { status });
       }),
     );
@@ -109,19 +113,43 @@ describe("the account actions", () => {
 
   it("says when Ward can't be reached to link", async () => {
     serve(503, { error: "ward_unavailable" });
-    await expect(linkWard()).rejects.toThrow("Ward isn't answering right now. Try again later.");
+    await expect(linkWard("pw")).rejects.toThrow("Ward isn't answering right now. Try again later.");
   });
 
   it("unlinks, and when this session began with Ward and ends with it, loads the login page afresh", async () => {
     const replace = vi.fn();
     vi.stubGlobal("window", { location: { replace } });
     serve(200, { signedOut: true });
-    await unlinkWard();
+    await unlinkWard("pw");
     expect(replace).toHaveBeenCalledWith("/shelfmark/login");
+  });
+
+  it("sends the typed password with the link and the unlink", async () => {
+    const replace = vi.fn();
+    vi.stubGlobal("window", { location: { replace, assign: vi.fn() } });
+    const calls = serve(200, { signedOut: false });
+    await unlinkWard("hunter2 hunter2");
+    expect(calls[0]).toEqual({ url: "/shelfmark-api/auth/ward/unlink", method: "POST" });
+    expect(bodies[0]).toEqual({ currentPassword: "hunter2 hunter2" });
+    serve(503, { error: "ward_unavailable" });
+    await linkWard("hunter2 hunter2").catch(() => undefined);
+    expect(bodies[0]).toEqual({ currentPassword: "hunter2 hunter2" });
+  });
+
+  it("says a wrong password is not the current one, with the library's code kept for the dialog", async () => {
+    serve(401, { error: "invalid_credentials" });
+    const error = await unlinkWard("wrong").catch((reason: unknown) => reason);
+    expect(error).toBeInstanceOf(AccountActionError);
+    expect(error).toMatchObject({
+      message: "That isn't your current password.",
+      error: { code: "invalid_credentials" },
+    });
+    serve(429, { error: "too_many_attempts", retryAfterSeconds: 45 });
+    await expect(linkWard("wrong")).rejects.toThrow("Too many tries. Wait 45 seconds, then try again.");
   });
 
   it("says a password must come before unlinking", async () => {
     serve(409, { error: "no_local_password" });
-    await expect(unlinkWard()).rejects.toThrow("Set a Shelfmark password first");
+    await expect(unlinkWard("pw")).rejects.toThrow("Set a Shelfmark password first");
   });
 });

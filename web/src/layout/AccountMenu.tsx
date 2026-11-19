@@ -7,13 +7,12 @@ import {
   changeUsername,
   chooseTheme,
   downloadBackup,
-  linkWard,
   signOut,
-  unlinkWard,
   useUsername,
   useWardLink,
   useWardNotice,
 } from "../account/actions";
+import { openWardLink, openWardUnlink } from "../account/WardLinkDialog";
 import { AlertIcon } from "../auth/icons";
 import { useBooks } from "../books/store";
 import { AccountIcon } from "../components/icons";
@@ -88,7 +87,7 @@ export function AccountMenu({ placement }: { placement: "bar" | "header" }) {
               {
                 label: "Sign in with Ward",
                 detail: ward.linked ? "Linked" : "Not linked",
-                onSelect: run(ward.linked ? unlinkWard : linkWard),
+                onSelect: run(async () => (ward.linked ? openWardUnlink() : openWardLink())),
               },
             ]
           : []),
