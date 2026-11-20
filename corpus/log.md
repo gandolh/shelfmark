@@ -864,3 +864,7 @@ Both vendored ward-auth copies went from 0.4.0 to 1.1.0 (checksums checked again
 ## [2026-11-19] done | Brief 15: a new column joins a saved order at its place
 
 One merge, `mergeColumnOrder` (`web/src/library/prefs.ts`), on read: a column a stored order doesn't name goes after the nearest earlier default column already placed, first if none. Readers now follows Your status on a device saved before it. Web only. Local `main`, not pushed, not deployed.
+
+## [2026-11-20] maintenance | The redesign's board page copied into the repo
+
+The estate redesign board is a private canvas, so `design/estate-redesign/` now holds a copy of this app's page on it and the build behind it: the directions, the judges' and the controller's rulings, the critique, the token hand-off, the board's notes, the owner's decisions, the proposed screens (as HTML with renders, or as the board's own artboard sources), and today's shots from before the redesign. It is the design record of brief 09, which built it; its README says what each file is. Prettier and the Docker build skip the folder.

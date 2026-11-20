@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shelfmark direction, Covers typeset</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&amp;family=Public+Sans:wght@400;600&amp;display=swap">
+<style>
+/* Hallmark · shape: app screen · genre: editorial · theme: brand · redesign: full
+ * paper: oklch(97.6% 0.005 85) · accent: oklch(49% 0.088 222) · display: Literata · body: Public Sans
+ * nav: kept (top bar with the three places, phone tab bar, account menu) · signature: the cover, and the title set in a book face · states: loading, empty, no match, error
+ * axes: warm paper/book serif/one teal · posture: restrained · modes: light+dark · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V3 · weakest: V, it keeps the shell the owner chose; the change is in the sheet, the type and the dark set */
+/* Hallmark · answered F4 · the secondary is the grey control fill the owner's Covers system uses, never the accent; one accent primary per screen */
+/* Hallmark · waive 72 · the sheet is a fixed 1440 artboard, never shown on a phone · a direction specimen drawn at one width */
+/* Hallmark · dismissed F25 · the palette table belongs to a fixed 1440 specimen sheet and is never read at 375 */
+.theme-light{color-scheme:light;--color-ground:#f6f3ef;--color-surface:#fffefd;--color-field:#ece9e4;--color-control:#e8e6e1;--color-control-raised:#fffefd;--color-control-hover:#dfdcd6;--color-row-hover:#f4f2ee;--color-rule:#e0deda;--color-outline:#7e7b75;--color-ink:#1d1c18;--color-ink-2:#44423e;--color-muted:#63605b;--color-accent:#0a6b84;--color-accent-hover:#005368;--color-on-accent:#fefdfb;--color-accent-wash:#d8eef6;--color-on-accent-wash:#004b5f;--color-focus:#0a6b84;--color-cover-edge:#1d1c18;--color-callout:#c83122;--color-on-callout:#fefdfb;--color-cover-1-bg:#7b2d35;--color-cover-1-ink:#f7eee6;--color-cover-2-bg:#d4a23a;--color-cover-2-ink:#2a1f10;--color-cover-3-bg:#33503e;--color-cover-3-ink:#eef0e2;--color-cover-4-bg:#2c3e57;--color-cover-4-ink:#eaeff5;--color-cover-5-bg:#5c3f78;--color-cover-5-ink:#f2ecf7;--color-cover-6-bg:#dccdb0;--color-cover-6-ink:#3a2e22;--color-cover-7-bg:#b9c3a5;--color-cover-7-ink:#26301f;--color-cover-8-bg:#2e2e30;--color-cover-8-ink:#e8c66c;--font-book:Literata,Georgia,'Times New Roman',serif;--font-ui:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--color-accent-ink:var(--color-on-accent);--radius-cover:3px;--radius-control:8px;--radius-panel:16px;--radius-full:999px;--shadow-cover:0 6px 14px rgb(40 36 30 / 0.2),0 1px 2px rgb(40 36 30 / 0.18);--shadow-float:0 12px 32px rgb(40 36 30 / 0.16),0 0 0 1px var(--color-rule);}
+.theme-dark{color-scheme:dark;--color-ground:#141310;--color-surface:#23211e;--color-field:#191714;--color-control:#302e29;--color-control-raised:#4a4743;--color-control-hover:#3a3833;--color-row-hover:#2a2925;--color-rule:#373531;--color-outline:#83807a;--color-ink:#ebe9e5;--color-ink-2:#c9c7c2;--color-muted:#a7a49f;--color-accent:#79c5d8;--color-accent-hover:#a0dcec;--color-on-accent:#0b181d;--color-accent-wash:#173b46;--color-on-accent-wash:#b2e5f2;--color-focus:#79c5d8;--color-cover-edge:#4f4d48;--color-callout:#f28058;--color-on-callout:#1e130f;--color-cover-1-bg:#7f3439;--color-cover-1-ink:#fbf1ea;--color-cover-2-bg:#836329;--color-cover-2-ink:#fff4dc;--color-cover-3-bg:#395844;--color-cover-3-ink:#f1f4e6;--color-cover-4-bg:#384e6b;--color-cover-4-ink:#eef3f9;--color-cover-5-bg:#5e457a;--color-cover-5-ink:#f6f0fa;--color-cover-6-bg:#564c3b;--color-cover-6-ink:#f0e6d2;--color-cover-7-bg:#49543d;--color-cover-7-ink:#e9eedf;--color-cover-8-bg:#323335;--color-cover-8-ink:#efd27a;--font-book:Literata,Georgia,'Times New Roman',serif;--font-ui:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--color-accent-ink:var(--color-on-accent);--radius-cover:3px;--radius-control:8px;--radius-panel:16px;--radius-full:999px;--shadow-cover:0 0 0 1px var(--color-cover-edge);--shadow-float:0 0 0 1px var(--color-rule);}
+html, body { overflow-x: clip; }
+body { margin: 0; }
+*, *::before, *::after { box-sizing: border-box; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.sm { container: page / inline-size; background: var(--color-ground); color: var(--color-ink); font-family: var(--font-ui); font-size: 14px; line-height: 20px; font-synthesis: none; -webkit-font-smoothing: antialiased; caret-color: var(--color-accent); scrollbar-color: var(--color-outline) var(--color-ground); }
+.sm ::selection { background: var(--color-accent-wash); color: var(--color-ink); }
+:where(.sm) :where(h1, h2, h3, p, dl, dd, ul, fieldset, legend) { margin: 0; padding: 0; }
+:where(.sm) :where(h1, h2, h3) { text-wrap: balance; }
+:where(.sm) ul { list-style: none; }
+:where(.sm) fieldset { border: 0; min-width: 0; }
+:where(.sm) :where(button, input) { font: inherit; color: inherit; }
+:where(.sm) a { color: inherit; text-decoration: none; }
+.sm svg { display: block; flex-shrink: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Type: six sizes. The book face carries what a book says; the UI face carries the rest. */
+.t-title { font-family: var(--font-book); font-weight: 600; font-size: 32px; line-height: 40px; letter-spacing: -0.01em; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
+.t-h2 { font-family: var(--font-book); font-weight: 600; font-size: 20px; line-height: 28px; text-wrap: balance; }
+.t-book { font-family: var(--font-book); font-weight: 600; font-size: 16px; line-height: 22px; overflow-wrap: break-word; min-width: 0; }
+.t-body { font-size: 16px; line-height: 24px; }
+.t-meta { font-size: 14px; line-height: 20px; }
+.t-label { font-size: 12px; line-height: 16px; font-weight: 600; }
+.ink-2 { color: var(--color-ink-2); }
+.muted { color: var(--color-muted); }
+.reading { color: var(--color-accent); font-weight: 600; }
+
+/* Buttons: one filled primary per screen; secondaries are a grey fill; quiet ones are text. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1), color 120ms cubic-bezier(0.2, 0, 0, 1); position: relative; }
+.btn::after { content: ""; position: absolute; inset: -4px 0; }
+.btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn-primary:hover, .btn-primary:active { background: var(--color-accent-hover); }
+.btn-secondary { background: var(--color-control); color: var(--color-ink); }
+.btn-secondary:hover { background: var(--color-control-hover); }
+.btn-secondary:active { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.btn-quiet { background: transparent; color: var(--color-accent); padding: 0 var(--space-2); }
+.btn-quiet:hover, .btn-quiet:active { color: var(--color-accent-hover); background: var(--color-row-hover); }
+.btn-leave { background: transparent; color: var(--color-ink); padding: 0 var(--space-2); font-weight: 400; }
+.btn-leave:hover { background: var(--color-row-hover); }
+.btn-large { height: 48px; padding: 0 var(--space-6); border-radius: var(--radius-full); font-size: 16px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.btn-off, .btn-off:hover { background: transparent; color: var(--color-muted); opacity: 1; cursor: default; }
+.is-hover.btn-primary { background: var(--color-accent-hover); }
+.is-hover.btn-secondary { background: var(--color-control-hover); }
+.is-press.btn-secondary { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.is-focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Tool buttons: the Library's list tools. Text in ink-2 on nothing. */
+.tool { display: inline-flex; align-items: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font-size: 14px; cursor: pointer; white-space: nowrap; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); }
+.tool:hover { background: var(--color-control); color: var(--color-ink); }
+.tool[aria-expanded="true"] { background: var(--color-accent-wash); color: var(--color-on-accent-wash); font-weight: 600; }
+
+/* Segmented: the places, Table / Covers, the Add modes. The current one is a raised tile. */
+.seg { display: inline-flex; gap: var(--space-1); padding: var(--space-1); border-radius: 12px; background: var(--color-control); }
+.seg > * { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font-size: 14px; white-space: nowrap; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); }
+.seg > * { position: relative; }
+.seg > *::after { content: ""; position: absolute; inset: -4px 0; }
+.seg > *:hover { background: var(--color-control-hover); color: var(--color-ink); }
+.seg > [aria-current="page"], .seg > [aria-pressed="true"], .seg > [aria-selected="true"] { background: var(--color-control-raised); color: var(--color-ink); font-weight: 600; box-shadow: 0 0 0 1px var(--color-rule); }
+
+/* Fields: a visible edge (3:1) that never changes width; focus is an outline. */
+.field { display: flex; align-items: center; gap: var(--space-2); height: 40px; padding: 0 var(--space-3); border: 1px solid var(--color-outline); border-radius: var(--radius-control); background: var(--color-field); color: var(--color-ink); }
+.field input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: 0; font-size: 14px; }
+.field input::placeholder { color: var(--color-muted); }
+.field:focus-within { outline: 2px solid var(--color-focus); outline-offset: -1px; }
+.field-large { height: 48px; }
+.field-large input { font-size: 16px; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.field-error { border-color: var(--color-ink-2); box-shadow: inset 0 0 0 1px var(--color-ink-2); }
+.err { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-ink); font-weight: 600; }
+
+/* Checkbox: drawn, so its edge passes 3:1 in both themes. */
+.check { appearance: none; margin: 0; width: 18px; height: 18px; border: 1.5px solid var(--color-outline); border-radius: 4px; background: var(--color-surface); display: inline-grid; place-content: center; cursor: pointer; }
+.check:checked, .check.is-on { background: var(--color-accent); border-color: var(--color-accent); }
+.check:checked::after, .check.is-on::after { content: ""; width: 9px; height: 5px; border: solid var(--color-on-accent); border-width: 0 0 2px 2px; transform: translateY(-1px) rotate(-45deg); }
+.hit { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; }
+
+/* Chips: radios drawn as pills. */
+.chip { display: inline-flex; align-items: center; height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-full); background: var(--color-control); color: var(--color-ink); font-size: 14px; cursor: pointer; white-space: nowrap; position: relative; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip:has(input:checked), .chip.is-on { background: var(--color-accent-wash); color: var(--color-on-accent-wash); font-weight: 600; }
+.chip:has(input:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.chip-new { background: transparent; border: 1px dashed var(--color-outline); color: var(--color-ink-2); }
+
+/* The cover: the only object with depth. A missing one is set in type on its tint. */
+.cover { container: cover / inline-size; position: relative; aspect-ratio: 2 / 3; border-radius: var(--radius-cover); box-shadow: var(--shadow-cover); overflow: hidden; flex-shrink: 0; }
+.cover-in { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 11cqw 10cqw 11cqw 17cqw; }
+.cover-in::before { content: ""; position: absolute; top: 0; bottom: 0; left: 7cqw; border-left: 1px solid currentColor; opacity: 0.24; }
+.cover-title { font-family: var(--font-book); font-weight: 600; font-size: 13cqw; line-height: 1.12; overflow-wrap: break-word; }
+.cover-author { font-family: var(--font-book); font-weight: 400; font-size: 8.5cqw; line-height: 1.2; padding-top: 4cqw; border-top: 1px solid currentColor; }
+.cover-initial { display: none; }
+@container cover (max-width: 72px) { .cover-in { padding: 9cqw 8cqw 9cqw 20cqw; } .cover-title, .cover-author { display: none; } .cover-initial { display: block; font-family: var(--font-book); font-weight: 600; font-size: 44cqw; line-height: 1; } }
+.tint-1 { background: var(--color-cover-1-bg); color: var(--color-cover-1-ink); }
+.tint-2 { background: var(--color-cover-2-bg); color: var(--color-cover-2-ink); }
+.tint-3 { background: var(--color-cover-3-bg); color: var(--color-cover-3-ink); }
+.tint-4 { background: var(--color-cover-4-bg); color: var(--color-cover-4-ink); }
+.tint-5 { background: var(--color-cover-5-bg); color: var(--color-cover-5-ink); }
+.tint-6 { background: var(--color-cover-6-bg); color: var(--color-cover-6-ink); }
+.tint-7 { background: var(--color-cover-7-bg); color: var(--color-cover-7-ink); }
+.tint-8 { background: var(--color-cover-8-bg); color: var(--color-cover-8-ink); }
+
+/* The shell: a top bar from 600 px of artboard, a tab bar under it. */
+.topbar { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--space-6); height: 64px; padding: 0 var(--space-10); background: var(--color-ground); border-bottom: 1px solid var(--color-rule); }
+.wordmark { font-family: var(--font-book); font-weight: 600; font-size: 20px; line-height: 28px; letter-spacing: -0.01em; justify-self: start; }
+.account { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: var(--radius-full); background: var(--color-control); color: var(--color-ink-2); cursor: pointer; }
+.account:hover { background: var(--color-control-hover); color: var(--color-ink); }
+.tabbar { display: none; }
+@container page (min-width: 768px) { .phone-only { display: none !important; } }
+@container page (max-width: 767px) {
+  .topbar { display: none; }
+  .desk-only { display: none !important; }
+  .tabbar { position: sticky; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-bottom: var(--space-3); background: var(--color-ground); border-top: 1px solid var(--color-rule); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 60px; color: var(--color-muted); font-size: 12px; line-height: 16px; }
+  .tabbar a[aria-current="page"] { color: var(--color-accent); font-weight: 600; }
+  .account { width: 48px; height: 48px; }
+  .hit { width: 48px; height: 48px; }
+  .t-title { font-size: 28px; line-height: 36px; }
+  .btn, .tool { height: 48px; }
+  .field { height: 48px; }
+  .field input { font-size: 16px; }
+  .seg > * { height: 40px; }
+  .chip { height: 48px; }
+}
+
+.page { padding: var(--space-8) var(--space-10) var(--space-12); }
+.page-narrow { max-width: 1100px; margin: 0 auto; }
+@container page (max-width: 767px) { .page { padding: var(--space-4) var(--space-4) var(--space-8); } }
+
+/* Floats: menus, toasts, the draft card. Light lifts with a shadow, dark with a lighter surface and a hairline. */
+.float { background: var(--color-surface); border-radius: var(--radius-panel); box-shadow: var(--shadow-float); }
+.menu-item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-control); color: var(--color-ink); }
+.menu-item:hover, .menu-item.is-hover { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.menu-label { padding: var(--space-2) var(--space-3) var(--space-1); color: var(--color-muted); }
+
+/* The board's numbered callouts. Annotation only, never part of the app. */
+.co { position: absolute; z-index: 20; top: var(--my); left: var(--mx); display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-full); background: var(--color-callout); color: var(--color-on-callout); font: 600 12px/1 var(--font-ui); pointer-events: none; }
+
+@container page (max-width: 1023px) { .co { left: var(--mxm); } }
+@container page (max-width: 767px) { .co { left: var(--mxp); top: var(--myp); width: 16px; height: 16px; font-size: 10px; } }
+.card { background: var(--color-surface); color: var(--color-ink); border-radius: var(--radius-panel); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+
+.hcard { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--space-4); padding: var(--space-6); }
+.hcard-title { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-4); min-width: 0; }
+.caption { margin-top: var(--space-1); }
+.toolbar { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.vrule { width: 1px; height: 24px; margin: 0 var(--space-3); background: var(--color-rule); }
+.tbox { margin-top: var(--space-4); }
+.tbl th:first-child { border-top-left-radius: var(--radius-panel); }
+.tbl th:last-child { border-top-right-radius: var(--radius-panel); }
+.tbl tbody tr:last-child td:first-child { border-bottom-left-radius: var(--radius-panel); }
+.tbl tbody tr:last-child td:last-child { border-bottom-right-radius: var(--radius-panel); }
+.tbl { width: 100%; border-collapse: collapse; }
+.tbl th { position: sticky; top: 64px; z-index: 5; height: 44px; padding: 0 var(--space-3); background: var(--color-surface); border-bottom: 1px solid var(--color-rule); text-align: left; font-weight: 600; }
+.tbl td { padding: var(--space-3); border-bottom: 1px solid var(--color-rule); vertical-align: middle; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+.tbl tbody tr { transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); }
+.tbl tbody tr:hover { background: var(--color-row-hover); }
+.tbl tbody tr:has(.check:checked) { background: var(--color-accent-wash); }
+.c-sel { position: relative; width: 68px; padding: 0 0 0 var(--space-3) !important; text-align: left; }
+.sort { display: inline-flex; align-items: center; gap: var(--space-1); height: 32px; padding: 0 var(--space-1); margin: 0 calc(var(--space-1) * -1); border: 0; border-radius: 6px; background: transparent; color: var(--color-ink-2); font-size: 12px; line-height: 16px; font-weight: 600; cursor: pointer; }
+.sort:hover { background: var(--color-control); color: var(--color-ink); }
+.sort.sorted { color: var(--color-ink); }
+.bookcell { position: relative; display: flex; align-items: center; gap: var(--space-4); min-width: 0; }
+.bookcell-text { position: relative; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.bookcell:hover .t-book { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.rowmeta { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-1); }
+.pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding-top: var(--space-5); }
+.pager-nav { display: flex; align-items: center; gap: var(--space-2); }
+.pages { display: flex; gap: var(--space-1); }
+.pg { display: inline-grid; place-items: center; min-width: 36px; height: 36px; border-radius: var(--radius-control); color: var(--color-ink-2); font-variant-numeric: tabular-nums; }
+.pg:hover { background: var(--color-control); }
+.pg[aria-current="page"] { background: var(--color-accent-wash); color: var(--color-on-accent-wash); font-weight: 600; }
+@container page (max-width: 767px) {
+  .libpage { padding-top: 0; }
+  .hcard { display: block; margin: 0 calc(var(--space-4) * -1); padding: var(--space-4); border-radius: 0 0 var(--radius-panel) var(--radius-panel); }
+  .toolbar { flex-wrap: nowrap; margin-top: var(--space-3); }
+  .viewsrow { padding: var(--space-2) 0 0; position: relative; }
+  .tbox { margin-top: var(--space-2); }
+  .tbl th { position: static; }
+  .tbl th.c-book, .tbl tbody tr:last-child td.c-book { border-top-right-radius: var(--radius-panel); }
+  .tbl tbody tr:last-child td.c-book { border-top-right-radius: 0; border-bottom-right-radius: var(--radius-panel); }
+  .tbl td { padding: var(--space-3) var(--space-2); }
+  .c-sel { width: 56px; padding: 0 0 0 var(--space-2) !important; }
+  .layoutseg > :first-child { order: 2; }
+  .pager { flex-direction: column; align-items: stretch; }
+  .pager-nav { justify-content: space-between; }
+}
+
+.dir { display: flex; flex-direction: column; gap: var(--space-12); padding: var(--space-16); }
+.block { display: flex; flex-direction: column; gap: var(--space-5); padding-top: var(--space-8); border-top: 1px solid var(--color-rule); }
+.pal { width: 100%; border-collapse: collapse; }
+.pal th, .pal td { padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--color-rule); text-align: left; vertical-align: middle; }
+.pal thead th { font-size: 12px; line-height: 16px; font-weight: 600; color: var(--color-muted); }
+.pal td.theme-light, .pal td.theme-dark { background: var(--color-ground); color: var(--color-ink); }
+.sw { display: flex; align-items: center; gap: var(--space-3); }
+.sw-chip { display: block; width: 44px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--color-outline); }
+.spec { display: flex; flex-direction: column; gap: var(--space-1); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-rule); }
+.panel { color: var(--color-ink); display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-6); border-radius: var(--radius-panel); background: var(--color-ground); box-shadow: inset 0 0 0 1px var(--color-rule); }
+.strip { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.state { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.stategroup { display: flex; flex-direction: column; gap: var(--space-2); }
+.stategrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); padding: var(--space-5); }
+.skel { display: block; border-radius: var(--radius-full); background: var(--color-control); }
+.ct { width: 100%; border-collapse: collapse; font-size: 14px; line-height: 20px; }
+.ct th { text-align: left; font-size: 12px; line-height: 16px; color: var(--color-muted); padding: var(--space-2); border-bottom: 1px solid var(--color-rule); }
+.ct td { padding: var(--space-1) var(--space-2); border-bottom: 1px solid var(--color-rule); }
+.ct td.num { text-align: right; }
+</style>
+</helmet>
+<div class="theme-light sm" style="width: 1440px">
+<div class="dir">
+<header style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 900px">
+<h1 class="t-title" style="font-size: 48px; line-height: 56px">Covers, typeset</h1>
+<p class="t-body ink-2" style="font-size: 20px; line-height: 28px; max-width: 60ch">Shelfmark keeps today’s islands, flat cards on a warm page, with the cover as the only object with depth and what a book says set in a book face.</p>
+</header>
+
+<section class="block"><h2 class="t-h2">Colour by role</h2>
+<div style="display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: var(--space-10); align-items: start">
+<table class="pal"><thead><tr><th scope="col">Role</th><th scope="col">Light</th><th scope="col">Dark</th></tr></thead><tbody>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">ground</span><span class="t-label muted" style="font-weight: 400; display: block">the page, the top bar, the tab bar</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-ground)"></span><span class="num t-meta">#f6f3ef</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-ground)"></span><span class="num t-meta">#141310</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">surface</span><span class="t-label muted" style="font-weight: 400; display: block">the islands: the header card, the table box, the fact cards, the draft, menus</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-surface)"></span><span class="num t-meta">#fffefd</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-surface)"></span><span class="num t-meta">#23211e</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">field</span><span class="t-label muted" style="font-weight: 400; display: block">inputs and the search field</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-field)"></span><span class="num t-meta">#ece9e4</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-field)"></span><span class="num t-meta">#191714</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">control</span><span class="t-label muted" style="font-weight: 400; display: block">secondary buttons, segmented tracks, chips</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-control)"></span><span class="num t-meta">#e8e6e1</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-control)"></span><span class="num t-meta">#302e29</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">control-raised</span><span class="t-label muted" style="font-weight: 400; display: block">the current segment: a raised tile on its track</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-control-raised)"></span><span class="num t-meta">#fffefd</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-control-raised)"></span><span class="num t-meta">#4a4743</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">control-hover</span><span class="t-label muted" style="font-weight: 400; display: block">a control under the pointer</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-control-hover)"></span><span class="num t-meta">#dfdcd6</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-control-hover)"></span><span class="num t-meta">#3a3833</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">row-hover</span><span class="t-label muted" style="font-weight: 400; display: block">a table row under the pointer, inside the table box</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-row-hover)"></span><span class="num t-meta">#f4f2ee</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-row-hover)"></span><span class="num t-meta">#2a2925</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">rule</span><span class="t-label muted" style="font-weight: 400; display: block">the one hairline: dividers, the bars’ edges</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-rule)"></span><span class="num t-meta">#e0deda</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-rule)"></span><span class="num t-meta">#373531</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">outline</span><span class="t-label muted" style="font-weight: 400; display: block">edges that must be seen: fields, checkboxes, the new-shelf chip</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-outline)"></span><span class="num t-meta">#7e7b75</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-outline)"></span><span class="num t-meta">#83807a</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">ink</span><span class="t-label muted" style="font-weight: 400; display: block">titles and primary text</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-ink)"></span><span class="num t-meta">#1d1c18</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-ink)"></span><span class="num t-meta">#ebe9e5</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">ink-2</span><span class="t-label muted" style="font-weight: 400; display: block">secondary text, table cells</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-ink-2)"></span><span class="num t-meta">#44423e</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-ink-2)"></span><span class="num t-meta">#c9c7c2</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">muted</span><span class="t-label muted" style="font-weight: 400; display: block">captions, counts, column heads, hints</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-muted)"></span><span class="num t-meta">#63605b</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-muted)"></span><span class="num t-meta">#a7a49f</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">accent</span><span class="t-label muted" style="font-weight: 400; display: block">the one colour that means press this</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-accent)"></span><span class="num t-meta">#0a6b84</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-accent)"></span><span class="num t-meta">#79c5d8</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">accent-hover</span><span class="t-label muted" style="font-weight: 400; display: block">the accent under the pointer and pressed</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-accent-hover)"></span><span class="num t-meta">#005368</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-accent-hover)"></span><span class="num t-meta">#a0dcec</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">on-accent</span><span class="t-label muted" style="font-weight: 400; display: block">text and icons on the accent</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-on-accent)"></span><span class="num t-meta">#fefdfb</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-on-accent)"></span><span class="num t-meta">#0b181d</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">accent-wash</span><span class="t-label muted" style="font-weight: 400; display: block">the current selection: a segment, a chip, a selected row</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-accent-wash)"></span><span class="num t-meta">#d8eef6</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-accent-wash)"></span><span class="num t-meta">#173b46</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">on-accent-wash</span><span class="t-label muted" style="font-weight: 400; display: block">text on the wash</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-on-accent-wash)"></span><span class="num t-meta">#004b5f</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-on-accent-wash)"></span><span class="num t-meta">#b2e5f2</span></div></td></tr>
+<tr><th scope="row"><span class="t-meta" style="font-weight: 600">cover-edge</span><span class="t-label muted" style="font-weight: 400; display: block">the cover’s shadow in light, its 1px edge in dark</span></th><td class="theme-light"><div class="sw"><span class="sw-chip" style="background: var(--color-cover-edge)"></span><span class="num t-meta">#1d1c18</span></div></td><td class="theme-dark"><div class="sw"><span class="sw-chip" style="background: var(--color-cover-edge)"></span><span class="num t-meta">#4f4d48</span></div></td></tr>
+</tbody></table>
+<div style="display: flex; flex-direction: column; gap: var(--space-6)">
+<div style="display: flex; flex-direction: column; gap: var(--space-2)"><h3 class="t-meta" style="font-weight: 600">The no-cover tints, light</h3><div class="theme-light" style="display: flex; flex-wrap: wrap; gap: var(--space-4); padding: var(--space-4); border-radius: var(--radius-panel); background: var(--color-ground)"><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-1" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">O</span><span class="cover-title">Oxblood</span><span class="cover-author">cover-1</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-1</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-2" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">O</span><span class="cover-title">Ochre</span><span class="cover-author">cover-2</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-2</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-3" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">F</span><span class="cover-title">Forest</span><span class="cover-author">cover-3</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-3</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-4" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Slate</span><span class="cover-author">cover-4</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-4</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-5" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">P</span><span class="cover-title">Plum</span><span class="cover-author">cover-5</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-5</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-6" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Sand</span><span class="cover-author">cover-6</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-6</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-7" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Sage</span><span class="cover-author">cover-7</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-7</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-8" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">C</span><span class="cover-title">Charcoal</span><span class="cover-author">cover-8</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-8</span></div></div></div>
+<div style="display: flex; flex-direction: column; gap: var(--space-2)"><h3 class="t-meta" style="font-weight: 600">The no-cover tints, dark: calmed a step, edged instead of shadowed</h3><div class="theme-dark" style="display: flex; flex-wrap: wrap; gap: var(--space-4); padding: var(--space-4); border-radius: var(--radius-panel); background: var(--color-ground)"><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-1" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">O</span><span class="cover-title">Oxblood</span><span class="cover-author">cover-1</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-1</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-2" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">O</span><span class="cover-title">Ochre</span><span class="cover-author">cover-2</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-2</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-3" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">F</span><span class="cover-title">Forest</span><span class="cover-author">cover-3</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-3</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-4" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Slate</span><span class="cover-author">cover-4</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-4</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-5" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">P</span><span class="cover-title">Plum</span><span class="cover-author">cover-5</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-5</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-6" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Sand</span><span class="cover-author">cover-6</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-6</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-7" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">S</span><span class="cover-title">Sage</span><span class="cover-author">cover-7</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-7</span></div><div style="display: flex; flex-direction: column; gap: var(--space-2); width: 96px"><div class="cover tint-8" style="width: 96px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">C</span><span class="cover-title">Charcoal</span><span class="cover-author">cover-8</span></div></div><span class="t-label ink-2" style="font-weight: 400">cover-8</span></div></div></div>
+<div style="display: flex; flex-direction: column; gap: var(--space-3)"><h3 class="t-meta" style="font-weight: 600">Type</h3>
+<div class="spec"><span class="t-title">Library</span><span class="t-label muted" style="font-weight: 400">Literata 600, 32/40 (28/36 on a phone): page titles, the wordmark at 20</span></div>
+<div class="spec"><span class="t-h2">About this copy</span><span class="t-label muted" style="font-weight: 400">Literata 600, 20/28: section heads, a draft’s title</span></div>
+<div class="spec"><span class="t-book">Pădurea spânzuraților, Ultima noapte de dragoste</span><span class="t-label muted" style="font-weight: 400">Literata 600, 16/22: a book’s title wherever it is listed</span></div>
+<div class="spec"><span class="t-body">Lent to a neighbour once; came back with a coffee ring on page 80.</span><span class="t-label muted" style="font-weight: 400">Public Sans 400, 16/24: body, every field on a phone</span></div>
+<div class="spec"><span class="t-meta">Humanitas <span class="num">2019</span> Living room · A2</span><span class="t-label muted" style="font-weight: 400">Public Sans 400 and 600, 14/20: table cells, controls; figures tabular</span></div>
+<div class="spec"><span class="t-label">Publisher</span><span class="t-label muted" style="font-weight: 400">Public Sans 600, 12/16: column heads, legends, tab labels; sentence case, untracked</span></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: var(--space-3)"><h3 class="t-meta" style="font-weight: 600">Space, shape, depth</h3>
+<div style="display: flex; align-items: flex-end; gap: var(--space-3)"><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 4px; height: 4px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">4</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 8px; height: 8px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">8</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 12px; height: 12px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">12</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 16px; height: 16px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">16</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 20px; height: 20px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">20</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 24px; height: 24px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">24</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 32px; height: 32px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">32</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 40px; height: 40px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">40</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 48px; height: 48px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">48</span></div><div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-1)"><span style="display: block; width: 64px; height: 64px; background: var(--color-accent-wash); border: 1px solid var(--color-accent)"></span><span class="t-label muted num" style="font-weight: 400">64</span></div></div>
+<div style="display: flex; gap: var(--space-4); align-items: center"><div style="display: flex; flex-direction: column; gap: var(--space-1); align-items: center"><span style="display: block; width: 64px; height: 44px; border: 1.5px solid var(--color-outline); border-radius: var(--radius-cover)"></span><span class="t-label muted" style="font-weight: 400">cover 3</span></div><div style="display: flex; flex-direction: column; gap: var(--space-1); align-items: center"><span style="display: block; width: 64px; height: 44px; border: 1.5px solid var(--color-outline); border-radius: var(--radius-control)"></span><span class="t-label muted" style="font-weight: 400">control 8</span></div><div style="display: flex; flex-direction: column; gap: var(--space-1); align-items: center"><span style="display: block; width: 64px; height: 44px; border: 1.5px solid var(--color-outline); border-radius: var(--radius-panel)"></span><span class="t-label muted" style="font-weight: 400">panel 16</span></div><div style="display: flex; flex-direction: column; gap: var(--space-1); align-items: center"><span style="display: block; width: 64px; height: 44px; border: 1.5px solid var(--color-outline); border-radius: var(--radius-full)"></span><span class="t-label muted" style="font-weight: 400">full 999</span></div></div>
+<div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-4)">
+<div class="theme-light" style="display: flex; gap: var(--space-5); align-items: center; padding: var(--space-5); border-radius: var(--radius-panel); background: var(--color-ground)"><div class="card" style="width: 72px; height: 48px"></div><div class="float" style="width: 72px; height: 48px"></div><div class="cover tint-8" style="width: 40px" aria-hidden="true"></div><span class="t-label ink-2" style="font-weight: 400">Light: a flat card, the float shadow, the cover shadow</span></div>
+<div class="theme-dark" style="display: flex; gap: var(--space-5); align-items: center; padding: var(--space-5); border-radius: var(--radius-panel); background: var(--color-ground)"><div class="card" style="width: 72px; height: 48px"></div><div class="float" style="width: 72px; height: 48px"></div><div class="cover tint-8" style="width: 40px" aria-hidden="true"></div><span class="t-label ink-2" style="font-weight: 400">Dark: a lighter card, a hairline on what floats, the cover edged</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="block"><h2 class="t-h2">Components, both themes</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6)"><div class="theme-light sm panel">
+<h3 class="t-h2">Light</h3>
+<div class="strip">
+<button type="button" class="btn btn-primary">Save</button>
+<button type="button" class="btn btn-primary is-hover">Hover</button>
+<button type="button" class="btn btn-primary is-focus">Focus</button>
+<button type="button" class="btn btn-primary" aria-disabled="true">Disabled</button>
+</div>
+<div class="strip">
+<button type="button" class="btn btn-secondary">Edit</button>
+<button type="button" class="btn btn-secondary is-hover">Hover</button>
+<button type="button" class="btn btn-secondary is-press">Pressed</button>
+<button type="button" class="btn btn-quiet">Edit details</button>
+<button type="button" class="tool">Filter</button>
+</div>
+<div class="strip"><div class="seg"><button type="button" aria-pressed="true">Table</button><button type="button" aria-pressed="false">Covers</button></div>
+<label class="chip is-on"><input type="radio" name="d-theme-light" checked="">Bedroom</label><label class="chip"><input type="radio" name="d-theme-light">Study · B1</label><label class="chip chip-new"><input type="radio" name="d-theme-light">New shelf</label>
+<label class="hit"><input type="checkbox" class="check is-on" checked="" aria-label="Selected"></label><label class="hit"><input type="checkbox" class="check" aria-label="Not selected"></label></div>
+<div style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 380px">
+<label for="isbn-theme-light" class="t-meta" style="font-weight: 600">ISBN</label>
+<div class="field field-large field-error"><input id="isbn-theme-light" value="978014143958" aria-invalid="true" aria-describedby="isbn-theme-light-err"></div>
+<p class="err t-meta" id="isbn-theme-light-err"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>An ISBN has 10 or 13 digits; this has 12.</p>
+</div>
+<table class="tbl" style="max-width: 560px"><tbody><tr>
+<td style="width: 52px; text-align: center"><label class="hit"><input type="checkbox" class="check" aria-label="Select Pădurea spânzuraților"></label></td>
+<td><span class="bookcell"><div class="cover tint-4" style="width: 44px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">P</span><span class="cover-title">Pădurea spânzuraților</span><span class="cover-author">Liviu Rebreanu</span></div></div><span class="bookcell-text"><span class="t-book">Pădurea spânzuraților</span><span class="ink-2">Liviu Rebreanu</span></span></span></td>
+<td class="ink-2">Living room · A2</td><td><span class="reading">Reading</span></td></tr></tbody></table>
+<div style="display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: flex-start">
+<div class="float" role="menu" aria-label="Account" style="width: 248px; padding: var(--space-2)">
+<a href="#" role="menuitem" class="menu-item">Change password</a>
+<a href="#" role="menuitem" class="menu-item is-hover">Theme<span class="t-meta" style="opacity: 0.85">System</span></a>
+<a href="#" role="menuitem" class="menu-item">Download a backup</a>
+<p class="menu-label t-label">Export library</p>
+<a href="#" role="menuitem" class="menu-item">Excel workbook</a>
+<a href="#" role="menuitem" class="menu-item">CSV</a>
+</div>
+<div class="float" role="status" style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4)"><span style="color: var(--color-accent)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span><span>Moved to your shelf.</span></div>
+</div>
+</div><div class="theme-dark sm panel">
+<h3 class="t-h2">Dark</h3>
+<div class="strip">
+<button type="button" class="btn btn-primary">Save</button>
+<button type="button" class="btn btn-primary is-hover">Hover</button>
+<button type="button" class="btn btn-primary is-focus">Focus</button>
+<button type="button" class="btn btn-primary" aria-disabled="true">Disabled</button>
+</div>
+<div class="strip">
+<button type="button" class="btn btn-secondary">Edit</button>
+<button type="button" class="btn btn-secondary is-hover">Hover</button>
+<button type="button" class="btn btn-secondary is-press">Pressed</button>
+<button type="button" class="btn btn-quiet">Edit details</button>
+<button type="button" class="tool">Filter</button>
+</div>
+<div class="strip"><div class="seg"><button type="button" aria-pressed="true">Table</button><button type="button" aria-pressed="false">Covers</button></div>
+<label class="chip is-on"><input type="radio" name="d-theme-dark" checked="">Bedroom</label><label class="chip"><input type="radio" name="d-theme-dark">Study · B1</label><label class="chip chip-new"><input type="radio" name="d-theme-dark">New shelf</label>
+<label class="hit"><input type="checkbox" class="check is-on" checked="" aria-label="Selected"></label><label class="hit"><input type="checkbox" class="check" aria-label="Not selected"></label></div>
+<div style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 380px">
+<label for="isbn-theme-dark" class="t-meta" style="font-weight: 600">ISBN</label>
+<div class="field field-large field-error"><input id="isbn-theme-dark" value="978014143958" aria-invalid="true" aria-describedby="isbn-theme-dark-err"></div>
+<p class="err t-meta" id="isbn-theme-dark-err"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6M12 16.5v.5"></path></svg>An ISBN has 10 or 13 digits; this has 12.</p>
+</div>
+<table class="tbl" style="max-width: 560px"><tbody><tr>
+<td style="width: 52px; text-align: center"><label class="hit"><input type="checkbox" class="check" aria-label="Select Pădurea spânzuraților"></label></td>
+<td><span class="bookcell"><div class="cover tint-4" style="width: 44px" aria-hidden="true"><div class="cover-in"><span class="cover-initial">P</span><span class="cover-title">Pădurea spânzuraților</span><span class="cover-author">Liviu Rebreanu</span></div></div><span class="bookcell-text"><span class="t-book">Pădurea spânzuraților</span><span class="ink-2">Liviu Rebreanu</span></span></span></td>
+<td class="ink-2">Living room · A2</td><td><span class="reading">Reading</span></td></tr></tbody></table>
+<div style="display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: flex-start">
+<div class="float" role="menu" aria-label="Account" style="width: 248px; padding: var(--space-2)">
+<a href="#" role="menuitem" class="menu-item">Change password</a>
+<a href="#" role="menuitem" class="menu-item is-hover">Theme<span class="t-meta" style="opacity: 0.85">System</span></a>
+<a href="#" role="menuitem" class="menu-item">Download a backup</a>
+<p class="menu-label t-label">Export library</p>
+<a href="#" role="menuitem" class="menu-item">Excel workbook</a>
+<a href="#" role="menuitem" class="menu-item">CSV</a>
+</div>
+<div class="float" role="status" style="display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4)"><span style="color: var(--color-accent)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span><span>Moved to your shelf.</span></div>
+</div>
+</div></div>
+</section>
+
+<section class="block"><h2 class="t-h2">States, per screen, as the app words them</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6)"><div class="theme-light sm panel" style="gap: var(--space-5)">
+<div class="stategroup"><h3 class="t-label muted">Library</h3><div class="card stategrid">
+<div class="state"><p class="t-book">No books yet</p><p class="muted t-meta" style="max-width: 46ch">Scan a barcode, type an ISBN, or write in what the cover says. Every book you add lands here, ready to sort, filter and search.</p><a href="#" class="btn btn-primary">Add a book</a></div>
+<div class="state"><p class="t-book">No books match</p><p class="muted t-meta" style="max-width: 46ch">Nothing matches these filters.</p><button type="button" class="btn btn-secondary">Clear filters</button></div>
+<div class="state"><p class="t-book">Your books didn’t load</p><p class="muted t-meta" style="max-width: 46ch">Something went wrong on the way.</p><button type="button" class="btn btn-secondary">Try again</button></div>
+<div class="state" aria-hidden="true" style="align-items: stretch"><div style="display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) 0"><span class="skel" style="width: 44px; height: 66px; border-radius: var(--radius-cover)"></span><span style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1"><span class="skel" style="width: 60%; height: 12px"></span><span class="skel" style="width: 35%; height: 12px"></span></span></div><div style="display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) 0"><span class="skel" style="width: 44px; height: 66px; border-radius: var(--radius-cover)"></span><span style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1"><span class="skel" style="width: 60%; height: 12px"></span><span class="skel" style="width: 35%; height: 12px"></span></span></div><p class="t-label muted" style="font-weight: 400">Loading: a still skeleton, after a beat</p></div></div></div>
+<div class="stategroup"><h3 class="t-label muted">A book</h3><div class="card stategrid">
+<div class="state"><p class="t-book">Opening the book…</p></div>
+<div class="state"><p class="t-book">This book isn’t in your library</p><p class="muted t-meta" style="max-width: 46ch">It may have been deleted, or the link is wrong.</p><a href="#" class="btn btn-secondary">Back to the Library</a></div>
+<div class="state"><p class="t-book">The library didn’t load</p><p class="muted t-meta" style="max-width: 46ch">Shelfmark can’t be reached.</p><button type="button" class="btn btn-secondary">Try again</button></div></div></div>
+<div class="stategroup"><h3 class="t-label muted">Add a book, Type ISBN</h3><div class="card stategrid">
+<div class="state"><p class="t-book">Looking it up in Open Library…</p><p class="muted t-meta" style="max-width: 46ch">Still looking. Open Library can take a few seconds.</p><button type="button" class="btn btn-leave">Cancel</button></div>
+<div class="state"><p class="t-book">Nothing found for 9789734650125.</p><p class="muted t-meta" style="max-width: 46ch">Fill in what the cover says; the rest can wait.</p><button type="button" class="btn btn-secondary">Add it by hand</button></div>
+<div class="state"><p class="t-book">The lookup didn’t work. Try again.</p><button type="button" class="btn btn-secondary">Look up</button></div></div></div>
+</div><div class="theme-dark sm panel" style="gap: var(--space-5)">
+<div class="stategroup"><h3 class="t-label muted">Library</h3><div class="card stategrid">
+<div class="state"><p class="t-book">No books yet</p><p class="muted t-meta" style="max-width: 46ch">Scan a barcode, type an ISBN, or write in what the cover says. Every book you add lands here, ready to sort, filter and search.</p><a href="#" class="btn btn-primary">Add a book</a></div>
+<div class="state"><p class="t-book">No books match</p><p class="muted t-meta" style="max-width: 46ch">Nothing matches these filters.</p><button type="button" class="btn btn-secondary">Clear filters</button></div>
+<div class="state"><p class="t-book">Your books didn’t load</p><p class="muted t-meta" style="max-width: 46ch">Something went wrong on the way.</p><button type="button" class="btn btn-secondary">Try again</button></div>
+<div class="state" aria-hidden="true" style="align-items: stretch"><div style="display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) 0"><span class="skel" style="width: 44px; height: 66px; border-radius: var(--radius-cover)"></span><span style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1"><span class="skel" style="width: 60%; height: 12px"></span><span class="skel" style="width: 35%; height: 12px"></span></span></div><div style="display: flex; gap: var(--space-3); align-items: center; padding: var(--space-2) 0"><span class="skel" style="width: 44px; height: 66px; border-radius: var(--radius-cover)"></span><span style="display: flex; flex-direction: column; gap: var(--space-2); flex: 1"><span class="skel" style="width: 60%; height: 12px"></span><span class="skel" style="width: 35%; height: 12px"></span></span></div><p class="t-label muted" style="font-weight: 400">Loading: a still skeleton, after a beat</p></div></div></div>
+<div class="stategroup"><h3 class="t-label muted">A book</h3><div class="card stategrid">
+<div class="state"><p class="t-book">Opening the book…</p></div>
+<div class="state"><p class="t-book">This book isn’t in your library</p><p class="muted t-meta" style="max-width: 46ch">It may have been deleted, or the link is wrong.</p><a href="#" class="btn btn-secondary">Back to the Library</a></div>
+<div class="state"><p class="t-book">The library didn’t load</p><p class="muted t-meta" style="max-width: 46ch">Shelfmark can’t be reached.</p><button type="button" class="btn btn-secondary">Try again</button></div></div></div>
+<div class="stategroup"><h3 class="t-label muted">Add a book, Type ISBN</h3><div class="card stategrid">
+<div class="state"><p class="t-book">Looking it up in Open Library…</p><p class="muted t-meta" style="max-width: 46ch">Still looking. Open Library can take a few seconds.</p><button type="button" class="btn btn-leave">Cancel</button></div>
+<div class="state"><p class="t-book">Nothing found for 9789734650125.</p><p class="muted t-meta" style="max-width: 46ch">Fill in what the cover says; the rest can wait.</p><button type="button" class="btn btn-secondary">Add it by hand</button></div>
+<div class="state"><p class="t-book">The lookup didn’t work. Try again.</p><button type="button" class="btn btn-secondary">Look up</button></div></div></div>
+</div></div>
+</section>
+
+<section class="block"><h2 class="t-h2">Contrast, every pair, WCAG 2.2</h2>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); align-items: start"><table class="ct"><thead><tr><th scope="col">Pair</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">Needs</th></tr></thead><tbody>
+<tr><td>surface on ground (an island against the page)</td><td class="num">1.10</td><td class="num">1.16</td><td class="num muted">1.09 / 1.15</td></tr>
+<tr><td>control on surface (a track or chip inside a card)</td><td class="num">1.24</td><td class="num">1.18</td><td class="num muted">1.09</td></tr>
+<tr><td>rule on surface (dividers inside a card)</td><td class="num">1.33</td><td class="num">1.31</td><td class="num muted">1.2</td></tr>
+<tr><td>field on surface (the search field in the header card)</td><td class="num">1.20</td><td class="num">1.11</td><td class="num muted">1.09</td></tr>
+<tr><td>ink on ground</td><td class="num">15.42</td><td class="num">15.32</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on surface</td><td class="num">16.93</td><td class="num">13.24</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on field</td><td class="num">14.08</td><td class="num">14.75</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on control</td><td class="num">13.67</td><td class="num">11.18</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on control-raised (current segment)</td><td class="num">16.93</td><td class="num">7.62</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on control-hover</td><td class="num">12.46</td><td class="num">9.66</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on row-hover</td><td class="num">15.25</td><td class="num">12.01</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink on accent-wash (selected row)</td><td class="num">14.19</td><td class="num">9.89</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink-2 on ground</td><td class="num">9.06</td><td class="num">11.00</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink-2 on surface</td><td class="num">9.95</td><td class="num">9.51</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink-2 on control</td><td class="num">8.04</td><td class="num">8.03</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink-2 on row-hover</td><td class="num">8.97</td><td class="num">8.62</td><td class="num muted">4.5 text</td></tr>
+<tr><td>ink-2 on accent-wash (selected row)</td><td class="num">8.35</td><td class="num">7.10</td><td class="num muted">4.5 text</td></tr>
+<tr><td>muted on ground</td><td class="num">5.66</td><td class="num">7.48</td><td class="num muted">4.5 text</td></tr>
+<tr><td>muted on surface</td><td class="num">6.21</td><td class="num">6.46</td><td class="num muted">4.5 text</td></tr>
+<tr><td>muted on field (placeholder, icon)</td><td class="num">5.17</td><td class="num">7.20</td><td class="num muted">4.5 text</td></tr>
+<tr><td>muted on row-hover</td><td class="num">5.60</td><td class="num">5.86</td><td class="num muted">4.5 text</td></tr>
+<tr><td>muted on accent-wash (selected row)</td><td class="num">5.21</td><td class="num">4.83</td><td class="num muted">4.5 text</td></tr>
+<tr><td>accent text on ground</td><td class="num">5.50</td><td class="num">9.55</td><td class="num muted">4.5 text</td></tr>
+<tr><td>accent text on surface</td><td class="num">6.04</td><td class="num">8.25</td><td class="num muted">4.5 text</td></tr>
+<tr><td>accent text on row-hover</td><td class="num">5.45</td><td class="num">7.48</td><td class="num muted">4.5 text</td></tr>
+<tr><td>accent text on accent-wash</td><td class="num">5.07</td><td class="num">6.16</td><td class="num muted">4.5 text</td></tr>
+<tr><td>accent-hover text on ground</td><td class="num">7.79</td><td class="num">12.34</td><td class="num muted">4.5 text</td></tr>
+</tbody></table><table class="ct"><thead><tr><th scope="col">Pair</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">Needs</th></tr></thead><tbody>
+<tr><td>on-accent on accent</td><td class="num">5.99</td><td class="num">9.28</td><td class="num muted">4.5 text</td></tr>
+<tr><td>on-accent on accent-hover</td><td class="num">8.48</td><td class="num">11.99</td><td class="num muted">4.5 text</td></tr>
+<tr><td>on-accent-wash on accent-wash</td><td class="num">8.05</td><td class="num">8.79</td><td class="num muted">4.5 text</td></tr>
+<tr><td>outline (field edge) on field</td><td class="num">3.48</td><td class="num">4.54</td><td class="num muted">3 UI</td></tr>
+<tr><td>outline (field edge) on ground</td><td class="num">3.81</td><td class="num">4.72</td><td class="num muted">3 UI</td></tr>
+<tr><td>outline (checkbox edge) on surface</td><td class="num">4.19</td><td class="num">4.08</td><td class="num muted">3 UI</td></tr>
+<tr><td>outline (checkbox edge) on row-hover</td><td class="num">3.77</td><td class="num">3.70</td><td class="num muted">3 UI</td></tr>
+<tr><td>ink-2 (error edge) on field</td><td class="num">8.28</td><td class="num">10.59</td><td class="num muted">3 UI</td></tr>
+<tr><td>focus ring on ground</td><td class="num">5.50</td><td class="num">9.55</td><td class="num muted">3 UI</td></tr>
+<tr><td>focus ring on surface</td><td class="num">6.04</td><td class="num">8.25</td><td class="num muted">3 UI</td></tr>
+<tr><td>focus ring on field</td><td class="num">5.03</td><td class="num">9.19</td><td class="num muted">3 UI</td></tr>
+<tr><td>focus ring on control</td><td class="num">4.88</td><td class="num">6.97</td><td class="num muted">3 UI</td></tr>
+<tr><td>focus ring on accent-wash</td><td class="num">5.07</td><td class="num">6.16</td><td class="num muted">3 UI</td></tr>
+<tr><td>accent (checked box, current tab icon) on ground</td><td class="num">5.50</td><td class="num">9.55</td><td class="num muted">3 UI</td></tr>
+<tr><td>accent (checked box) on surface</td><td class="num">6.04</td><td class="num">8.25</td><td class="num muted">3 UI</td></tr>
+<tr><td>cover-edge on ground (dark: the cover’s 1px edge)</td><td class="num">15.42</td><td class="num">2.20</td><td class="num muted">1.4</td></tr>
+<tr><td>rule on ground (hairline, Lc 15 target)</td><td class="num">1.21</td><td class="num">1.52</td><td class="num muted">1.2</td></tr>
+<tr><td>on-callout on callout (board marker)</td><td class="num">5.27</td><td class="num">6.93</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-1 ink on its tint (oxblood)</td><td class="num">8.08</td><td class="num">7.69</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-2 ink on its tint (ochre)</td><td class="num">6.93</td><td class="num">5.08</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-3 ink on its tint (forest)</td><td class="num">7.72</td><td class="num">7.09</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-4 ink on its tint (slate)</td><td class="num">9.39</td><td class="num">7.62</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-5 ink on its tint (plum)</td><td class="num">7.43</td><td class="num">7.19</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-6 ink on its tint (sand)</td><td class="num">8.41</td><td class="num">6.80</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-7 ink on its tint (sage)</td><td class="num">7.48</td><td class="num">6.78</td><td class="num muted">4.5 text</td></tr>
+<tr><td>cover-8 ink on its tint (charcoal, gold letters)</td><td class="num">8.21</td><td class="num">8.53</td><td class="num muted">4.5 text</td></tr>
+</tbody></table></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":5234}}'>
+class Component extends DCLogic {
+renderVals() {
+return {};
+}
+}
+</script>
+</body>
+</html>

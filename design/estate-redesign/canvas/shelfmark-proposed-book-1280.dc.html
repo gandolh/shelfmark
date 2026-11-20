@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shelfmark a book, proposed</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600&amp;family=Public+Sans:wght@400;600&amp;display=swap">
+<style>
+/* Hallmark · shape: app screen · genre: editorial · theme: brand · redesign: full
+ * paper: oklch(97.6% 0.005 85) · accent: oklch(49% 0.088 222) · display: Literata · body: Public Sans
+ * nav: kept (top bar with the three places, phone tab bar, account menu) · signature: the cover, and the title set in a book face · states: loading, empty, no match, error
+ * axes: warm paper/book serif/one teal · posture: restrained · modes: light+dark · contrast: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R5 V3 · weakest: V, it keeps the shell the owner chose; the change is in the sheet, the type and the dark set */
+/* Hallmark · answered F4 · the secondary is the grey control fill the owner's Covers system uses, never the accent; one accent primary per screen */
+.theme-light{color-scheme:light;--color-ground:#f6f3ef;--color-surface:#fffefd;--color-field:#ece9e4;--color-control:#e8e6e1;--color-control-raised:#fffefd;--color-control-hover:#dfdcd6;--color-row-hover:#f4f2ee;--color-rule:#e0deda;--color-outline:#7e7b75;--color-ink:#1d1c18;--color-ink-2:#44423e;--color-muted:#63605b;--color-accent:#0a6b84;--color-accent-hover:#005368;--color-on-accent:#fefdfb;--color-accent-wash:#d8eef6;--color-on-accent-wash:#004b5f;--color-focus:#0a6b84;--color-cover-edge:#1d1c18;--color-callout:#c83122;--color-on-callout:#fefdfb;--color-cover-1-bg:#7b2d35;--color-cover-1-ink:#f7eee6;--color-cover-2-bg:#d4a23a;--color-cover-2-ink:#2a1f10;--color-cover-3-bg:#33503e;--color-cover-3-ink:#eef0e2;--color-cover-4-bg:#2c3e57;--color-cover-4-ink:#eaeff5;--color-cover-5-bg:#5c3f78;--color-cover-5-ink:#f2ecf7;--color-cover-6-bg:#dccdb0;--color-cover-6-ink:#3a2e22;--color-cover-7-bg:#b9c3a5;--color-cover-7-ink:#26301f;--color-cover-8-bg:#2e2e30;--color-cover-8-ink:#e8c66c;--font-book:Literata,Georgia,'Times New Roman',serif;--font-ui:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--color-accent-ink:var(--color-on-accent);--radius-cover:3px;--radius-control:8px;--radius-panel:16px;--radius-full:999px;--shadow-cover:0 6px 14px rgb(40 36 30 / 0.2),0 1px 2px rgb(40 36 30 / 0.18);--shadow-float:0 12px 32px rgb(40 36 30 / 0.16),0 0 0 1px var(--color-rule);}
+.theme-dark{color-scheme:dark;--color-ground:#141310;--color-surface:#23211e;--color-field:#191714;--color-control:#302e29;--color-control-raised:#4a4743;--color-control-hover:#3a3833;--color-row-hover:#2a2925;--color-rule:#373531;--color-outline:#83807a;--color-ink:#ebe9e5;--color-ink-2:#c9c7c2;--color-muted:#a7a49f;--color-accent:#79c5d8;--color-accent-hover:#a0dcec;--color-on-accent:#0b181d;--color-accent-wash:#173b46;--color-on-accent-wash:#b2e5f2;--color-focus:#79c5d8;--color-cover-edge:#4f4d48;--color-callout:#f28058;--color-on-callout:#1e130f;--color-cover-1-bg:#7f3439;--color-cover-1-ink:#fbf1ea;--color-cover-2-bg:#836329;--color-cover-2-ink:#fff4dc;--color-cover-3-bg:#395844;--color-cover-3-ink:#f1f4e6;--color-cover-4-bg:#384e6b;--color-cover-4-ink:#eef3f9;--color-cover-5-bg:#5e457a;--color-cover-5-ink:#f6f0fa;--color-cover-6-bg:#564c3b;--color-cover-6-ink:#f0e6d2;--color-cover-7-bg:#49543d;--color-cover-7-ink:#e9eedf;--color-cover-8-bg:#323335;--color-cover-8-ink:#efd27a;--font-book:Literata,Georgia,'Times New Roman',serif;--font-ui:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:20px;--space-6:24px;--space-8:32px;--space-10:40px;--space-12:48px;--space-16:64px;--color-accent-ink:var(--color-on-accent);--radius-cover:3px;--radius-control:8px;--radius-panel:16px;--radius-full:999px;--shadow-cover:0 0 0 1px var(--color-cover-edge);--shadow-float:0 0 0 1px var(--color-rule);}
+html, body { overflow-x: clip; }
+body { margin: 0; }
+*, *::before, *::after { box-sizing: border-box; }
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.sm { container: page / inline-size; background: var(--color-ground); color: var(--color-ink); font-family: var(--font-ui); font-size: 14px; line-height: 20px; font-synthesis: none; -webkit-font-smoothing: antialiased; caret-color: var(--color-accent); scrollbar-color: var(--color-outline) var(--color-ground); }
+.sm ::selection { background: var(--color-accent-wash); color: var(--color-ink); }
+:where(.sm) :where(h1, h2, h3, p, dl, dd, ul, fieldset, legend) { margin: 0; padding: 0; }
+:where(.sm) :where(h1, h2, h3) { text-wrap: balance; }
+:where(.sm) ul { list-style: none; }
+:where(.sm) fieldset { border: 0; min-width: 0; }
+:where(.sm) :where(button, input) { font: inherit; color: inherit; }
+:where(.sm) a { color: inherit; text-decoration: none; }
+.sm svg { display: block; flex-shrink: 0; }
+.num { font-variant-numeric: tabular-nums; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Type: six sizes. The book face carries what a book says; the UI face carries the rest. */
+.t-title { font-family: var(--font-book); font-weight: 600; font-size: 32px; line-height: 40px; letter-spacing: -0.01em; overflow-wrap: break-word; min-width: 0; text-wrap: balance; }
+.t-h2 { font-family: var(--font-book); font-weight: 600; font-size: 20px; line-height: 28px; text-wrap: balance; }
+.t-book { font-family: var(--font-book); font-weight: 600; font-size: 16px; line-height: 22px; overflow-wrap: break-word; min-width: 0; }
+.t-body { font-size: 16px; line-height: 24px; }
+.t-meta { font-size: 14px; line-height: 20px; }
+.t-label { font-size: 12px; line-height: 16px; font-weight: 600; }
+.ink-2 { color: var(--color-ink-2); }
+.muted { color: var(--color-muted); }
+.reading { color: var(--color-accent); font-weight: 600; }
+
+/* Buttons: one filled primary per screen; secondaries are a grey fill; quiet ones are text. */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); font-size: 14px; font-weight: 600; white-space: nowrap; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1), color 120ms cubic-bezier(0.2, 0, 0, 1); position: relative; }
+.btn::after { content: ""; position: absolute; inset: -4px 0; }
+.btn-primary { background: var(--color-accent); color: var(--color-accent-ink); }
+.btn-primary:hover, .btn-primary:active { background: var(--color-accent-hover); }
+.btn-secondary { background: var(--color-control); color: var(--color-ink); }
+.btn-secondary:hover { background: var(--color-control-hover); }
+.btn-secondary:active { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.btn-quiet { background: transparent; color: var(--color-accent); padding: 0 var(--space-2); }
+.btn-quiet:hover, .btn-quiet:active { color: var(--color-accent-hover); background: var(--color-row-hover); }
+.btn-leave { background: transparent; color: var(--color-ink); padding: 0 var(--space-2); font-weight: 400; }
+.btn-leave:hover { background: var(--color-row-hover); }
+.btn-large { height: 48px; padding: 0 var(--space-6); border-radius: var(--radius-full); font-size: 16px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; }
+.btn-off, .btn-off:hover { background: transparent; color: var(--color-muted); opacity: 1; cursor: default; }
+.is-hover.btn-primary { background: var(--color-accent-hover); }
+.is-hover.btn-secondary { background: var(--color-control-hover); }
+.is-press.btn-secondary { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.is-focus { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+
+/* Tool buttons: the Library's list tools. Text in ink-2 on nothing. */
+.tool { display: inline-flex; align-items: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font-size: 14px; cursor: pointer; white-space: nowrap; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); }
+.tool:hover { background: var(--color-control); color: var(--color-ink); }
+.tool[aria-expanded="true"] { background: var(--color-accent-wash); color: var(--color-on-accent-wash); font-weight: 600; }
+
+/* Segmented: the places, Table / Covers, the Add modes. The current one is a raised tile. */
+.seg { display: inline-flex; gap: var(--space-1); padding: var(--space-1); border-radius: 12px; background: var(--color-control); }
+.seg > * { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 var(--space-4); border: 0; border-radius: var(--radius-control); background: transparent; color: var(--color-ink-2); font-size: 14px; white-space: nowrap; cursor: pointer; transition: background-color 120ms cubic-bezier(0.2, 0, 0, 1); }
+.seg > * { position: relative; }
+.seg > *::after { content: ""; position: absolute; inset: -4px 0; }
+.seg > *:hover { background: var(--color-control-hover); color: var(--color-ink); }
+.seg > [aria-current="page"], .seg > [aria-pressed="true"], .seg > [aria-selected="true"] { background: var(--color-control-raised); color: var(--color-ink); font-weight: 600; box-shadow: 0 0 0 1px var(--color-rule); }
+
+/* Fields: a visible edge (3:1) that never changes width; focus is an outline. */
+.field { display: flex; align-items: center; gap: var(--space-2); height: 40px; padding: 0 var(--space-3); border: 1px solid var(--color-outline); border-radius: var(--radius-control); background: var(--color-field); color: var(--color-ink); }
+.field input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; outline: 0; font-size: 14px; }
+.field input::placeholder { color: var(--color-muted); }
+.field:focus-within { outline: 2px solid var(--color-focus); outline-offset: -1px; }
+.field-large { height: 48px; }
+.field-large input { font-size: 16px; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.field-error { border-color: var(--color-ink-2); box-shadow: inset 0 0 0 1px var(--color-ink-2); }
+.err { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-ink); font-weight: 600; }
+
+/* Checkbox: drawn, so its edge passes 3:1 in both themes. */
+.check { appearance: none; margin: 0; width: 18px; height: 18px; border: 1.5px solid var(--color-outline); border-radius: 4px; background: var(--color-surface); display: inline-grid; place-content: center; cursor: pointer; }
+.check:checked, .check.is-on { background: var(--color-accent); border-color: var(--color-accent); }
+.check:checked::after, .check.is-on::after { content: ""; width: 9px; height: 5px; border: solid var(--color-on-accent); border-width: 0 0 2px 2px; transform: translateY(-1px) rotate(-45deg); }
+.hit { position: relative; display: inline-grid; place-items: center; width: 44px; height: 44px; }
+
+/* Chips: radios drawn as pills. */
+.chip { display: inline-flex; align-items: center; height: 36px; padding: 0 var(--space-4); border-radius: var(--radius-full); background: var(--color-control); color: var(--color-ink); font-size: 14px; cursor: pointer; white-space: nowrap; position: relative; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip:has(input:checked), .chip.is-on { background: var(--color-accent-wash); color: var(--color-on-accent-wash); font-weight: 600; }
+.chip:has(input:focus-visible) { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.chip-new { background: transparent; border: 1px dashed var(--color-outline); color: var(--color-ink-2); }
+
+/* The cover: the only object with depth. A missing one is set in type on its tint. */
+.cover { container: cover / inline-size; position: relative; aspect-ratio: 2 / 3; border-radius: var(--radius-cover); box-shadow: var(--shadow-cover); overflow: hidden; flex-shrink: 0; }
+.cover-in { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; padding: 11cqw 10cqw 11cqw 17cqw; }
+.cover-in::before { content: ""; position: absolute; top: 0; bottom: 0; left: 7cqw; border-left: 1px solid currentColor; opacity: 0.24; }
+.cover-title { font-family: var(--font-book); font-weight: 600; font-size: 13cqw; line-height: 1.12; overflow-wrap: break-word; }
+.cover-author { font-family: var(--font-book); font-weight: 400; font-size: 8.5cqw; line-height: 1.2; padding-top: 4cqw; border-top: 1px solid currentColor; }
+.cover-initial { display: none; }
+@container cover (max-width: 72px) { .cover-in { padding: 9cqw 8cqw 9cqw 20cqw; } .cover-title, .cover-author { display: none; } .cover-initial { display: block; font-family: var(--font-book); font-weight: 600; font-size: 44cqw; line-height: 1; } }
+.tint-1 { background: var(--color-cover-1-bg); color: var(--color-cover-1-ink); }
+.tint-2 { background: var(--color-cover-2-bg); color: var(--color-cover-2-ink); }
+.tint-3 { background: var(--color-cover-3-bg); color: var(--color-cover-3-ink); }
+.tint-4 { background: var(--color-cover-4-bg); color: var(--color-cover-4-ink); }
+.tint-5 { background: var(--color-cover-5-bg); color: var(--color-cover-5-ink); }
+.tint-6 { background: var(--color-cover-6-bg); color: var(--color-cover-6-ink); }
+.tint-7 { background: var(--color-cover-7-bg); color: var(--color-cover-7-ink); }
+.tint-8 { background: var(--color-cover-8-bg); color: var(--color-cover-8-ink); }
+
+/* The shell: a top bar from 600 px of artboard, a tab bar under it. */
+.topbar { position: sticky; top: 0; z-index: 10; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: var(--space-6); height: 64px; padding: 0 var(--space-10); background: var(--color-ground); border-bottom: 1px solid var(--color-rule); }
+.wordmark { font-family: var(--font-book); font-weight: 600; font-size: 20px; line-height: 28px; letter-spacing: -0.01em; justify-self: start; }
+.account { display: inline-grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: var(--radius-full); background: var(--color-control); color: var(--color-ink-2); cursor: pointer; }
+.account:hover { background: var(--color-control-hover); color: var(--color-ink); }
+.tabbar { display: none; }
+@container page (min-width: 768px) { .phone-only { display: none !important; } }
+@container page (max-width: 767px) {
+  .topbar { display: none; }
+  .desk-only { display: none !important; }
+  .tabbar { position: sticky; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-bottom: var(--space-3); background: var(--color-ground); border-top: 1px solid var(--color-rule); }
+  .tabbar a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: 60px; color: var(--color-muted); font-size: 12px; line-height: 16px; }
+  .tabbar a[aria-current="page"] { color: var(--color-accent); font-weight: 600; }
+  .account { width: 48px; height: 48px; }
+  .hit { width: 48px; height: 48px; }
+  .t-title { font-size: 28px; line-height: 36px; }
+  .btn, .tool { height: 48px; }
+  .field { height: 48px; }
+  .field input { font-size: 16px; }
+  .seg > * { height: 40px; }
+  .chip { height: 48px; }
+}
+
+.page { padding: var(--space-8) var(--space-10) var(--space-12); }
+.page-narrow { max-width: 1100px; margin: 0 auto; }
+@container page (max-width: 767px) { .page { padding: var(--space-4) var(--space-4) var(--space-8); } }
+
+/* Floats: menus, toasts, the draft card. Light lifts with a shadow, dark with a lighter surface and a hairline. */
+.float { background: var(--color-surface); border-radius: var(--radius-panel); box-shadow: var(--shadow-float); }
+.menu-item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-control); color: var(--color-ink); }
+.menu-item:hover, .menu-item.is-hover { background: var(--color-accent-wash); color: var(--color-on-accent-wash); }
+.menu-label { padding: var(--space-2) var(--space-3) var(--space-1); color: var(--color-muted); }
+
+/* The board's numbered callouts. Annotation only, never part of the app. */
+.co { position: absolute; z-index: 20; top: var(--my); left: var(--mx); display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: var(--radius-full); background: var(--color-callout); color: var(--color-on-callout); font: 600 12px/1 var(--font-ui); pointer-events: none; }
+
+@container page (max-width: 1023px) { .co { left: var(--mxm); } }
+@container page (max-width: 767px) { .co { left: var(--mxp); top: var(--myp); width: 16px; height: 16px; font-size: 10px; } }
+.card { background: var(--color-surface); color: var(--color-ink); border-radius: var(--radius-panel); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 1ms !important; animation-duration: 1ms !important; } }
+
+.bookgrid { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-12); padding-top: var(--space-6); }
+.covercol { flex: 0 0 240px; display: flex; flex-direction: column; gap: var(--space-4); position: sticky; top: 96px; }
+.maincol { flex: 999 1 360px; min-width: 0; max-width: 720px; display: flex; flex-direction: column; gap: var(--space-4); }
+.where { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) 0 var(--space-2); }
+.where-facts { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+.where-facts > div { display: flex; flex-direction: column; gap: var(--space-1); }
+.where-value { font-size: 20px; line-height: 28px; font-weight: 600; }
+.fcard { padding: var(--space-5); }
+.facts { margin-top: var(--space-2); }
+.fact { display: grid; grid-template-columns: 152px minmax(0, 1fr); gap: var(--space-4); padding: var(--space-3) 0; border-bottom: 1px solid var(--color-rule); }
+.fact:last-child { border-bottom: 0; padding-bottom: 0; }
+.fact dd { font-size: 16px; line-height: 24px; max-width: 60ch; }
+.fact dt { line-height: 24px; }
+.tag { display: inline-flex; align-items: center; height: 28px; padding: 0 var(--space-3); border-radius: var(--radius-full); background: var(--color-control); font-size: 14px; }
+@container page (max-width: 1023px) {
+  .bookgrid { gap: var(--space-6); }
+  .covercol { flex-basis: 200px; }
+}
+@container page (max-width: 767px) {
+  .bookgrid { gap: var(--space-6); padding-top: var(--space-2); }
+  .covercol { flex: 1 1 100%; position: static; align-items: center; }
+  .covercol > div { width: 168px; }
+  .covercol .btn { width: auto !important; }
+  .where .btn { flex: 1 1 100%; }
+  .fcard { padding: var(--space-4); }
+  .fact { grid-template-columns: minmax(0, 1fr); gap: var(--space-1); }
+}
+</style>
+</helmet>
+<div class="{{themeClass}}" style="min-height: 800px">
+<header class="topbar">
+<a href="#" class="wordmark" aria-label="Shelfmark, the Library">Shelfmark</a>
+<nav aria-label="Places" class="seg"><a href="#" aria-current="page">Library</a><a href="#">Add a book</a><a href="#">Wishlist</a></nav>
+<div style="display: flex; align-items: center; justify-content: flex-end; gap: var(--space-3); min-width: 0">
+<label class="field" style="width: 100%; max-width: 240px; min-width: 0; height: 36px"><span class="muted"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><path d="M16.5 16.5L21 21"></path></svg></span><span class="vh">Search the library</span><input type="search" placeholder="Search" autocomplete="off"></label>
+<button type="button" class="account" aria-label="Account" aria-haspopup="menu"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg></button>
+</div>
+</header>
+<main class="page page-narrow">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: var(--space-4)">
+<a href="#" class="btn btn-quiet" style="margin-left: calc(var(--space-2) * -1)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"></path></svg>Library</a>
+<button type="button" class="account phone-only" aria-label="Account" aria-haspopup="menu"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"></path></svg></button>
+</div>
+<div class="bookgrid">
+<div class="covercol">
+<div style="position: relative"><span class="co" aria-hidden="true" style="--my: 0px; --mx: -34px; --mxm: -34px; --mxp: -34px; --myp: 0px">3</span><div class="cover tint-8" style="width: 240px; width: 100%" aria-hidden="true"><div class="cover-in"><span class="cover-initial">E</span><span class="cover-title">Enigma Otiliei</span><span class="cover-author">George Călinescu</span></div></div></div>
+<button type="button" class="btn btn-secondary" style="width: 100%"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><circle cx="9" cy="10" r="2"></circle><path d="M21 16l-5-5-9 9"></path></svg>Change cover</button>
+</div>
+<div class="maincol">
+<div style="position: relative"><span class="co" aria-hidden="true" style="--my: 10px; --mx: -36px; --mxm: -23px; --mxp: -16px; --myp: 10px">1</span>
+<h1 class="t-title">Enigma Otiliei</h1>
+<p class="t-body ink-2">George Călinescu</p>
+</div>
+<div class="where" style="position: relative"><span class="co" aria-hidden="true" style="--my: calc(50% - 11px); --mx: -36px; --mxm: -23px; --mxp: -16px; --myp: calc(50% - 8px)">2</span>
+<dl class="where-facts">
+<div><dt class="t-label muted">Shelf</dt><dd class="where-value">Study · B1</dd></div>
+<div><dt class="t-label muted">Status</dt><dd class="where-value reading">Reading</dd></div>
+</dl>
+<button type="button" class="btn btn-secondary" id="book-edit"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"></path></svg>Edit</button>
+</div>
+<section class="card fcard" aria-labelledby="copy-h" style="position: relative"><span class="co" aria-hidden="true" style="--my: 20px; --mx: -36px; --mxm: -23px; --mxp: -16px; --myp: 20px">4</span>
+<h2 class="t-h2" id="copy-h">About this copy</h2>
+<dl class="facts">
+<div class="fact"><dt class="muted">Format</dt><dd>Paperback</dd></div>
+<div class="fact"><dt class="muted">Condition</dt><dd>Good</dd></div>
+<div class="fact"><dt class="muted">Tags</dt><dd><span class="tag">classic</span></dd></div>
+<div class="fact"><dt class="muted">Notes</dt><dd>Lent to a neighbour once; came back with a coffee ring on page 80.</dd></div>
+<div class="fact"><dt class="muted">Added</dt><dd>Today</dd></div>
+</dl>
+</section>
+<section class="card fcard" aria-labelledby="book-h">
+<h2 class="t-h2" id="book-h">About the book</h2>
+<dl class="facts">
+<div class="fact"><dt class="muted">Publisher</dt><dd>Litera</dd></div>
+<div class="fact"><dt class="muted">Year</dt><dd>2016</dd></div>
+<div class="fact"><dt class="muted">Pages</dt><dd>512</dd></div>
+<div class="fact"><dt class="muted">Language</dt><dd>Romanian</dd></div>
+<div class="fact"><dt class="muted">Details from</dt><dd>Typed in by hand</dd></div>
+</dl>
+</section>
+</div>
+</div>
+</main>
+<nav class="tabbar" aria-label="Places"><a href="#" aria-current="page"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 5a2 2 0 0 1 2-2h12v15H7a2 2 0 0 0-2 2z"></path><path d="M5 20a2 2 0 0 0 2 1h12v-3"></path></svg><span>Library</span></a><a href="#"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8M8 12h8"></path></svg><span>Add a book</span></a><a href="#"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"></path></svg><span>Wishlist</span></a></nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"theme":{"editor":"enum","options":["light","dark"],"default":"light"},"$preview":{"width":1280,"height":1008}}'>
+class Component extends DCLogic {
+renderVals() {
+const t = this.props.theme ?? 'light';
+return { themeClass: t === 'dark' ? 'theme-dark sm' : 'theme-light sm' };
+}
+}
+</script>
+</body>
+</html>
