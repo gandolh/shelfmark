@@ -118,3 +118,22 @@ export function ImageIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** An arrow leaving a box: a link that opens another site (Open Library). */
+export function ExternalIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M14 4.5h5.5V10M19.5 4.5 11 13" />
+      <path d="M17.5 14v4.5a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1v-11a1 1 0 0 1 1-1H10" />
+    </Icon>
+  );
+}
+
+/** A plus on its own: Add to wishlist, inside a button that names it. */
+export function PlusIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 5.5v13M5.5 12h13" />
+    </Icon>
+  );
+}

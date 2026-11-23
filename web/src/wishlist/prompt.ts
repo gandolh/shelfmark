@@ -5,7 +5,7 @@ import { RECOMMENDATIONS_MAX, recommendationImportSchema, type RecommendationImp
  * return, the schema, and the warning that titles must be real books. It
  * leaves out everything about the library but the file the owner attaches.
  */
-export const IMPORT_SCHEMA_EXAMPLE = `[
+const IMPORT_SCHEMA_EXAMPLE = `[
   { "title": "Orbitor", "authors": ["Mircea Cărtărescu"], "isbn13": "9789735050000", "reason": "One line on why it fits." }
 ]`;
 

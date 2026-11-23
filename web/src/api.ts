@@ -10,8 +10,10 @@ import {
   type ImportJob,
   type Recommendation,
   type RecommendationImport,
+  type RefreshJob,
   importJobSchema,
   recommendationListSchema,
+  refreshJobSchema,
 } from "@shelfmark/shared";
 import { API_BASE } from "./base";
 
@@ -234,6 +236,13 @@ export const recommendationsApi = {
 
   dismiss: (key: string, options?: CallOptions): Promise<void> =>
     apiRequest(`/api/recommendations/${encodeURIComponent(key)}/dismiss`, { ...options, method: "POST" }),
+
+  /** Starts the Similar refresh (the server's own model); a 409 while one is running. */
+  startRefresh: (options?: CallOptions): Promise<RefreshJob> =>
+    apiRequest("/api/recommendations/refresh", { ...options, method: "POST", schema: refreshJobSchema }),
+
+  refreshProgress: (options?: CallOptions): Promise<RefreshJob> =>
+    apiRequest("/api/recommendations/refresh", { ...options, schema: refreshJobSchema }),
 };
 
 /**
