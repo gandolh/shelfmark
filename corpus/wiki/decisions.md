@@ -1,6 +1,6 @@
 ---
-summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward (since 2026-11-17 a family, each with their own status and rating on every book); English interface; the familiar table app in the Covers variant, light; three places (Library, Add a book, Wishlist; two until 2026-11-10); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app).
-updated: 2026-11-17
+summary: Locked calls for Shelfmark, each with date, rejected alternatives and reason. Physical books only (ebooks stay in Atrium); a web app with a PWA on React, Fastify and SQLite; one user, deployed on the VPS with its own login and Sign in with Ward (since 2026-11-17 a family, each with their own status and rating on every book); English interface; the familiar table app in the Covers variant, light; three places (Library, Add a book, Wishlist; two until 2026-11-10); one row per physical copy; no loans; Google Books needs the owner's free API key; covers live in SQLite; Romanian books are looked up in three library catalogs and the CIP lists before Google, politely; the camera reads only on a press; Base UI under the menus, panels, dialog and switches. Research recommendations live on the concept pages until the owner confirms them; only lightweight tests (nothing boots the app). Engineering calls from 2026-11-23 on are on decisions-engineering.md.
+updated: 2026-11-23
 ---
 
 # Decisions
@@ -10,6 +10,7 @@ a real trade-off. Changing one needs an explicit revisit and a `log.md` entry.
 Recommendations on other pages (scanner library, export library, client-side
 filtering) are **not** decisions until the owner confirms
 them; [open-questions.md](open-questions.md) tracks what still needs an answer.
+Engineering calls made since 2026-11-23 are on [decisions-engineering.md](decisions-engineering.md).
 
 ## Physical books only; ebooks stay in Atrium
 _2026-10-14_. Shelfmark catalogs printed books on the owner's shelves. It never

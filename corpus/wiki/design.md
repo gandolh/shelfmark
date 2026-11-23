@@ -1,6 +1,6 @@
 ---
 summary: How Shelfmark's look was chosen and why (owner, 2026-10-14). The familiar table app played straight, in the Covers variant (calibrated on Apple's own apps; the cover leads, chrome recedes, one teal accent, light). The original token table, the three-place navigation (Library, Add a book, Wishlist; two places until 2026-11-10) with an account menu instead of Settings, the library table and covers grid, the Add a book flow and its three scan outcomes, the mock-ups, and the 2026-10-15 finish review. The Library's header card, full width and toolbar (2026-11-04). The system as built is DESIGN.md at the repo root. Read before any UI brief.
-updated: 2026-11-13
+updated: 2026-11-23
 ---
 
 # Design
@@ -85,7 +85,9 @@ Three places: **Library**, **Add a book** and **Wishlist** (two until
 - **Wishlist** is a place (since 2026-11-10, built 2026-11-11): the wished-for
   books as covers, an Add a book button that lands in the wishlist, then the
   recommendations ([recommendations.md](recommendations.md)). Library holds
-  the owned books only; the Owned / Wishlist tabs went.
+  the owned books only; the Owned / Wishlist tabs went. Since 2026-11-23 the
+  recommendations are a white card with a tab per source, Similar books and
+  From Claude (the owner's pick over both side by side; DESIGN.md has the detail).
 
 ## Library
 

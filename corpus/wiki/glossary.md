@@ -1,6 +1,6 @@
 ---
-summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status (each person's own) and reader, lookup and draft, CIP and the CIP block, library catalog and CIP index. Use these words in code, UI copy and briefs.
-updated: 2026-11-17
+summary: Shelfmark's vocabulary, one word per concept with the synonyms it replaces. Book, collection (owned, wishlist), shelf and room, status (each person's own) and reader, lookup and draft, CIP and the CIP block, library catalog and CIP index, similar book and From Claude. Use these words in code, UI copy and briefs.
+updated: 2026-11-23
 ---
 
 # Glossary
@@ -26,6 +26,17 @@ A book in no collection, suggested from what the library holds, or named by
 Claude and checked in Open Library. Never a book that is owned, wished for or
 dismissed ([recommendations.md](recommendations.md)).
 _Avoid_: suggestion, pick, discovery
+
+**Similar book**:
+A recommendation Shelfmark's own model found close to books in the library
+(source `similar`); the Similar books tab lists them, *Find similar books*
+finds them.
+_Avoid_: AI pick, model pick, match, related book
+
+**From Claude**:
+A recommendation Claude named from the library file the owner handed it,
+imported and checked in Open Library (source `claude`); the From Claude tab.
+_Avoid_: AI pick, Claude's suggestion
 
 **Dismissed**:
 A recommendation the owner said "Not interested" to; never shown again, by work
