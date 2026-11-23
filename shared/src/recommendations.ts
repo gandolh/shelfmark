@@ -7,11 +7,15 @@ import { z } from "zod";
  * prompt for Claude names.
  */
 
-/** Up to this many picks in one import, and on the list. */
+/** Up to this many picks in one import, and per source on the list. */
 export const RECOMMENDATIONS_MAX = 30;
 
-/** Where a recommendation came from. A later source adds a value. */
-export const recommendationSourceSchema = z.enum(["claude", "series"]);
+/**
+ * Where a recommendation came from: Claude's picks, checked in Open Library;
+ * "similar", the books Shelfmark's own model finds close to the library's;
+ * "series", kept for a source not built yet. A later source adds a value.
+ */
+export const recommendationSourceSchema = z.enum(["claude", "series", "similar"]);
 export type RecommendationSource = z.infer<typeof recommendationSourceSchema>;
 
 export const recommendationSchema = z.object({
@@ -23,7 +27,7 @@ export const recommendationSchema = z.object({
   language: z.string().nullable(),
   coverUrl: z.string().nullable(),
   isbn13: z.string().nullable(),
-  /** One line each: "Because you have 4 books by …", or Claude's own. */
+  /** One line each: "Close to “Baltagul”, rated 5.", or Claude's own. */
   reasons: z.array(z.string()),
   source: recommendationSourceSchema,
   /** The work's page on Open Library, when it has a key. */
@@ -63,3 +67,21 @@ export const importJobSchema = z.object({
   added: z.number().int().min(0),
 });
 export type ImportJob = z.infer<typeof importJobSchema>;
+
+/**
+ * The Similar refresh: Open Library asked by the library's authors and
+ * subjects, then the model run over the library and what came back. One at a
+ * time; `done` of `total` counts the requests while `step` is "catalog", and
+ * the books compared while it is "model".
+ */
+export const refreshJobSchema = z.object({
+  state: z.enum(["idle", "running", "done", "failed"]),
+  step: z.enum(["catalog", "model"]).nullable(),
+  done: z.number().int().min(0),
+  total: z.number().int().min(0),
+  /** Similar books on the list after the refresh. */
+  added: z.number().int().min(0),
+  /** Why a refresh found nothing or failed, in words for the page. */
+  message: z.string().nullable(),
+});
+export type RefreshJob = z.infer<typeof refreshJobSchema>;

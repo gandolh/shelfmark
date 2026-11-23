@@ -13,6 +13,7 @@
   "dependencies": {
     "@fastify/swagger": "9.9.3",
     "@fastify/type-provider-zod": "1.0.3",
+    "@huggingface/transformers": "4.3.2",
     "@shelfmark/shared": "0.1.0",
     "better-sqlite3": "13.0.3",
     "close-with-grace": "2.5.0",

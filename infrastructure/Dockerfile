@@ -5,6 +5,13 @@
 # in build stages and never reach the runtime image. The web app is a static
 # site that vps-deploy builds and ships separately; it is not in this image.
 #
+# The runtime stages are Debian (glibc), not Alpine (musl): the Similar
+# recommendations run all-MiniLM-L6-v2 through transformers.js, whose
+# onnxruntime-node ships Linux binaries for glibc only, and on Alpine its import
+# fails ("ld-linux-x86-64.so.2"). The compile stages stay on Alpine; they only
+# run tsc. onnxruntime-node's postinstall (which would fetch the CUDA and
+# TensorRT providers) is denied in package.json's allowScripts.
+#
 #   docker compose -f infrastructure/docker-compose.yml up shelfmark-api
 #
 # ── Why this container runs as root ─────────────────────────────────────────
@@ -51,8 +58,10 @@ RUN npx tsc -b server
 # ---------------------------------------------------------------------------
 # proddeps — runtime dependencies only, native modules built here
 # ---------------------------------------------------------------------------
-FROM node:24-alpine AS proddeps
-RUN apk add --no-cache python3 make g++
+FROM node:24-trixie-slim AS proddeps
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends python3 make g++ \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
 COPY shared/package.json ./shared/
@@ -69,22 +78,33 @@ RUN npm ci --omit=dev -w @shelfmark/server --include-workspace-root
 # (`prebuilds/linuxmusl-x64.node`), not directories, and a whitelist written
 # against bare names silently deletes all of them, leaving an image that builds
 # clean and crash-loops on a missing better_sqlite3.node.
+#
+# onnxruntime-node ships every platform's binaries (about 290 MB); only this
+# image's own Linux architecture stays. onnxruntime-web comes with
+# transformers.js but never runs in Node: its WebAssembly builds (about 90 MB)
+# and source maps (about 20 MB) go, its JavaScript stays because transformers.js
+# imports it.
 RUN cd node_modules \
  && find . -name '*.o' -delete \
  && find . -type d -name obj.target -prune -exec rm -rf {} + \
  && rm -rf better-sqlite3/deps better-sqlite3/src \
  && find . -type d -name prebuilds -exec sh -c \
-      'rm -f "$1"/darwin-*.node "$1"/win32-*.node "$1"/android-*.node' _ {} \;
+      'rm -f "$1"/darwin-*.node "$1"/win32-*.node "$1"/android-*.node' _ {} \; \
+ && rm -rf onnxruntime-node/bin/napi-v6/darwin onnxruntime-node/bin/napi-v6/win32 \
+ && arch="$(node -p process.arch)" \
+ && find onnxruntime-node/bin/napi-v6/linux -mindepth 1 -maxdepth 1 ! -name "$arch" -exec rm -rf {} + \
+ && find onnxruntime-web \( -name '*.wasm' -o -name '*.map' \) -delete
 
 # ---------------------------------------------------------------------------
 # prod — slim runtime: no compiler, no test code, no TypeScript
 # ---------------------------------------------------------------------------
-FROM node:24-alpine AS prod
+FROM node:24-trixie-slim AS prod
 LABEL org.opencontainers.image.title="Shelfmark" \
       org.opencontainers.image.description="Shelfmark API: the book catalog"
-# pdftotext, for the CIP index's weekly refresh (server/src/cip/refresh.ts).
-RUN apk add --no-cache poppler-utils
-# wget, for the healthcheck below, ships in node:alpine's busybox.
+# pdftotext, for the CIP index's weekly refresh (server/src/features/lookup/cip/refresh.ts).
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends poppler-utils \
+ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=proddeps /app/node_modules ./node_modules
 COPY package.json ./
@@ -98,15 +118,23 @@ COPY server/vendor ./server/vendor
 # tsc compiles src/**/* including the tests. They import a runner that
 # --omit=dev never installed, so shipping them is dead weight.
 RUN find ./server/dist ./shared/dist \( -name '*.test.js' -o -name '*.test.js.map' -o -name '*.test.d.ts' \) -delete
+# MALLOC_ARENA_MAX: glibc gives each thread that allocates its own malloc arena and
+# keeps them, so the API's resident memory grows with every burst of outbound
+# requests (decompression runs on libuv's threads); two arenas bound that, the
+# common setting for Node on glibc. Measured 2026-11-23: 13 Open Library searches
+# grew the process by 46 MB with the default, 31 MB with 2.
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
     PORT=8796 \
-    DATA_DIR=/data
-# The book database and covers (shelfmark.db). A BIND MOUNT on the VPS (the host's
+    DATA_DIR=/data \
+    MALLOC_ARENA_MAX=2
+# The book database and covers (shelfmark.db), and the model's files (models/, 23 MB,
+# downloaded on the first Similar refresh). A BIND MOUNT on the VPS (the host's
 # /srv/shelfmark-api/data), so it survives every deploy.
 VOLUME /data
 EXPOSE 8796
-# Shell form, so it follows the runtime PORT rather than a baked constant.
+# Shell form, so it follows the runtime PORT rather than a baked constant. Node's own
+# fetch: the Debian image has no wget or curl, and installing one for this is a package more.
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s \
-  CMD wget -qO- "http://127.0.0.1:${PORT}/api/health" || exit 1
+  CMD node -e "fetch('http://127.0.0.1:${PORT}/api/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
 CMD ["node", "server/dist/server.js"]

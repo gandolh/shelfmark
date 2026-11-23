@@ -5,10 +5,11 @@ import { array, record } from "../lookup/index.js";
 import { titleKey, workKeyOf } from "./keys.js";
 
 /**
- * Recommendations, dismissals and what the library knows (brief 04, step 6).
- * The list is the last one only: an import appends, a refresh replaces its
- * source's rows. Each read of the list drops what the library has gained
- * since, so no card is ever a book in the database.
+ * Recommendations, dismissals and what the library knows. The list is the
+ * last one only: an import appends, a refresh replaces its source's rows.
+ * Each read of the list drops what the library has gained since, so no card
+ * is ever a book in the database. A work is one row: an import takes over a
+ * row another source listed, and a refresh leaves Claude's rows alone.
  */
 
 export interface StoredRecommendation {
@@ -26,12 +27,31 @@ export interface StoredRecommendation {
   score: number;
 }
 
+/** A book as the Similar profile reads it: both collections, with every reader's status and best rating. */
+export interface LibraryBook {
+  title: string;
+  subtitle: string | null;
+  authors: readonly string[];
+  subjects: readonly string[];
+  tags: readonly string[];
+  language: string | null;
+  collection: "owned" | "wishlist";
+  /** The highest rating anyone gave it, or `null`. */
+  bestRating: number | null;
+  /** Each reader's status that says something; a book nobody marked has none. */
+  statuses: readonly string[];
+}
+
 export interface RecommendationStore {
   /** What the library and the dismissals know, for the dedup. */
   known(): Known;
-  /** The list, minus anything now known, highest score first, at most `limit`. */
+  /** Every book, for the Similar profile. */
+  library(): LibraryBook[];
+  /** The source of each listed row, by its key and by its title key. */
+  listedSources(): Map<string, RecommendationSource>;
+  /** The list, minus anything now known, highest score first, at most `limit` from each source. */
   list(limit: number): Recommendation[];
-  /** Adds picks; a pick whose key is already listed keeps its place and gains its reasons. */
+  /** Adds picks; a pick whose key is already listed takes the row over: its source, reasons and score. */
   append(picks: readonly StoredRecommendation[]): void;
   /** Replaces one source's rows in a single transaction. */
   replaceSource(source: RecommendationSource, picks: readonly StoredRecommendation[]): void;
@@ -90,7 +110,30 @@ export function createRecommendationStore(db: Db, now: () => Date = () => new Da
   const insert = db.prepare(`
     INSERT INTO recommendations (key, title, authors, year, language, cover_url, isbn13, isbns, title_key, reasons, source, score, refreshed_at)
     VALUES (@key, @title, @authors, @year, @language, @coverUrl, @isbn13, @isbns, @titleKey, @reasons, @source, @score, @at)
-    ON CONFLICT (key) DO UPDATE SET reasons = excluded.reasons`);
+    ON CONFLICT (key) DO UPDATE SET
+      reasons = excluded.reasons, source = excluded.source, score = excluded.score, refreshed_at = excluded.refreshed_at`);
+  const sources = db.prepare<[], { key: string; title_key: string; source: RecommendationSource }>(
+    "SELECT key, title_key, source FROM recommendations",
+  );
+  const library = db.prepare<
+    [],
+    {
+      title: string;
+      subtitle: string | null;
+      authors: string;
+      subjects: string;
+      tags: string;
+      language: string | null;
+      collection: "owned" | "wishlist";
+      best_rating: number | null;
+      statuses: string;
+    }
+  >(`
+    SELECT b.title, b.subtitle, b.authors, b.subjects, b.language, b.collection,
+      (SELECT json_group_array(t.name) FROM book_tags bt JOIN tags t ON t.id = bt.tag_id WHERE bt.book_id = b.id) AS tags,
+      (SELECT max(r.rating) FROM readings r WHERE r.book_id = b.id) AS best_rating,
+      (SELECT json_group_array(r.status) FROM readings r WHERE r.book_id = b.id AND r.status <> 'unread') AS statuses
+    FROM books b ORDER BY b.id`);
   const remove = db.prepare<[string]>("DELETE FROM recommendations WHERE key = ?");
   const removeSource = db.prepare<[string]>("DELETE FROM recommendations WHERE source = ?");
   const dismiss = db.prepare<[string, string, string]>(
@@ -134,10 +177,33 @@ export function createRecommendationStore(db: Db, now: () => Date = () => new Da
 
   return {
     known,
+    library: () =>
+      library.all().map((row) => ({
+        title: row.title,
+        subtitle: row.subtitle,
+        authors: strings(row.authors),
+        subjects: strings(row.subjects),
+        tags: strings(row.tags),
+        language: row.language,
+        collection: row.collection,
+        bestRating: row.best_rating,
+        statuses: strings(row.statuses),
+      })),
+    listedSources() {
+      const out = new Map<string, RecommendationSource>();
+      for (const row of sources.all()) {
+        out.set(row.key, row.source);
+        out.set(`t:${row.title_key}`, row.source);
+      }
+      return out;
+    },
     list(limit) {
       const have = known();
       const out: Recommendation[] = [];
+      const perSource = new Map<RecommendationSource, number>();
       for (const row of rows.all()) {
+        const taken = perSource.get(row.source) ?? 0;
+        if (taken === limit) continue;
         const isbns = strings(row.isbns);
         const workKey = row.key.startsWith("t:") ? null : row.key;
         const authors = strings(row.authors);
@@ -163,7 +229,7 @@ export function createRecommendationStore(db: Db, now: () => Date = () => new Da
             openLibraryUrl: workKey === null ? null : `https://openlibrary.org/works/${workKey}`,
           }),
         );
-        if (out.length === limit) break;
+        perSource.set(row.source, taken + 1);
       }
       return out;
     },

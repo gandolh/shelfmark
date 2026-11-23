@@ -32,6 +32,15 @@ export function titleStem(title: string): string {
   return words.replace(LEADING_ARTICLE, "");
 }
 
+/**
+ * A title stem that also matches Romanian's older spelling: "â" and "î" are
+ * one sound, and books printed before 1993 write "spînzuraților" where newer
+ * ones write "spânzuraților".
+ */
+export function looseStem(title: string): string {
+  return titleStem(title.replace(/â/g, "î").replace(/Â/g, "Î"));
+}
+
 /** The title key: the stem plus the first author's surname. A book with no author is its stem alone. */
 export function titleKey(title: string, authors: readonly string[]): string {
   const stem = titleStem(title);
