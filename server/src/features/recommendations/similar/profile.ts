@@ -25,7 +25,11 @@ export interface Profile {
   seeds: Seed[];
   /** Every author of a seed, by summed weight, heaviest first. */
   authors: string[];
-  /** Subjects and tags at least two seeds share, by summed weight, generic ones left out. */
+  /**
+   * Catalog subjects at least two seeds share, by summed weight, generic ones
+   * left out. Never the owner's own tags: those stay on the server (the model
+   * reads them), since a search must not carry what the owner wrote.
+   */
   subjects: string[];
   /** The languages the library's books are in. */
   languages: ReadonlySet<string>;
@@ -129,7 +133,7 @@ export function profileOf(books: readonly LibraryBook[]): Profile {
   }
   for (const { book, weight } of weighed) {
     for (const author of book.authors) tally(authors, author, weight);
-    for (const topic of new Set([...book.subjects, ...book.tags])) if (!generic(topic)) tally(subjects, topic, weight);
+    for (const subject of new Set(book.subjects)) if (!generic(subject)) tally(subjects, subject, weight);
   }
 
   return {

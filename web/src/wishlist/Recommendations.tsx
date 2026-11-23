@@ -213,7 +213,11 @@ function SourceList({ recs, source }: { recs: RecommendationsState; source: Reco
       </p>
     );
   }
-  if (items.length === 0) return <p className={cn(TEXT, "mt-5 max-w-prose")}>{EMPTY[source]}</p>;
+  if (items.length === 0) {
+    // While the first search runs, its status line says enough.
+    if (source === "similar" && recs.refresh?.state === "running") return null;
+    return <p className={cn(TEXT, "mt-5 max-w-prose")}>{EMPTY[source]}</p>;
+  }
 
   return (
     <>

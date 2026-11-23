@@ -111,7 +111,8 @@ describe("the profile", () => {
     expect(profile.seeds.map((seed) => seed.title)).toEqual(["Loved", "Unread", "Also unread"]);
     expect(profile.authors[0]).toBe("Mihail Sadoveanu");
     // "Fiction" names no topic; "Sea stories" is shared by two kept books (the disliked one counts for nothing).
-    expect(profile.subjects).toEqual(["war", "Sea stories"]);
+    // "war" is the owner's own tag on two books: the model reads it, but it is never searched for.
+    expect(profile.subjects).toEqual(["Sea stories"]);
     expect(profile.authorLanguages.get("sadoveanu")).toEqual(new Set(["ro"]));
     expect(profile.seeds[0]?.text).toBe("Loved. Mihail Sadoveanu. war");
   });
@@ -293,8 +294,9 @@ describe("the Similar refresh", () => {
 
     expect(job.state()).toMatchObject({ state: "done", added: 3, message: null });
     expect(serialize(refreshJobSchema, job.state())).toBe(JSON.stringify(job.state()));
-    // Two authors and one shared tag: three searches.
-    expect(fetch.calls).toHaveLength(3);
+    // Two authors; the tag both books share stays on the server: two searches, neither naming it.
+    expect(fetch.calls).toHaveLength(2);
+    expect(fetch.calls.some((call) => call.url.searchParams.has("subject"))).toBe(false);
     const list = store.list(30);
     // Moby-Dick is on a shelf, so it never shows.
     expect(list.map((item) => item.title).sort()).toEqual(["Billy Budd", "Shirley", "Typee"]);
@@ -330,6 +332,39 @@ describe("the Similar refresh", () => {
     await job.settled();
     expect(store.list(30).filter((item) => item.source === "similar")).toHaveLength(job.state().added);
     expect(store.list(30).filter((item) => item.source === "claude")).toHaveLength(1);
+  });
+
+  it("leaves a work to Claude when an import lists it while the model runs", async () => {
+    const db = open();
+    insertBook(db, "Moby-Dick", ["Herman Melville"], { rating: 5 });
+    const store = createRecommendationStore(db);
+    const words = fakeEmbedder();
+    const importing: Embedder = {
+      async embed(texts, onProgress, signal) {
+        store.append([
+          {
+            key: "OL11W",
+            workKey: "OL11W",
+            title: "Typee",
+            authors: ["Herman Melville"],
+            year: 1846,
+            language: "en",
+            coverUrl: null,
+            isbns: [],
+            reasons: ["Claude's reason."],
+            source: "claude",
+            score: 0,
+          },
+        ]);
+        return words.embed(texts, onProgress, signal);
+      },
+    };
+    const { job } = setup(db, importing);
+    job.start();
+    await job.settled();
+    const typee = store.list(30).filter((item) => item.title === "Typee");
+    expect(typee).toEqual([expect.objectContaining({ source: "claude", reasons: ["Claude's reason."] })]);
+    expect(job.state().added).toBe(store.list(30).filter((item) => item.source === "similar").length);
   });
 
   it("says there is nothing to compare when the library is empty", async () => {

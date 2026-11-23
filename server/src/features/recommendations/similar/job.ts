@@ -108,8 +108,14 @@ export function createRefreshJob({ catalog, store, embedder, log }: RefreshJobDe
       score,
     }));
     if (signal.aborted) return;
-    store.replaceSource("similar", rows);
-    finish(rows.length, null);
+    // An import may have finished while the model ran: a work it listed stays Claude's.
+    const nowListed = store.listedSources();
+    const stillOurs = rows.filter((row) => {
+      const source = nowListed.get(row.key) ?? nowListed.get(`t:${titleKey(row.title, row.authors)}`);
+      return source === undefined || source === "similar";
+    });
+    store.replaceSource("similar", stillOurs);
+    finish(stillOurs.length, null);
   }
 
   return {
