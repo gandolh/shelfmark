@@ -132,5 +132,8 @@ estate calls of 2026-11-09. The product calls are in
 
 ## Todos
 
-None open. The Atrium link and the pinned bulk bar were dropped on
-2026-10-23 (their todos record why).
+- [Enter waits for the keyboard to finish a word](../todos/enter-waits-for-the-keyboard-to-finish-a-word.md)
+  (2026-11-23, unverified): the tags field and the shelf picker act on an Enter the phone keyboard is still
+  composing. Confirm on Android first.
+
+The Atrium link and the pinned bulk bar were dropped on 2026-10-23 (their todos record why).

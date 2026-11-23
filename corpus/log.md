@@ -877,3 +877,9 @@ The owner asked to try all-MiniLM-L6-v2 through transformers.js, kept as an opti
 
 A review before hand-back found the Similar refresh sending the owner's own tags to Open Library as `subject=` searches (a demo tag, "school", sat in the catalog cache), against brief 04's rule that nothing about the library leaves the box except by the owner's download. Only catalog subjects and authors are searched now; the tags stay in what the model reads (`5e7636d`). The same commit re-reads the listed sources before a refresh stores, so a Claude import that finishes while the model runs keeps its row, and hides the empty Similar line while the first search runs. Checked after: the first press in a browser at 1280 light and 390 dark on demo data with no Similar rows (opens on From Claude, which had books; *Find similar books*, "Asking Open Library, 0 of 24…", "Found 30 similar books." in 7 to 13 s); the phone dialog's Close is reached by scrolling the sheet; the committed `HEAD` built from `git archive` and run through `infrastructure/docker-compose.yml` reports `healthy` with the `node` healthcheck, has `pdftotext` 25.03 and `MALLOC_ARENA_MAX=2`, and ran a refresh (container about 310 MB at the model's peak, 99 MB right after). vps-deploy sets no memory cap on Shelfmark's stack. `npm run check` exit 0 (942 tests).
 
+
+## [2026-11-23] todo | Enter waits for the keyboard to finish a word
+
+From the modern-web-guidance research (my-personal-skills): `TagsField` and `ShelfPicker` act on Enter with no
+composition check, so a phone keyboard's half-finished word may become a chip. Unverified; the
+[todo](todos/enter-waits-for-the-keyboard-to-finish-a-word.md) starts with a check on Android.
