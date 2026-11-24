@@ -19,7 +19,7 @@ Four things in `infrastructure/Dockerfile`:
   glibc for onnxruntime-node; bookworm has glibc 2.36, and onnxruntime-node ships manylinux binaries, so it
   should load there. Bookworm also ships `poppler-utils`, though an older poppler than trixie's, and the CIP
   refresh parses `pdftotext -layout` output (`server/src/features/lookup/cip/parse.ts`).
-- **The `deps` stage installs every workspace** (`RUN npm ci`, line 47) to run `npx tsc -b server` (line 58). The
+- **The `deps` stage installs every workspace** (`RUN npm ci`, line 47) to run `npx tsc -b server` (line 56). The
   web app's tree is installed for nothing. Measured on the laptop on 2026-11-24: the full install is 916 MB of
   `node_modules`; the server's closure plus the root's dev dependencies is about 720 MB, so about 196 MB less per
   cold build.
