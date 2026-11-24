@@ -66,3 +66,7 @@ already do this (`event.nativeEvent.isComposing` in satchel's composer, `event.i
 - Settled 2026-11-25 (owner): promote it.
 - Mine (technical): build the guard before the phone check, since it is harmless when there is no bug; a shared
   helper instead of two inline checks; helper test only, no DOM test environment.
+
+## Outcome (2026-11-25)
+
+Built as written. `isComposingKey` in `web/src/lib/ime.ts` (three-case unit test); `TagsField` and `ShelfPicker` return from the Enter branch before `preventDefault` when it is true. Commit 9d53b7f. Web client only. The Android phone check is the owner's.

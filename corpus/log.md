@@ -900,3 +900,6 @@ The owner tried Similar books on the real library and kept it as built ("Lgtm. I
 
 ## 2026-11-25 brief 18
 `npm run check` now runs through `scripts/check.mjs` (copied from lantern): every step runs after a failure, one line per step, the whole output in `node_modules/.cache/check/last.log`. Prettier and dependency-cruiser got caches; `scripts` joined the ESLint scripts option. Done, nothing to deploy.
+
+## 2026-11-25 brief 19
+Enter in the Tags field and the shelf picker now waits while the keyboard is composing a word (`isComposingKey`, `web/src/lib/ime.ts`). Ready for deploy (web client only); the Android phone check is the owner's.

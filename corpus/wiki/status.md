@@ -39,6 +39,7 @@ estate calls of 2026-11-09. The product calls are in
 - **Each reader on the page** (2026-11-17, brief 12, the web). "Your status" and "Your rating" on every control, filter and header; the other readers under them on the book page, one line each; a Readers column in the Library, on by default, that neither sorts nor filters. Built on local `main`, not pushed, not deployed: `node cli.ts shelfmark server` built from this commit (the saved views' column list is shared), then `node cli.ts shelfmark deploy`. Readers joins a saved column order after Your status (brief 15, 2026-11-19).
 
 - **One-pass check** (2026-11-25, brief 18). `npm run check` runs every step through `scripts/check.mjs` and keeps its log in `node_modules/.cache/check/last.log`; local `main`, nothing to deploy.
+- **Enter and the keyboard** (2026-11-25, brief 19). Tags and the shelf picker ignore an Enter that belongs to a composing keyboard; local `main`, web client only (`node cli.ts shelfmark deploy`); owner step: the Android check in [the brief](../briefs/done/19-enter-waits-for-the-keyboard-to-finish-a-word.md).
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
 - **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app
