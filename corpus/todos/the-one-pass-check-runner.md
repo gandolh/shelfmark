@@ -7,7 +7,7 @@ tags: [harness]
 
 # The one-pass check runner and the ESLint scripts option
 
-Promoted 2026-11-25 to [brief 18](../briefs/done/18-the-one-pass-check-runner.md).
+Promoted 2026-11-24 to [brief 18](../briefs/done/18-the-one-pass-check-runner.md).
 
 On 2026-11-23 the estate's other app repos got a `scripts/check.mjs` runner for `npm run check` (every step runs even
 after one fails, one line per step, the whole log kept in `node_modules/.cache/check/last.log`), Prettier's check

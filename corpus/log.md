@@ -895,11 +895,11 @@ the toolchain line matches the other Debian images. Ships with `node cli.ts shel
 ## 2026-11-24 brief 17
 The image moved to node:24.22.1-bookworm-slim (runtime) and a pinned alpine (build); the build installs only the server closure (915 to 721 MB). Model and CIP parse verified on bookworm. 488 MB to 463 MB. Ready for deploy.
 
-## 2026-11-25 Similar books kept
+## 2026-11-24 Similar books kept
 The owner tried Similar books on the real library and kept it as built ("Lgtm. I tested it. I like it."): the tab stays, the model stays on the server, and the image size and a refresh's short memory peak are fine for the box. Brief 16's two questions answered on the board.
 
-## 2026-11-25 brief 18
+## 2026-11-24 brief 18
 `npm run check` now runs through `scripts/check.mjs` (copied from lantern): every step runs after a failure, one line per step, the whole output in `node_modules/.cache/check/last.log`. Prettier and dependency-cruiser got caches; `scripts` joined the ESLint scripts option. Done, nothing to deploy.
 
-## 2026-11-25 brief 19
+## 2026-11-24 brief 19
 Enter in the Tags field and the shelf picker now waits while the keyboard is composing a word (`isComposingKey`, `web/src/lib/ime.ts`). Ready for deploy (web client only); the Android phone check is the owner's.

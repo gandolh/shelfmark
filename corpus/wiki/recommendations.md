@@ -6,7 +6,7 @@ updated: 2026-11-23
 # Recommendations
 
 Brief 04 built the Claude path (2026-11-11); brief 16 added Similar books and the tabs (2026-11-23). The owner tried
-Similar books on the real library on 2026-11-25 and kept it as built: the tab stays, and the model stays on the server
+Similar books on the real library on 2026-11-24 and kept it as built: the tab stays, and the model stays on the server
 (the bigger image and a refresh's few seconds near 430 MB are fine for the box; no move to the browser). The owner's rule: **a recommendation is never a book already in the database.**
 
 ## The page
