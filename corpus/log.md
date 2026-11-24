@@ -894,3 +894,6 @@ the toolchain line matches the other Debian images. Ships with `node cli.ts shel
 
 ## 2026-11-24 brief 17
 The image moved to node:24.22.1-bookworm-slim (runtime) and a pinned alpine (build); the build installs only the server closure (915 to 721 MB). Model and CIP parse verified on bookworm. 488 MB to 463 MB. Ready for deploy.
+
+## 2026-11-25 Similar books kept
+The owner tried Similar books on the real library and kept it as built ("Lgtm. I tested it. I like it."): the tab stays, the model stays on the server, and the image size and a refresh's short memory peak are fine for the box. Brief 16's two questions answered on the board.

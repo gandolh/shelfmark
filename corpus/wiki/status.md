@@ -1,5 +1,5 @@
 ---
-summary: Snapshot as of 2026-11-04, per area; the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed; each reader their own status and rating (briefs 11, server, and 12, web) built on local main 2026-11-17, not deployed; Similar books (brief 16) built on local main 2026-11-23, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
+summary: Snapshot as of 2026-11-04, per area (Similar books judged 2026-11-25: kept); the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed; each reader their own status and rating (briefs 11, server, and 12, web) built on local main 2026-11-17, not deployed; Similar books (brief 16) built on local main 2026-11-23, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
 updated: 2026-11-23
 ---
 
@@ -82,12 +82,6 @@ estate calls of 2026-11-09. The product calls are in
 
 ## Next (owner)
 
-0. **Deploy brief 16 and judge Similar books** (server and web): back up the database first,
-   then from `vps-deploy` `node cli.ts shelfmark server` and `node cli.ts shelfmark deploy`. The
-   image is 488 MB (was 278 MB); the box downloads the model (23 MB) into the data folder on the
-   first *Find similar books*, and a refresh holds about 430 MB for its few seconds. Then on the
-   Wishlist, Similar books tab: press *Find similar books* (a minute or two the first time), and
-   count how many of the first ten you'd want. Keep the tab, or say the word and it goes.
 1. **Deploy briefs 02 and 03** (web only, no server change), from
    `vps-deploy`: `node cli.ts shelfmark deploy`. It also brings brief 01's
    pages if they weren't live yet. Then on the Android phone: the white
