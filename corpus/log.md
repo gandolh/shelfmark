@@ -883,3 +883,11 @@ A review before hand-back found the Similar refresh sending the owner's own tags
 From the modern-web-guidance research (my-personal-skills): `TagsField` and `ShelfPicker` act on Enter with no
 composition check, so a phone keyboard's half-finished word may become a chip. Unverified; the
 [todo](todos/enter-waits-for-the-keyboard-to-finish-a-word.md) starts with a check on Android.
+
+## [2026-11-24] todo | Brief 17 from the infra review of 2026-11-24
+
+Filed from the estate's infra review. The runtime stages move from trixie to `node:24.22.1-bookworm-slim`, the
+base the other Debian images share (about 230 MB of unshared base off the box), after checking that the model
+loads and the CIP parse matches; trixie stays if either fails. The `deps` stage installs only the server's
+closure (about 196 MB less build cache per cold build), the alpine base is pinned to `node:24.22.1-alpine`, and
+the toolchain line matches the other Debian images. Ships with `node cli.ts shelfmark server`.
