@@ -12,7 +12,7 @@ export default [
     server: "server/src",
     // Scripts run by hand, which print and read the environment directly: the repo's own, the docs
     // capture helper and the OCR fixture recorder.
-    scripts: ["server/scripts", "docs/images", "web/src/ocr/fixtures"],
+    scripts: ["scripts", "server/scripts", "docs/images", "web/src/ocr/fixtures"],
     // Allowed to print: the server entry, the seed and the CIP refresh talk to the person running them.
     console: ["server/src/server.ts", "server/src/seed.ts", "server/src/features/lookup/cip/cli.ts"],
     // ScannerDemo is loaded with lazy(import()), which reads `default`.
