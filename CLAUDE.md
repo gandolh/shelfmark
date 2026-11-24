@@ -22,9 +22,9 @@ API and SQLite. Read [corpus/index.md](corpus/index.md) first.
   `tsc -p web --noEmit`.
 - `shared/dist` must exist before the tests: `pretest` builds it.
 - `.env` sits at the repo root, not in `server/`. Production listens on 8796.
-- The build is `npm ci` and `npx tsc -b server` (the Dockerfile). The
-  Dockerfile copies only `tsconfig.base.json`, so the house compiler flags live
-  there and not in an extended file.
+- The build is `npm ci -w @shelfmark/server --include-workspace-root` and `npx tsc -b server` (the Dockerfile; the
+  web app's tree is not installed). The Dockerfile copies only `tsconfig.base.json`, so the house compiler flags
+  live there and not in an extended file.
 - `vendor/house-style/`, `server/vendor/` and `web/vendor/` are generated
   copies. Never edit them; `npm run house-style:sync` refreshes the first.
 - `check:conventions` runs knip, dependency-cruiser and the two house

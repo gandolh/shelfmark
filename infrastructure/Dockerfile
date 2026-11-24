@@ -5,7 +5,7 @@
 # in build stages and never reach the runtime image. The web app is a static
 # site that vps-deploy builds and ships separately; it is not in this image.
 #
-# The runtime stages are Debian (glibc), not Alpine (musl): the Similar
+# The runtime stages are Debian bookworm (glibc), not Alpine (musl): the Similar
 # recommendations run all-MiniLM-L6-v2 through transformers.js, whose
 # onnxruntime-node ships Linux binaries for glibc only, and on Alpine its import
 # fails ("ld-linux-x86-64.so.2"). The compile stages stay on Alpine; they only
@@ -29,22 +29,28 @@
 # service could not write its own database.
 
 # ---------------------------------------------------------------------------
-# deps — full workspace install, with the toolchain native modules may need
+# deps — the server's install (its closure plus the root's dev tools), with the toolchain native modules may need
 # ---------------------------------------------------------------------------
-FROM node:24-alpine AS deps
+FROM node:24.22.1-alpine AS deps
 # better-sqlite3 13 ships Node-API prebuilds including linuxmusl-x64, so this is
 # a fallback rather than the normal path — but a version bump that drops the
 # musl prebuild would otherwise fail the build with a cryptic node-gyp error.
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
+# The bases are pinned to one patch (the estate moves them in one sweep), so a
+# rebuild reuses its cache until the pin changes. Bookworm is the Debian the
+# estate's other images share.
+#
 # Manifests first, for layer caching: one root lockfile, one npm ci. Every
 # workspace manifest is needed because `npm ci` validates the lockfile against
-# every workspace the root package.json declares and bails on a missing one.
+# every workspace the root package.json declares and bails on a missing one. The
+# install itself is scoped to the server (shared comes with it): tsc -b server
+# never needs the web app's tree.
 COPY package.json package-lock.json .npmrc tsconfig.base.json ./
 COPY shared/package.json ./shared/
 COPY server/package.json ./server/
 COPY web/package.json ./web/
-RUN npm ci
+RUN npm ci -w @shelfmark/server --include-workspace-root
 
 # ---------------------------------------------------------------------------
 # builder — compile shared and the server (tsc -b → shared/dist, server/dist)
@@ -58,9 +64,9 @@ RUN npx tsc -b server
 # ---------------------------------------------------------------------------
 # proddeps — runtime dependencies only, native modules built here
 # ---------------------------------------------------------------------------
-FROM node:24-trixie-slim AS proddeps
+FROM node:24.22.1-bookworm-slim AS proddeps
 RUN apt-get update \
- && apt-get install -y --no-install-recommends python3 make g++ \
+ && apt-get install -y --no-install-recommends python3 make g++ ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY package.json package-lock.json .npmrc ./
@@ -98,7 +104,7 @@ RUN cd node_modules \
 # ---------------------------------------------------------------------------
 # prod — slim runtime: no compiler, no test code, no TypeScript
 # ---------------------------------------------------------------------------
-FROM node:24-trixie-slim AS prod
+FROM node:24.22.1-bookworm-slim AS prod
 LABEL org.opencontainers.image.title="Shelfmark" \
       org.opencontainers.image.description="Shelfmark API: the book catalog"
 # pdftotext, for the CIP index's weekly refresh (server/src/features/lookup/cip/refresh.ts).
