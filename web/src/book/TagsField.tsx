@@ -1,6 +1,7 @@
 import { useId, useState, type KeyboardEvent } from "react";
 import { ClearIcon } from "../components/icons";
 import { addToList } from "./patch";
+import { isComposingKey } from "../lib/ime";
 
 export interface TagsFieldProps {
   label: string;
@@ -29,6 +30,8 @@ export function TagsField({ label, value, onChange, suggestions = [], hint, disa
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
+      // The keyboard owns an Enter that picks or ends a composed word.
+      if (isComposingKey(event)) return;
       // Enter here adds the chip; it must not save the form.
       event.preventDefault();
       commit(text);

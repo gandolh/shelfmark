@@ -2,6 +2,7 @@ import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { Toggle, ToggleGroup } from "../components/ui/ToggleGroup";
 import { PlusIcon } from "./icons";
 import { matchShelf, normalizeShelf } from "./shelves";
+import { isComposingKey } from "../lib/ime";
 
 export interface ShelfPickerProps {
   /** The chosen shelf, or `null` for none. */
@@ -53,6 +54,8 @@ export function ShelfPicker({ value, onChange, shelves, limit = 6, label = "Shel
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
+      // The keyboard owns an Enter that picks or ends a composed word.
+      if (isComposingKey(event)) return;
       // Keep the form from submitting: Enter here means "this shelf".
       event.preventDefault();
       close();
