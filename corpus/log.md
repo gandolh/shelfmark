@@ -897,3 +897,6 @@ The image moved to node:24.22.1-bookworm-slim (runtime) and a pinned alpine (bui
 
 ## 2026-11-25 Similar books kept
 The owner tried Similar books on the real library and kept it as built ("Lgtm. I tested it. I like it."): the tab stays, the model stays on the server, and the image size and a refresh's short memory peak are fine for the box. Brief 16's two questions answered on the board.
+
+## 2026-11-25 brief 18
+`npm run check` now runs through `scripts/check.mjs` (copied from lantern): every step runs after a failure, one line per step, the whole output in `node_modules/.cache/check/last.log`. Prettier and dependency-cruiser got caches; `scripts` joined the ESLint scripts option. Done, nothing to deploy.

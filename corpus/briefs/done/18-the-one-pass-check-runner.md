@@ -70,3 +70,7 @@ None.
 
 - Settled 2026-11-25 (owner): promote it.
 - Mine (technical): copy Lantern's file verbatim rather than adapt it; keep the existing step order.
+
+## Outcome (2026-11-25)
+
+Built as written. `scripts/check.mjs` is lantern's file unchanged; `check`, `format:check` and `check:conventions` got the runner and the two caches; `scripts` joined the ESLint `scripts` option; the root `CLAUDE.md` bullet was replaced. `check:conventions` keeps shelfmark's `--warn-only` on check-structure. `npm run check` passes; with a deliberate lint error it still ran the later steps and exited 1. Commit 9978fb6.
