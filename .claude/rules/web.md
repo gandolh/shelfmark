@@ -8,6 +8,9 @@ paths:
 - Read [DESIGN.md](../../DESIGN.md) and
   [corpus/wiki/overlays.md](../../corpus/wiki/overlays.md) before you add or
   change a component.
+- Browsers: Chrome on Android decides what to build; Safari on iPhone,
+  Firefox and desktop Safari must keep working. Before you use a platform
+  feature newer than Baseline Widely available, read the `web-platform` skill.
 - Base UI sits under the menus, panels, dialog and switches
   ([corpus/wiki/decisions.md](../../corpus/wiki/decisions.md)). Native
   checkboxes, radios and selects stay native.
