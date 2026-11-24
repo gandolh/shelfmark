@@ -93,3 +93,15 @@ change, run the checks, and hand back with steps 2, 4 and 5 for the controller.
 ## Owner steps
 
 - `node cli.ts shelfmark server` from vps-deploy. The deploy builds the image on the box.
+
+## Outcome (2026-11-24)
+
+Built on local `main`: `cadb1a8`. Not pushed, not deployed.
+
+- **Scoped install (step 1).** Full `npm ci`: 915 MB of `node_modules`; `npm ci -w @shelfmark/server --include-workspace-root`: 721 MB. `npx tsc -b server` compiles; no missing workspace.
+- **Bookworm (step 2).** `node:24.22.1-bookworm-slim` loads `onnxruntime-node` (and trixie does too). One CIP issue (2026-08, one download) through `pdftotext -layout`: poppler 22.12.0 (bookworm) and 25.03.0 (trixie) print byte-identical text; the server's parser gives 1,954 records on both, the same first and last. No fallback needed.
+- **Dockerfile.** `deps`/`builder` on `node:24.22.1-alpine`, `proddeps`/`prod` on `node:24.22.1-bookworm-slim`, `ca-certificates` on the toolchain line as the other Debian images write it, the scoped `npm ci`, header names bookworm; `MALLOC_ARENA_MAX=2` kept. `CLAUDE.md` and `decisions-engineering.md` updated.
+- **Image sizes, one machine** (`docker history` saved in the run's scratch folder): trixie 488 MB, bookworm 463 MB (target `prod`).
+- **Walk (step 5)** on a scratch data folder with no Google key: healthy, `/api/health` answers; a Similar refresh on 4 hand-entered books ran the model and listed 30 books (Open Library only); the CIP refresh of 2026-08 stored 1,954 records. The container used about 105 MB after the refresh.
+- **Checks.** `npm run check` exit 0 (942 tests); `bash corpus/lint.sh` clean (6 existing warnings).
+- **Not measured.** The cold build time and cache size on the box.

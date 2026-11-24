@@ -891,3 +891,6 @@ base the other Debian images share (about 230 MB of unshared base off the box), 
 loads and the CIP parse matches; trixie stays if either fails. The `deps` stage installs only the server's
 closure (about 196 MB less build cache per cold build), the alpine base is pinned to `node:24.22.1-alpine`, and
 the toolchain line matches the other Debian images. Ships with `node cli.ts shelfmark server`.
+
+## 2026-11-24 brief 17
+The image moved to node:24.22.1-bookworm-slim (runtime) and a pinned alpine (build); the build installs only the server closure (915 to 721 MB). Model and CIP parse verified on bookworm. 488 MB to 463 MB. Ready for deploy.
