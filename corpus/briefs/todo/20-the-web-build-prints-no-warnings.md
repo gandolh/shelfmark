@@ -18,7 +18,8 @@ From `npm run build` on 2026-11-25:
 3. **"inlineDynamicImports option is deprecated"**, while vite-plugin-pwa builds `web/src/sw.ts`. The plugin sets
    `output.inlineDynamicImports: true` itself whenever it builds the worker as an ES module. Version 2.0.0 ships the
    same build file byte for byte (checked 2026-11-25), so upgrading doesn't help. In IIFE format it builds the worker
-   in library mode and doesn't set the option.
+   in library mode and doesn't set the option: a scratch copy built with `rollupFormat: "iife"` on 2026-11-25 printed
+   no deprecation and wrote a plain IIFE `sw.js`.
 
 ## Decisions
 
@@ -54,14 +55,17 @@ All settled. None of them is open.
 
 - [ ] `npm run build` exits 0 and prints no warning; the outcome lists the entry chunk's size before and after.
 - [ ] `npm run check` exits 0.
-- [ ] On the preview build: the service worker installs; after one load the app shell opens offline; the update
+- [ ] The update path from today's worker: serve a build of `main` before this change in the preview, load it so its
+      worker installs, then serve the new build and reload. The update prompt appears, the new worker takes over, and
+      the app works. The outcome says so.
+- [ ] On the preview build from a clean profile: the service worker installs; after one load the app shell opens offline; the update
       prompt still appears after a rebuild; reading a CIP block still caches the OCR files on first use; Ask Claude
       and the account menu's export both still work. No failed chunk request, no console error.
 - [ ] `bash corpus/lint.sh` passes.
 
 ## Owner steps
 
-- `node cli.ts shelfmark all` from vps-deploy.
+- `node cli.ts shelfmark deploy` from vps-deploy (the web build only; the API doesn't change).
 
 ## Owner decisions
 

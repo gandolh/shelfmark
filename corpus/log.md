@@ -907,4 +907,4 @@ Enter in the Tags field and the shelf picker now waits while the keyboard is com
 ## [2026-11-25] todo | Task 20: The web build prints no warnings
 
 Filed from the owner's ask to fix the build warnings in the most active repos (more than 10 commits outside the corpus
-in two days). The web build prints three warnings: the 920 kB entry chunk, an export module imported both lazily and eagerly, and vite-plugin-pwa's deprecated inlineDynamicImports. The entry is split, the export module loads lazily in both places, and the service worker builds as IIFE, since upgrading the plugin doesn't help. Ships with node cli.ts shelfmark all.
+in two days). The web build prints three warnings: the 920 kB entry chunk, an export module imported both lazily and eagerly, and vite-plugin-pwa's deprecated inlineDynamicImports. The entry is split, the export module loads lazily in both places, and the service worker builds as IIFE, since upgrading the plugin doesn't help. Ships with `node cli.ts shelfmark deploy`.
