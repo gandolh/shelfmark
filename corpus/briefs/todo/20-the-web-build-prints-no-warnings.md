@@ -13,9 +13,9 @@ prints three warnings.
 From `npm run build` on 2026-11-25:
 
 1. **"Some chunks are larger than 500 kB"**: the entry chunk `index-*.js` is 920 kB (286 kB gzip).
-2. **`INEFFECTIVE_DYNAMIC_IMPORT`**: `src/export/exportLibrary.ts` is imported dynamically by
-   `src/layout/AccountMenu.tsx` but statically by `src/wishlist/AskClaudeDialog.tsx`, so it stays in the main chunk.
-3. **"inlineDynamicImports option is deprecated"**, while vite-plugin-pwa builds `src/sw.ts`. The plugin sets
+2. **`INEFFECTIVE_DYNAMIC_IMPORT`**: `web/src/export/exportLibrary.ts` is imported dynamically by
+   `web/src/layout/AccountMenu.tsx` but statically by `web/src/wishlist/AskClaudeDialog.tsx`, so it stays in the main chunk.
+3. **"inlineDynamicImports option is deprecated"**, while vite-plugin-pwa builds `web/src/sw.ts`. The plugin sets
    `output.inlineDynamicImports: true` itself whenever it builds the worker as an ES module. Version 2.0.0 ships the
    same build file byte for byte (checked 2026-11-25), so upgrading doesn't help. In IIFE format it builds the worker
    in library mode and doesn't set the option.
