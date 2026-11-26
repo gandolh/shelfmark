@@ -71,3 +71,28 @@ All settled. None of them is open.
 
 - Settled 2026-11-25 (owner): "run build and fix all the warnings for the most active projects". Which repos count
   (more than 10 commits outside the corpus in two days) and how each warning is fixed are the controller's calls.
+
+## Outcome (2026-11-26)
+
+`npm run build` exits 0 and prints no warning. The entry chunk went from 919.84 kB (285.5 kB gzip) to 377.58 kB
+(116.5 kB gzip); the biggest chunk of Shelfmark's own is now that entry, and `chunkSizeWarningLimit` is untouched.
+
+- **What filled the entry** (source bytes per package, from a sourcemap of the old build): the app's own code 850 kB,
+  `@base-ui/react` 679 kB, `react-dom` 545 kB, `zod` 370 kB, `@tanstack/table-core` 202 kB, `tailwind-merge` 106 kB.
+- **Lazy pages**: `web/src/layout/AppShell.tsx` loads Add a book (and Add to the wishlist), Wishlist, a book, Import
+  and Stats with `lazy()` through a small `lazyPage` helper; the Library stays in the entry because it is the first
+  screen. Rolldown then moves what only those pages use (Base UI's menus and dialogs, `zod`, `tailwind-merge`, the
+  table's columns) into shared chunks, the largest `Page-*.js` at 251 kB.
+- **`exportLibrary`** loads on demand in `AskClaudeDialog` as it does in `AccountMenu`; a failed load says so in the
+  dialog's message line instead of an unhandled rejection.
+- **Worker as IIFE**: `injectManifest.rollupFormat: "iife"` in `web/vite.config.ts`. `pwa/register.ts` builds its
+  `Workbox` with no `type: "module"`, so nothing changed there; `dist/sw.js` has no `import`.
+- **Checked on `vite preview` in Chromium, real API with a throwaway account (the `.env` is deleted)**: from a build of
+  `main` before this change, the worker installed and controlled the page; serving the new build and reloading showed
+  "A new version is ready", Reload made the new worker take over and the new entry load, and every route and a book
+  page opened. From a clean profile on the new build: the worker installs and controls after one reload; every route,
+  a book, the account menu's CSV and Excel exports and Ask Claude's download work; reading a CIP block (a generated
+  photo) filled the title and author and left the four OCR files in the `shelfmark-ocr` cache; offline the shell
+  opens (the fonts and the session call fail there, as before). No failed chunk request and no console error while
+  online.
+- Not tried: a phone, and the camera. Ships with `node cli.ts shelfmark deploy` (web only).

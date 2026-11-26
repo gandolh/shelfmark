@@ -2,7 +2,6 @@ import { useRef, useState, type ReactNode } from "react";
 import { useBooks } from "../books/store";
 import { Button } from "../components/Button";
 import { Dialog, DialogActions } from "../components/ui/Dialog";
-import { exportLibrary } from "../export/exportLibrary";
 import { useIsDesktop } from "../layout/viewport";
 import { CLAUDE_PROMPT, readImportText } from "./prompt";
 import type { RecommendationsState } from "./useRecommendations";
@@ -61,6 +60,16 @@ export function AskClaudeDialog({
     }
   };
 
+  // The export's code loads only when the button is pressed.
+  const download = async () => {
+    try {
+      const { exportLibrary } = await import("../export/exportLibrary");
+      await exportLibrary(books, "csv");
+    } catch {
+      setMessage("The library could not be downloaded. Try again.");
+    }
+  };
+
   const submit = async () => {
     const read = readImportText(text);
     if (!read.ok) {
@@ -76,12 +85,7 @@ export function AskClaudeDialog({
         <ol className="flex flex-col gap-5">
           <Step n={1} title="Download your library">
             <p className={TEXT}>A CSV of every book, owned and wished for, to attach in Claude.</p>
-            <Button
-              size="compact"
-              data-autofocus
-              disabled={books.length === 0}
-              onClick={() => void exportLibrary(books, "csv")}
-            >
+            <Button size="compact" data-autofocus disabled={books.length === 0} onClick={() => void download()}>
               Download your library
             </Button>
           </Step>

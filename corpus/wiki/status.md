@@ -1,6 +1,6 @@
 ---
 summary: Snapshot as of 2026-11-04, per area (Similar books judged 2026-11-24: kept); the Covers, typeset redesign (brief 09) built on local main 2026-11-13, web only, not deployed; each reader their own status and rating (briefs 11, server, and 12, web) built on local main 2026-11-17, not deployed; Similar books (brief 16) built on local main 2026-11-23, not deployed. v1 built 2026-10-14/15; Romanian catalogs and the CIP index 2026-10-17; the scanning changes to 2026-10-21; Base UI and the v1.x set 2026-10-23; change the username 2026-10-24; pages in the Library 2026-11-02 (pushed); ten a page, the page's tick box, the full width and a header card 2026-11-04 (built, not deployed); the toolbar on the card and "Export library" in the account menu 2026-11-04 (built, not deployed). Deployed 2026-10-24 and pushed. What waits on the owner (a lookup check, the phone checks on the scanner and the camera readout, the CIP photos, the owner-setup checks).
-updated: 2026-11-23
+updated: 2026-11-26
 ---
 
 # Status
@@ -40,6 +40,7 @@ estate calls of 2026-11-09. The product calls are in
 
 - **One-pass check** (2026-11-24, brief 18). `npm run check` runs every step through `scripts/check.mjs` and keeps its log in `node_modules/.cache/check/last.log`; local `main`, nothing to deploy.
 - **Enter and the keyboard** (2026-11-24, brief 19). Tags and the shelf picker ignore an Enter that belongs to a composing keyboard; local `main`, web client only (`node cli.ts shelfmark deploy`); owner step: the Android check in [the brief](../briefs/done/19-enter-waits-for-the-keyboard-to-finish-a-word.md).
+- **Quiet web build** (2026-11-26, brief 20). `npm run build` prints no warning: pages other than the Library load lazily (entry 920 to 378 kB), `exportLibrary` is lazy in Ask Claude too, and the service worker is an IIFE; local `main`, web client only (`node cli.ts shelfmark deploy`).
 - **House style** (2026-11-11). Prettier at 120, house ESLint, knip, dependency-cruiser, `npm run check` and `check:fast`, the root `CLAUDE.md` and `.claude/rules/`; built on local `main`, not deployed ([decisions.md](decisions.md)).
 
 - **v1** (2026-10-14/15). The book store and API, ISBN utilities, the app
