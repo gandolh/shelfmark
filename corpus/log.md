@@ -908,3 +908,6 @@ Enter in the Tags field and the shelf picker now waits while the keyboard is com
 
 Filed from the owner's ask to fix the build warnings in the most active repos (more than 10 commits outside the corpus
 in two days). The web build prints three warnings: the 920 kB entry chunk, an export module imported both lazily and eagerly, and vite-plugin-pwa's deprecated inlineDynamicImports. The entry is split, the export module loads lazily in both places, and the service worker builds as IIFE, since upgrading the plugin doesn't help. Ships with `node cli.ts shelfmark deploy`.
+
+## 2026-11-26 brief 20
+The web build prints no warning. The entry chunk went from 920 kB to 378 kB: the Add, Wishlist, book, Import and Stats pages load lazily, `exportLibrary` loads on demand in Ask Claude as in the account menu, and the service worker builds as IIFE (`rollupFormat`), which drops vite-plugin-pwa's `inlineDynamicImports` deprecation. The update from the old ES worker, the offline shell, the OCR cache and both exports were checked in Chromium. The board was not updated: brief-board was not available in this session. Ready for deploy (web only).

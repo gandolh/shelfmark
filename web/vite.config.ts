@@ -201,6 +201,11 @@ export default defineConfig(({ mode }) => {
           ],
         },
         injectManifest: {
+          // IIFE, not the ES default: the plugin builds an ES worker with the
+          // deprecated `inlineDynamicImports` option and prints a warning for it.
+          // sw.ts has only static imports, and pwa/register.ts registers it as
+          // a classic script (no `type: "module"`).
+          rollupFormat: "iife",
           // The app shell, and the scanner's zxing .wasm (1.09 MB, under
           // workbox's 2 MiB limit) so scanning starts offline. Nothing of the
           // API is cached here.

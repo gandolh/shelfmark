@@ -1,9 +1,4 @@
 import { lazy, Suspense, useEffect, type ComponentType } from "react";
-import { AddBookPage } from "../add/AddBookPage";
-import { WishlistPage } from "../wishlist/WishlistPage";
-import { BookPage } from "../book/BookPage";
-import { ImportPage } from "../import/ImportPage";
-import { StatsPage } from "../stats/StatsPage";
 import { LibraryPage } from "../library/LibraryPage";
 import {
   LIBRARY,
@@ -23,6 +18,13 @@ import { useIsDesktop } from "./viewport";
 
 type PageComponent<N extends RouteName> = ComponentType<{ params: RouteParams<N> }>;
 
+/** A page loaded on its first visit, from its own chunk. */
+const lazyPage = <P,>(load: () => Promise<ComponentType<P>>) => lazy(async () => ({ default: await load() }));
+
+const AddBookPage = lazyPage(() => import("../add/AddBookPage").then((m) => m.AddBookPage));
+const AddPage = () => <AddBookPage />;
+const AddWishlistPage = () => <AddBookPage target="wishlist" />;
+
 /**
  * Each route's page, one line per route in router.ts's table (the typecheck
  * wants them all). `null` renders nothing: `/login` is the auth gate's,
@@ -32,12 +34,12 @@ type PageComponent<N extends RouteName> = ComponentType<{ params: RouteParams<N>
  */
 const PAGES: { [N in RouteName]: PageComponent<N> | null } = {
   library: LibraryPage,
-  add: () => <AddBookPage />,
-  wishlist: WishlistPage,
-  addWishlist: () => <AddBookPage target="wishlist" />,
-  book: BookPage,
-  import: ImportPage,
-  stats: StatsPage,
+  add: AddPage,
+  wishlist: lazyPage(() => import("../wishlist/WishlistPage").then((m) => m.WishlistPage)),
+  addWishlist: AddWishlistPage,
+  book: lazyPage(() => import("../book/BookPage").then((m) => m.BookPage)),
+  import: lazyPage(() => import("../import/ImportPage").then((m) => m.ImportPage)),
+  stats: lazyPage(() => import("../stats/StatsPage").then((m) => m.StatsPage)),
   login: null,
   devScanner: import.meta.env.DEV ? lazy(() => import("../scanner/ScannerDemo")) : null,
 };
